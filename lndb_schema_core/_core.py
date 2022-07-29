@@ -113,6 +113,13 @@ class jupynb(SQLModel, table=True):  # type: ignore
     time_updated: datetime = Field(default_factory=utcnow, nullable=False)
 
 
+class pipeline(SQLModel, table=True):  # type: ignore
+    """Pipeline interfacing lamindb."""
+
+    id: str = Field(default=None, primary_key=True)
+    v: str = Field(default=None, primary_key=True)
+
+
 # ----------
 # Access log
 # ----------
