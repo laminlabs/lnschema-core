@@ -1,18 +1,18 @@
 from datetime import datetime as datetime
 from enum import Enum
-from typing import Optional
+from typing import Optional, Union
 
 from sqlmodel import Field, ForeignKeyConstraint, SQLModel, UniqueConstraint
 
-from .id import id_dobject, id_track
+from .id import id_dobject, id_dtransform, id_track
 
 
 def utcnow():
     return datetime.utcnow().replace(microsecond=0)
 
 
-class schema_version(SQLModel, table=True):  # type: ignore
-    """Schema version."""
+class lndb_schema_core(SQLModel, table=True):  # type: ignore
+    """Schema module version."""
 
     id: Optional[str] = Field(primary_key=True)
     user_id: str = Field(foreign_key="user.id")
@@ -21,23 +21,11 @@ class schema_version(SQLModel, table=True):  # type: ignore
 
 
 class user(SQLModel, table=True):  # type: ignore
-    """Users operating `lamindb`."""
+    """User operating `lamindb`."""
 
     __table_args__ = (UniqueConstraint("email"),)
     id: Optional[str] = Field(primary_key=True)
     email: str
-    time_created: datetime = Field(default_factory=utcnow, nullable=False)
-    time_updated: datetime = Field(default_factory=utcnow, nullable=False)
-
-
-class jupynb(SQLModel, table=True):  # type: ignore
-    """Jupyter notebook from which users operate `lamindb`."""
-
-    id: str = Field(default=None, primary_key=True)
-    v: str = Field(default=None, primary_key=True)
-    name: Optional[str]
-    type: str  #: Jupyter notebook (nbproject), pipeline, etc.
-    user_id: str = Field(foreign_key="user.id")
     time_created: datetime = Field(default_factory=utcnow, nullable=False)
     time_updated: datetime = Field(default_factory=utcnow, nullable=False)
 
@@ -57,20 +45,71 @@ class dobject(SQLModel, table=True):  # type: ignore
     - .vcf ⟷ ?
     """
 
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ["jupynb_id", "jupynb_v"],
-            ["jupynb.id", "jupynb.v"],
-            name="dobject_jupynb",
-        ),
-    )
-
     id: Optional[str] = Field(default_factory=id_dobject, primary_key=True)
     v: str = Field(default=None, primary_key=True)
     name: Optional[str]
     file_suffix: str
-    jupynb_id: str
-    jupynb_v: str
+    dsource_id: str = Field(foreign_key="dtransform.id")
+    time_created: datetime = Field(default_factory=utcnow, nullable=False)
+    time_updated: datetime = Field(default_factory=utcnow, nullable=False)
+
+
+class dtransform(SQLModel, table=True):  # type: ignore
+    """Data transformation."""
+
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["jupynb_id", "jupynb_v"],
+            ["jupynb.id", "jupynb.v"],
+            name="dtransform_jupynb",
+        ),
+        ForeignKeyConstraint(
+            ["pipeline_id", "pipeline_v"],
+            ["pipeline.id", "pipeline.v"],
+            name="dtransform_pipeline",
+        ),
+    )
+    id: str = Field(default_factory=id_dtransform, primary_key=True)
+    jupynb_id: Union[str, None] = None
+    jupynb_v: Union[str, None] = None
+    pipeline_id: Union[str, None] = None
+    pipeline_v: Union[str, None] = None
+
+
+class dtransform_in(SQLModel, table=True):  # type: ignore
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["dobject_id", "dobject_v"],
+            ["dobject.id", "dobject.v"],
+            name="dtransform_in_dobject",
+        ),
+    )
+    dtransform_id: str = Field(foreign_key="dtransform.id", primary_key=True)
+    dobject_id: str = Field(primary_key=True)
+    dobject_v: str = Field(primary_key=True)
+
+
+class dtransform_out(SQLModel, table=True):  # type: ignore
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["dobject_id", "dobject_v"],
+            ["dobject.id", "dobject.v"],
+            name="dtransform_out_dobject",
+        ),
+    )
+    dtransform_id: str = Field(foreign_key="dtransform.id", primary_key=True)
+    dobject_id: str = Field(primary_key=True)
+    dobject_v: str = Field(primary_key=True)
+
+
+class jupynb(SQLModel, table=True):  # type: ignore
+    """Jupyter notebook from which users operate lamindb."""
+
+    id: str = Field(default=None, primary_key=True)
+    v: str = Field(default=None, primary_key=True)
+    name: Optional[str]
+    type: str  #: Jupyter notebook (nbproject), pipeline, etc.
+    user_id: str = Field(foreign_key="user.id")
     time_created: datetime = Field(default_factory=utcnow, nullable=False)
     time_updated: datetime = Field(default_factory=utcnow, nullable=False)
 

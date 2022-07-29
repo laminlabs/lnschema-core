@@ -2,10 +2,14 @@
 
 __version__ = "0.1.0"  # denote a pre-release for 0.1.0 with 0.1a1
 
+from . import id
 from ._core import (  # noqa
     dobject,
+    dtransform,
+    dtransform_in,
+    dtransform_out,
     jupynb,
-    schema_version,
+    lndb_schema_core,
     track_do,
     track_do_type,
     user,
