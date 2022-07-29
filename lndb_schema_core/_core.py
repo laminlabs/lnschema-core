@@ -108,7 +108,6 @@ class jupynb(SQLModel, table=True):  # type: ignore
     id: str = Field(default=None, primary_key=True)
     v: str = Field(default=None, primary_key=True)
     name: Optional[str]
-    type: str  #: Jupyter notebook (nbproject), pipeline, etc.
     user_id: str = Field(foreign_key="user.id")
     time_created: datetime = Field(default_factory=utcnow, nullable=False)
     time_updated: datetime = Field(default_factory=utcnow, nullable=False)
