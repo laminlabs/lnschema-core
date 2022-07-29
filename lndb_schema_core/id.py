@@ -11,9 +11,13 @@ def id(n_char: int) -> str:
 def id_dobject() -> str:
     """IDs for dobject.
 
-    21 characters (62**21=4e+37 possibilities) outperform UUID (2*122=5e+36)!
+    21 characters (62**21=4e+37 possibilities) outperform UUID (2*122=5e+36).
     """
     return id(n_char=21)
+
+
+def id_dtransform() -> str:
+    return id(n_char=22)
 
 
 def id_user() -> str:
