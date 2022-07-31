@@ -33,16 +33,14 @@ class user(SQLModel, table=True):  # type: ignore
 class dobject(SQLModel, table=True):  # type: ignore
     """Data objects in storage & memory.
 
-    Data objects often correspond to files.
-
     Storage ⟷ memory examples:
-    - `.csv`, `.tsv`, `.feather`, `.parquet` ⟷ `pd.DataFrame`
-    - `.h5ad`, `.h5mu`, or their zarr versions ⟷ `anndata.AnnData`, `mudata.MuData`
-    - `.jpg`, `.png` ⟷ `np.ndarray`, or a dedicated imaging in-memory container
-    - zarr directory ⟷ zarr loader
-    - TileDB store ⟷ TileDB loader
-    - fastq ⟷ ?
-    - .vcf ⟷ ?
+
+    - Table: `.csv`, `.tsv`, `.feather`, `.parquet` ⟷ `pd.DataFrame`
+    - Annotated matrix: `.h5ad`, `.h5mu`, `.zarrad` ⟷ `anndata.AnnData`, `mudata.MuData`
+    - Image: `.jpg`, `.png` ⟷ `np.ndarray`, or a dedicated imaging in-memory container
+    - Tensor: zarr directory, TileDB store ⟷ zarr loader, TileDB loader
+    - Fastq: fastq ⟷ /
+    - VCF: .vcf ⟷ /
     """
 
     id: Optional[str] = Field(default_factory=id_dobject, primary_key=True)
