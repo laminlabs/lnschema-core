@@ -23,9 +23,13 @@ class lndb_schema_core(SQLModel, table=True):  # type: ignore
 class user(SQLModel, table=True):  # type: ignore
     """User operating `lamindb`."""
 
-    __table_args__ = (UniqueConstraint("email"),)
+    __table_args__ = (
+        UniqueConstraint("email"),
+        UniqueConstraint("handle"),
+    )
     id: Optional[str] = Field(primary_key=True)
     email: str
+    handle: str = Field(nullable=False)
     time_created: datetime = Field(default_factory=utcnow, nullable=False)
     time_updated: datetime = Field(default_factory=utcnow, nullable=False)
 
