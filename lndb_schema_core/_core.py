@@ -20,7 +20,7 @@ class version_yvzi(SQLModel, table=True):  # type: ignore
 
 
 class user(SQLModel, table=True):  # type: ignore
-    """User operating `lamindb`."""
+    """Users operating a given LaminDB instance."""
 
     __table_args__ = (
         UniqueConstraint("email"),
@@ -56,7 +56,7 @@ class dobject(SQLModel, table=True):  # type: ignore
 
 
 class dtransform(SQLModel, table=True):  # type: ignore
-    """Data transformation."""
+    """Data transformations."""
 
     __table_args__ = (
         ForeignKeyConstraint(
@@ -78,6 +78,8 @@ class dtransform(SQLModel, table=True):  # type: ignore
 
 
 class dtransform_in(SQLModel, table=True):  # type: ignore
+    """Inputs - link dtransform & dobject."""
+
     __table_args__ = (
         ForeignKeyConstraint(
             ["dobject_id", "dobject_v"],
@@ -91,6 +93,8 @@ class dtransform_in(SQLModel, table=True):  # type: ignore
 
 
 class dtransform_out(SQLModel, table=True):  # type: ignore
+    """Outputs - link dtransform & dobject."""
+
     __table_args__ = (
         ForeignKeyConstraint(
             ["dobject_id", "dobject_v"],
@@ -104,7 +108,7 @@ class dtransform_out(SQLModel, table=True):  # type: ignore
 
 
 class jupynb(SQLModel, table=True):  # type: ignore
-    """Jupyter notebook from which users operate lamindb."""
+    """Jupyter notebooks."""
 
     id: str = Field(default=None, primary_key=True)
     v: str = Field(default=None, primary_key=True)
@@ -115,7 +119,7 @@ class jupynb(SQLModel, table=True):  # type: ignore
 
 
 class pipeline(SQLModel, table=True):  # type: ignore
-    """Pipeline interfacing lamindb."""
+    """Pipelines."""
 
     id: str = Field(default=None, primary_key=True)
     v: str = Field(default=None, primary_key=True)
