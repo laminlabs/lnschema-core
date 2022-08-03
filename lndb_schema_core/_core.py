@@ -2,7 +2,7 @@ from datetime import datetime as datetime
 from enum import Enum
 from typing import Optional, Union
 
-from sqlmodel import Field, ForeignKeyConstraint, SQLModel, UniqueConstraint
+from sqlmodel import Field, ForeignKeyConstraint, MetaData, SQLModel, UniqueConstraint
 
 from .id import id_dobject, id_dtransform, id_usage
 
@@ -14,6 +14,7 @@ def utcnow():
 class version_yvzi(SQLModel, table=True):  # type: ignore
     """Schema module version."""
 
+    metadata = MetaData(schema="yvzi")
     v: Optional[str] = Field(primary_key=True)
     user_id: str = Field(foreign_key="user.id")
     time_created: datetime = Field(default_factory=utcnow, nullable=False)
@@ -26,6 +27,7 @@ class user(SQLModel, table=True):  # type: ignore
         UniqueConstraint("email"),
         UniqueConstraint("handle"),
     )
+    metadata = MetaData(schema="yvzi")
     id: Optional[str] = Field(primary_key=True)
     email: str
     handle: str = Field(nullable=False)
@@ -46,6 +48,7 @@ class dobject(SQLModel, table=True):  # type: ignore
     - VCF: .vcf ⟷ /
     """
 
+    metadata = MetaData(schema="yvzi")
     id: Optional[str] = Field(default_factory=id_dobject, primary_key=True)
     v: str = Field(default=None, primary_key=True)
     name: Optional[str]
@@ -70,6 +73,7 @@ class dtransform(SQLModel, table=True):  # type: ignore
             name="dtransform_pipeline",
         ),
     )
+    metadata = MetaData(schema="yvzi")
     id: str = Field(default_factory=id_dtransform, primary_key=True)
     jupynb_id: Union[str, None] = None
     jupynb_v: Union[str, None] = None
@@ -87,6 +91,7 @@ class dtransform_in(SQLModel, table=True):  # type: ignore
             name="dtransform_in_dobject",
         ),
     )
+    metadata = MetaData(schema="yvzi")
     dtransform_id: str = Field(foreign_key="dtransform.id", primary_key=True)
     dobject_id: str = Field(primary_key=True)
     dobject_v: str = Field(primary_key=True)
@@ -102,6 +107,7 @@ class dtransform_out(SQLModel, table=True):  # type: ignore
             name="dtransform_out_dobject",
         ),
     )
+    metadata = MetaData(schema="yvzi")
     dtransform_id: str = Field(foreign_key="dtransform.id", primary_key=True)
     dobject_id: str = Field(primary_key=True)
     dobject_v: str = Field(primary_key=True)
@@ -110,6 +116,7 @@ class dtransform_out(SQLModel, table=True):  # type: ignore
 class jupynb(SQLModel, table=True):  # type: ignore
     """Jupyter notebooks."""
 
+    metadata = MetaData(schema="yvzi")
     id: str = Field(default=None, primary_key=True)
     v: str = Field(default=None, primary_key=True)
     name: Optional[str]
@@ -152,6 +159,7 @@ class usage(SQLModel, table=True):  # type: ignore
         ),
     )
 
+    metadata = MetaData(schema="yvzi")
     id: Optional[str] = Field(default_factory=id_usage, primary_key=True)
     type: usage_type = Field(nullable=False)
     user_id: str = Field(foreign_key="user.id", nullable=False)
