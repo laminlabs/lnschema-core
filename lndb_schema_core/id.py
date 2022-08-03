@@ -2,10 +2,20 @@ import random
 import string
 
 
-def id(n_char: int) -> str:
+def id_base62(n_char: int) -> str:
     base62 = string.digits + string.ascii_letters.swapcase()
     id = "".join(random.choice(base62) for i in range(n_char))
     return id
+
+
+def id_base26(n_char: int):
+    base26 = string.ascii_lowercase
+    id = "".join(random.choice(base26) for i in range(n_char))
+    return id
+
+
+def id_schema_module():
+    return id_base26(4)
 
 
 def id_dobject() -> str:
@@ -13,11 +23,11 @@ def id_dobject() -> str:
 
     21 characters (62**21=4e+37 possibilities) outperform UUID (2*122=5e+36).
     """
-    return id(n_char=21)
+    return id_base62(n_char=21)
 
 
 def id_dtransform() -> str:
-    return id(n_char=22)
+    return id_base62(n_char=22)
 
 
 def id_user() -> str:
@@ -38,16 +48,16 @@ def id_user() -> str:
     100k    2e-05
     1M      2e-03
     """
-    return id(n_char=8)
+    return id_base62(n_char=8)
 
 
 def id_track() -> str:
-    return id(n_char=24)
+    return id_base62(n_char=24)
 
 
 def id_secret() -> str:
-    return id(n_char=40)
+    return id_base62(n_char=40)
 
 
 def id_instance() -> str:
-    return id(n_char=12)
+    return id_base62(n_char=12)
