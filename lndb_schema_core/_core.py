@@ -4,7 +4,7 @@ from typing import Optional, Union
 
 from sqlmodel import Field, ForeignKeyConstraint, SQLModel, UniqueConstraint
 
-from .id import id_dobject, id_dtransform, id_track
+from .id import id_dobject, id_dtransform, id_usage
 
 
 def utcnow():
@@ -20,7 +20,7 @@ class version_yvzi(SQLModel, table=True):  # type: ignore
 
 
 class user(SQLModel, table=True):  # type: ignore
-    """User operating `lamindb`."""
+    """Users operating a given LaminDB instance."""
 
     __table_args__ = (
         UniqueConstraint("email"),
@@ -56,7 +56,7 @@ class dobject(SQLModel, table=True):  # type: ignore
 
 
 class dtransform(SQLModel, table=True):  # type: ignore
-    """Data transformation."""
+    """Data transformations."""
 
     __table_args__ = (
         ForeignKeyConstraint(
@@ -78,6 +78,8 @@ class dtransform(SQLModel, table=True):  # type: ignore
 
 
 class dtransform_in(SQLModel, table=True):  # type: ignore
+    """Inputs - link dtransform & dobject."""
+
     __table_args__ = (
         ForeignKeyConstraint(
             ["dobject_id", "dobject_v"],
@@ -91,6 +93,8 @@ class dtransform_in(SQLModel, table=True):  # type: ignore
 
 
 class dtransform_out(SQLModel, table=True):  # type: ignore
+    """Outputs - link dtransform & dobject."""
+
     __table_args__ = (
         ForeignKeyConstraint(
             ["dobject_id", "dobject_v"],
@@ -104,7 +108,7 @@ class dtransform_out(SQLModel, table=True):  # type: ignore
 
 
 class jupynb(SQLModel, table=True):  # type: ignore
-    """Jupyter notebook from which users operate lamindb."""
+    """Jupyter notebooks."""
 
     id: str = Field(default=None, primary_key=True)
     v: str = Field(default=None, primary_key=True)
@@ -115,7 +119,7 @@ class jupynb(SQLModel, table=True):  # type: ignore
 
 
 class pipeline(SQLModel, table=True):  # type: ignore
-    """Pipeline interfacing lamindb."""
+    """Pipelines."""
 
     id: str = Field(default=None, primary_key=True)
     v: str = Field(default=None, primary_key=True)
@@ -126,7 +130,7 @@ class pipeline(SQLModel, table=True):  # type: ignore
 # ----------
 
 
-class track_do_type(str, Enum):
+class usage_type(str, Enum):
     """Data access types."""
 
     ingest = "ingest"
@@ -134,29 +138,23 @@ class track_do_type(str, Enum):
     update = "update"
     delete = "delete"
     load = "load"
+    link = "link"
 
 
-class track_do(SQLModel, table=True):  # type: ignore
-    """Data access log: do operations on the database."""
+class usage(SQLModel, table=True):  # type: ignore
+    """Data usage log: do operations on the database."""
 
     __table_args__ = (
         ForeignKeyConstraint(
-            ["jupynb_id", "jupynb_v"],
-            ["jupynb.id", "jupynb.v"],
-            name="track_do_jupynb",
-        ),
-        ForeignKeyConstraint(
             ["dobject_id", "dobject_v"],
             ["dobject.id", "dobject.v"],
-            name="track_do_dobject",
+            name="usage_dobject",
         ),
     )
 
-    id: Optional[str] = Field(default_factory=id_track, primary_key=True)
-    type: track_do_type = Field(nullable=False)  #: Data access type.
+    id: Optional[str] = Field(default_factory=id_usage, primary_key=True)
+    type: usage_type = Field(nullable=False)
     user_id: str = Field(foreign_key="user.id", nullable=False)
-    jupynb_id: str
-    jupynb_v: str
     time: datetime = Field(default_factory=utcnow, nullable=False)
     dobject_id: str
     dobject_v: str
