@@ -4,7 +4,7 @@ Import the package::
 
    import lndb_schema_core
 
-This is the complete API reference:
+All models:
 
 .. autosummary::
    :toctree: .
@@ -15,9 +15,17 @@ This is the complete API reference:
    dtransform_in
    dtransform_out
    jupynb
-   track_do
-   track_do_type
+   usage
    version_yvzi
+
+Helpers:
+
+.. autosummary::
+   :toctree: .
+
+   usage_type
+   id
+
 """
 # This is lndb-schema-module yvzi.
 _schema_module_id = "yvzi"
@@ -30,8 +38,8 @@ from ._core import (  # noqa
     dtransform_in,
     dtransform_out,
     jupynb,
-    track_do,
-    track_do_type,
+    usage,
+    usage_type,
     user,
     version_yvzi,
 )

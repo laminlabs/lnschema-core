@@ -51,7 +51,7 @@ def id_user() -> str:
     return id_base62(n_char=8)
 
 
-def id_track() -> str:
+def id_usage() -> str:
     return id_base62(n_char=24)
 
 
