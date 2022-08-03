@@ -11,13 +11,12 @@ def utcnow():
     return datetime.utcnow().replace(microsecond=0)
 
 
-class lndb_schema_core(SQLModel, table=True):  # type: ignore
+class version_yvzi(SQLModel, table=True):  # type: ignore
     """Schema module version."""
 
-    id: Optional[str] = Field(primary_key=True)
+    v: Optional[str] = Field(primary_key=True)
     user_id: str = Field(foreign_key="user.id")
     time_created: datetime = Field(default_factory=utcnow, nullable=False)
-    time_updated: datetime = Field(default_factory=utcnow, nullable=False)
 
 
 class user(SQLModel, table=True):  # type: ignore
