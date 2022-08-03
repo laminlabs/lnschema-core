@@ -1,4 +1,4 @@
-"""Core schema module.
+"""Schema module core (`yvzi`).
 
 Import the package::
 
@@ -14,7 +14,7 @@ This is the complete API reference:
    dtransform_in
    dtransform_out
    jupynb
-   lndb_schema_core
+   version_yvzi
    track_do
    track_do_type
    user
