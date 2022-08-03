@@ -9,16 +9,15 @@ This is the complete API reference:
 .. autosummary::
    :toctree: .
 
+   user
    dobject
    dtransform
    dtransform_in
    dtransform_out
    jupynb
-   version_yvzi
    track_do
    track_do_type
-   user
-
+   version_yvzi
 """
 # This is lndb-schema-module yvzi.
 _schema_module_id = "yvzi"
