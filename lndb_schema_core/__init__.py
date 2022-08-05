@@ -15,6 +15,7 @@ All models:
    dtransform_in
    dtransform_out
    jupynb
+   pipeline
    usage
    version_yvzi
 
@@ -38,6 +39,7 @@ from ._core import (  # noqa
     dtransform_in,
     dtransform_out,
     jupynb,
+    pipeline,
     usage,
     usage_type,
     user,
