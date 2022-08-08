@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚚 Add migration from v0.1.1 to v0.3.0 | [8](https://github.com/laminlabs/lndb-schema-core/pull/8) | [falexwolf](https://github.com/falexwolf) | 2022-08-08 |
 🚚 Rename `track_do` to `usage` | [6](https://github.com/laminlabs/lndb-schema-core/pull/6) | [falexwolf](https://github.com/falexwolf) | 2022-08-03 | 0.3.0
 🏗️ Attach id `yvzi` and add version table `version_yvzi` | [5](https://github.com/laminlabs/lndb-schema-core/pull/5) | [falexwolf](https://github.com/falexwolf) | 2022-08-03 |
 🗃️ Add `user.handle` | [4](https://github.com/laminlabs/lndb-schema-core/pull/4) | [falexwolf](https://github.com/falexwolf) | 2022-08-01 | 0.2.1
