@@ -64,17 +64,11 @@ class dtransform(SQLModel, table=True):  # type: ignore
             ["jupynb.id", "jupynb.v"],
             name="dtransform_jupynb",
         ),
-        ForeignKeyConstraint(
-            ["pipeline_id", "pipeline_v"],
-            ["pipeline.id", "pipeline.v"],
-            name="dtransform_pipeline",
-        ),
     )
     id: str = Field(default_factory=id_dtransform, primary_key=True)
     jupynb_id: Union[str, None] = None
     jupynb_v: Union[str, None] = None
-    pipeline_id: Union[str, None] = None
-    pipeline_v: Union[str, None] = None
+    pipeline_id: Union[str, None] = Field(default=None, foreign_key="pipeline.id")
 
 
 class dtransform_in(SQLModel, table=True):  # type: ignore
@@ -122,7 +116,6 @@ class pipeline(SQLModel, table=True):  # type: ignore
     """Pipelines."""
 
     id: str = Field(default=None, primary_key=True)
-    v: str = Field(default=None, primary_key=True)
 
 
 # ----------
