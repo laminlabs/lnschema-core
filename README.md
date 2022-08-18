@@ -1,6 +1,6 @@
 [![pypi](https://img.shields.io/pypi/v/lndb_schema_core?color=%2334D058&label=pypi%20package)](https://pypi.org/project/lndb_schema_core)
 
-# lndb-schema-core: Core schema module
+# lndb-schema-core: Schema module for data provenance (`yvzi`)
 
 This package is in private beta at this moment!
 
