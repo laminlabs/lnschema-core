@@ -13,7 +13,7 @@ dependencies = [
 ]
 
 [project.urls]
-Home = "https://github.com/laminlabs/lndb-schema-core"
+Home = "https://github.com/laminlabs/lnschema-core"
 
 [project.optional-dependencies]
 dev = [

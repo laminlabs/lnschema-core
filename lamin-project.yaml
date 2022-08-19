@@ -1,5 +1,5 @@
-project_name: lndb-schema-core
+project_name: lnschema-core
 description: Core schema module
-project_slug: lndb-schema-core
-repository_name: lndb-schema-core
+project_slug: lnschema-core
+repository_name: lnschema-core
 package_name: lndb_schema_core
