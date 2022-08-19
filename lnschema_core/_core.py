@@ -36,7 +36,7 @@ class user(SQLModel, table=True):  # type: ignore
 class storage(SQLModel, table=True):  # type: ignore
     """Storage used by a given LaminDB instance."""
 
-    __table_args__ = (UniqueConstraint("storage_root"),)
+    __table_args__ = (UniqueConstraint("root"),)
     id: Optional[int] = Field(default=None, primary_key=True)
     root: str = Field(nullable=False)
     region: str

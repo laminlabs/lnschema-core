@@ -26,7 +26,7 @@ def upgrade() -> None:
         sa.Column("type", sqlmodel.sql.sqltypes.AutoString(), nullable=True),
         sa.Column("time_created", sa.DateTime(), nullable=False),
         sa.Column("time_updated", sa.DateTime(), nullable=False),
-        sa.PrimaryKeyConstraint("id"),
+        sa.PrimaryKeyConstraint("root"),
     )
 
 
