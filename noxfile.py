@@ -18,7 +18,7 @@ def build(session):
     session.run(
         "pytest",
         "-s",
-        "--cov=lndb_schema_core",
+        "--cov=lnschema_core",
         "--cov-append",
         "--cov-report=term-missing",
     )

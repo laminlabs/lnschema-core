@@ -2,7 +2,7 @@
 
 Import the package::
 
-   import lndb_schema_core
+   import lnschema_core
 
 All models:
 
@@ -28,7 +28,7 @@ Helpers:
    id
 
 """
-# This is lndb-schema-module yvzi.
+# This is lnschema-module yvzi.
 _schema_module_id = "yvzi"
 __version__ = "0.3.1"  # denote a pre-release for 0.1.0 with 0.1a1
 

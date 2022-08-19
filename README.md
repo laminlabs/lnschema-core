@@ -1,9 +1,9 @@
-[![pypi](https://img.shields.io/pypi/v/lndb_schema_core?color=%2334D058&label=pypi%20package)](https://pypi.org/project/lndb_schema_core)
+[![pypi](https://img.shields.io/pypi/v/lnschema_core?color=%2334D058&label=pypi%20package)](https://pypi.org/project/lnschema_core)
 
-# lndb-schema-core: Schema module for data provenance (`yvzi`)
+# lnschema-core: Schema module for data provenance (`yvzi`)
 
 This package is in private beta at this moment!
 
 Follow https://twitter.com/laminlabs to learn about a first public release.
 
-For beta users: Read the [docs](https://lamin.ai/docs/lndb-schema-core).
+For beta users: Read the [docs](https://lamin.ai/docs/lnschema-core).
