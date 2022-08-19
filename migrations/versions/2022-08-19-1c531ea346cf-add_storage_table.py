@@ -28,6 +28,35 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("root"),
     )
 
+    # Add storage_root column
+    op.create_table(
+        "dobject_tmp",
+        sa.Column("id", sqlmodel.sql.sqltypes.AutoString(), nullable=True),
+        sa.Column("v", sqlmodel.sql.sqltypes.AutoString(), nullable=True),
+        sa.Column("name", sqlmodel.sql.sqltypes.AutoString(), nullable=True),
+        sa.Column("file_suffix", sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+        sa.Column("dsource_id", sqlmodel.sql.sqltypes.AutoString()),
+        sa.Column("storage_root", sqlmodel.sql.sqltypes.AutoString()),
+        sa.Column("time_created", sa.DateTime(), nullable=False),
+        sa.Column("time_updated", sa.DateTime(), nullable=False),
+        sa.ForeignKeyConstraint(
+            ["dsource_id"],
+            ["dtransform.id"],
+        ),
+        sa.ForeignKeyConstraint(
+            ["storage_root"],
+            ["storage.root"],
+        ),
+        sa.PrimaryKeyConstraint("id", "v"),
+    )
+    op.execute(
+        "insert into dobject_tmp(id, v, name, file_suffix, dsource_id,"
+        " time_created, time_updated) select id, v, name, file_suffix, dsource_id,"
+        " time_created, time_updated from dobject"
+    )
+    op.drop_table("dobject")
+    op.rename_table("dobject_tmp", "dobject")
+
 
 def downgrade() -> None:
     pass

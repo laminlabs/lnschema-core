@@ -61,6 +61,7 @@ class dobject(SQLModel, table=True):  # type: ignore
     name: Optional[str]
     file_suffix: str
     dsource_id: str = Field(foreign_key="dtransform.id")
+    storage_root: str = Field(foreign_key="storage.root")
     time_created: datetime = Field(default_factory=utcnow, nullable=False)
     time_updated: datetime = Field(default_factory=utcnow, nullable=False)
 
