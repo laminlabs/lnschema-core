@@ -20,8 +20,8 @@ def upgrade() -> None:
     # Completely new table
     op.create_table(
         "storage",
-        sa.Column("id", sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-        sa.Column("root", sqlmodel.sql.sqltypes.AutoString(), nullable=True),
+        sa.Column("id", sa.BIGINT, nullable=False),
+        sa.Column("root", sqlmodel.sql.sqltypes.AutoString(), nullable=False),
         sa.Column("region", sqlmodel.sql.sqltypes.AutoString(), nullable=True),
         sa.Column("type", sqlmodel.sql.sqltypes.AutoString(), nullable=True),
         sa.Column("time_created", sa.DateTime(), nullable=False),
