@@ -38,9 +38,9 @@ class storage(SQLModel, table=True):  # type: ignore
 
     __table_args__ = (UniqueConstraint("storage_root"),)
     id: Optional[str] = Field(primary_key=True)
-    storage_root: str = Field(nullable=False)
-    storage_region: str
-    storage_type: str
+    root: str = Field(nullable=False)
+    region: str
+    type: str
     time_created: datetime = Field(default_factory=utcnow, nullable=False)
     time_updated: datetime = Field(default_factory=utcnow, nullable=False)
 
