@@ -33,6 +33,18 @@ class user(SQLModel, table=True):  # type: ignore
     time_updated: datetime = Field(default_factory=utcnow, nullable=False)
 
 
+class storage(SQLModel, table=True):  # type: ignore
+    """Storage used by a given LaminDB instance."""
+
+    __table_args__ = UniqueConstraint("storage_dir")
+    id: Optional[str] = Field(primary_key=True)
+    storage_root: str = Field(nullable=False)
+    storage_region: str
+    storage_type: str
+    time_created: datetime = Field(default_factory=utcnow, nullable=False)
+    time_updated: datetime = Field(default_factory=utcnow, nullable=False)
+
+
 class dobject(SQLModel, table=True):  # type: ignore
     """Data objects in storage & memory.
 
