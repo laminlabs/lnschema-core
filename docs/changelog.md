@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-🚚 Rename package from `lndb-schema-core` to `lnschema-core` | [10](https://github.com/laminlabs/lnschema-core/pull/10) | [falexwolf](https://github.com/falexwolf) | 2022-08-19 |
+🚚 Rename package from `lndb-schema-core` to `lnschema-core` | [10](https://github.com/laminlabs/lnschema-core/pull/10) | [falexwolf](https://github.com/falexwolf) | 2022-08-19 | 0.3.2
 🗃️ Rename `pipeline` to `pipeline_run` and remove `v` | [9](https://github.com/laminlabs/lnschema-core/pull/9) | [bpenteado](https://github.com/bpenteado) | 2022-08-18 | 0.3.1
 🚚 Add migration from v0.1.1 to v0.3.0 | [8](https://github.com/laminlabs/lnschema-core/pull/8) | [falexwolf](https://github.com/falexwolf) | 2022-08-08 |
 🚚 Rename `track_do` to `usage` | [6](https://github.com/laminlabs/lnschema-core/pull/6) | [falexwolf](https://github.com/falexwolf) | 2022-08-03 | 0.3.0
