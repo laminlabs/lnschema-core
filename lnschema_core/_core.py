@@ -37,8 +37,8 @@ class storage(SQLModel, table=True):  # type: ignore
     """Storage used by a given LaminDB instance."""
 
     root: str = Field(primary_key=True)
-    region: str
-    type: str
+    region: Optional[str]
+    type: Optional[str]
     time_created: datetime = Field(default_factory=utcnow, nullable=False)
     time_updated: datetime = Field(default_factory=utcnow, nullable=False)
 
