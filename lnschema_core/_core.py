@@ -33,6 +33,16 @@ class user(SQLModel, table=True):  # type: ignore
     time_updated: datetime = Field(default_factory=utcnow, nullable=False)
 
 
+class storage(SQLModel, table=True):  # type: ignore
+    """Storage used by a given LaminDB instance."""
+
+    root: str = Field(primary_key=True)
+    region: Optional[str]
+    type: Optional[str]
+    time_created: datetime = Field(default_factory=utcnow, nullable=False)
+    time_updated: datetime = Field(default_factory=utcnow, nullable=False)
+
+
 class dobject(SQLModel, table=True):  # type: ignore
     """Data objects in storage & memory.
 
@@ -51,6 +61,7 @@ class dobject(SQLModel, table=True):  # type: ignore
     name: Optional[str]
     file_suffix: str
     dsource_id: str = Field(foreign_key="dtransform.id")
+    storage_root: str = Field(foreign_key="storage.root")
     time_created: datetime = Field(default_factory=utcnow, nullable=False)
     time_updated: datetime = Field(default_factory=utcnow, nullable=False)
 
