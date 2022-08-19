@@ -1,18 +1,17 @@
-"""Add storage table
+"""Add storage table.
 
 Revision ID: 1c531ea346cf
 Revises: 8c78543d1c5b
 Create Date: 2022-08-19 15:51:31.185793
 
 """
-from alembic import op
 import sqlalchemy as sa
 import sqlmodel
-
+from alembic import op
 
 # revision identifiers, used by Alembic.
-revision = '1c531ea346cf'
-down_revision = '8c78543d1c5b'
+revision = "1c531ea346cf"
+down_revision = "8c78543d1c5b"
 branch_labels = None
 depends_on = None
 
