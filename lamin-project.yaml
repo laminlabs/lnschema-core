@@ -2,4 +2,4 @@ project_name: lnschema-core
 description: Core schema module
 project_slug: lnschema-core
 repository_name: lnschema-core
-package_name: lndb_schema_core
+package_name: lnschema_core

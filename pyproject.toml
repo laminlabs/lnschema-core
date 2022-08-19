@@ -3,7 +3,7 @@ requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
 
 [project]
-name = "lndb_schema_core"
+name = "lnschema_core"
 authors = [{name = "Lamin Labs", email = "laminlabs@gmail.com"}]
 readme = "README.md"
 dynamic = ["version", "description"]
@@ -35,5 +35,5 @@ testpaths = [
 
 [tool.coverage.run]
 omit = [
-    "lndb_schema_core/*",
+    "lnschema_core/*",
 ]

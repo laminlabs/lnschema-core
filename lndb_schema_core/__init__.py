@@ -2,7 +2,7 @@
 
 Import the package::
 
-   import lndb_schema_core
+   import lnschema_core
 
 All models:
 
