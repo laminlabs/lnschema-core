@@ -1,4 +1,4 @@
-"""Add storage table.
+"""v0.3.3.
 
 Revision ID: 1c531ea346cf
 Revises: 8c78543d1c5b
