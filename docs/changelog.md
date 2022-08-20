@@ -3,7 +3,6 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-Track cloud workspace location | [13](https://github.com/laminlabs/lnschema-core/pull/13) | [fredericenard](https://github.com/fredericenard) | 2022-08-20 |
 🚚 Rename package from `lndb-schema-core` to `lnschema-core` | [10](https://github.com/laminlabs/lnschema-core/pull/10) | [falexwolf](https://github.com/falexwolf) | 2022-08-19 | 0.3.2
 🗃️ Rename `pipeline` to `pipeline_run` and remove `v` | [9](https://github.com/laminlabs/lnschema-core/pull/9) | [bpenteado](https://github.com/bpenteado) | 2022-08-18 | 0.3.1
 🚚 Add migration from v0.1.1 to v0.3.0 | [8](https://github.com/laminlabs/lnschema-core/pull/8) | [falexwolf](https://github.com/falexwolf) | 2022-08-08 |
