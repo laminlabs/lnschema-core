@@ -40,6 +40,7 @@ from ._core import (  # noqa
     dtransform_out,
     jupynb,
     pipeline_run,
+    storage,
     usage,
     usage_type,
     user,
