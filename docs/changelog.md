@@ -3,7 +3,6 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-Track cloud workspace location | [12](https://github.com/laminlabs/lnschema-core/pull/12) | [fredericenard](https://github.com/fredericenard) | 2022-08-20 |
 🏗️ Create `storage` table track storage metadata | [11](https://github.com/laminlabs/lnschema-core/pull/11) | [fredericenard](https://github.com/fredericenard) | 2022-08-20 | 0.3.3
 🚚 Rename package from `lndb-schema-core` to `lnschema-core` | [10](https://github.com/laminlabs/lnschema-core/pull/10) | [falexwolf](https://github.com/falexwolf) | 2022-08-19 | 0.3.2
 🗃️ Rename `pipeline` to `pipeline_run` and remove `v` | [9](https://github.com/laminlabs/lnschema-core/pull/9) | [bpenteado](https://github.com/bpenteado) | 2022-08-18 | 0.3.1
