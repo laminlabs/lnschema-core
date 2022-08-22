@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚚 Add migration script for v0.4.0 | [16](https://github.com/laminlabs/lnschema-core/pull/16) | [falexwolf](https://github.com/falexwolf) | 2022-08-22 |
 🏗️ Prepare v0.4.0: add indexes and remove `dtransform_out` | [15](https://github.com/laminlabs/lnschema-core/pull/15) | [falexwolf](https://github.com/falexwolf) | 2022-08-22 |
 Track cloud workspace location | [14](https://github.com/laminlabs/lnschema-core/pull/14) | [fredericenard](https://github.com/fredericenard) | 2022-08-20 | 0.3.3
 🚚 Rename package from `lndb-schema-core` to `lnschema-core` | [10](https://github.com/laminlabs/lnschema-core/pull/10) | [falexwolf](https://github.com/falexwolf) | 2022-08-19 | 0.3.2
