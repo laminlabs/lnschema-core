@@ -1,3 +1,5 @@
+"""ID generators."""
+
 import random
 import string
 
