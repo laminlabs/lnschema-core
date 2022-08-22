@@ -27,8 +27,8 @@ class user(SQLModel, table=True):  # type: ignore
         UniqueConstraint("handle"),
     )
     id: Optional[str] = Field(primary_key=True)
-    email: str
-    handle: str = Field(nullable=False)
+    email: str = Field(index=True)
+    handle: str = Field(nullable=False, index=True)
     time_created: datetime = Field(default_factory=utcnow, nullable=False)
     time_updated: datetime = Field(default_factory=utcnow, nullable=False)
 
@@ -58,12 +58,12 @@ class dobject(SQLModel, table=True):  # type: ignore
 
     id: Optional[str] = Field(default_factory=id_dobject, primary_key=True)
     v: str = Field(default=None, primary_key=True)
-    name: Optional[str]
-    file_suffix: str
-    dsource_id: str = Field(foreign_key="dtransform.id")
-    storage_root: str = Field(foreign_key="storage.root")
-    time_created: datetime = Field(default_factory=utcnow, nullable=False)
-    time_updated: datetime = Field(default_factory=utcnow, nullable=False)
+    name: Optional[str] = Field(index=True)
+    file_suffix: str = Field(index=True)
+    dtransform_id: str = Field(foreign_key="dtransform.id", index=True)
+    storage_root: str = Field(foreign_key="storage.root", index=True)
+    time_created: datetime = Field(default_factory=utcnow, nullable=False, index=True)
+    time_updated: datetime = Field(default_factory=utcnow, nullable=False, index=True)
 
 
 class dtransform(SQLModel, table=True):  # type: ignore
@@ -77,10 +77,10 @@ class dtransform(SQLModel, table=True):  # type: ignore
         ),
     )
     id: str = Field(default_factory=id_dtransform, primary_key=True)
-    jupynb_id: Union[str, None] = None
-    jupynb_v: Union[str, None] = None
+    jupynb_id: Union[str, None] = Field(default=None, index=True)
+    jupynb_v: Union[str, None] = Field(default=None, index=True)
     pipeline_run_id: Union[str, None] = Field(
-        default=None, foreign_key="pipeline_run.id"
+        default=None, foreign_key="pipeline_run.id", index=True
     )
 
 
@@ -99,30 +99,15 @@ class dtransform_in(SQLModel, table=True):  # type: ignore
     dobject_v: str = Field(primary_key=True)
 
 
-class dtransform_out(SQLModel, table=True):  # type: ignore
-    """Outputs - link dtransform & dobject."""
-
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ["dobject_id", "dobject_v"],
-            ["dobject.id", "dobject.v"],
-            name="dtransform_out_dobject",
-        ),
-    )
-    dtransform_id: str = Field(foreign_key="dtransform.id", primary_key=True)
-    dobject_id: str = Field(primary_key=True)
-    dobject_v: str = Field(primary_key=True)
-
-
 class jupynb(SQLModel, table=True):  # type: ignore
     """Jupyter notebooks."""
 
     id: str = Field(default=None, primary_key=True)
     v: str = Field(default=None, primary_key=True)
-    name: Optional[str]
-    user_id: str = Field(foreign_key="user.id")
-    time_created: datetime = Field(default_factory=utcnow, nullable=False)
-    time_updated: datetime = Field(default_factory=utcnow, nullable=False)
+    name: Optional[str] = Field(index=True)
+    user_id: str = Field(foreign_key="user.id", index=True)
+    time_created: datetime = Field(default_factory=utcnow, nullable=False, index=True)
+    time_updated: datetime = Field(default_factory=utcnow, nullable=False, index=True)
 
 
 class pipeline_run(SQLModel, table=True):  # type: ignore
@@ -159,8 +144,8 @@ class usage(SQLModel, table=True):  # type: ignore
     )
 
     id: Optional[str] = Field(default_factory=id_usage, primary_key=True)
-    type: usage_type = Field(nullable=False)
-    user_id: str = Field(foreign_key="user.id", nullable=False)
-    time: datetime = Field(default_factory=utcnow, nullable=False)
-    dobject_id: str
-    dobject_v: str
+    type: usage_type = Field(nullable=False, index=True)
+    user_id: str = Field(foreign_key="user.id", nullable=False, index=True)
+    time: datetime = Field(default_factory=utcnow, nullable=False, index=True)
+    dobject_id: str = Field(index=True)
+    dobject_v: str = Field(index=True)

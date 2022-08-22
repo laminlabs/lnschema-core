@@ -13,7 +13,6 @@ All models:
    dobject
    dtransform
    dtransform_in
-   dtransform_out
    jupynb
    pipeline_run
    usage
@@ -37,7 +36,6 @@ from ._core import (  # noqa
     dobject,
     dtransform,
     dtransform_in,
-    dtransform_out,
     jupynb,
     pipeline_run,
     storage,
