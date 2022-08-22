@@ -12,7 +12,7 @@ def utcnow():
 
 
 class version_yvzi(SQLModel, table=True):  # type: ignore
-    """Versions of the core schema module deployed in a given instance.
+    """Core schema module versions deployed in a given instance.
 
     Migrations of the schema module add rows to this table, storing the schema
     module version to which we migrated along with the user who performed the
@@ -143,7 +143,7 @@ class dtransform(SQLModel, table=True):  # type: ignore
 
 
 class dtransform_in(SQLModel, table=True):  # type: ignore
-    """Input data for data transformation.
+    """Input data for data transformations.
 
     This is a many-to-many link table for `dtransform` and `dobject` storing the
     inputs of data transformations.
