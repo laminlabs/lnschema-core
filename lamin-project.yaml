@@ -1,5 +1,5 @@
 project_name: lnschema-core
-description: Core schema module
+description: Data provenance
 project_slug: lnschema-core
 repository_name: lnschema-core
 package_name: lnschema_core
