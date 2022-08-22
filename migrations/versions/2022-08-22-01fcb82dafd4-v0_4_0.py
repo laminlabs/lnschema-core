@@ -44,8 +44,8 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
     )
     op.execute(
-        "insert into dtransform_tmp (id, jupynb_id, jupynb_v) select id, id, v from"
-        " dtransform"
+        "insert into dtransform_tmp (id, jupynb_id, jupynb_v) select id, jupynb_id,"
+        " jupynb_v from dtransform"
     )
     op.drop_table("dtransform")
     op.rename_table("dtransform_tmp", "dtransform")
@@ -84,7 +84,7 @@ def upgrade() -> None:
         sa.Column("time_created", sa.DateTime(), nullable=False, index=True),
         sa.Column("time_updated", sa.DateTime(), nullable=False, index=True),
         sa.ForeignKeyConstraint(
-            ["dsource_id"],
+            ["dtransform_id"],
             ["dtransform.id"],
         ),
         sa.ForeignKeyConstraint(
