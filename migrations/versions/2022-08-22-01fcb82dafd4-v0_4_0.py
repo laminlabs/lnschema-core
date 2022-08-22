@@ -26,6 +26,41 @@ def upgrade() -> None:
     op.drop_table("pipeline")
 
     # Update the dtransform table
+    op.create_table(
+        "dtransform_tmp",
+        sa.Column("id", sqlmodel.sql.sqltypes.AutoString(), nullable=True),
+        sa.Column("jupynb_id", sqlmodel.sql.sqltypes.AutoString(), nullable=True),
+        sa.Column("jupynb_v", sqlmodel.sql.sqltypes.AutoString(), nullable=True),
+        sa.Column("pipeline_run_id", sqlmodel.sql.sqltypes.AutoString(), nullable=True),
+        sa.ForeignKeyConstraint(
+            ["jupynb_id", "jupynb_v"],
+            ["jupynb.id", "jupynb.v"],
+            name="dtransform_jupynb",
+        ),
+        sa.ForeignKeyConstraint(
+            ["pipeline_run_id"],
+            ["pipeline_run.id"],
+        ),
+        sa.PrimaryKeyConstraint("id"),
+    )
+    op.execute(
+        "insert into dtransform_tmp (id, jupynb_id, jupynb_v) select id, id, v from"
+        " dtransform"
+    )
+    op.drop_table("dtransform")
+    op.rename_table("dtransform_tmp", "dtransform")
+    op.create_index(
+        op.f("ix_dtransform_jupynb_id"), "dtransform", ["jupynb_id"], unique=False
+    )
+    op.create_index(
+        op.f("ix_dtransform_jupynb_v"), "dtransform", ["jupynb_v"], unique=False
+    )
+    op.create_index(
+        op.f("ix_dtransform_pipeline_run_id"),
+        "dtransform",
+        ["pipeline_run_id"],
+        unique=False,
+    )
 
     # Drop the redundant dtransform_out table
     op.drop_table("dtransform_out")
@@ -66,6 +101,7 @@ def upgrade() -> None:
     op.drop_table("dobject")
     op.rename_table("dobject_tmp", "dobject")
 
+    # Create indexes on jupynb
     op.create_index(op.f("ix_jupynb_name"), "jupynb", ["name"], unique=False)
     op.create_index(
         op.f("ix_jupynb_time_created"), "jupynb", ["time_created"], unique=False
@@ -74,15 +110,17 @@ def upgrade() -> None:
         op.f("ix_jupynb_time_updated"), "jupynb", ["time_updated"], unique=False
     )
     op.create_index(op.f("ix_jupynb_user_id"), "jupynb", ["user_id"], unique=False)
+
+    # Create indexes on usage
     op.create_index(op.f("ix_usage_dobject_id"), "usage", ["dobject_id"], unique=False)
     op.create_index(op.f("ix_usage_dobject_v"), "usage", ["dobject_v"], unique=False)
     op.create_index(op.f("ix_usage_time"), "usage", ["time"], unique=False)
     op.create_index(op.f("ix_usage_type"), "usage", ["type"], unique=False)
     op.create_index(op.f("ix_usage_user_id"), "usage", ["user_id"], unique=False)
-    op.alter_column("user", "handle", existing_type=sa.VARCHAR(), nullable=False)
+
+    # Create indexes on user
     op.create_index(op.f("ix_user_email"), "user", ["email"], unique=False)
     op.create_index(op.f("ix_user_handle"), "user", ["handle"], unique=False)
-    op.create_unique_constraint(None, "user", ["handle"])
 
 
 def downgrade() -> None:
