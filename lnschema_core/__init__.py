@@ -4,21 +4,33 @@ Import the package::
 
    import lnschema_core
 
-All models:
+Main tables:
 
 .. autosummary::
    :toctree: .
 
-   user
    dobject
    dtransform
    dtransform_in
+   user
+   usage
+
+Data transformations:
+
+.. autosummary::
+   :toctree: .
+
    jupynb
    pipeline_run
-   usage
+
+Tracking migrations:
+
+.. autosummary::
+   :toctree: .
+
    version_yvzi
 
-Helpers:
+Non-table helper functionality:
 
 .. autosummary::
    :toctree: .
