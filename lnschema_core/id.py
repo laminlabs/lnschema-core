@@ -63,3 +63,7 @@ def id_secret() -> str:
 
 def id_instance() -> str:
     return id_base62(n_char=12)
+
+
+def id_storage() -> str:
+    return id_base62(n_char=14)
