@@ -4,7 +4,7 @@ from typing import Optional, Union
 
 from sqlmodel import Field, ForeignKeyConstraint, SQLModel, UniqueConstraint
 
-from .id import id_dobject, id_dtransform, id_usage
+from .id import id_dobject, id_dtransform, id_storage, id_usage
 
 
 def utcnow():
@@ -49,7 +49,8 @@ class storage(SQLModel, table=True):  # type: ignore
     along with metadata.
     """
 
-    root: str = Field(primary_key=True)
+    id: Optional[str] = Field(default_factory=id_storage, primary_key=True)
+    root: str = Field(index=True)
     region: Optional[str]
     type: Optional[str]
     time_created: datetime = Field(default_factory=utcnow, nullable=False)
@@ -98,7 +99,7 @@ class dobject(SQLModel, table=True):  # type: ignore
     name: Optional[str] = Field(index=True)
     file_suffix: str = Field(index=True)
     dtransform_id: str = Field(foreign_key="dtransform.id", index=True)
-    storage_root: str = Field(foreign_key="storage.root", index=True)
+    storage_id: str = Field(foreign_key="storage.id", index=True)
     time_created: datetime = Field(default_factory=utcnow, nullable=False, index=True)
     time_updated: datetime = Field(default_factory=utcnow, nullable=False, index=True)
 
