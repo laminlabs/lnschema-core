@@ -30,12 +30,12 @@ Tracking migrations:
 
    version_yvzi
 
-Non-table helper functionality:
+Auxiliary modules:
 
 .. autosummary::
    :toctree: .
 
-   usage_type
+   type
    id
 
 """
@@ -43,7 +43,7 @@ Non-table helper functionality:
 _schema_module_id = "yvzi"
 __version__ = "0.4.1"  # denote a pre-release for 0.1.0 with 0.1a1
 
-from . import id
+from . import id, type  # noqa
 from ._core import (  # noqa
     dobject,
     dtransform,
