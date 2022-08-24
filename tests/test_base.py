@@ -2,8 +2,8 @@ from lnschema_core import id
 
 
 def test_id():
-    assert len(id.id_dobject()) == 21
-    assert len(id.id_user()) == 8
-    assert len(id.id_secret()) == 40
-    assert len(id.id_usage()) == 24
-    assert len(id.id_instance()) == 12
+    assert len(id.dobject()) == 21
+    assert len(id.user()) == 8
+    assert len(id.secret()) == 40
+    assert len(id.usage()) == 24
+    assert len(id.instance()) == 10
