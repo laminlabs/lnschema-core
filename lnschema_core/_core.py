@@ -1,10 +1,10 @@
 from datetime import datetime as datetime
-from enum import Enum
 from typing import Optional, Union
 
 from sqlmodel import Field, ForeignKeyConstraint, SQLModel, UniqueConstraint
 
 from .id import id_dobject, id_dtransform, id_storage, id_usage
+from .type import usage as usage_type
 
 
 def utcnow():
@@ -205,17 +205,6 @@ class pipeline_run(SQLModel, table=True):  # type: ignore
 # ----------
 # Access log
 # ----------
-
-
-class usage_type(str, Enum):
-    """Data access types."""
-
-    ingest = "ingest"
-    query = "query"
-    update = "update"
-    delete = "delete"
-    load = "load"
-    link = "link"
 
 
 class usage(SQLModel, table=True):  # type: ignore
