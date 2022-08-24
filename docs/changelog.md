@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚸 Change instance & storage id to 10 char, overhaul ID module | [20](https://github.com/laminlabs/lnschema-core/pull/20) | [falexwolf](https://github.com/falexwolf) | 2022-08-24 |
 Use id to reference storage | [19](https://github.com/laminlabs/lnschema-core/pull/19) | [fredericenard](https://github.com/fredericenard) | 2022-08-23 | 0.4.1
 🚚 Add migration for v0.4.0 | [16](https://github.com/laminlabs/lnschema-core/pull/16) | [falexwolf](https://github.com/falexwolf) | 2022-08-22 | 0.4.0
 🏗️ Add indexes and remove `dtransform_out` | [15](https://github.com/laminlabs/lnschema-core/pull/15) | [falexwolf](https://github.com/falexwolf) | 2022-08-22 |
