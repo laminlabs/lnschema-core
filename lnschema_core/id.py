@@ -62,8 +62,26 @@ def id_secret() -> str:
 
 
 def id_instance() -> str:
-    return id_base62(n_char=12)
+    """LaminDB instance: 10-char base62.
+
+    Collision probability is 6e-03 for 100M instances: 1M users with 100 instances/user.
+    """
+    return id_base62(n_char=10)
 
 
 def id_storage() -> str:
-    return id_base62(n_char=14)
+    """Storage root: 10-char base62.
+
+    Collision probability is 6e-03 for 100M storage roots: 1M users with 100
+    storage roots/user.
+    """
+    return id_base62(n_char=10)
+
+
+def nbproject():  # rename to nbproject_id also in metadata slot?
+    """Jupyter notebook: 12-char base62.
+
+    Collision probability is 2e-04 for 1B notebooks: 1M users with 1k notebooks/user.
+    """
+    # https://github.com/laminlabs/lamin-notes/blob/main/docs/2022/ids.ipynb
+    return id_base62(n_char=12)
