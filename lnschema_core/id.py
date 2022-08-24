@@ -78,7 +78,7 @@ def id_storage() -> str:
     return id_base62(n_char=10)
 
 
-def nbproject():  # rename to nbproject_id also in metadata slot?
+def nbproject():
     """Jupyter notebook: 12-char base62.
 
     Collision probability is 2e-04 for 1B notebooks: 1M users with 1k notebooks/user.
