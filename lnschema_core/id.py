@@ -1,4 +1,4 @@
-"""ID generators.
+"""IDs.
 
 See: https://github.com/laminlabs/lamin-notes/blob/main/docs/2022/ids.ipynb
 
