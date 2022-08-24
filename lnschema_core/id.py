@@ -1,5 +1,7 @@
 """ID generators.
 
+See: https://github.com/laminlabs/lamin-notes/blob/main/docs/2022/ids.ipynb
+
 Base generators:
 
 .. autosummary::
