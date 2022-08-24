@@ -18,13 +18,13 @@ Entity-related generators:
 
    schema
    user
+   instance
+   storage
    dobject
    dtransform
-   secret
    usage
-   storage
-   instance
    jupynb
+   secret
 """
 from ._id import (  # noqa
     base26,
