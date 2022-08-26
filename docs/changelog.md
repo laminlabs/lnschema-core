@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+✨ Add table `pipeline` | [22](https://github.com/laminlabs/lnschema-core/pull/22) | [falexwolf](https://github.com/falexwolf) | 2022-08-26 |
 ♻️ Refactor id, create `type` submodule | [21](https://github.com/laminlabs/lnschema-core/pull/21) | [falexwolf](https://github.com/falexwolf) | 2022-08-24 |
 🚸 Change instance & storage id to 10 char, overhaul ID module | [20](https://github.com/laminlabs/lnschema-core/pull/20) | [falexwolf](https://github.com/falexwolf) | 2022-08-24 |
 Use id to reference storage | [19](https://github.com/laminlabs/lnschema-core/pull/19) | [fredericenard](https://github.com/fredericenard) | 2022-08-23 | 0.4.1
