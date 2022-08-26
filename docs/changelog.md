@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🐛 Re-export `pipeline` at root level | [23](https://github.com/laminlabs/lnschema-core/pull/23) | [falexwolf](https://github.com/falexwolf) | 2022-08-26 |
 ✨ Add table `pipeline` | [22](https://github.com/laminlabs/lnschema-core/pull/22) | [falexwolf](https://github.com/falexwolf) | 2022-08-26 | 0.5.0
 ♻️ Refactor id, create `type` submodule | [21](https://github.com/laminlabs/lnschema-core/pull/21) | [falexwolf](https://github.com/falexwolf) | 2022-08-24 |
 🚸 Change instance & storage id to 10 char, overhaul ID module | [20](https://github.com/laminlabs/lnschema-core/pull/20) | [falexwolf](https://github.com/falexwolf) | 2022-08-24 |
