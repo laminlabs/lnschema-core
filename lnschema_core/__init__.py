@@ -21,6 +21,7 @@ Data transformations:
    :toctree: .
 
    jupynb
+   pipeline
    pipeline_run
 
 Tracking migrations:
@@ -49,6 +50,7 @@ from ._core import (  # noqa
     dtransform,
     dtransform_in,
     jupynb,
+    pipeline,
     pipeline_run,
     storage,
     usage,
