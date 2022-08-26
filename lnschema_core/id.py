@@ -24,6 +24,8 @@ Entity-related generators:
    dtransform
    usage
    jupynb
+   pipeline
+   pipeline_run
    secret
 """
 from ._id import (  # noqa
@@ -34,6 +36,8 @@ from ._id import (  # noqa
     dtransform,
     instance,
     jupynb,
+    pipeline,
+    pipeline_run,
     schema,
     secret,
     storage,
