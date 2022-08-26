@@ -197,6 +197,7 @@ class pipeline(SQLModel, table=True):  # type: ignore
     v: Optional[str] = Field(default="1", primary_key=True)
     name: Optional[str] = Field(default=None, index=True)
     reference: Optional[str] = Field(default=None, index=True)
+    time_created: datetime = Field(default_factory=utcnow, nullable=False)
 
 
 class pipeline_run(SQLModel, table=True):  # type: ignore
@@ -220,6 +221,7 @@ class pipeline_run(SQLModel, table=True):  # type: ignore
     pipeline_id: str = Field(index=True)
     pipeline_v: str = Field(index=True)
     name: Optional[str] = Field(default=None, index=True)
+    time_created: datetime = Field(default_factory=utcnow, nullable=False)
 
 
 class usage(SQLModel, table=True):  # type: ignore
