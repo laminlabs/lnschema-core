@@ -1,9 +1,9 @@
 from datetime import datetime as datetime
-from typing import Optional, Union
+from typing import Optional
 
 from sqlmodel import Field, ForeignKeyConstraint, SQLModel, UniqueConstraint
 
-from .id import id_dobject, id_dtransform, id_storage, id_usage
+from . import id as idg
 from .type import usage as usage_type
 
 
@@ -49,10 +49,10 @@ class storage(SQLModel, table=True):  # type: ignore
     along with metadata.
     """
 
-    id: Optional[str] = Field(default_factory=id_storage, primary_key=True)
+    id: Optional[str] = Field(default_factory=idg.storage, primary_key=True)
     root: str = Field(index=True)
-    region: Optional[str]
-    type: Optional[str]
+    region: Optional[str] = None
+    type: Optional[str] = None
     time_created: datetime = Field(default_factory=utcnow, nullable=False)
     time_updated: datetime = Field(default_factory=utcnow, nullable=False)
 
@@ -94,8 +94,8 @@ class dobject(SQLModel, table=True):  # type: ignore
     - QC: `.html` ⟷ /
     """
 
-    id: Optional[str] = Field(default_factory=id_dobject, primary_key=True)
-    v: str = Field(default=None, primary_key=True)
+    id: Optional[str] = Field(default_factory=idg.dobject, primary_key=True)
+    v: Optional[str] = Field(default="1", primary_key=True)
     name: Optional[str] = Field(index=True)
     file_suffix: str = Field(index=True)
     dtransform_id: str = Field(foreign_key="dtransform.id", index=True)
@@ -135,10 +135,10 @@ class dtransform(SQLModel, table=True):  # type: ignore
             name="dtransform_jupynb",
         ),
     )
-    id: str = Field(default_factory=id_dtransform, primary_key=True)
-    jupynb_id: Union[str, None] = Field(default=None, index=True)
-    jupynb_v: Union[str, None] = Field(default=None, index=True)
-    pipeline_run_id: Union[str, None] = Field(
+    id: str = Field(default_factory=idg.dtransform, primary_key=True)
+    jupynb_id: Optional[str] = Field(default=None, index=True)
+    jupynb_v: Optional[str] = Field(default=None, index=True)
+    pipeline_run_id: Optional[str] = Field(
         default=None, foreign_key="pipeline_run.id", index=True
     )
 
@@ -176,12 +176,27 @@ class jupynb(SQLModel, table=True):  # type: ignore
     IDs for Jupyter notebooks are generated through nbproject.
     """
 
-    id: str = Field(default=None, primary_key=True)
-    v: str = Field(default=None, primary_key=True)
+    id: Optional[str] = Field(default=None, primary_key=True)
+    v: Optional[str] = Field(default="1", primary_key=True)
     name: Optional[str] = Field(index=True)
     user_id: str = Field(foreign_key="user.id", index=True)
     time_created: datetime = Field(default_factory=utcnow, nullable=False, index=True)
     time_updated: datetime = Field(default_factory=utcnow, nullable=False, index=True)
+
+
+class pipeline(SQLModel, table=True):  # type: ignore
+    """Pipelines.
+
+    A pipeline is typically versioned software that can perform a data
+    transformation/processing workflow. This can be anything from typical
+    workflow tools (Nextflow, Snakemake, Prefect, Apache Airflow, etc.) to
+    simple (versioned) scripts.
+    """
+
+    id: Optional[str] = Field(default_factory=idg.pipeline, primary_key=True)
+    v: Optional[str] = Field(default="1", primary_key=True)
+    name: Optional[str] = Field(default=None, index=True)
+    reference: Optional[str] = Field(default=None, index=True)
 
 
 class pipeline_run(SQLModel, table=True):  # type: ignore
@@ -190,21 +205,21 @@ class pipeline_run(SQLModel, table=True):  # type: ignore
     Pipeline runs represent one type of data transformation (`dtransform`) and
     have a unique correspondence in `dtransform`.
 
-    A pipeline is typically versioned software that can perform a data
-    transformation/processing workflow. This can be anything from typical
-    workflow tools (Nextflow, snakemake, prefect, Apache Airflow, etc.) to
-    simple (versioned) scripts.
-
     For instance, `lnbfx` stores references to bioinformatics workflow runs by
     linking to entries in this table.
     """
 
-    id: str = Field(default=None, primary_key=True)
-
-
-# ----------
-# Access log
-# ----------
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["pipeline_id", "pipeline_v"],
+            ["pipeline.id", "pipeline.v"],
+            name="pipeline",
+        ),
+    )
+    id: Optional[str] = Field(default_factory=idg.pipeline_run, primary_key=True)
+    pipeline_id: str = Field(index=True)
+    pipeline_v: str = Field(index=True)
+    name: Optional[str] = Field(default=None, index=True)
 
 
 class usage(SQLModel, table=True):  # type: ignore
@@ -221,7 +236,7 @@ class usage(SQLModel, table=True):  # type: ignore
         ),
     )
 
-    id: Optional[str] = Field(default_factory=id_usage, primary_key=True)
+    id: Optional[str] = Field(default_factory=idg.usage, primary_key=True)
     type: usage_type = Field(nullable=False, index=True)
     user_id: str = Field(foreign_key="user.id", nullable=False, index=True)
     time: datetime = Field(default_factory=utcnow, nullable=False, index=True)

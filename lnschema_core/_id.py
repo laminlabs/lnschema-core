@@ -27,12 +27,12 @@ def base26(n_char: int):
 
 
 def schema():
-    """Schema module: 4-char base26."""
+    """Schema module: 4 base26."""
     return base26(4)
 
 
 def dobject() -> str:
-    """Data object: 21-char base62.
+    """Data object: 21 base62.
 
     21 characters (62**21=4e+37 possibilities) outperform UUID (2*122=5e+36).
     """
@@ -40,8 +40,8 @@ def dobject() -> str:
 
 
 def dtransform() -> str:
-    """Data transformation: 21-char base62."""
-    return base62(n_char=22)
+    """Data transformation: 21 base62."""
+    return base62(n_char=21)
 
 
 def user() -> str:
@@ -67,17 +67,17 @@ def user() -> str:
 
 
 def usage() -> str:
-    """Usage event: 24-char base62."""
+    """Usage event: 24 base62."""
     return base62(n_char=24)
 
 
 def secret() -> str:
-    """Password or secret: 40-char base62."""
+    """Password or secret: 40 base62."""
     return base62(n_char=40)
 
 
 def instance() -> str:
-    """LaminDB instance: 10-char base62.
+    """LaminDB instance: 10 base62.
 
     Collision probability is 6e-03 for 100M instances: 1M users with 100 instances/user.
     """
@@ -85,7 +85,7 @@ def instance() -> str:
 
 
 def storage() -> str:
-    """Storage root: 10-char base62.
+    """Storage root: 10 base62.
 
     Collision probability is 6e-03 for 100M storage roots: 1M users with 100
     storage roots/user.
@@ -93,8 +93,24 @@ def storage() -> str:
     return base62(n_char=10)
 
 
+def pipeline() -> str:
+    """Pipeline: 9 base62.
+
+    Collision probability is low for 10M pipelines: 1M users with 10 pipelines/user.
+    """
+    return base62(n_char=9)
+
+
+def pipeline_run() -> str:
+    """Pipeline run: 20 base62.
+
+    One char less than dtransform and dobject!
+    """
+    return base62(n_char=20)
+
+
 def jupynb():
-    """Jupyter notebook: 12-char base62.
+    """Jupyter notebook: 12 base62.
 
     Collision probability is 2e-04 for 1B notebooks: 1M users with 1k notebooks/user.
 
