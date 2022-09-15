@@ -11,19 +11,6 @@ def utcnow():
     return datetime.utcnow().replace(microsecond=0)
 
 
-class version_yvzi(SQLModel, table=True):  # type: ignore
-    """Core schema module versions deployed in a given instance.
-
-    Migrations of the schema module add rows to this table, storing the schema
-    module version to which we migrated along with the user who performed the
-    migration.
-    """
-
-    v: Optional[str] = Field(primary_key=True)
-    user_id: str = Field(foreign_key="user.id")
-    time_created: datetime = Field(default_factory=utcnow, nullable=False)
-
-
 class user(SQLModel, table=True):  # type: ignore
     """Users operating a given LaminDB instance.
 
@@ -244,3 +231,26 @@ class usage(SQLModel, table=True):  # type: ignore
     time: datetime = Field(default_factory=utcnow, nullable=False, index=True)
     dobject_id: str = Field(index=True)
     dobject_v: str = Field(index=True)
+
+
+class version_yvzi(SQLModel, table=True):  # type: ignore
+    """Core schema module versions deployed in a given instance.
+
+    Migrations of the schema module add rows to this table, storing the schema
+    module version to which we migrated along with the user who performed the
+    migration.
+    """
+
+    v: Optional[str] = Field(primary_key=True)
+    migration: Optional[str] = None
+    user_id: str = Field(foreign_key="user.id")
+    time_created: datetime = Field(default_factory=utcnow, nullable=False)
+
+
+class migration_yvzi(SQLModel, table=True):  # type: ignore
+    """Latest migration.
+
+    This stores the reference to the latest migration script deployed.
+    """
+
+    version_num: Optional[str] = Field(primary_key=True)
