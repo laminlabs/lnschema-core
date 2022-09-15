@@ -24,12 +24,13 @@ Data transformations:
    pipeline
    pipeline_run
 
-Tracking migrations:
+Tracking versions & migrations:
 
 .. autosummary::
    :toctree: .
 
    version_yvzi
+   migration_yvzi
 
 Auxiliary modules:
 
@@ -51,6 +52,7 @@ from ._core import (  # noqa
     dtransform,
     dtransform_in,
     jupynb,
+    migration_yvzi,
     pipeline,
     pipeline_run,
     storage,
