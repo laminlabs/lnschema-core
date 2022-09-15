@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+✨ Enable independent migrations across modules | [25](https://github.com/laminlabs/lnschema-core/pull/25) | [falexwolf](https://github.com/falexwolf) | 2022-09-15 |
 🩹 Add timestamps to `pipeline` | [24](https://github.com/laminlabs/lnschema-core/pull/24) | [falexwolf](https://github.com/falexwolf) | 2022-08-26 | 0.5.1
 🐛 Re-export `pipeline` at root level | [23](https://github.com/laminlabs/lnschema-core/pull/23) | [falexwolf](https://github.com/falexwolf) | 2022-08-26 |
 ✨ Add table `pipeline` | [22](https://github.com/laminlabs/lnschema-core/pull/22) | [falexwolf](https://github.com/falexwolf) | 2022-08-26 | 0.5.0
