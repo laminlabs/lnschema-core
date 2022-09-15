@@ -24,12 +24,13 @@ Data transformations:
    pipeline
    pipeline_run
 
-Tracking migrations:
+Tracking versions & migrations:
 
 .. autosummary::
    :toctree: .
 
    version_yvzi
+   migration_yvzi
 
 Auxiliary modules:
 
@@ -42,6 +43,7 @@ Auxiliary modules:
 """
 # This is lnschema-module yvzi.
 _schema_module_id = "yvzi"
+_migration = "5fa54c55c3bf"
 __version__ = "0.5.1"  # denote a pre-release for 0.1.0 with 0.1a1
 
 from . import id, type  # noqa
@@ -50,6 +52,7 @@ from ._core import (  # noqa
     dtransform,
     dtransform_in,
     jupynb,
+    migration_yvzi,
     pipeline,
     pipeline_run,
     storage,
