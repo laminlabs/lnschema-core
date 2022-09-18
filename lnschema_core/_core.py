@@ -1,15 +1,11 @@
 from datetime import datetime as datetime
 from typing import Optional
 
-from sqlalchemy.sql import func
 from sqlmodel import Field, ForeignKeyConstraint, SQLModel, UniqueConstraint
 
 from . import id as idg
+from ._timestamps import CreatedAt, UpdatedAt
 from .type import usage as usage_type
-
-
-def utcnow():
-    return datetime.utcnow().replace(microsecond=0)
 
 
 class user(SQLModel, table=True):  # type: ignore
@@ -25,10 +21,8 @@ class user(SQLModel, table=True):  # type: ignore
     id: Optional[str] = Field(primary_key=True)
     email: str = Field(index=True)
     handle: str = Field(nullable=False, index=True)
-    time_created: Optional[datetime] = Field(
-        sa_column_kwargs=dict(server_default=func.now())
-    )
-    time_updated: Optional[datetime] = Field(sa_column_kwargs=dict(onupdate=func.now()))
+    created_at: Optional[datetime] = CreatedAt
+    updated_at: Optional[datetime] = UpdatedAt
 
 
 class storage(SQLModel, table=True):  # type: ignore
@@ -43,8 +37,8 @@ class storage(SQLModel, table=True):  # type: ignore
     root: str = Field(index=True)
     region: Optional[str] = None
     type: Optional[str] = None
-    time_created: datetime = Field(default_factory=utcnow, nullable=False)
-    time_updated: datetime = Field(default_factory=utcnow, nullable=False)
+    created_at: Optional[datetime] = CreatedAt
+    updated_at: Optional[datetime] = UpdatedAt
 
 
 class dobject(SQLModel, table=True):  # type: ignore
@@ -90,8 +84,8 @@ class dobject(SQLModel, table=True):  # type: ignore
     file_suffix: str = Field(index=True)
     dtransform_id: str = Field(foreign_key="dtransform.id", index=True)
     storage_id: str = Field(foreign_key="storage.id", index=True)
-    time_created: datetime = Field(default_factory=utcnow, nullable=False, index=True)
-    time_updated: datetime = Field(default_factory=utcnow, nullable=False, index=True)
+    created_at: Optional[datetime] = CreatedAt
+    updated_at: Optional[datetime] = UpdatedAt
 
 
 class dtransform(SQLModel, table=True):  # type: ignore
@@ -170,8 +164,8 @@ class jupynb(SQLModel, table=True):  # type: ignore
     v: Optional[str] = Field(default="1", primary_key=True)
     name: Optional[str] = Field(index=True)
     user_id: str = Field(foreign_key="user.id", index=True)
-    time_created: datetime = Field(default_factory=utcnow, nullable=False, index=True)
-    time_updated: datetime = Field(default_factory=utcnow, nullable=False, index=True)
+    created_at: Optional[datetime] = CreatedAt
+    updated_at: Optional[datetime] = UpdatedAt
 
 
 class pipeline(SQLModel, table=True):  # type: ignore
@@ -187,7 +181,8 @@ class pipeline(SQLModel, table=True):  # type: ignore
     v: Optional[str] = Field(default="1", primary_key=True)
     name: Optional[str] = Field(default=None, index=True)
     reference: Optional[str] = Field(default=None, index=True)
-    time_created: datetime = Field(default_factory=utcnow, nullable=False)
+    created_at: Optional[datetime] = CreatedAt
+    updated_at: Optional[datetime] = UpdatedAt
 
 
 class pipeline_run(SQLModel, table=True):  # type: ignore
@@ -211,7 +206,7 @@ class pipeline_run(SQLModel, table=True):  # type: ignore
     pipeline_id: str = Field(index=True)
     pipeline_v: str = Field(index=True)
     name: Optional[str] = Field(default=None, index=True)
-    time_created: datetime = Field(default_factory=utcnow, nullable=False)
+    created_at: Optional[datetime] = CreatedAt
 
 
 class usage(SQLModel, table=True):  # type: ignore
@@ -231,7 +226,7 @@ class usage(SQLModel, table=True):  # type: ignore
     id: Optional[str] = Field(default_factory=idg.usage, primary_key=True)
     type: usage_type = Field(nullable=False, index=True)
     user_id: str = Field(foreign_key="user.id", nullable=False, index=True)
-    time: datetime = Field(default_factory=utcnow, nullable=False, index=True)
+    time: datetime = CreatedAt
     dobject_id: str = Field(index=True)
     dobject_v: str = Field(index=True)
 
@@ -247,7 +242,7 @@ class version_yvzi(SQLModel, table=True):  # type: ignore
     v: Optional[str] = Field(primary_key=True)
     migration: Optional[str] = None
     user_id: str = Field(foreign_key="user.id")
-    time_created: datetime = Field(default_factory=utcnow, nullable=False)
+    created_at: Optional[datetime] = CreatedAt
 
 
 class migration_yvzi(SQLModel, table=True):  # type: ignore
