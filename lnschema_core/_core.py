@@ -1,6 +1,7 @@
 from datetime import datetime as datetime
 from typing import Optional
 
+from sqlalchemy.sql import func
 from sqlmodel import Field, ForeignKeyConstraint, SQLModel, UniqueConstraint
 
 from . import id as idg
@@ -24,8 +25,10 @@ class user(SQLModel, table=True):  # type: ignore
     id: Optional[str] = Field(primary_key=True)
     email: str = Field(index=True)
     handle: str = Field(nullable=False, index=True)
-    time_created: datetime = Field(default_factory=utcnow, nullable=False)
-    time_updated: datetime = Field(default_factory=utcnow, nullable=False)
+    time_created: Optional[datetime] = Field(
+        sa_column_kwargs=dict(server_default=func.now())
+    )
+    time_updated: Optional[datetime] = Field(sa_column_kwargs=dict(onupdate=func.now()))
 
 
 class storage(SQLModel, table=True):  # type: ignore
