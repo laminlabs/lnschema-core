@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚚 Move testdb into tests dir | [26](https://github.com/laminlabs/lnschema-core/pull/26) | [falexwolf](https://github.com/falexwolf) | 2022-09-18 |
 ✨ Enable independent migrations across modules | [25](https://github.com/laminlabs/lnschema-core/pull/25) | [falexwolf](https://github.com/falexwolf) | 2022-09-15 | 0.6.0
 🩹 Add timestamps to `pipeline` | [24](https://github.com/laminlabs/lnschema-core/pull/24) | [falexwolf](https://github.com/falexwolf) | 2022-08-26 | 0.5.1
 🐛 Re-export `pipeline` at root level | [23](https://github.com/laminlabs/lnschema-core/pull/23) | [falexwolf](https://github.com/falexwolf) | 2022-08-26 |
