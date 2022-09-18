@@ -56,7 +56,7 @@ def run_migrations_online() -> None:
             connection=connection,
             target_metadata=target_metadata,
             version_table="migration_%s" % config.config_ini_section,
-            render_as_batch=True,
+            render_as_batch=True,  # comment this out if necessary
         )
 
         with context.begin_transaction():
