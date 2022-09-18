@@ -44,7 +44,7 @@ Auxiliary modules:
 # This is lnschema-module yvzi.
 _schema_id = "yvzi"
 _migration = "3b60b87450c0"
-__version__ = "0.6.0"  # denote a pre-release for 0.1.0 with 0.1a1
+__version__ = "0.7.0"  # denote a pre-release for 0.1.0 with 0.1a1
 
 from . import id, type  # noqa
 from ._core import (  # noqa

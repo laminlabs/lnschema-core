@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-✨ Rename time stamps and make them server default | [27](https://github.com/laminlabs/lnschema-core/pull/27) | [falexwolf](https://github.com/falexwolf) | 2022-09-18 |
+✨ Rename time stamps and make them server default | [27](https://github.com/laminlabs/lnschema-core/pull/27) | [falexwolf](https://github.com/falexwolf) | 2022-09-18 | 0.7.0
 🚚 Move testdb into tests dir | [26](https://github.com/laminlabs/lnschema-core/pull/26) | [falexwolf](https://github.com/falexwolf) | 2022-09-18 |
 ✨ Enable independent migrations across modules | [25](https://github.com/laminlabs/lnschema-core/pull/25) | [falexwolf](https://github.com/falexwolf) | 2022-09-15 | 0.6.0
 🩹 Add timestamps to `pipeline` | [24](https://github.com/laminlabs/lnschema-core/pull/24) | [falexwolf](https://github.com/falexwolf) | 2022-08-26 | 0.5.1
