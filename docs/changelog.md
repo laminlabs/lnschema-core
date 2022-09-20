@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚚 Move migrations to package | [29](https://github.com/laminlabs/lnschema-core/pull/29) | [falexwolf](https://github.com/falexwolf) | 2022-09-20 |
 🚚 Rename `file_suffix` to `suffix` | [28](https://github.com/laminlabs/lnschema-core/pull/28) | [falexwolf](https://github.com/falexwolf) | 2022-09-18 | 0.7.1
 ✨ Rename time stamps and make them server default | [27](https://github.com/laminlabs/lnschema-core/pull/27) | [falexwolf](https://github.com/falexwolf) | 2022-09-18 | 0.7.0
 🚚 Move testdb into tests dir | [26](https://github.com/laminlabs/lnschema-core/pull/26) | [falexwolf](https://github.com/falexwolf) | 2022-09-18 |
