@@ -1,7 +1,7 @@
 from datetime import datetime as datetime
 from typing import Optional
 
-from sqlmodel import Field, ForeignKeyConstraint, SQLModel, UniqueConstraint
+from sqlmodel import Field, ForeignKeyConstraint, SQLModel
 
 from . import id as idg
 from ._timestamps import CreatedAt, UpdatedAt
@@ -14,13 +14,9 @@ class user(SQLModel, table=True):  # type: ignore
     The All data here is always synched from the corresponding table in the hub.
     """
 
-    __table_args__ = (
-        UniqueConstraint("email"),
-        UniqueConstraint("handle"),
-    )
     id: Optional[str] = Field(primary_key=True)
-    email: str = Field(index=True)
-    handle: str = Field(nullable=False, index=True)
+    email: str = Field(index=True, unique=True)
+    handle: str = Field(nullable=False, index=True, unique=True)
     created_at: Optional[datetime] = CreatedAt
     updated_at: Optional[datetime] = UpdatedAt
 
