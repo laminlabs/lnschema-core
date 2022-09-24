@@ -17,7 +17,7 @@ class user(SQLModel, table=True):  # type: ignore
     id: Optional[str] = Field(primary_key=True)
     email: str = Field(index=True, unique=True)
     handle: str = Field(nullable=False, index=True, unique=True)
-    created_at: Optional[datetime] = CreatedAt
+    created_at: datetime = CreatedAt
     updated_at: Optional[datetime] = UpdatedAt
 
 
@@ -33,7 +33,7 @@ class storage(SQLModel, table=True):  # type: ignore
     root: str = Field(index=True)
     region: Optional[str] = None
     type: Optional[str] = None
-    created_at: Optional[datetime] = CreatedAt
+    created_at: datetime = CreatedAt
     updated_at: Optional[datetime] = UpdatedAt
 
 
@@ -80,7 +80,7 @@ class dobject(SQLModel, table=True):  # type: ignore
     suffix: Optional[str] = Field(default=None, index=True)
     dtransform_id: str = Field(foreign_key="dtransform.id", index=True)
     storage_id: str = Field(foreign_key="storage.id", index=True)
-    created_at: Optional[datetime] = CreatedAt
+    created_at: datetime = CreatedAt
     updated_at: Optional[datetime] = UpdatedAt
 
 
@@ -160,7 +160,7 @@ class jupynb(SQLModel, table=True):  # type: ignore
     v: Optional[str] = Field(default="1", primary_key=True)
     name: Optional[str] = Field(index=True)
     user_id: str = Field(foreign_key="user.id", index=True)
-    created_at: Optional[datetime] = CreatedAt
+    created_at: datetime = CreatedAt
     updated_at: Optional[datetime] = UpdatedAt
 
 
@@ -177,7 +177,7 @@ class pipeline(SQLModel, table=True):  # type: ignore
     v: Optional[str] = Field(default="1", primary_key=True)
     name: Optional[str] = Field(default=None, index=True)
     reference: Optional[str] = Field(default=None, index=True)
-    created_at: Optional[datetime] = CreatedAt
+    created_at: datetime = CreatedAt
     updated_at: Optional[datetime] = UpdatedAt
 
 
@@ -202,7 +202,7 @@ class pipeline_run(SQLModel, table=True):  # type: ignore
     pipeline_id: str = Field(index=True)
     pipeline_v: str = Field(index=True)
     name: Optional[str] = Field(default=None, index=True)
-    created_at: Optional[datetime] = CreatedAt
+    created_at: datetime = CreatedAt
 
 
 class usage(SQLModel, table=True):  # type: ignore
@@ -238,7 +238,7 @@ class version_yvzi(SQLModel, table=True):  # type: ignore
     v: Optional[str] = Field(primary_key=True)
     migration: Optional[str] = None
     user_id: str = Field(foreign_key="user.id")
-    created_at: Optional[datetime] = CreatedAt
+    created_at: datetime = CreatedAt
 
 
 class migration_yvzi(SQLModel, table=True):  # type: ignore
