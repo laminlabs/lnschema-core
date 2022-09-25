@@ -3,6 +3,8 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+:bento: Add migration script | [34](https://github.com/laminlabs/lnschema-core/pull/34) | [falexwolf](https://github.com/falexwolf) | 2022-09-24 | 0.7.3
+:adhesive_bandage: Fix type annotation of timestamps | [33](https://github.com/laminlabs/lnschema-core/pull/33) | [falexwolf](https://github.com/falexwolf) | 2022-09-24 |
 💄 Add noqa to script mako & simpler unique constraint | [31](https://github.com/laminlabs/lnschema-core/pull/31) | [falexwolf](https://github.com/falexwolf) | 2022-09-23 |
 ✨ Added insert to usage type | [30](https://github.com/laminlabs/lnschema-core/pull/30) | [sunnyosun](https://github.com/sunnyosun) | 2022-09-21 |
 🚚 Move migrations to package | [29](https://github.com/laminlabs/lnschema-core/pull/29) | [falexwolf](https://github.com/falexwolf) | 2022-09-20 | 0.7.2
