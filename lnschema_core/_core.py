@@ -75,7 +75,7 @@ class dobject(SQLModel, table=True):  # type: ignore
     """
 
     id: Optional[str] = Field(default_factory=idg.dobject, primary_key=True)
-    v: str = Field(default="1", primary_key=True)
+    v: Optional[str] = Field(default="1", primary_key=True)
     name: Optional[str] = Field(index=True)
     suffix: Optional[str] = Field(default=None, index=True)
     dtransform_id: str = Field(foreign_key="dtransform.id", index=True)
