@@ -79,6 +79,8 @@ class dobject(SQLModel, table=True):  # type: ignore
     name: Optional[str] = Field(index=True)
     suffix: Optional[str] = Field(default=None, index=True)
     dtransform_id: str = Field(foreign_key="dtransform.id", index=True)
+    size: Optional[float] = Field(default=None, index=True)
+    """Size in bytes."""
     storage_id: str = Field(foreign_key="storage.id", index=True)
     created_at: datetime = CreatedAt
     updated_at: Optional[datetime] = UpdatedAt
