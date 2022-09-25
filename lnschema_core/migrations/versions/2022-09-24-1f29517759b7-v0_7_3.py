@@ -78,6 +78,14 @@ def upgrade() -> None:
             existing_server_default=sa.text("(CURRENT_TIMESTAMP)"),
         )
 
+    with op.batch_alter_table("usage", schema=None) as batch_op:
+        batch_op.alter_column(
+            "time",
+            existing_type=sa.DATETIME(),
+            nullable=False,
+            server_default=sa.text("(CURRENT_TIMESTAMP)"),
+        )
+
 
 def downgrade() -> None:
     pass
