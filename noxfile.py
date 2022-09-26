@@ -4,6 +4,7 @@ import nox
 
 nox.options.reuse_existing_virtualenvs = True
 nox.options.error_on_external_run = False
+nox.options.default_venv_backend = None
 
 
 @nox.session(python=["3.7", "3.8", "3.9", "3.10", "3.11"])
