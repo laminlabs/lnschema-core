@@ -4,7 +4,7 @@ Import the package::
 
    import lnschema_core
 
-Main tables:
+Data objects & transformations:
 
 .. autosummary::
    :toctree: .
@@ -12,7 +12,14 @@ Main tables:
    dobject
    dtransform
    dtransform_in
+
+Users, storage locations, and usage statistics:
+
+.. autosummary::
+   :toctree: .
+
    user
+   storage
    usage
 
 Data transformations:
