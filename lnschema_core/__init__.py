@@ -4,7 +4,7 @@ Import the package::
 
    import lnschema_core
 
-Main tables:
+Data objects & transformations:
 
 .. autosummary::
    :toctree: .
@@ -12,7 +12,14 @@ Main tables:
    dobject
    dtransform
    dtransform_in
+
+Users, storage locations, and usage statistics:
+
+.. autosummary::
+   :toctree: .
+
    user
+   storage
    usage
 
 Data transformations:
@@ -43,7 +50,7 @@ Auxiliary modules:
 """
 # This is lnschema-module yvzi.
 _schema_id = "yvzi"
-_migration = "7e8f7b30792e"
+_migration = "1190648443cb"
 __version__ = "0.8.0"  # denote a pre-release for 0.1.0 with 0.1a1
 
 from . import id, type  # noqa
