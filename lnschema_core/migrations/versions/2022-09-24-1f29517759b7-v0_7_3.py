@@ -64,7 +64,7 @@ def upgrade() -> None:
             nullable=False,
             existing_server_default=sa.text("(CURRENT_TIMESTAMP)"),
         )
-        batch_op.drop_constraint("user", type_="unique")
+        # batch_op.drop_constraint("user", type_="unique")  # seems not needed
         batch_op.drop_index("ix_user_email")
         batch_op.create_index(batch_op.f("ix_user_email"), ["email"], unique=True)
         batch_op.drop_index("ix_user_handle")
