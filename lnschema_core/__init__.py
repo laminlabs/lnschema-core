@@ -1,4 +1,4 @@
-"""Schema module core (`yvzi`).
+"""Data provenance & flow (`yvzi`).
 
 Import the package::
 
