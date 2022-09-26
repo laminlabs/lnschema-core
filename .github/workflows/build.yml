@@ -33,7 +33,7 @@ jobs:
       - name: Cache
         uses: actions/cache@v3
         env:
-          cache-name: cache-0
+          cache-name: cache-1
         with:
           path: |
             .nox
@@ -44,11 +44,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install nox
       - name: Lint
+        if: matrix.python-version == '3.9'
         run: |
-          nox -s lint
+          nox -s lint --python ${{ matrix.python-version }}  --no-error-on-external-run
       - name: Build
         run: |
-          nox -s build --python ${{ matrix.python-version }}
+          nox -s build --python ${{ matrix.python-version }}  --no-error-on-external-run
       - name: Codecov
         if: matrix.python-version == '3.9'
         uses: codecov/codecov-action@v2
