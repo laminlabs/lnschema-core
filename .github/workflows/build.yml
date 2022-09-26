@@ -46,10 +46,10 @@ jobs:
       - name: Lint
         if: matrix.python-version == '3.9'
         run: |
-          nox -s lint --python ${{ matrix.python-version }}  --no-error-on-external-run
+          nox -s lint --python ${{ matrix.python-version }}
       - name: Build
         run: |
-          nox -s build --python ${{ matrix.python-version }}  --no-error-on-external-run
+          nox -s build --python ${{ matrix.python-version }}
       - name: Codecov
         if: matrix.python-version == '3.9'
         uses: codecov/codecov-action@v2
