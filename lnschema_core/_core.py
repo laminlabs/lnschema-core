@@ -1,7 +1,7 @@
 from datetime import datetime as datetime
 from typing import Optional
 
-from sqlmodel import Field, ForeignKeyConstraint, SQLModel
+from sqlmodel import Field, ForeignKeyConstraint, PrimaryKeyConstraint, SQLModel
 
 from . import id as idg
 from ._timestamps import CreatedAt, UpdatedAt
@@ -42,6 +42,39 @@ class storage(SQLModel, table=True):  # type: ignore
     """Cloud storage region if applicable."""
     created_at: datetime = CreatedAt
     updated_at: Optional[datetime] = UpdatedAt
+
+
+class instance(SQLModel, table=True):  # type: ignore
+    """Instances."""
+
+    id: str = Field(default=None, primary_key=True)
+    name: Optional[str]
+    storage_id: str = Field(foreign_key=storage.id)
+    dbconfig: str
+    cache_dir: str
+    sqlite_file: str
+    sqlite_file_local: str
+    db: str
+    created_at: datetime = CreatedAt
+    updated_at: Optional[datetime] = UpdatedAt
+
+
+class user_instance(SQLModel, table=True):  # type: ignore
+    """Relationships between users and instances."""
+
+    __table_args__ = (PrimaryKeyConstraint("user_id", "instance_id"),)
+    user_id: str = Field(foreign_key=user.id, index=True)
+    instance_id: str = Field(foreign_key=instance.id, index=True)
+    reated_at: datetime = CreatedAt
+
+
+class dtranform_instance(SQLModel, table=True):  # type: ignore
+    """Relationships between users and instances."""
+
+    __table_args__ = (PrimaryKeyConstraint("dtranform_id", "instance_id"),)
+    dtranform_id: str = Field(foreign_key="dtransform.id", index=True)
+    instance_id: str = Field(foreign_key=instance.id, index=True)
+    reated_at: datetime = CreatedAt
 
 
 class dobject(SQLModel, table=True):  # type: ignore
