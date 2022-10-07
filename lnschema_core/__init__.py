@@ -50,8 +50,8 @@ Auxiliary modules:
 """
 # This is lnschema-module yvzi.
 _schema_id = "yvzi"
-_migration = "439c4ee0a22a"
-__version__ = "0.9.0"  # denote a pre-release for 0.1.0 with 0.1a1
+_migration = "0c819d33ca9b"
+__version__ = "0.10.0"  # denote a pre-release for 0.1.0 with 0.1a1
 
 from . import id, type  # noqa
 from ._core import (  # noqa
