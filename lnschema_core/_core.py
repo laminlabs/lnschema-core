@@ -5,6 +5,7 @@ from sqlmodel import Field, ForeignKeyConstraint, SQLModel
 
 from . import id as idg
 from ._timestamps import CreatedAt, UpdatedAt
+from ._users import CreatedBy
 from .type import usage as usage_type
 
 
@@ -181,7 +182,7 @@ class jupynb(SQLModel, table=True):  # type: ignore
     v: str = Field(default="1", primary_key=True)
     """Version identifier, defaults to `"1"`.
 
-    Use this to label different versions of the same data object.
+    Use this to label different versions of the same notebook.
 
     Consider using `semantic versioning <https://semver.org>`__
     with `Python versioning <https://peps.python.org/pep-0440/>`__.
@@ -213,7 +214,10 @@ class pipeline(SQLModel, table=True):  # type: ignore
     v: str = Field(default="1", primary_key=True)
     name: Optional[str] = Field(default=None, index=True)
     reference: Optional[str] = Field(default=None, index=True)
+    created_by: str = CreatedBy
+    """Auto-populated link to :class:`~lnschema_core.user`."""
     created_at: datetime = CreatedAt
+    """Auto-populated time stamp."""
     updated_at: Optional[datetime] = UpdatedAt
 
 
