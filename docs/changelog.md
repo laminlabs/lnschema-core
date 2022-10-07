@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚸 Auto-populated CreatedBy | [40](https://github.com/laminlabs/lnschema-core/pull/40) | [falexwolf](https://github.com/falexwolf) | 2022-10-07 |
 🏗️ Remove version column from dobject | [39](https://github.com/laminlabs/lnschema-core/pull/39) | [falexwolf](https://github.com/falexwolf) | 2022-09-30 | 0.9.0
 👷 Fix CI setup | [37](https://github.com/laminlabs/lnschema-core/pull/37) | [falexwolf](https://github.com/falexwolf) | 2022-09-26 |
 🚸 Fix type annotations of primary keys and add docstrings everywhere  | [35](https://github.com/laminlabs/lnschema-core/pull/35) | [falexwolf](https://github.com/falexwolf) | 2022-09-26 | 0.8.1
