@@ -17,8 +17,9 @@ depends_on = None
 
 
 def upgrade() -> None:
+    op.add_column("jupynb", sa.Column("created_by", sqlmodel.sql.sqltypes.AutoString()))
+    op.execute("update jupynb set created_by = user_id")
     with op.batch_alter_table("jupynb", schema=None) as batch_op:
-        batch_op.add_column(sa.Column("created_by", sqlmodel.sql.sqltypes.AutoString()))
         batch_op.drop_index("ix_jupynb_user_id")
         batch_op.create_index(
             batch_op.f("ix_jupynb_created_by"), ["created_by"], unique=False
