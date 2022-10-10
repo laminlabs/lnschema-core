@@ -22,7 +22,7 @@ class user(SQLModel, table=True):  # type: ignore
     """Primary user email used for logging in."""
     handle: str = Field(nullable=False, index=True, unique=True)
     """User handle."""
-    name: str = Field(index=True)
+    name: Optional[str] = Field(index=True)
     """Long display name."""
     created_at: datetime = CreatedAt
     updated_at: Optional[datetime] = UpdatedAt
