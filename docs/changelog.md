@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚚 Add name column to user | [42](https://github.com/laminlabs/lnschema-core/pull/42) | [falexwolf](https://github.com/falexwolf) | 2022-10-10 |
 🩹 Fix migration script | [41](https://github.com/laminlabs/lnschema-core/pull/41) | [falexwolf](https://github.com/falexwolf) | 2022-10-07 | 0.10.1
 🚸 Auto-populated CreatedBy | [40](https://github.com/laminlabs/lnschema-core/pull/40) | [falexwolf](https://github.com/falexwolf) | 2022-10-07 | 0.10.0
 🏗️ Remove version column from dobject | [39](https://github.com/laminlabs/lnschema-core/pull/39) | [falexwolf](https://github.com/falexwolf) | 2022-09-30 | 0.9.0
