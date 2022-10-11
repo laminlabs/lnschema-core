@@ -105,7 +105,7 @@ class dobject(SQLModel, table=True):  # type: ignore
     storage_id: str = Field(foreign_key="storage.id", index=True)
     """Link to :class:`~lnschema_core.storage` location that stores the `dobject`."""
     checksum: Optional[str] = Field(default=None, index=True)
-    """Checksum of dobject file."""
+    """Checksum of file (md5)."""
     created_at: datetime = CreatedAt
     """Time of creation."""
     updated_at: Optional[datetime] = UpdatedAt

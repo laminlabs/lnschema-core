@@ -3,8 +3,9 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-Add checksum column | [43](https://github.com/laminlabs/lnschema-core/pull/43) | [fredericenard](https://github.com/fredericenard) | 2022-10-11 | 0.12.0
-🚚 Add name column to user | [42](https://github.com/laminlabs/lnschema-core/pull/42) | [falexwolf](https://github.com/falexwolf) | 2022-10-10 | 0.11.0
+🐛 Add migration version | - | [falexwolf](https://github.com/falexwolf) | 2022-10-11 | 0.12.1
+✨ Add `checksum` column | [43](https://github.com/laminlabs/lnschema-core/pull/43) | [fredericenard](https://github.com/fredericenard) | 2022-10-11 | 0.12.0
+🚚 Add `name` column to user | [42](https://github.com/laminlabs/lnschema-core/pull/42) | [falexwolf](https://github.com/falexwolf) | 2022-10-10 | 0.11.0
 🩹 Fix migration script | [41](https://github.com/laminlabs/lnschema-core/pull/41) | [falexwolf](https://github.com/falexwolf) | 2022-10-07 | 0.10.1
 🚸 Auto-populated CreatedBy | [40](https://github.com/laminlabs/lnschema-core/pull/40) | [falexwolf](https://github.com/falexwolf) | 2022-10-07 | 0.10.0
 🏗️ Remove version column from dobject | [39](https://github.com/laminlabs/lnschema-core/pull/39) | [falexwolf](https://github.com/falexwolf) | 2022-09-30 | 0.9.0
