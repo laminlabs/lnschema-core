@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-:truck: Rename query to select | [45](https://github.com/laminlabs/lnschema-core/pull/45) | [falexwolf](https://github.com/falexwolf) | 2022-10-12 |
+🚚 Rename query to select | [45](https://github.com/laminlabs/lnschema-core/pull/45) | [falexwolf](https://github.com/falexwolf) | 2022-10-12 | 0.13.0
 🐛 Add migration version | - | [falexwolf](https://github.com/falexwolf) | 2022-10-11 | 0.12.1
 ✨ Add `checksum` column | [43](https://github.com/laminlabs/lnschema-core/pull/43) | [fredericenard](https://github.com/fredericenard) | 2022-10-11 | 0.12.0
 🚚 Add `name` column to user | [42](https://github.com/laminlabs/lnschema-core/pull/42) | [falexwolf](https://github.com/falexwolf) | 2022-10-10 | 0.11.0
