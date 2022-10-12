@@ -6,7 +6,7 @@ class usage(str, Enum):
 
     ingest = "ingest"
     insert = "insert"
-    query = "query"
+    select = "select"
     update = "update"
     delete = "delete"
     load = "load"
