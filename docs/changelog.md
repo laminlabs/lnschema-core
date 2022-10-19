@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-✨ Added `dset` and `project` | [46](https://github.com/laminlabs/lnschema-core/pull/46) | [sunnyosun](https://github.com/sunnyosun) | 2022-10-19 |
+✨ Added `dset` and `project` | [46](https://github.com/laminlabs/lnschema-core/pull/46) | [sunnyosun](https://github.com/sunnyosun) | 2022-10-19 | 0.14.0
 🚚 Rename query to select | [45](https://github.com/laminlabs/lnschema-core/pull/45) | [falexwolf](https://github.com/falexwolf) | 2022-10-12 | 0.13.0
 🐛 Add migration version | - | [falexwolf](https://github.com/falexwolf) | 2022-10-11 | 0.12.1
 ✨ Add `checksum` column | [43](https://github.com/laminlabs/lnschema-core/pull/43) | [fredericenard](https://github.com/fredericenard) | 2022-10-11 | 0.12.0
