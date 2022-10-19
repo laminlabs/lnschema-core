@@ -9,6 +9,7 @@ Data objects & transformations:
 .. autosummary::
    :toctree: .
 
+   dset
    dobject
    dtransform
    dtransform_in
@@ -31,6 +32,13 @@ Data transformations:
    pipeline
    pipeline_run
 
+Project management:
+
+.. autosummary::
+   :toctree: .
+
+   project
+
 Tracking versions & migrations:
 
 .. autosummary::
@@ -51,17 +59,21 @@ Auxiliary modules:
 # This is lnschema-module yvzi.
 _schema_id = "yvzi"
 _migration = "2ddcb037e3ea"
-__version__ = "0.13.0"  # denote a pre-release for 0.1.0 with 0.1a1
+__version__ = "0.13.0"
 
 from . import id, type  # noqa
 from ._core import (  # noqa
     dobject,
+    dset,
+    dset_dobject,
     dtransform,
     dtransform_in,
     jupynb,
     migration_yvzi,
     pipeline,
     pipeline_run,
+    project,
+    project_dset,
     storage,
     usage,
     usage_type,

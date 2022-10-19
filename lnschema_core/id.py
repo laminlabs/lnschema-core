@@ -26,6 +26,7 @@ Entity-related generators:
    jupynb
    pipeline
    pipeline_run
+   project
    secret
 """
 from ._id import (  # noqa
