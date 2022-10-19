@@ -39,6 +39,11 @@ def dobject() -> str:
     return base62(n_char=21)
 
 
+def dset() -> str:
+    """Data set: 21 base62."""
+    return base62(n_char=21)
+
+
 def dtransform() -> str:
     """Data transformation: 21 base62."""
     return base62(n_char=21)
@@ -63,6 +68,11 @@ def user() -> str:
     1M      2e-03
     ======= ===========
     """
+    return base64(n_char=8)
+
+
+def project() -> str:
+    """Project: 8 base64."""
     return base64(n_char=8)
 
 
