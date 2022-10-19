@@ -48,6 +48,50 @@ class storage(SQLModel, table=True):  # type: ignore
     updated_at: Optional[datetime] = UpdatedAt
 
 
+class dset(SQLModel, table=True):  # type: ignore
+    """Sets of dobjects."""
+
+    id: str = Field(default_factory=idg.dset, primary_key=True)
+    name: str = Field(index=True)
+    created_by: str = CreatedBy
+    """Auto-populated link to :class:`~lnschema_core.user`."""
+    created_at: datetime = CreatedAt
+    """Time of creation."""
+    updated_at: Optional[datetime] = UpdatedAt
+    """Time of last update."""
+
+
+class dset_dobject(SQLModel, table=True):  # type: ignore
+    """Link table of dset and dobject."""
+
+    dset_id: str = Field(foreign_key="dset.id", primary_key=True)
+    """Link to :class:`~lnschema_core.dset`."""
+    dobject_id: str = Field(foreign_key="dobject.id", primary_key=True)
+    """Link to :class:`~lnschema_core.dobject`."""
+
+
+class project(SQLModel, table=True):  # type: ignore
+    """Projects."""
+
+    id: str = Field(default_factory=idg.project, primary_key=True)
+    name: str = Field(index=True)
+    created_by: str = CreatedBy
+    """Auto-populated link to :class:`~lnschema_core.user`."""
+    created_at: datetime = CreatedAt
+    """Time of creation."""
+    updated_at: Optional[datetime] = UpdatedAt
+    """Time of last update."""
+
+
+class project_dset(SQLModel, table=True):  # type: ignore
+    """Link table of project and dset."""
+
+    project_id: str = Field(foreign_key="project.id", primary_key=True)
+    """Link to :class:`~lnschema_core.dobject`."""
+    dset_id: str = Field(foreign_key="dset.id", primary_key=True)
+    """Link to :class:`~lnschema_core.dset`."""
+
+
 class dobject(SQLModel, table=True):  # type: ignore
     """Data objects in storage & memory.
 
