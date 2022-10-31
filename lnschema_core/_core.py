@@ -316,21 +316,3 @@ class usage(SQLModel, table=True):  # type: ignore
     """Time of event."""
     dobject_id: str = Field(foreign_key="core.dobject.id", index=True)
     """Link to the affected :class:`~lnschema_core.dobject`."""
-
-
-class version_yvzi(SQLModel, table=True):  # type: ignore
-    """Core schema module versions deployed in a given instance.
-
-    Migrations of the schema module add rows to this table, storing the schema
-    module version to which we migrated along with the user who performed the
-    migration.
-    """
-
-    v: Optional[str] = Field(primary_key=True)
-    """Python package version of `lnschema_core`."""
-    migration: Optional[str] = None
-    """Migration script reference of the latest migration leading up to the Python package version."""  # noqa
-    user_id: str = CreatedBy
-    """Link to :class:`~lnschema_core.user`."""
-    created_at: datetime = CreatedAt
-    """Time of creation."""
