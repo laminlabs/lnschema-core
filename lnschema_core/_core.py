@@ -1,11 +1,11 @@
 from datetime import datetime as datetime
 from typing import Optional
 
-from lndb_setup._prepare_schema import schema_sqlmodel
 from sqlmodel import Field, ForeignKeyConstraint
 
 from . import _name as schema_name
 from . import id as idg
+from ._prepare_schema import schema_sqlmodel
 from ._timestamps import CreatedAt, UpdatedAt
 from ._users import CreatedBy
 from .type import usage as usage_type
