@@ -3,11 +3,15 @@ from sqlalchemy.orm import declared_attr
 
 
 def schema_sqlmodel(schema_name: str):
-    from lndb_setup._settings_load import load_or_create_instance_settings
+    try:
+        from lndb_setup._settings_load import load_or_create_instance_settings
 
-    isettings = load_or_create_instance_settings()
+        isettings = load_or_create_instance_settings()
+        sqlite_true = isettings._dbconfig == "sqlite"
+    except ImportError:
+        sqlite_true = True
 
-    if not isettings._dbconfig == "sqlite":
+    if sqlite_true:
 
         class SQLModel(sqm.SQLModel):
             @declared_attr
