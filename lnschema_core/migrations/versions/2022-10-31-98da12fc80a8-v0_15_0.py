@@ -26,7 +26,10 @@ def upgrade() -> None:
         op.rename_table(old_table_name="dobject", new_table_name="core.dobject")
         op.rename_table(old_table_name="usage", new_table_name="core.usage")
         op.rename_table(old_table_name="jupynb", new_table_name="core.jupynb")
-        op.rename_table(old_table_name="pipeline", new_table_name="core.pipeline_run")
+        op.rename_table(old_table_name="pipeline", new_table_name="core.pipeline")
+        op.rename_table(
+            old_table_name="pipeline_run", new_table_name="core.pipeline_run"
+        )
         op.rename_table(old_table_name="dset", new_table_name="core.dset")
         op.rename_table(old_table_name="project", new_table_name="core.project")
         op.rename_table(
