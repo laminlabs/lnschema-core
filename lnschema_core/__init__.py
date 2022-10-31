@@ -58,6 +58,7 @@ Auxiliary modules:
 """
 # This is lnschema-module yvzi.
 _schema_id = "yvzi"
+_name = "core"
 _migration = "cf5913791674"
 __version__ = "0.14.0"
 
@@ -69,7 +70,6 @@ from ._core import (  # noqa
     dtransform,
     dtransform_in,
     jupynb,
-    migration_yvzi,
     pipeline,
     pipeline_run,
     project,
@@ -80,3 +80,4 @@ from ._core import (  # noqa
     user,
     version_yvzi,
 )
+from ._migration_table import migration_yvzi
