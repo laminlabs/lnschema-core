@@ -78,6 +78,5 @@ from ._core import (  # noqa
     usage,
     usage_type,
     user,
-    version_yvzi,
 )
-from ._migration_table import migration_yvzi
+from ._versions import migration_yvzi, version_yvzi
