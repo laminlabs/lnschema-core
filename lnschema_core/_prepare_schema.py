@@ -1,10 +1,10 @@
 import sqlmodel as sqm
 from sqlalchemy.orm import declared_attr
 
-from ._settings_load import load_or_create_instance_settings
-
 
 def schema_sqlmodel(schema_name: str):
+    from lndb_setup._settings_load import load_or_create_instance_settings
+
     isettings = load_or_create_instance_settings()
 
     if not isettings._dbconfig == "sqlite":
