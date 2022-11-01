@@ -39,22 +39,12 @@ Project management:
 
    project
 
-Tracking versions & migrations:
+Development tools:
 
 .. autosummary::
    :toctree: .
 
-   version_yvzi
-   migration_yvzi
-
-Auxiliary modules:
-
-.. autosummary::
-   :toctree: .
-
-   type
-   id
-   sqlmodel
+   dev
 
 """
 # This is lnschema-module yvzi.
@@ -63,7 +53,6 @@ _name = "core"
 _migration = "cf5913791674"
 __version__ = "0.14.0"
 
-from . import id, type  # noqa
 from ._core import (  # noqa
     dobject,
     dset,
@@ -80,4 +69,3 @@ from ._core import (  # noqa
     usage_type,
     user,
 )
-from ._versions import migration_yvzi, version_yvzi
