@@ -19,5 +19,5 @@ Auxiliary modules:
 
 """
 
-from .. import id, sqlmodel, type  # noqa
-from .._versions import migration_yvzi, version_yvzi  # noqa
+from . import id, sqlmodel, type  # noqa
+from ._versions import migration_yvzi, version_yvzi  # noqa

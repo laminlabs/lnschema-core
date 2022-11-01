@@ -3,8 +3,8 @@ from typing import Optional
 
 from sqlmodel import Field, SQLModel
 
-from ._timestamps import CreatedAt
-from ._users import CreatedBy
+from .._timestamps import CreatedAt
+from .._users import CreatedBy
 
 
 class version_yvzi(SQLModel, table=True):  # type: ignore
