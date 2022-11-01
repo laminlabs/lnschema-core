@@ -53,6 +53,7 @@ _name = "core"
 _migration = "cf5913791674"
 __version__ = "0.14.0"
 
+from . import dev
 from ._core import (  # noqa
     dobject,
     dset,
@@ -69,3 +70,4 @@ from ._core import (  # noqa
     usage_type,
     user,
 )
+from .dev import id  # backward compat
