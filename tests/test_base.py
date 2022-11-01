@@ -1,4 +1,4 @@
-from lnschema_core import id
+from lnschema_core.dev import id
 
 
 def test_id():
