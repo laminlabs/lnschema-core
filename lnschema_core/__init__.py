@@ -54,6 +54,7 @@ Auxiliary modules:
 
    type
    id
+   sqlmodel
 
 """
 # This is lnschema-module yvzi.

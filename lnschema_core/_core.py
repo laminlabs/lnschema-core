@@ -5,9 +5,9 @@ from sqlmodel import Field, ForeignKeyConstraint
 
 from . import _name as schema_name
 from . import id as idg
-from ._prepare_schema import schema_sqlmodel
 from ._timestamps import CreatedAt, UpdatedAt
 from ._users import CreatedBy
+from .sqlmodel import schema_sqlmodel
 from .type import usage as usage_type
 
 SQLModel = schema_sqlmodel(schema_name)
