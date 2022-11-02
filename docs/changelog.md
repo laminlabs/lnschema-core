@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🍱 Migration and fixes for postgres | [50](https://github.com/laminlabs/lnschema-core/pull/50) | [falexwolf](https://github.com/falexwolf) | 2022-11-02 |
 ✨ Schema modules on SQL level | [49](https://github.com/laminlabs/lnschema-core/pull/49) | [falexwolf](https://github.com/falexwolf) | 2022-11-01 |
 🧑‍💻 Added naming convention | [47](https://github.com/laminlabs/lnschema-core/pull/47) | [sunnyosun](https://github.com/sunnyosun) | 2022-10-20 |
 ✨ Added `dset` and `project` | [46](https://github.com/laminlabs/lnschema-core/pull/46) | [sunnyosun](https://github.com/sunnyosun) | 2022-10-19 | 0.14.0
