@@ -7,35 +7,35 @@
    SQLModelPrefix
 """
 
-from typing import Optional
-
 import sqlmodel as sqm
 from sqlalchemy.orm import declared_attr
+
+# it's tricky to deal with class variables in SQLModel children
+# hence, we're using a global variable, here
+SCHEMA_NAME = None
 
 
 class SQLModelModule(sqm.SQLModel):
     """SQLModel for schema module."""
 
-    schema_name: Optional[str] = None
-
+    # this here is problematic for those tables that overwrite
+    # __table_args__; we currently need to treat them manually
     @declared_attr
     def __table_args__(cls) -> str:
         """Update table args with schema module."""
-        return dict(schema=cls.schema_name)  # type: ignore
+        return dict(schema=f"{SCHEMA_NAME}")  # type: ignore
 
 
 class SQLModelPrefix(sqm.SQLModel):  # type: ignore
     """SQLModel prefixed by schema module name."""
 
-    schema_name: Optional[str] = None
-
     @declared_attr
     def __tablename__(cls) -> str:  # type: ignore
         """Prefix table name with schema module."""
-        return f"{cls.schema_name}.{cls.__name__.lower()}"
+        return f"{SCHEMA_NAME}.{cls.__name__.lower()}"
 
 
-def schema_sqlmodel(schema_name: str):
+def is_sqlite():
     try:
         from lndb_setup._settings_load import load_or_create_instance_settings
 
@@ -44,9 +44,14 @@ def schema_sqlmodel(schema_name: str):
     except ImportError:
         sqlite_true = True
 
-    if sqlite_true:
-        SQLModelPrefix.schema_name = schema_name
+    return sqlite_true
+
+
+def schema_sqlmodel(schema_name: str):
+    global SCHEMA_NAME
+    SCHEMA_NAME = schema_name
+
+    if is_sqlite():
         return SQLModelPrefix
     else:
-        SQLModelModule.schema_name = schema_name
         return SQLModelModule

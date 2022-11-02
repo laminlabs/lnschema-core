@@ -39,7 +39,19 @@ def upgrade() -> None:
             old_table_name="dset_dobject", new_table_name="core.dset_dobject"
         )
     else:
-        pass
+        op.execute("alter table public.dtransform set schema core")
+        op.execute("alter table public.storage set schema core")
+        op.execute("alter table public.user set schema core")
+        op.execute("alter table public.dtransform_in set schema core")
+        op.execute("alter table public.dobject set schema core")
+        op.execute("alter table public.usage set schema core")
+        op.execute("alter table public.jupynb set schema core")
+        op.execute("alter table public.pipeline set schema core")
+        op.execute("alter table public.pipeline_run set schema core")
+        op.execute("alter table public.dset set schema core")
+        op.execute("alter table public.project set schema core")
+        op.execute("alter table public.project_dset set schema core")
+        op.execute("alter table public.dset_dobject set schema core")
 
 
 def downgrade() -> None:
