@@ -190,6 +190,7 @@ class dtransform(SQLModel, table=True):  # type: ignore
             ["core.jupynb.id", "core.jupynb.v"],
             name="dtransform_jupynb",
         ),
+        {"schema": "core"},
     )
     id: str = Field(default_factory=idg.dtransform, primary_key=True)
     """Universal base62 ID & primary key, generated through :func:`~lnschema_core.dev.id.dtransform`."""  # noqa
@@ -290,6 +291,7 @@ class pipeline_run(SQLModel, table=True):  # type: ignore
             ["core.pipeline.id", "core.pipeline.v"],
             name="pipeline",
         ),
+        {"schema": "core"},
     )
     id: Optional[str] = Field(default_factory=idg.pipeline_run, primary_key=True)
     pipeline_id: str = Field(index=True)

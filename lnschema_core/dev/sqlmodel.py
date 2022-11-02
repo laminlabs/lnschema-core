@@ -18,6 +18,8 @@ SCHEMA_NAME = None
 class SQLModelModule(sqm.SQLModel):
     """SQLModel for schema module."""
 
+    # this here is problematic for those tables that overwrite
+    # __table_args__; we currently need to treat them manually
     @declared_attr
     def __table_args__(cls) -> str:
         """Update table args with schema module."""
