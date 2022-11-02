@@ -54,8 +54,20 @@ _migration = "cf5913791674"
 __version__ = "0.14.0"
 
 from . import dev
-from ._core import (  # noqa; dobject,; dset,; dset_dobject,; dtransform,; dtransform_in,; jupynb,; pipeline,; pipeline_run,; project,; project_dset,; usage,; usage_type,
+from ._core import (  # noqa
+    dobject,
+    dset,
+    dset_dobject,
+    dtransform,
+    dtransform_in,
+    jupynb,
+    pipeline,
+    pipeline_run,
+    project,
+    project_dset,
     storage,
+    usage,
+    usage_type,
     user,
 )
 from .dev import id  # backward compat
