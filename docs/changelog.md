@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🎨 Camel case class names | [51](https://github.com/laminlabs/lnschema-core/pull/51) | [falexwolf](https://github.com/falexwolf) | 2022-11-02 |
 🍱 Migration and fixes for postgres | [50](https://github.com/laminlabs/lnschema-core/pull/50) | [falexwolf](https://github.com/falexwolf) | 2022-11-02 |
 ✨ Schema modules on SQL level | [49](https://github.com/laminlabs/lnschema-core/pull/49) | [falexwolf](https://github.com/falexwolf) | 2022-11-01 |
 🧑‍💻 Added naming convention | [47](https://github.com/laminlabs/lnschema-core/pull/47) | [sunnyosun](https://github.com/sunnyosun) | 2022-10-20 |
