@@ -12,7 +12,7 @@ Data objects & transformations:
    DSet
    DObject
    DTransform
-   DTransform_in
+   DTransformIn
 
 Users, storage locations, and usage statistics:
 
@@ -53,18 +53,20 @@ _name = "core"
 _migration = "98da12fc80a8"
 __version__ = "0.15.0"
 
-from . import dev
-from ._core import dobject as DObject
-from ._core import dset as DSet
-from ._core import dset_dobject as DSetDObject
-from ._core import dtransform as DTransform
-from ._core import dtransform_in as DTransformIn
-from ._core import jupynb as Jupynb
-from ._core import pipeline as Pipeline
-from ._core import pipeline_run as PipelineRun
-from ._core import project as Project
-from ._core import project_dset as ProjectDSet
-from ._core import storage as Storage
-from ._core import usage as Usage
-from ._core import user as User
+from . import _core, dev
+from ._core import (
+    DObject,
+    DSet,
+    DSetDObject,
+    DTransform,
+    DTransformIn,
+    Jupynb,
+    Pipeline,
+    PipelineRun,
+    Project,
+    ProjectDSet,
+    Storage,
+    Usage,
+    User,
+)
 from .dev import id  # backward compat
