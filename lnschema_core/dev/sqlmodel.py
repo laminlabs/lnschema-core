@@ -35,7 +35,7 @@ class SQLModelPrefix(sqm.SQLModel):  # type: ignore
         return f"{SCHEMA_NAME}.{cls.__name__.lower()}"
 
 
-def schema_sqlmodel(schema_name: str):
+def is_sqlite():
     try:
         from lndb_setup._settings_load import load_or_create_instance_settings
 
@@ -44,10 +44,14 @@ def schema_sqlmodel(schema_name: str):
     except ImportError:
         sqlite_true = True
 
+    return sqlite_true
+
+
+def schema_sqlmodel(schema_name: str):
     global SCHEMA_NAME
     SCHEMA_NAME = schema_name
 
-    if sqlite_true:
+    if is_sqlite():
         return SQLModelPrefix
     else:
         return SQLModelModule

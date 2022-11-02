@@ -7,7 +7,7 @@ from . import _name as schema_name
 from ._timestamps import CreatedAt, UpdatedAt
 from ._users import CreatedBy
 from .dev import id as idg
-from .dev.sqlmodel import schema_sqlmodel
+from .dev.sqlmodel import is_sqlite, schema_sqlmodel
 from .dev.type import usage as usage_type
 
 SQLModel = schema_sqlmodel(schema_name)
@@ -190,7 +190,7 @@ class dtransform(SQLModel, table=True):  # type: ignore
             ["core.jupynb.id", "core.jupynb.v"],
             name="dtransform_jupynb",
         ),
-        {"schema": "core"},
+        {"schema": schema_name if not is_sqlite() else None},
     )
     id: str = Field(default_factory=idg.dtransform, primary_key=True)
     """Universal base62 ID & primary key, generated through :func:`~lnschema_core.dev.id.dtransform`."""  # noqa
@@ -291,7 +291,7 @@ class pipeline_run(SQLModel, table=True):  # type: ignore
             ["core.pipeline.id", "core.pipeline.v"],
             name="pipeline",
         ),
-        {"schema": "core"},
+        {"schema": schema_name if not is_sqlite() else None},
     )
     id: Optional[str] = Field(default_factory=idg.pipeline_run, primary_key=True)
     pipeline_id: str = Field(index=True)
