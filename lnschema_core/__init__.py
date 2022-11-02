@@ -50,8 +50,8 @@ Development tools:
 # This is lnschema-module yvzi.
 _schema_id = "yvzi"
 _name = "core"
-_migration = "cf5913791674"
-__version__ = "0.14.0"
+_migration = "98da12fc80a8"
+__version__ = "0.15.0"
 
 from . import dev
 from ._core import (  # noqa
