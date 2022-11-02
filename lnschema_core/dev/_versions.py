@@ -20,7 +20,7 @@ class version_yvzi(SQLModel, table=True):  # type: ignore
     migration: Optional[str] = None
     """Migration script reference of the latest migration leading up to the Python package version."""  # noqa
     user_id: str = CreatedBy
-    """Link to :class:`~lnschema_core.user`."""
+    """Link to :class:`~lnschema_core.User`."""
     created_at: datetime = CreatedAt
     """Time of creation."""
 

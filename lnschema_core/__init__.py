@@ -9,35 +9,35 @@ Data objects & transformations:
 .. autosummary::
    :toctree: .
 
-   dset
-   dobject
-   dtransform
-   dtransform_in
+   DSet
+   DObject
+   DTransform
+   DTransformIn
 
 Users, storage locations, and usage statistics:
 
 .. autosummary::
    :toctree: .
 
-   user
-   storage
-   usage
+   User
+   Storage
+   Usage
 
 Data transformations:
 
 .. autosummary::
    :toctree: .
 
-   jupynb
-   pipeline
-   pipeline_run
+   Jupynb
+   Pipeline
+   PipelineRun
 
 Project management:
 
 .. autosummary::
    :toctree: .
 
-   project
+   Project
 
 Development tools:
 
@@ -53,21 +53,22 @@ _name = "core"
 _migration = "98da12fc80a8"
 __version__ = "0.15.0"
 
-from . import dev
-from ._core import (  # noqa
-    dobject,
-    dset,
-    dset_dobject,
-    dtransform,
-    dtransform_in,
-    jupynb,
-    pipeline,
-    pipeline_run,
-    project,
-    project_dset,
-    storage,
-    usage,
-    usage_type,
-    user,
+from . import _core, dev
+from ._core import (
+    DObject,
+    DSet,
+    DSetDObject,
+    DTransform,
+    DTransformIn,
+    Jupynb,
+    Pipeline,
+    PipelineRun,
+    Project,
+    ProjectDSet,
+    Storage,
+    Usage,
+    User,
 )
 from .dev import id  # backward compat
+
+storage = Storage  # backward compat

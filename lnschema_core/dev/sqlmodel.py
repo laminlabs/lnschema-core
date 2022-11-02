@@ -52,6 +52,10 @@ def schema_sqlmodel(schema_name: str):
     SCHEMA_NAME = schema_name
 
     if is_sqlite():
-        return SQLModelPrefix
+        prefix = f"{schema_name}."
+        schema_arg = None
+        return SQLModelPrefix, prefix, schema_arg
     else:
-        return SQLModelModule
+        prefix = None
+        schema_arg = schema_name
+        return SQLModelModule, prefix, schema_arg

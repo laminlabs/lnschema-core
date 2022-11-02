@@ -7,13 +7,13 @@ from . import _name as schema_name
 from ._timestamps import CreatedAt, UpdatedAt
 from ._users import CreatedBy
 from .dev import id as idg
-from .dev.sqlmodel import is_sqlite, schema_sqlmodel
+from .dev.sqlmodel import schema_sqlmodel
 from .dev.type import usage as usage_type
 
-SQLModel = schema_sqlmodel(schema_name)
+SQLModel, prefix, schema_arg = schema_sqlmodel(schema_name)
 
 
-class user(SQLModel, table=True):  # type: ignore
+class User(SQLModel, table=True):  # type: ignore
     """User accounts.
 
     All data in this table is synched from the cloud user account to ensure a
@@ -32,7 +32,7 @@ class user(SQLModel, table=True):  # type: ignore
     updated_at: Optional[datetime] = UpdatedAt
 
 
-class storage(SQLModel, table=True):  # type: ignore
+class Storage(SQLModel, table=True):  # type: ignore
     """Storage locations.
 
     A dobject or dtransform-associated file can be stored in any desired S3,
@@ -52,21 +52,26 @@ class storage(SQLModel, table=True):  # type: ignore
     updated_at: Optional[datetime] = UpdatedAt
 
 
-class dset(SQLModel, table=True):  # type: ignore
-    """Sets of dobjects."""
+class DSet(SQLModel, table=True):  # type: ignore
+    """Datasets.
+
+    In LaminDB, a dataset is a collection of data objects (`DObject`).
+    """
 
     id: str = Field(default_factory=idg.dset, primary_key=True)
     name: str = Field(index=True)
     created_by: str = CreatedBy
-    """Auto-populated link to :class:`~lnschema_core.user`."""
+    """Auto-populated link to :class:`~lnschema_core.User`."""
     created_at: datetime = CreatedAt
     """Time of creation."""
     updated_at: Optional[datetime] = UpdatedAt
     """Time of last update."""
 
 
-class dset_dobject(SQLModel, table=True):  # type: ignore
+class DSetDObject(SQLModel, table=True):  # type: ignore
     """Link table of dset and dobject."""
+
+    __tablename__ = "{prefix}dset_dobject"
 
     dset_id: str = Field(foreign_key="core.dset.id", primary_key=True)
     """Link to :class:`~lnschema_core.dset`."""
@@ -74,21 +79,23 @@ class dset_dobject(SQLModel, table=True):  # type: ignore
     """Link to :class:`~lnschema_core.dobject`."""
 
 
-class project(SQLModel, table=True):  # type: ignore
+class Project(SQLModel, table=True):  # type: ignore
     """Projects."""
 
     id: str = Field(default_factory=idg.project, primary_key=True)
     name: str = Field(index=True)
     created_by: str = CreatedBy
-    """Auto-populated link to :class:`~lnschema_core.user`."""
+    """Auto-populated link to :class:`~lnschema_core.User`."""
     created_at: datetime = CreatedAt
     """Time of creation."""
     updated_at: Optional[datetime] = UpdatedAt
     """Time of last update."""
 
 
-class project_dset(SQLModel, table=True):  # type: ignore
+class ProjectDSet(SQLModel, table=True):  # type: ignore
     """Link table of project and dset."""
+
+    __tablename__ = "{prefix}project_dset"
 
     project_id: str = Field(foreign_key="core.project.id", primary_key=True)
     """Link to :class:`~lnschema_core.dobject`."""
@@ -96,7 +103,7 @@ class project_dset(SQLModel, table=True):  # type: ignore
     """Link to :class:`~lnschema_core.dset`."""
 
 
-class dobject(SQLModel, table=True):  # type: ignore
+class DObject(SQLModel, table=True):  # type: ignore
     """Data objects in storage & memory.
 
     Data objects (`dobjects`) always represent a dataset, a set of jointly measured
@@ -149,9 +156,9 @@ class dobject(SQLModel, table=True):  # type: ignore
     Examples: 1KB is 1e3 bytes, 1MB is 1e6, 1GB is 1e9, 1TB is 1e12 etc.
     """
     dtransform_id: str = Field(foreign_key="core.dtransform.id", index=True)
-    """Link to :class:`~lnschema_core.dtransform` that generated the `dobject`."""
+    """Link to :class:`~lnschema_core.DTransform` that generated the `dobject`."""
     storage_id: str = Field(foreign_key="core.storage.id", index=True)
-    """Link to :class:`~lnschema_core.storage` location that stores the `dobject`."""
+    """Link to :class:`~lnschema_core.Storage` location that stores the `dobject`."""
     checksum: Optional[str] = Field(default=None, index=True)
     """Checksum of file (md5)."""
     created_at: datetime = CreatedAt
@@ -160,7 +167,7 @@ class dobject(SQLModel, table=True):  # type: ignore
     """Time of last update."""
 
 
-class dtransform(SQLModel, table=True):  # type: ignore
+class DTransform(SQLModel, table=True):  # type: ignore
     """Data transformations.
 
     A data transformation (`dtransform`) is _any_ transformation of a `dobject`.
@@ -190,21 +197,21 @@ class dtransform(SQLModel, table=True):  # type: ignore
             ["core.jupynb.id", "core.jupynb.v"],
             name="dtransform_jupynb",
         ),
-        {"schema": schema_name if not is_sqlite() else None},
+        {"schema": schema_arg},
     )
     id: str = Field(default_factory=idg.dtransform, primary_key=True)
     """Universal base62 ID & primary key, generated through :func:`~lnschema_core.dev.id.dtransform`."""  # noqa
     jupynb_id: Optional[str] = Field(default=None, index=True)
-    """Link to :class:`~lnschema_core.jupynb` that mediated the data transformation."""
+    """Link to :class:`~lnschema_core.Jupynb` that mediated the data transformation."""
     jupynb_v: Optional[str] = Field(default=None, index=True)
-    """Second part of composite primary key to link to :class:`~lnschema_core.jupynb`."""  # noqa
+    """Second part of composite primary key to link to :class:`~lnschema_core.Jupynb`."""  # noqa
     pipeline_run_id: Optional[str] = Field(
         default=None, foreign_key="core.pipeline_run.id", index=True
     )
-    """Link to :class:`~lnschema_core.pipeline_run` that mediated the data transformation."""  # noqa
+    """Link to :class:`~lnschema_core.PipelineRun` that mediated the data transformation."""  # noqa
 
 
-class dtransform_in(SQLModel, table=True):  # type: ignore
+class DTransformIn(SQLModel, table=True):  # type: ignore
     """Input data for data transformations.
 
     This is a many-to-many link table for `dtransform` and `dobject` storing the
@@ -216,13 +223,15 @@ class dtransform_in(SQLModel, table=True):  # type: ignore
     - One `dtransform` can have several `dobjects` as inputs.
     """
 
+    __tablename__ = "{prefix}dtransform_in"
+
     dtransform_id: str = Field(foreign_key="core.dtransform.id", primary_key=True)
-    """Link to :class:`~lnschema_core.dtransform`."""
+    """Link to :class:`~lnschema_core.DTransform`."""
     dobject_id: str = Field(foreign_key="core.dobject.id", primary_key=True)
-    """Link to :class:`~lnschema_core.dobject`."""
+    """Link to :class:`~lnschema_core.DObject`."""
 
 
-class jupynb(SQLModel, table=True):  # type: ignore
+class Jupynb(SQLModel, table=True):  # type: ignore
     """Jupyter notebooks.
 
     Jupyter notebooks (`jupynbs`) represent one type of data transformation
@@ -248,14 +257,14 @@ class jupynb(SQLModel, table=True):  # type: ignore
     <https://lamin.ai/docs/nbproject/nbproject.dev.metalive#nbproject.dev.MetaLive.title>`__.
     """
     created_by: str = CreatedBy
-    """Auto-populated link to :class:`~lnschema_core.user`."""
+    """Auto-populated link to :class:`~lnschema_core.User`."""
     created_at: datetime = CreatedAt
     """Time of creation."""
     updated_at: Optional[datetime] = UpdatedAt
     """Time of last update."""
 
 
-class pipeline(SQLModel, table=True):  # type: ignore
+class Pipeline(SQLModel, table=True):  # type: ignore
     """Pipelines.
 
     A pipeline is typically versioned software that can perform a data
@@ -269,13 +278,13 @@ class pipeline(SQLModel, table=True):  # type: ignore
     name: Optional[str] = Field(default=None, index=True)
     reference: Optional[str] = Field(default=None, index=True)
     created_by: str = CreatedBy
-    """Auto-populated link to :class:`~lnschema_core.user`."""
+    """Auto-populated link to :class:`~lnschema_core.User`."""
     created_at: datetime = CreatedAt
     """Auto-populated time stamp."""
     updated_at: Optional[datetime] = UpdatedAt
 
 
-class pipeline_run(SQLModel, table=True):  # type: ignore
+class PipelineRun(SQLModel, table=True):  # type: ignore
     """Pipeline runs.
 
     Pipeline runs represent one type of data transformation (`dtransform`) and
@@ -285,24 +294,25 @@ class pipeline_run(SQLModel, table=True):  # type: ignore
     linking to entries in this table.
     """
 
+    __tablename__ = "{prefix}pipeline_run"
     __table_args__ = (
         ForeignKeyConstraint(
             ["pipeline_id", "pipeline_v"],
             ["core.pipeline.id", "core.pipeline.v"],
             name="pipeline",
         ),
-        {"schema": schema_name if not is_sqlite() else None},
+        {"schema": schema_arg},
     )
     id: Optional[str] = Field(default_factory=idg.pipeline_run, primary_key=True)
     pipeline_id: str = Field(index=True)
     pipeline_v: str = Field(index=True)
     name: Optional[str] = Field(default=None, index=True)
     created_by: str = CreatedBy
-    """Auto-populated link to :class:`~lnschema_core.user`."""
+    """Auto-populated link to :class:`~lnschema_core.User`."""
     created_at: datetime = CreatedAt
 
 
-class usage(SQLModel, table=True):  # type: ignore
+class Usage(SQLModel, table=True):  # type: ignore
     """Data usage log.
 
     Any API call in the `lamindb.db` API is logged here.
@@ -313,8 +323,8 @@ class usage(SQLModel, table=True):  # type: ignore
     type: usage_type = Field(nullable=False, index=True)
     """Usage type."""
     user_id: str = CreatedBy
-    """Link to :class:`~lnschema_core.user`."""
+    """Link to :class:`~lnschema_core.User`."""
     time: datetime = CreatedAt
     """Time of event."""
     dobject_id: str = Field(foreign_key="core.dobject.id", index=True)
-    """Link to the affected :class:`~lnschema_core.dobject`."""
+    """Link to the affected :class:`~lnschema_core.DObject`."""
