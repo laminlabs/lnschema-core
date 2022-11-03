@@ -71,7 +71,7 @@ class DSet(SQLModel, table=True):  # type: ignore
 class DSetDObject(SQLModel, table=True):  # type: ignore
     """Link table of dset and dobject."""
 
-    __tablename__ = "{prefix}dset_dobject"
+    __tablename__ = f"{prefix}dset_dobject"
 
     dset_id: str = Field(foreign_key="core.dset.id", primary_key=True)
     """Link to :class:`~lnschema_core.dset`."""
@@ -95,7 +95,7 @@ class Project(SQLModel, table=True):  # type: ignore
 class ProjectDSet(SQLModel, table=True):  # type: ignore
     """Link table of project and dset."""
 
-    __tablename__ = "{prefix}project_dset"
+    __tablename__ = f"{prefix}project_dset"
 
     project_id: str = Field(foreign_key="core.project.id", primary_key=True)
     """Link to :class:`~lnschema_core.dobject`."""
@@ -223,7 +223,7 @@ class DTransformIn(SQLModel, table=True):  # type: ignore
     - One `dtransform` can have several `dobjects` as inputs.
     """
 
-    __tablename__ = "{prefix}dtransform_in"
+    __tablename__ = f"{prefix}dtransform_in"
 
     dtransform_id: str = Field(foreign_key="core.dtransform.id", primary_key=True)
     """Link to :class:`~lnschema_core.DTransform`."""
@@ -294,7 +294,7 @@ class PipelineRun(SQLModel, table=True):  # type: ignore
     linking to entries in this table.
     """
 
-    __tablename__ = "{prefix}pipeline_run"
+    __tablename__ = f"{prefix}pipeline_run"
     __table_args__ = (
         ForeignKeyConstraint(
             ["pipeline_id", "pipeline_v"],
