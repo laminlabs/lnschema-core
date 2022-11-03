@@ -58,6 +58,6 @@ def schema_sqlmodel(schema_name: str):
         schema_arg = None
         return SQLModelPrefix, prefix, schema_arg
     else:
-        prefix = None
+        prefix = ""
         schema_arg = schema_name
         return SQLModelModule, prefix, schema_arg
