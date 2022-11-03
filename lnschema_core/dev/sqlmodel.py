@@ -36,6 +36,8 @@ class SQLModelPrefix(sqm.SQLModel):  # type: ignore
 
 
 def is_sqlite():
+    # for this to work, lndb_setup can't import lnschema_core statically
+    # at can only import it dynamically like all other schema modules
     try:
         from lndb_setup._settings_load import load_or_create_instance_settings
 
