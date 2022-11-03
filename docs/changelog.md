@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+:bug: Fix prefix | [53](https://github.com/laminlabs/lnschema-core/pull/53) | [falexwolf](https://github.com/falexwolf) | 2022-11-03 |
 🐛 Fix prefix | [52](https://github.com/laminlabs/lnschema-core/pull/52) | [falexwolf](https://github.com/falexwolf) | 2022-11-03 | 0.15.1
 🎨 Camel case class names | [51](https://github.com/laminlabs/lnschema-core/pull/51) | [falexwolf](https://github.com/falexwolf) | 2022-11-02 | 0.15.0
 🍱 Migration and fixes for postgres | [50](https://github.com/laminlabs/lnschema-core/pull/50) | [falexwolf](https://github.com/falexwolf) | 2022-11-02 |
