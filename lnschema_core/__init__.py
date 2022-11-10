@@ -1,42 +1,29 @@
-"""Data provenance & flow (`yvzi`).
+"""Data lineage (`yvzi`).
+
+.. note::
+   Please see the documented API reference `here <https://lamin.ai/docs/db/lamindb.schema>`__.
+
+   This page just provides a list of entities.
 
 Import the package::
 
    import lnschema_core
 
-Data objects & transformations:
+Entities:
 
 .. autosummary::
    :toctree: .
 
-   DSet
    DObject
    DTransform
+   DSet
    DTransformIn
-
-Users, storage locations, and usage statistics:
-
-.. autosummary::
-   :toctree: .
-
-   User
-   Storage
-   Usage
-
-Data transformations:
-
-.. autosummary::
-   :toctree: .
-
    Jupynb
    Pipeline
    PipelineRun
-
-Project management:
-
-.. autosummary::
-   :toctree: .
-
+   User
+   Storage
+   Usage
    Project
 
 Development tools:
