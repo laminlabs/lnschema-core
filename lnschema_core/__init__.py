@@ -37,8 +37,8 @@ Development tools:
 # This is lnschema-module yvzi.
 _schema_id = "yvzi"
 _name = "core"
-_migration = "98da12fc80a8"
-__version__ = "0.15.2"
+_migration = "4ee426b656bb"
+__version__ = "0.16.0"
 
 from . import _core, dev
 from ._core import (
