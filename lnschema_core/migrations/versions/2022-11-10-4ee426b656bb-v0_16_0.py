@@ -16,7 +16,7 @@ branch_labels = None
 depends_on = None
 
 
-def upgrade() -> None:
+def upgrade_sqlite() -> None:
     op.rename_table("core.pipeline_run", "core.run")
     op.alter_column(
         "core.dtransform", column_name="pipeline_run_id", new_column_name="run_id"
@@ -212,6 +212,24 @@ def upgrade() -> None:
         batch_op.create_index(
             batch_op.f("ix_core.user_updated_at"), ["updated_at"], unique=False
         )
+
+
+def upgrade_postgres():
+    op.rename_table("pipeline_run", "run", schema="core")
+    op.alter_column(
+        "dtransform",
+        column_name="pipeline_run_id",
+        new_column_name="run_id",
+        schema="core",
+    )
+
+
+def upgrade() -> None:
+    bind = op.get_bind()
+    if bind.engine.name == "sqlite":
+        upgrade_sqlite()
+    else:
+        upgrade_postgres()
 
 
 def downgrade() -> None:
