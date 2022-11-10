@@ -20,7 +20,7 @@ Entities:
    DTransformIn
    Jupynb
    Pipeline
-   PipelineRun
+   Run
    User
    Storage
    Usage
@@ -49,9 +49,9 @@ from ._core import (
     DTransformIn,
     Jupynb,
     Pipeline,
-    PipelineRun,
     Project,
     ProjectDSet,
+    Run,
     Storage,
     Usage,
     User,
