@@ -174,7 +174,7 @@ class DTransform(SQLModel, table=True):  # type: ignore
     For instance:
 
     - Jupyter notebooks (`jupynb`)
-    - Pipeline runs of software (workflows) and scripts (`pipeline_run`).
+    - Pipeline runs of software (workflows) and scripts (`run`).
     - Physical instruments making measurements (needs to be configured).
     - Human decisions based on data visualizations (needs to be configured).
 
@@ -205,10 +205,8 @@ class DTransform(SQLModel, table=True):  # type: ignore
     """Link to :class:`~lnschema_core.Jupynb` that mediated the data transformation."""
     jupynb_v: Optional[str] = Field(default=None, index=True)
     """Second part of composite primary key to link to :class:`~lnschema_core.Jupynb`."""  # noqa
-    pipeline_run_id: Optional[str] = Field(
-        default=None, foreign_key="core.pipeline_run.id", index=True
-    )
-    """Link to :class:`~lnschema_core.PipelineRun` that mediated the data transformation."""  # noqa
+    run_id: Optional[str] = Field(default=None, foreign_key="core.run.id", index=True)
+    """Link to :class:`~lnschema_core.Run` that mediated the data transformation."""  # noqa
 
 
 class DTransformIn(SQLModel, table=True):  # type: ignore
@@ -284,7 +282,7 @@ class Pipeline(SQLModel, table=True):  # type: ignore
     updated_at: Optional[datetime] = UpdatedAt
 
 
-class PipelineRun(SQLModel, table=True):  # type: ignore
+class Run(SQLModel, table=True):  # type: ignore
     """Pipeline runs.
 
     Pipeline runs represent one type of data transformation (`dtransform`) and
@@ -294,7 +292,7 @@ class PipelineRun(SQLModel, table=True):  # type: ignore
     linking to entries in this table.
     """
 
-    __tablename__ = f"{prefix}pipeline_run"
+    __tablename__ = f"{prefix}run"
     __table_args__ = (
         ForeignKeyConstraint(
             ["pipeline_id", "pipeline_v"],
@@ -303,7 +301,7 @@ class PipelineRun(SQLModel, table=True):  # type: ignore
         ),
         {"schema": schema_arg},
     )
-    id: Optional[str] = Field(default_factory=idg.pipeline_run, primary_key=True)
+    id: Optional[str] = Field(default_factory=idg.run, primary_key=True)
     pipeline_id: str = Field(index=True)
     pipeline_v: str = Field(index=True)
     name: Optional[str] = Field(default=None, index=True)

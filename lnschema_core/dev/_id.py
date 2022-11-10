@@ -111,7 +111,7 @@ def pipeline() -> str:
     return base62(n_char=9)
 
 
-def pipeline_run() -> str:
+def run() -> str:
     """Pipeline run: 20 base62.
 
     One char less than dtransform and dobject!

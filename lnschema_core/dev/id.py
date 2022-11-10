@@ -25,7 +25,7 @@ Entity-related generators:
    usage
    jupynb
    pipeline
-   pipeline_run
+   run
    project
    secret
 """
@@ -39,8 +39,8 @@ from ._id import (  # noqa
     instance,
     jupynb,
     pipeline,
-    pipeline_run,
     project,
+    run,
     schema,
     secret,
     storage,
