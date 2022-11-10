@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+:bento: Add migration for postgres | [55](https://github.com/laminlabs/lnschema-core/pull/55) | [falexwolf](https://github.com/falexwolf) | 2022-11-10 |
 🚚 Rename `PipeineRun` to `Run` | [54](https://github.com/laminlabs/lnschema-core/pull/54) | [falexwolf](https://github.com/falexwolf) | 2022-11-10 | 0.16.0
 🐛 Fix prefix II | [53](https://github.com/laminlabs/lnschema-core/pull/53) | [falexwolf](https://github.com/falexwolf) | 2022-11-03 | 0.15.2
 🐛 Fix prefix | [52](https://github.com/laminlabs/lnschema-core/pull/52) | [falexwolf](https://github.com/falexwolf) | 2022-11-03 | 0.15.1
