@@ -53,7 +53,7 @@ class Storage(SQLModel, table=True):  # type: ignore
 
 
 class DSet(SQLModel, table=True):  # type: ignore
-    """Datasets.
+    """Datasets: collections of data objects.
 
     In LaminDB, a dataset is a collection of data objects (`DObject`).
     """
