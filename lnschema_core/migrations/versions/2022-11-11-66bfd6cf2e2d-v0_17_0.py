@@ -18,7 +18,9 @@ depends_on = None
 
 def upgrade() -> None:
     bind = op.get_bind()
-    if bind.engine.name == "sqlite":
+    sqlite = bind.engine.name == "sqlite"
+
+    if sqlite:
         prefix, schema = "core.", None
         op.execute("PRAGMA foreign_keys=OFF")
     else:
@@ -39,12 +41,6 @@ def upgrade() -> None:
         )
         batch_op.create_index(
             batch_op.f("ix_core.dtransform_pipeline_v"), ["pipeline_v"], unique=False
-        )
-        batch_op.create_foreign_key(
-            batch_op.f("fk_core.dtransform_pipeline_id_pipeline"),
-            "core.pipeline",
-            ["pipeline_id", "pipeline_v"],
-            ["id", "v"],
         )
         batch_op.add_column(
             sa.Column(
@@ -71,26 +67,71 @@ def upgrade() -> None:
         batch_op.create_index(
             batch_op.f("ix_core.dtransform_name"), ["name"], unique=False
         )
-        batch_op.create_foreign_key(
-            batch_op.f("fk_core.dtransform_created_by_user"),
-            "core.user",
+        if sqlite:
+            batch_op.create_foreign_key(
+                batch_op.f("fk_core.dtransform_pipeline_id_pipeline"),
+                f"{prefix}pipeline",
+                ["pipeline_id", "pipeline_v"],
+                ["id", "v"],
+            )
+            batch_op.create_foreign_key(
+                batch_op.f("fk_core.dtransform_created_by_user"),
+                f"{prefix}user",
+                ["created_by"],
+                ["id"],
+            )
+
+    if not sqlite:
+        op.create_foreign_key(
+            "fk_core.dtransform_pipeline_id_pipeline",
+            f"{prefix}dtransform",
+            f"{prefix}pipeline",
+            ["pipeline_id", "pipeline_v"],
+            ["id", "v"],
+            source_schema=schema,
+            referent_schema=schema,
+        )
+        op.create_foreign_key(
+            "fk_core.dtransform_created_by_user",
+            f"{prefix}dtransform",
+            f"{prefix}user",
             ["created_by"],
             ["id"],
+            source_schema=schema,
+            referent_schema=schema,
         )
 
-    op.execute(
+    if sqlite:
+        op.execute(
+            """
+        update "core.dtransform"
+        set created_by = "core.run".created_by,
+        created_at = "core.run".created_at,
+        name = "core.run".name,
+        pipeline_id = "core.run".pipeline_id,
+        pipeline_v = "core.run".pipeline_v
+        from "core.run"
+        where run_id = "core.run".id;
         """
-    update "core.dtransform"
-    set created_by = "core.run".created_by,
-    created_at = "core.run".created_at,
-    name = "core.run".name,
-    pipeline_id = "core.run".pipeline_id,
-    pipeline_v = "core.run".pipeline_v
-    from "core.run"
-    where run_id = "core.run".id;
-    """
-    )
+        )
+    else:
+        op.execute(
+            """
+        update core.dtransform
+        set created_by = core.run.created_by,
+        created_at = core.run.created_at,
+        name = core.run.name,
+        pipeline_id = core.run.pipeline_id,
+        pipeline_v = core.run.pipeline_v
+        from core.run
+        where run_id = core.run.id;
+        """
+        )
 
+    op.drop_index("ix_core.dtransform_run_id")
+    op.drop_column(f"{prefix}dtransform", "run_id", schema=schema)
+    op.drop_constraint("bfx_run_id_fkey", "run", schema="bfx")
+    op.drop_constraint("dtransform_pipeline_run_id_fkey", "dtransform", schema="core")
     op.drop_table(f"{prefix}run", schema=schema)
 
     op.rename_table(
@@ -109,8 +150,6 @@ def upgrade() -> None:
         new_column_name="run_id",
         schema=schema,
     )
-    op.drop_index("ix_core.dtransform_run_id")
-    op.drop_column(f"{prefix}run", "run_id", schema=schema)
 
     if bind.engine.name == "sqlite":
         op.execute("PRAGMA foreign_keys=ON")
