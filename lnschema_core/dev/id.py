@@ -21,11 +21,10 @@ Entity-related generators:
    instance
    storage
    dobject
-   dtransform
+   run
    usage
    jupynb
    pipeline
-   run
    project
    secret
 """
@@ -35,7 +34,6 @@ from ._id import (  # noqa
     base64,
     dobject,
     dset,
-    dtransform,
     instance,
     jupynb,
     pipeline,
@@ -52,7 +50,7 @@ id_base62 = base62  # backward compat
 id_base26 = base26  # backward compat
 id_schema_module = schema  # backward compat
 id_dobject = dobject  # backward compat
-id_dtransform = dtransform  # backward compat
+id_run = run  # backward compat
 id_user = user  # backward compat
 id_usage = usage  # backward compat
 id_secret = secret  # backward compat
