@@ -44,7 +44,7 @@ def dset() -> str:
     return base62(n_char=21)
 
 
-def dtransform() -> str:
+def run() -> str:
     """Data transformation: 21 base62."""
     return base62(n_char=21)
 
@@ -109,14 +109,6 @@ def pipeline() -> str:
     Collision probability is low for 10M pipelines: 1M users with 10 pipelines/user.
     """
     return base62(n_char=9)
-
-
-def run() -> str:
-    """Pipeline run: 20 base62.
-
-    One char less than dtransform and dobject!
-    """
-    return base62(n_char=20)
 
 
 def jupynb():

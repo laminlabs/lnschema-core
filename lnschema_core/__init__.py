@@ -15,12 +15,11 @@ Entities:
    :toctree: .
 
    DObject
-   DTransform
+   Run
    DSet
-   DTransformIn
+   RunIn
    Jupynb
    Pipeline
-   Run
    User
    Storage
    Usage
@@ -45,13 +44,12 @@ from ._core import (
     DObject,
     DSet,
     DSetDObject,
-    DTransform,
-    DTransformIn,
     Jupynb,
     Pipeline,
     Project,
     ProjectDSet,
     Run,
+    RunIn,
     Storage,
     Usage,
     User,
