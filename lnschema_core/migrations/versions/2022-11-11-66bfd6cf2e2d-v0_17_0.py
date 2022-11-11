@@ -17,8 +17,14 @@ depends_on = None
 
 
 def upgrade() -> None:
-    op.execute("PRAGMA foreign_keys=OFF")
-    with op.batch_alter_table("core.dtransform") as batch_op:
+    bind = op.get_bind()
+    if bind.engine.name == "sqlite":
+        prefix, schema = "core.", None
+        op.execute("PRAGMA foreign_keys=OFF")
+    else:
+        prefix, schema = "", "core"
+
+    with op.batch_alter_table(f"{prefix}dtransform", schema=schema) as batch_op:
         batch_op.add_column(
             sa.Column("name", sqlmodel.sql.sqltypes.AutoString(), nullable=True)
         )
@@ -85,16 +91,29 @@ def upgrade() -> None:
     """
     )
 
-    op.drop_table("core.run")
+    op.drop_table(f"{prefix}run", schema=schema)
 
-    op.rename_table(old_table_name="core.dtransform", new_table_name="core.run")
-    op.rename_table(old_table_name="core.dtransform_in", new_table_name="core.run_in")
-    op.alter_column(
-        "core.dobject", column_name="dtransform_id", new_column_name="run_id"
+    op.rename_table(
+        old_table_name=f"{prefix}dtransform",
+        new_table_name=f"{prefix}run",
+        schema=schema,
     )
-    op.execute("PRAGMA foreign_keys=ON")
+    op.rename_table(
+        old_table_name=f"{prefix}dtransform_in",
+        new_table_name=f"{prefix}run_in",
+        schema=schema,
+    )
+    op.alter_column(
+        f"{prefix}dobject",
+        column_name="dtransform_id",
+        new_column_name="run_id",
+        schema=schema,
+    )
     op.drop_index("ix_core.dtransform_run_id")
-    op.drop_column("core.run", "run_id")
+    op.drop_column(f"{prefix}run", "run_id", schema=schema)
+
+    if bind.engine.name == "sqlite":
+        op.execute("PRAGMA foreign_keys=ON")
 
 
 def downgrade() -> None:
