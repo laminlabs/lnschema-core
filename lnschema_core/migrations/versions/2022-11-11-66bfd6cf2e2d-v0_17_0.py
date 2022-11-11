@@ -93,6 +93,8 @@ def upgrade() -> None:
         "core.dobject", column_name="dtransform_id", new_column_name="run_id"
     )
     op.execute("PRAGMA foreign_keys=ON")
+    op.drop_index("ix_core.dtransform_run_id")
+    op.drop_column("core.run", "run_id")
 
 
 def downgrade() -> None:
