@@ -74,14 +74,14 @@ def upgrade() -> None:
 
     op.execute(
         """
-    update core.dtransform
-    set core.dtransform.created_by = core.run.created_by,
-    core.dtransform.created_at = core.dtransform.created_at,
-    core.dtransform.name = core.run.name,
-    core.dtransform.pipeline_id = core.run.pipeline_id,
-    core.dtransform.pipeline_v = core.run.pipeline_v,
-    from core.run
-    where core.dtransform.run_id = core.run.id
+    update "core.dtransform"
+    set "core.dtransform".created_by = "core.run".created_by,
+    "core.dtransform".created_at = "core.run".created_at,
+    "core.dtransform".name = "core.run".name,
+    "core.dtransform".pipeline_id = "core.run".pipeline_id,
+    "core.dtransform".pipeline_v = "core.run".pipeline_v,
+    from "core.run"
+    where "core.dtransform".run_id = "core.run".id
     """
     )
 
