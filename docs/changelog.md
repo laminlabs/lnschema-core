@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-💚 Fix migration | [57](https://github.com/laminlabs/lnschema-core/pull/57) | [falexwolf](https://github.com/falexwolf) | 2022-11-12 |
+💚 Fix migration | [57](https://github.com/laminlabs/lnschema-core/pull/57) | [falexwolf](https://github.com/falexwolf) | 2022-11-12 | 0.17.1
 🏗️ Aggregate `Run` and `DTransform` | [56](https://github.com/laminlabs/lnschema-core/pull/56) | [falexwolf](https://github.com/falexwolf) | 2022-11-11 | 0.17.0
 🍱 Add migration for postgres | [55](https://github.com/laminlabs/lnschema-core/pull/55) | [falexwolf](https://github.com/falexwolf) | 2022-11-10 | 0.16.1
 🚚 Rename `PipeineRun` to `Run` | [54](https://github.com/laminlabs/lnschema-core/pull/54) | [falexwolf](https://github.com/falexwolf) | 2022-11-10 | 0.16.0
