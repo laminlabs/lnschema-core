@@ -128,10 +128,15 @@ def upgrade() -> None:
         """
         )
 
-    op.drop_index("ix_core.dtransform_run_id")
+    try:
+        op.drop_index("ix_core.dtransform_run_id")
+        op.drop_constraint("bfx_run_id_fkey", "run", schema="bfx")
+        op.drop_constraint(
+            "dtransform_pipeline_run_id_fkey", "dtransform", schema="core"
+        )
+    except Exception:
+        pass
     op.drop_column(f"{prefix}dtransform", "run_id", schema=schema)
-    op.drop_constraint("bfx_run_id_fkey", "run", schema="bfx")
-    op.drop_constraint("dtransform_pipeline_run_id_fkey", "dtransform", schema="core")
     op.drop_table(f"{prefix}run", schema=schema)
 
     op.rename_table(
