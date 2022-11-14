@@ -7,6 +7,7 @@ from . import _name as schema_name
 from ._timestamps import CreatedAt, UpdatedAt
 from ._users import CreatedBy
 from .dev import id as idg
+from .dev._storage import filepath_from_dobject
 from .dev.sqlmodel import schema_sqlmodel
 from .dev.type import usage as usage_type
 
@@ -168,6 +169,11 @@ class DObject(SQLModel, table=True):  # type: ignore
     """Time of creation."""
     updated_at: Optional[datetime] = UpdatedAt
     """Time of last update."""
+
+    @property
+    def path(self):
+        """Path on storage."""
+        return filepath_from_dobject(self)
 
 
 class Run(SQLModel, table=True):  # type: ignore
