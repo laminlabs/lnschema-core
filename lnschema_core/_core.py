@@ -1,6 +1,8 @@
 from datetime import datetime as datetime
-from typing import Optional
+from pathlib import Path
+from typing import Optional, Union
 
+from cloudpathlib import CloudPath
 from sqlmodel import Field, ForeignKeyConstraint
 
 from . import _name as schema_name
@@ -169,9 +171,9 @@ class DObject(SQLModel, table=True):  # type: ignore
     """Time of creation."""
     updated_at: Optional[datetime] = UpdatedAt
     """Time of last update."""
+    _local_filepath: Optional[Path] = None
 
-    @property
-    def path(self):
+    def path(self) -> Union[Path, CloudPath]:
         """Path on storage."""
         return filepath_from_dobject(self)
 
