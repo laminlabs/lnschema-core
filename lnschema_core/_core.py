@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import List, Optional, Union
 
 from cloudpathlib import CloudPath
+from sqlalchemy.orm import RelationshipProperty, relationship
 from sqlmodel import Field, ForeignKeyConstraint, Relationship
 
 from . import _name as schema_name
@@ -174,7 +175,7 @@ class DObject(SQLModel, table=True):  # type: ignore
     updated_at: Optional[datetime] = UpdatedAt
     """Time of last update."""
     _local_filepath: Optional[Path] = None
-    run: "Run" = Relationship(back_populates="dobjects")
+    run: RelationshipProperty = relationship("Run", back_populates="dobjects")
     features: "Features" = Relationship(back_populates="dobjects")
 
     def path(self) -> Union[Path, CloudPath]:
