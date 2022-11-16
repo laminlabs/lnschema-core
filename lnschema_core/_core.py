@@ -174,7 +174,7 @@ class DObject(SQLModel, table=True):  # type: ignore
     updated_at: Optional[datetime] = UpdatedAt
     """Time of last update."""
     _local_filepath: Optional[Path] = None
-    run: "Run" = Relationship(back_populates="out")
+    run: "Run" = Relationship(back_populates="dobjects")
     features: "Features" = Relationship(back_populates="dobjects")
 
     def path(self) -> Union[Path, CloudPath]:
@@ -230,7 +230,8 @@ class Run(SQLModel, table=True):  # type: ignore
     created_by: str = CreatedBy
     """Auto-populated link to :class:`~lnschema_core.User`."""
     created_at: datetime = CreatedAt
-    run: List["DObject"] = Relationship(back_populates="run")
+    dobjects: List["DObject"] = Relationship(back_populates="run")
+    """Output data :class:`~lnschema_core.DObject`."""
 
 
 class RunIn(SQLModel, table=True):  # type: ignore
@@ -311,6 +312,7 @@ class Features(SQLModel, table=True):  # type: ignore
     type: str  # was called entity_type
     created_by: str = CreatedBy
     created_at: datetime = CreatedAt
+    dobjects: List["DObject"] = Relationship(back_populates="features")
 
 
 class Usage(SQLModel, table=True):  # type: ignore
