@@ -1,9 +1,9 @@
 from datetime import datetime as datetime
 from pathlib import Path
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 from cloudpathlib import CloudPath
-from sqlmodel import Field, ForeignKeyConstraint
+from sqlmodel import Field, ForeignKeyConstraint, Relationship
 
 from . import _name as schema_name
 from ._timestamps import CreatedAt, UpdatedAt
@@ -165,6 +165,8 @@ class DObject(SQLModel, table=True):  # type: ignore
     """Link to :class:`~lnschema_core.Run` that generated the `dobject`."""
     storage_id: str = Field(foreign_key="core.storage.id", index=True)
     """Link to :class:`~lnschema_core.Storage` location that stores the `dobject`."""
+    features_id: Optional[str] = Field(default=None, foreign_key="core.features.id")
+    """Features id."""
     checksum: Optional[str] = Field(default=None, index=True)
     """Checksum of file (md5)."""
     created_at: datetime = CreatedAt
@@ -172,6 +174,8 @@ class DObject(SQLModel, table=True):  # type: ignore
     updated_at: Optional[datetime] = UpdatedAt
     """Time of last update."""
     _local_filepath: Optional[Path] = None
+    run: "Run" = Relationship(back_populates="out")
+    features: "Features" = Relationship(back_populates="dobjects")
 
     def path(self) -> Union[Path, CloudPath]:
         """Path on storage."""
@@ -226,6 +230,7 @@ class Run(SQLModel, table=True):  # type: ignore
     created_by: str = CreatedBy
     """Auto-populated link to :class:`~lnschema_core.User`."""
     created_at: datetime = CreatedAt
+    run: List["DObject"] = Relationship(back_populates="run")
 
 
 class RunIn(SQLModel, table=True):  # type: ignore
@@ -297,6 +302,15 @@ class Pipeline(SQLModel, table=True):  # type: ignore
     created_at: datetime = CreatedAt
     """Auto-populated time stamp."""
     updated_at: Optional[datetime] = UpdatedAt
+
+
+class Features(SQLModel, table=True):  # type: ignore
+    """Sets of features."""
+
+    id: str = Field(primary_key=True)  # use a hash
+    type: str  # was called entity_type
+    created_by: str = CreatedBy
+    created_at: datetime = CreatedAt
 
 
 class Usage(SQLModel, table=True):  # type: ignore
