@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import List, Optional, Union
 
 from cloudpathlib import CloudPath
+from pydantic.fields import PrivateAttr
 from sqlmodel import Field, ForeignKeyConstraint, Relationship
 
 from . import _name as schema_name
@@ -173,13 +174,14 @@ class DObject(SQLModel, table=True):  # type: ignore
     """Time of creation."""
     updated_at: Optional[datetime] = UpdatedAt
     """Time of last update."""
-    _local_filepath: Optional[Path] = None
     # we need the fully module-qualified path here, as there might be more
     # modules with an ORM Run
     run: "lnschema_core._core.Run" = Relationship(  # type: ignore  # noqa
         back_populates="dobjects"
     )
     features: "Features" = Relationship(back_populates="dobjects")
+    _local_filepath: Path = PrivateAttr()
+    _memory_rep: Path = PrivateAttr()
 
     def path(self) -> Union[Path, CloudPath]:
         """Path on storage."""
