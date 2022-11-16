@@ -155,6 +155,12 @@ def upgrade() -> None:
         new_column_name="run_id",
         schema=schema,
     )
+    op.alter_column(
+        f"{prefix}run_in",
+        column_name="dtransform_id",
+        new_column_name="run_id",
+        schema=schema,
+    )
 
     if bind.engine.name == "sqlite":
         op.execute("PRAGMA foreign_keys=ON")
