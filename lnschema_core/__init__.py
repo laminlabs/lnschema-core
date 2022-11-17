@@ -24,6 +24,7 @@ Entities:
    Storage
    Usage
    Project
+   Features
 
 Development tools:
 
@@ -44,6 +45,7 @@ from ._core import (
     DObject,
     DSet,
     DSetDObject,
+    Features,
     Jupynb,
     Pipeline,
     Project,

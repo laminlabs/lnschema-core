@@ -7,12 +7,30 @@
    SQLModelPrefix
 """
 
+from typing import Any, Optional, Sequence, Tuple
+
 import sqlmodel as sqm
 from sqlalchemy.orm import declared_attr
 
 # it's tricky to deal with class variables in SQLModel children
 # hence, we're using a global variable, here
 SCHEMA_NAME = None
+
+
+def __repr_args__(self) -> Sequence[Tuple[Optional[str], Any]]:
+    # sort like fields
+    return [
+        (k, self.__dict__[k])
+        for k in self.__fields__
+        if (
+            not k.startswith("_sa_")
+            and k in self.__dict__  # noqa
+            and self.__dict__[k] is not None  # noqa
+        )
+    ]
+
+
+sqm.SQLModel.__repr_args__ = __repr_args__
 
 
 class SQLModelModule(sqm.SQLModel):

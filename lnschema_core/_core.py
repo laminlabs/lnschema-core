@@ -1,7 +1,11 @@
 from datetime import datetime as datetime
-from typing import Optional
+from pathlib import Path
+from typing import List, Optional, Union
 
-from sqlmodel import Field, ForeignKeyConstraint
+from cloudpathlib import CloudPath
+from pydantic.fields import PrivateAttr
+from sqlalchemy import Column, ForeignKey, Table
+from sqlmodel import Field, ForeignKeyConstraint, Relationship
 
 from . import _name as schema_name
 from ._timestamps import CreatedAt, UpdatedAt
@@ -104,6 +108,14 @@ class ProjectDSet(SQLModel, table=True):  # type: ignore
     """Link to :class:`~lnschema_core.dset`."""
 
 
+dobject_features = Table(
+    f"{prefix}dobject_features",
+    SQLModel.metadata,
+    Column("dobject_id", ForeignKey("core.dobject.id"), primary_key=True),
+    Column("features_id", ForeignKey("core.features.id"), primary_key=True),
+)
+
+
 class DObject(SQLModel, table=True):  # type: ignore
     """Data objects in storage & memory.
 
@@ -169,9 +181,19 @@ class DObject(SQLModel, table=True):  # type: ignore
     """Time of creation."""
     updated_at: Optional[datetime] = UpdatedAt
     """Time of last update."""
+    # we need the fully module-qualified path here, as there might be more
+    # modules with an ORM Run
+    run: "lnschema_core._core.Run" = Relationship(  # type: ignore  # noqa
+        back_populates="dobjects"
+    )
+    features: List["Features"] = Relationship(
+        back_populates="dobjects",
+        sa_relationship_kwargs=dict(secondary=dobject_features),
+    )
+    _local_filepath: Path = PrivateAttr()
+    _memory_rep: Path = PrivateAttr()
 
-    @property
-    def path(self):
+    def path(self) -> Union[Path, CloudPath]:
         """Path on storage."""
         return filepath_from_dobject(self)
 
@@ -224,6 +246,8 @@ class Run(SQLModel, table=True):  # type: ignore
     created_by: str = CreatedBy
     """Auto-populated link to :class:`~lnschema_core.User`."""
     created_at: datetime = CreatedAt
+    dobjects: List["DObject"] = Relationship(back_populates="run")
+    """Output data :class:`~lnschema_core.DObject`."""
 
 
 class RunIn(SQLModel, table=True):  # type: ignore
@@ -295,6 +319,19 @@ class Pipeline(SQLModel, table=True):  # type: ignore
     created_at: datetime = CreatedAt
     """Auto-populated time stamp."""
     updated_at: Optional[datetime] = UpdatedAt
+
+
+class Features(SQLModel, table=True):  # type: ignore
+    """Sets of features."""
+
+    id: str = Field(primary_key=True)  # use a hash
+    type: str  # was called entity_type
+    created_by: str = CreatedBy
+    created_at: datetime = CreatedAt
+    dobjects: List["DObject"] = Relationship(
+        back_populates="features",
+        sa_relationship_kwargs=dict(secondary=dobject_features),
+    )
 
 
 class Usage(SQLModel, table=True):  # type: ignore
