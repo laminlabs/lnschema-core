@@ -18,11 +18,15 @@ SCHEMA_NAME = None
 
 
 def __repr_args__(self) -> Sequence[Tuple[Optional[str], Any]]:
-    # Don't show SQLAlchemy private attributes
+    # sort like fields
     return [
-        (k, v)
-        for k, v in self.__dict__.items()
-        if not k.startswith("_sa_") and v is not None and k in self.__fields__
+        (k, self.__dict__[k])
+        for k in self.__fields__
+        if (
+            not k.startswith("_sa_")
+            and k in self.__dict__  # noqa
+            and self.__dict__[k] is not None  # noqa
+        )
     ]
 
 

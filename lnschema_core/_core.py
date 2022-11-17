@@ -4,6 +4,7 @@ from typing import List, Optional, Union
 
 from cloudpathlib import CloudPath
 from pydantic.fields import PrivateAttr
+from sqlalchemy import Column, ForeignKey, Table
 from sqlmodel import Field, ForeignKeyConstraint, Relationship
 
 from . import _name as schema_name
@@ -107,6 +108,14 @@ class ProjectDSet(SQLModel, table=True):  # type: ignore
     """Link to :class:`~lnschema_core.dset`."""
 
 
+dobject_features = Table(
+    f"{prefix}dobject_features",
+    SQLModel.metadata,
+    Column("dobject_id", ForeignKey("core.dobject.id"), primary_key=True),
+    Column("features_id", ForeignKey("core.features.id"), primary_key=True),
+)
+
+
 class DObject(SQLModel, table=True):  # type: ignore
     """Data objects in storage & memory.
 
@@ -166,8 +175,6 @@ class DObject(SQLModel, table=True):  # type: ignore
     """Link to :class:`~lnschema_core.Run` that generated the `dobject`."""
     storage_id: str = Field(foreign_key="core.storage.id", index=True)
     """Link to :class:`~lnschema_core.Storage` location that stores the `dobject`."""
-    features_id: Optional[str] = Field(default=None, foreign_key="core.features.id")
-    """Features id."""
     checksum: Optional[str] = Field(default=None, index=True)
     """Checksum of file (md5)."""
     created_at: datetime = CreatedAt
@@ -179,7 +186,10 @@ class DObject(SQLModel, table=True):  # type: ignore
     run: "lnschema_core._core.Run" = Relationship(  # type: ignore  # noqa
         back_populates="dobjects"
     )
-    features: "Features" = Relationship(back_populates="dobjects")
+    features: List["Features"] = Relationship(
+        back_populates="dobjects",
+        sa_relationship_kwargs=dict(secondary=dobject_features),
+    )
     _local_filepath: Path = PrivateAttr()
     _memory_rep: Path = PrivateAttr()
 
@@ -318,7 +328,10 @@ class Features(SQLModel, table=True):  # type: ignore
     type: str  # was called entity_type
     created_by: str = CreatedBy
     created_at: datetime = CreatedAt
-    dobjects: List["DObject"] = Relationship(back_populates="features")
+    dobjects: List["DObject"] = Relationship(
+        back_populates="features",
+        sa_relationship_kwargs=dict(secondary=dobject_features),
+    )
 
 
 class Usage(SQLModel, table=True):  # type: ignore
