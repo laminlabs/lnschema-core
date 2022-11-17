@@ -38,7 +38,7 @@ Development tools:
 _schema_id = "yvzi"
 _name = "core"
 _migration = "66bfd6cf2e2d"
-__version__ = "0.18.0"
+__version__ = "0.19.0"
 
 from . import _core, dev
 from ._core import (
