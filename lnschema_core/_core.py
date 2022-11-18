@@ -166,30 +166,36 @@ class DObject(SQLModel, table=True):  # type: ignore
     This is a file extension if the `dobject` is stored in a file format.
     It's `None` if the storage format doesn't have a canonical extension.
     """
+
     size: Optional[float] = Field(default=None, index=True)
     """Size in bytes.
 
     Examples: 1KB is 1e3 bytes, 1MB is 1e6, 1GB is 1e9, 1TB is 1e12 etc.
     """
-    run_id: str = Field(foreign_key="core.run.id", index=True)
-    """Link to :class:`~lnschema_core.Run` that generated the `dobject`."""
-    storage_id: str = Field(foreign_key="core.storage.id", index=True)
-    """Link to :class:`~lnschema_core.Storage` location that stores the `dobject`."""
-    checksum: Optional[str] = Field(default=None, index=True)
+    hash: Optional[str] = Field(default=None, index=True)
     """Checksum of file (md5)."""
-    created_at: datetime = CreatedAt
-    """Time of creation."""
-    updated_at: Optional[datetime] = UpdatedAt
-    """Time of last update."""
-    # we need the fully module-qualified path here, as there might be more
-    # modules with an ORM Run
+
+    # We need the fully module-qualified path below, as there might be more
+    # schema modules with an ORM called "Run"
     run: "lnschema_core._core.Run" = Relationship(  # type: ignore  # noqa
         back_populates="dobjects"
     )
+    """Link to :class:`~lnschema_core.Run` that generated the `dobject`."""
+    run_id: str = Field(foreign_key="core.run.id", index=True)
+    """The run id."""
+    storage_id: str = Field(foreign_key="core.storage.id", index=True)
+    """The id of :class:`~lnschema_core.Storage` location that stores the `dobject`."""
     features: List["Features"] = Relationship(
         back_populates="dobjects",
         sa_relationship_kwargs=dict(secondary=dobject_features),
     )
+    """Link to feature sets."""
+    created_at: datetime = CreatedAt
+    """Time of creation."""
+    updated_at: Optional[datetime] = UpdatedAt
+    """Time of last update."""
+
+    # private attributes
     _local_filepath: Path = PrivateAttr()
     _memory_rep: Path = PrivateAttr()
 
