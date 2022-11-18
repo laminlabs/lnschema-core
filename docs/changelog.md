@@ -3,8 +3,8 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-:truck: Rename checksum to hash | [60](https://github.com/laminlabs/lnschema-core/pull/60) | [falexwolf](https://github.com/falexwolf) | 2022-11-18 |
-🏗️ Add Features table | [59](https://github.com/laminlabs/lnschema-core/pull/59) | [falexwolf](https://github.com/falexwolf) | 2022-11-17 | 0.19.0
+🚚 Rename `checksum` to `hash` | [60](https://github.com/laminlabs/lnschema-core/pull/60) | [falexwolf](https://github.com/falexwolf) | 2022-11-18 | 0.20.0
+🏗️ Add `Features` table | [59](https://github.com/laminlabs/lnschema-core/pull/59) | [falexwolf](https://github.com/falexwolf) | 2022-11-17 | 0.19.0
 ✨ Add `path` property to `DObject` | [58](https://github.com/laminlabs/lnschema-core/pull/58) | [falexwolf](https://github.com/falexwolf) | 2022-11-14 | 0.18.0
 💚 Fix migration | [57](https://github.com/laminlabs/lnschema-core/pull/57) | [falexwolf](https://github.com/falexwolf) | 2022-11-12 | 0.17.1
 🏗️ Aggregate `Run` and `DTransform` | [56](https://github.com/laminlabs/lnschema-core/pull/56) | [falexwolf](https://github.com/falexwolf) | 2022-11-11 | 0.17.0
