@@ -175,7 +175,7 @@ class DObject(SQLModel, table=True):  # type: ignore
     """Link to :class:`~lnschema_core.Run` that generated the `dobject`."""
     storage_id: str = Field(foreign_key="core.storage.id", index=True)
     """Link to :class:`~lnschema_core.Storage` location that stores the `dobject`."""
-    checksum: Optional[str] = Field(default=None, index=True)
+    hash: Optional[str] = Field(default=None, index=True)
     """Checksum of file (md5)."""
     created_at: datetime = CreatedAt
     """Time of creation."""
