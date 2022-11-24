@@ -52,9 +52,10 @@ from ._core import (
     ProjectDSet,
     Run,
     RunIn,
+    Storage,
     Usage,
     User,
 )
-from .dev import Storage, id  # backward compat
+from .dev import id  # backward compat
 
 storage = Storage  # backward compat
