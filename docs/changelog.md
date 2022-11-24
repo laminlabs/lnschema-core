@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-Move storage table in public schema | [62](https://github.com/laminlabs/lnschema-core/pull/62) | [fredericenard](https://github.com/fredericenard) | 2022-11-24 |
+Move storage table in public schema | [62](https://github.com/laminlabs/lnschema-core/pull/62) | [fredericenard](https://github.com/fredericenard) | 2022-11-24 | 0.21.0
 🚚 Rename `checksum` to `hash` | [60](https://github.com/laminlabs/lnschema-core/pull/60) | [falexwolf](https://github.com/falexwolf) | 2022-11-18 | 0.20.0
 🏗️ Add `Features` table | [59](https://github.com/laminlabs/lnschema-core/pull/59) | [falexwolf](https://github.com/falexwolf) | 2022-11-17 | 0.19.0
 ✨ Add `path` property to `DObject` | [58](https://github.com/laminlabs/lnschema-core/pull/58) | [falexwolf](https://github.com/falexwolf) | 2022-11-14 | 0.18.0
