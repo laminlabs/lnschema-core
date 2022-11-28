@@ -32,7 +32,7 @@ Development tools:
    :toctree: .
 
    dev
-
+   link
 """
 # This is lnschema-module yvzi.
 _schema_id = "yvzi"
@@ -40,7 +40,7 @@ _name = "core"
 _migration = "4b4005b7841c"
 __version__ = "0.21.1"
 
-from . import _core, dev
+from . import dev, link
 from ._core import (
     DObject,
     DSet,

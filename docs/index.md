@@ -5,20 +5,17 @@
 
 Core schema module for tracking data lineage.
 
-It is built with [SQLModel](https://sqlmodel.tiangolo.com/), which is based on [SQLAlchemy](https://www.sqlalchemy.org/) & [Pydantic](https://pydantic-docs.helpmanual.io/).
+It is built with [SQLModel](https://sqlmodel.tiangolo.com/), a shallow wrapper that unifies [SQLAlchemy](https://www.sqlalchemy.org/) & [Pydantic](https://pydantic-docs.helpmanual.io/).
 
-- See the tables in this module in the [API](api).
+- [Get started](guide/get-started) or browse the [tables](https://lamin.ai/docs/db/lamindb.schema).
 - See the [source code](https://github.com/laminlabs/lnschema-core) on GitHub.
 - For changes, see the [changelog](changelog).
-- For the overall schema API, see [db/lamindb.schema](https://lamin.ai/docs/db/lamindb.schema).
-- For basic functionality and development, see the [guide](guide) and the [notes](notes).
 
 ```{toctree}
 :maxdepth: 1
 :hidden:
 
-api
 guide
-notes
+api
 changelog
 ```
