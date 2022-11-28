@@ -4,11 +4,11 @@ from typing import List, Optional, Union
 
 from cloudpathlib import CloudPath
 from pydantic.fields import PrivateAttr
-from sqlalchemy import Column, ForeignKey, Table
 from sqlmodel import Field, ForeignKeyConstraint, Relationship
 from sqlmodel import SQLModel as SQLModelPublicSchema
 
 from . import _name as schema_name
+from ._link import DObjectFeatures
 from ._timestamps import CreatedAt, UpdatedAt
 from ._users import CreatedBy
 from .dev import id as idg
@@ -109,14 +109,6 @@ class ProjectDSet(SQLModel, table=True):  # type: ignore
     """Link to :class:`~lnschema_core.dset`."""
 
 
-dobject_features = Table(
-    f"{prefix}dobject_features",
-    SQLModel.metadata,
-    Column("dobject_id", ForeignKey("core.dobject.id"), primary_key=True),
-    Column("features_id", ForeignKey("core.features.id"), primary_key=True),
-)
-
-
 class DObject(SQLModel, table=True):  # type: ignore
     """Data objects in storage & memory.
 
@@ -188,7 +180,7 @@ class DObject(SQLModel, table=True):  # type: ignore
     """The id of :class:`~lnschema_core.Storage` location that stores the `dobject`."""
     features: List["Features"] = Relationship(
         back_populates="dobjects",
-        sa_relationship_kwargs=dict(secondary=dobject_features),
+        sa_relationship_kwargs=dict(secondary=DObjectFeatures.__table__),
     )
     """Link to feature sets."""
     created_at: datetime = CreatedAt
@@ -337,7 +329,7 @@ class Features(SQLModel, table=True):  # type: ignore
     created_at: datetime = CreatedAt
     dobjects: List["DObject"] = Relationship(
         back_populates="features",
-        sa_relationship_kwargs=dict(secondary=dobject_features),
+        sa_relationship_kwargs=dict(secondary=DObjectFeatures.__table__),
     )
 
 
