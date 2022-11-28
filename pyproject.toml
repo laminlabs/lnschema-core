@@ -23,9 +23,7 @@ dev = [
 test = [
     "pytest>=6.0",
     "pytest-cov",
-    "natsort",
-    "pandas",
-    "lndb_setup>=0.20.0",
+    "lndb_setup>=0.20.1",
 ]
 
 [tool.black]
