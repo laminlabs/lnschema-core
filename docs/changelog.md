@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🎨 Prettify API & docs | [64](https://github.com/laminlabs/lnschema-core/pull/64) | [falexwolf](https://github.com/falexwolf) | 2022-11-28 |
 🍱 Add tested migration | [63](https://github.com/laminlabs/lnschema-core/pull/63) | [falexwolf](https://github.com/falexwolf) | 2022-11-28 | 0.21.1
 🚚 Move storage to public | [62](https://github.com/laminlabs/lnschema-core/pull/62) | [fredericenard](https://github.com/fredericenard) | 2022-11-24 | 0.21.0
 🚚 Rename `checksum` to `hash` | [60](https://github.com/laminlabs/lnschema-core/pull/60) | [falexwolf](https://github.com/falexwolf) | 2022-11-18 | 0.20.0
