@@ -24,6 +24,7 @@ test = [
     "pytest>=6.0",
     "pytest-cov",
     "lndb_setup>=0.20.3",
+    "lamindb",
 ]
 
 [tool.black]
