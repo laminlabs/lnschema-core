@@ -1,3 +1,7 @@
+# internal
+lamin-site-assets_test/
+tests/lamin-site-assets_test/
+
 # macOS
 .DS_Store
 .AppleDouble
