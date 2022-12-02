@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+✨ Bypass load settings | [65](https://github.com/laminlabs/lnschema-core/pull/65) | [fredericenard](https://github.com/fredericenard) | 2022-12-02 |
 🎨 Prettify API & docs | [64](https://github.com/laminlabs/lnschema-core/pull/64) | [falexwolf](https://github.com/falexwolf) | 2022-11-28 |
 🍱 Add tested migration | [63](https://github.com/laminlabs/lnschema-core/pull/63) | [falexwolf](https://github.com/falexwolf) | 2022-11-28 | 0.21.1
 🚚 Move storage to public | [62](https://github.com/laminlabs/lnschema-core/pull/62) | [fredericenard](https://github.com/fredericenard) | 2022-11-24 | 0.21.0
