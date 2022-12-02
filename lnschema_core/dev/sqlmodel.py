@@ -7,6 +7,7 @@
    SQLModelPrefix
 """
 
+import os
 from typing import Any, Optional, Sequence, Tuple
 
 import sqlmodel as sqm
@@ -71,7 +72,11 @@ def schema_sqlmodel(schema_name: str):
     global SCHEMA_NAME
     SCHEMA_NAME = schema_name
 
-    if is_sqlite():
+    if "hub" in os.environ and os.environ["hub"] == "true":
+        prefix = ""
+        schema_arg = schema_name
+        return SQLModelModule, prefix, schema_arg
+    elif is_sqlite():
         prefix = f"{schema_name}."
         schema_arg = None
         return SQLModelPrefix, prefix, schema_arg
