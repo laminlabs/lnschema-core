@@ -62,7 +62,7 @@ def is_sqlite():
 
         isettings = load_instance_settings()
         sqlite_true = isettings._dbconfig == "sqlite"
-    except ImportError:
+    except (ImportError, RuntimeError):
         sqlite_true = True
 
     return sqlite_true
