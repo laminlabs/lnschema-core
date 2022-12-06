@@ -84,3 +84,10 @@ def schema_sqlmodel(schema_name: str):
         prefix = ""
         schema_arg = schema_name
         return SQLModelModule, prefix, schema_arg
+
+
+def add_relationship_keys(table: sqm.SQLModel):  # type: ignore
+    """add all relationship keys to __sqlmodel_relationships__."""
+    for i in getattr(table, "__mapper__").relationships:
+        if i not in getattr(table, "__sqlmodel_relationships__"):
+            getattr(table, "__sqlmodel_relationships__")[i.key] = None
