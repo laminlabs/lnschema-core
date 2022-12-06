@@ -2,13 +2,14 @@ from datetime import datetime as datetime
 from pathlib import Path
 from typing import List, Optional, Union
 
+import sqlalchemy as sa
 from cloudpathlib import CloudPath
 from pydantic.fields import PrivateAttr
 from sqlmodel import Field, ForeignKeyConstraint, Relationship
 from sqlmodel import SQLModel as SQLModelPublicSchema
 
 from . import _name as schema_name
-from ._link import DObjectFeatures
+from ._link import DObjectFeatures, DSetDObject, ProjectDSet, RunIn  # noqa
 from ._timestamps import CreatedAt, UpdatedAt
 from ._users import CreatedBy
 from .dev import id as idg
@@ -59,7 +60,7 @@ class Storage(SQLModelPublicSchema, table=True):  # type: ignore
 
 
 class DSet(SQLModel, table=True):  # type: ignore
-    """Datasets: collections of data objects.
+    """Datasets, collections of data objects.
 
     In LaminDB, a dataset is a collection of data objects (`DObject`).
     """
@@ -74,17 +75,6 @@ class DSet(SQLModel, table=True):  # type: ignore
     """Time of last update."""
 
 
-class DSetDObject(SQLModel, table=True):  # type: ignore
-    """Link table of dset and dobject."""
-
-    __tablename__ = f"{prefix}dset_dobject"
-
-    dset_id: str = Field(foreign_key="core.dset.id", primary_key=True)
-    """Link to :class:`~lnschema_core.dset`."""
-    dobject_id: str = Field(foreign_key="core.dobject.id", primary_key=True)
-    """Link to :class:`~lnschema_core.dobject`."""
-
-
 class Project(SQLModel, table=True):  # type: ignore
     """Projects."""
 
@@ -96,17 +86,6 @@ class Project(SQLModel, table=True):  # type: ignore
     """Time of creation."""
     updated_at: Optional[datetime] = UpdatedAt
     """Time of last update."""
-
-
-class ProjectDSet(SQLModel, table=True):  # type: ignore
-    """Link table of project and dset."""
-
-    __tablename__ = f"{prefix}project_dset"
-
-    project_id: str = Field(foreign_key="core.project.id", primary_key=True)
-    """Link to :class:`~lnschema_core.dobject`."""
-    dset_id: str = Field(foreign_key="core.dset.id", primary_key=True)
-    """Link to :class:`~lnschema_core.dset`."""
 
 
 class DObject(SQLModel, table=True):  # type: ignore
@@ -160,22 +139,24 @@ class DObject(SQLModel, table=True):  # type: ignore
     It's `None` if the storage format doesn't have a canonical extension.
     """
 
-    size: Optional[float] = Field(default=None, index=True)
+    size: Optional[int] = Field(
+        default=None, index=True, sa_column=sa.Column(sa.BigInteger())
+    )
     """Size in bytes.
 
     Examples: 1KB is 1e3 bytes, 1MB is 1e6, 1GB is 1e9, 1TB is 1e12 etc.
     """
     hash: Optional[str] = Field(default=None, index=True)
-    """Checksum of file (md5)."""
+    """Hash (md5)."""
 
     # We need the fully module-qualified path below, as there might be more
     # schema modules with an ORM called "Run"
-    run: "lnschema_core._core.Run" = Relationship(  # type: ignore  # noqa
-        back_populates="dobjects"
+    source: "lnschema_core._core.Run" = Relationship(  # type: ignore  # noqa
+        back_populates="output"
     )
     """Link to :class:`~lnschema_core.Run` that generated the `dobject`."""
     run_id: str = Field(foreign_key="core.run.id", index=True)
-    """The run id."""
+    """The source run id."""
     storage_id: str = Field(foreign_key="storage.id", index=True)
     """The id of :class:`~lnschema_core.Storage` location that stores the `dobject`."""
     features: List["Features"] = Relationship(
@@ -183,6 +164,11 @@ class DObject(SQLModel, table=True):  # type: ignore
         sa_relationship_kwargs=dict(secondary=DObjectFeatures.__table__),
     )
     """Link to feature sets."""
+    targets: List["lnschema_core._core.Run"] = Relationship(  # type: ignore  # noqa
+        back_populates="input",
+        sa_relationship_kwargs=dict(secondary=RunIn.__table__),
+    )
+    "Runs that use this dobject as input."
     created_at: datetime = CreatedAt
     """Time of creation."""
     updated_at: Optional[datetime] = UpdatedAt
@@ -242,31 +228,16 @@ class Run(SQLModel, table=True):  # type: ignore
     jupynb_id: Optional[str] = Field(default=None, index=True)
     """Link to :class:`~lnschema_core.Jupynb`."""
     jupynb_v: Optional[str] = Field(default=None, index=True)
+    output: List["DObject"] = Relationship(back_populates="run")
+    """Output data :class:`~lnschema_core.DObject`."""
+    input: List["DObject"] = Relationship(
+        back_populates="targets", sa_relationship_kwargs=dict(secondary=RunIn.__table__)
+    )
+    """Input data :class:`~lnschema_core.DObject`."""
     created_by: str = CreatedBy
     """Auto-populated link to :class:`~lnschema_core.User`."""
     created_at: datetime = CreatedAt
-    dobjects: List["DObject"] = Relationship(back_populates="run")
-    """Output data :class:`~lnschema_core.DObject`."""
-
-
-class RunIn(SQLModel, table=True):  # type: ignore
-    """Inputs of runs.
-
-    This is a many-to-many link table for `run` and `dobject` storing the
-    inputs of data transformations.
-
-    A data transformation can have an arbitrary number of data objects as inputs.
-
-    - The same `dobject` can be used as input in many different `runs`.
-    - One `run` can have several `dobjects` as inputs.
-    """
-
-    __tablename__ = f"{prefix}run_in"
-
-    run_id: str = Field(foreign_key="core.run.id", primary_key=True)
-    """Link to :class:`~lnschema_core.Run`."""
-    dobject_id: str = Field(foreign_key="core.dobject.id", primary_key=True)
-    """Link to :class:`~lnschema_core.DObject`."""
+    """Time of creation."""
 
 
 class Jupynb(SQLModel, table=True):  # type: ignore

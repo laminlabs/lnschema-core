@@ -17,7 +17,6 @@ Entities:
    DObject
    Run
    DSet
-   RunIn
    Jupynb
    Pipeline
    User
@@ -44,12 +43,10 @@ from . import dev, link
 from ._core import (
     DObject,
     DSet,
-    DSetDObject,
     Features,
     Jupynb,
     Pipeline,
     Project,
-    ProjectDSet,
     Run,
     RunIn,
     Storage,
