@@ -36,6 +36,14 @@ def test_model_definitions_match_ddl(alembic_runner):
                     f" change.\n{rendered_upgrade}"
                 )
 
+    try:
+        alembic_runner.migrate_up_to("heads")
+    except RuntimeError as e:
+        raise AlembicTestFailure(
+            "Failed to upgrade to the head revision. This means the historical chain"
+            f" from an empty database, to the current revision is not possible.\n{e}"
+        )
+
     alembic_runner.generate_revision(
         message="test revision",
         autogenerate=True,
