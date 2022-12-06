@@ -1,4 +1,5 @@
 import pytest
+import sqlalchemy as sa
 from alembic.autogenerate.api import AutogenContext
 from alembic.autogenerate.render import _render_cmd_body
 from lndb_setup._test_migrate import migrate_test
@@ -42,6 +43,11 @@ def test_model_definitions_match_ddl(alembic_runner):
                     ],
                 )
 
+    engine = sa.create_engine("sqlite:///testdb/testdb.lndb")
+    with engine.connect() as conn:
+        conn.execute(
+            sa.text("create table migration_alembic as select * from migration_yvzi")
+        )
     alembic_runner.generate_revision(
         message="test revision",
         autogenerate=True,
