@@ -62,7 +62,10 @@ def run_migrations_online() -> None:
             poolclass=pool.NullPool,
         )
 
-    render_as_batch = config_section["sqlalchemy.url"].startswith("sqlite:///")
+    if "sqlalchemy.url" in config_section:
+        render_as_batch = config_section["sqlalchemy.url"].startswith("sqlite:///")
+    else:
+        render_as_batch = False
 
     with connectable.connect() as connection:
         context.configure(

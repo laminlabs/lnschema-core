@@ -1,6 +1,7 @@
 # internal
 lamin-site-assets_test/
 tests/lamin-site-assets_test/
+testdb/
 
 # macOS
 .DS_Store
