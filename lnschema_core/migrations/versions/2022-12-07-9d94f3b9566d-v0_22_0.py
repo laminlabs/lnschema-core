@@ -26,7 +26,7 @@ def upgrade() -> None:
     else:
         prefix, schema = "", "core"
 
-    with op.batch_alter_table(f"{prefix}.dobject", schema=schema) as batch_op:
+    with op.batch_alter_table(f"{prefix}dobject", schema=schema) as batch_op:
         batch_op.alter_column(
             "size",
             existing_type=sa.FLOAT(),
