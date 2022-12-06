@@ -228,7 +228,7 @@ class Run(SQLModel, table=True):  # type: ignore
     jupynb_id: Optional[str] = Field(default=None, index=True)
     """Link to :class:`~lnschema_core.Jupynb`."""
     jupynb_v: Optional[str] = Field(default=None, index=True)
-    output: List["DObject"] = Relationship(back_populates="run")
+    output: List["DObject"] = Relationship(back_populates="source")
     """Output data :class:`~lnschema_core.DObject`."""
     input: List["DObject"] = Relationship(
         back_populates="targets", sa_relationship_kwargs=dict(secondary=RunIn.__table__)
