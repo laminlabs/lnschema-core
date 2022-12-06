@@ -19,6 +19,7 @@ target_metadata.naming_convention = {
 }
 
 from lnschema_core import *  # noqa
+from lnschema_core import _schema_id  # noqa
 
 
 def run_migrations_offline() -> None:
@@ -55,6 +56,7 @@ def run_migrations_online() -> None:
     config_section = config.get_section(config.config_ini_section)
     # see https://pytest-alembic.readthedocs.io/en/latest/setup.html#env-py
     connectable = context.config.attributes.get("connection", None)
+    # below follows the standard case
     if connectable is None:
         connectable = engine_from_config(
             config_section,
@@ -71,7 +73,7 @@ def run_migrations_online() -> None:
         context.configure(
             connection=connection,
             target_metadata=target_metadata,
-            version_table="migration_%s" % config.config_ini_section,
+            version_table=f"migration_{_schema_id}",
             render_as_batch=render_as_batch,
             compare_type=True,
         )

@@ -140,7 +140,7 @@ class DObject(SQLModel, table=True):  # type: ignore
     """
 
     size: Optional[int] = Field(
-        default=None, index=True, sa_column=sa.Column(sa.BigInteger())
+        default=None, sa_column=sa.Column(sa.BigInteger(), index=True)
     )
     """Size in bytes.
 
