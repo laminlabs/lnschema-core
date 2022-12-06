@@ -17,6 +17,9 @@ def lint(session: nox.Session) -> None:
 
 @nox.session(python=["3.7", "3.8", "3.9", "3.10", "3.11"])
 def build(session):
+    session.install("lndb_setup")
+    login_user_1 = "lndb login testuser1@lamin.ai --password cEvcwMJFX4OwbsYVaMt2Os6GxxGgDUlBGILs2RyS"  # noqa
+    session.run(*(login_user_1.split(" ")))
     # init a test instance from the main branch
     session.run("git", "checkout", os.environ["GITHUB_HEAD_REF"])
     test_instance = "lndb init --storage testdb"
@@ -24,8 +27,6 @@ def build(session):
     # go back to the PR branch
     session.run("git", "checkout", os.environ["GITHUB_BASE_REF"])
     session.install(".[dev,test]")
-    login_user_1 = "lndb login testuser1@lamin.ai --password cEvcwMJFX4OwbsYVaMt2Os6GxxGgDUlBGILs2RyS"  # noqa
-    session.run(*(login_user_1.split(" ")))
     session.run(
         "pytest",
         "-s",
