@@ -32,14 +32,8 @@ def test_model_definitions_match_ddl(alembic_runner):
                     " with the set of steps described in the revision history. This"
                     " usually means that someone has made manual changes to the"
                     " database's DDL, or some model has been changed without also"
-                    " generating a migration to describe that change.",
-                    context=[
-                        (
-                            "The upgrade which would have been generated would look"
-                            " like",
-                            rendered_upgrade,
-                        )
-                    ],
+                    " generating a migration to describe that"
+                    f" change.\n{rendered_upgrade}"
                 )
 
     alembic_runner.generate_revision(
