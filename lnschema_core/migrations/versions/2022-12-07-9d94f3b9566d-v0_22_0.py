@@ -22,7 +22,6 @@ def upgrade() -> None:
 
     if sqlite:
         prefix, schema = "core.", None
-        op.execute("PRAGMA foreign_keys=OFF")
     else:
         prefix, schema = "", "core"
 
@@ -41,7 +40,6 @@ def downgrade() -> None:
 
     if sqlite:
         prefix, schema = "core.", None
-        op.execute("PRAGMA foreign_keys=OFF")
     else:
         prefix, schema = "", "core"
 
