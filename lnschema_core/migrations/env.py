@@ -7,7 +7,7 @@ from sqlmodel import SQLModel
 config = context.config
 
 if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+    fileConfig(config.config_file_name, disable_existing_loggers=False)
 
 target_metadata = SQLModel.metadata
 target_metadata.naming_convention = {
@@ -53,11 +53,14 @@ def run_migrations_online() -> None:
 
     """
     config_section = config.get_section(config.config_ini_section)
-    connectable = engine_from_config(
-        config_section,
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
+    # see https://pytest-alembic.readthedocs.io/en/latest/setup.html#env-py
+    connectable = context.config.attributes.get("connection", None)
+    if connectable is None:
+        connectable = engine_from_config(
+            config_section,
+            prefix="sqlalchemy.",
+            poolclass=pool.NullPool,
+        )
 
     render_as_batch = config_section["sqlalchemy.url"].startswith("sqlite:///")
 
@@ -67,6 +70,7 @@ def run_migrations_online() -> None:
             target_metadata=target_metadata,
             version_table="migration_%s" % config.config_ini_section,
             render_as_batch=render_as_batch,
+            compare_type=True,
         )
 
         with context.begin_transaction():

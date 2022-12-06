@@ -1,4 +1,7 @@
 from lndb_setup._test_migrate import migrate_test
+from pytest_alembic.tests import (  # noqa  # is automatically run
+    test_model_definitions_match_ddl,
+)
 
 
 def test_migrate_sqlite():
