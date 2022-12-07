@@ -1,7 +1,8 @@
-import os
 from pathlib import Path
 
 import nox
+from lndb_setup._nox_tools import setup_test_instances_from_main_branch
+from lndb_setup._test_migrate import model_definitions_match_ddl
 
 nox.options.reuse_existing_virtualenvs = True
 nox.options.error_on_external_run = False
@@ -17,19 +18,15 @@ def lint(session: nox.Session) -> None:
 
 @nox.session(python=["3.7", "3.8", "3.9", "3.10", "3.11"])
 def build(session):
-    session.install("lndb_setup")
-    login_user_1 = "lndb login testuser1@lamin.ai --password cEvcwMJFX4OwbsYVaMt2Os6GxxGgDUlBGILs2RyS"  # noqa
-    session.run(*(login_user_1.split(" ")))
-    # init a test instance from the main branch
-    if "GITHUB_BASE_REF" in os.environ and os.environ["GITHUB_BASE_REF"] != "":
-        session.run("git", "checkout", os.environ["GITHUB_BASE_REF"], external=True)
-    session.install(".")
-    test_instance = "lndb init --storage testdb"
-    session.run(*(test_instance.split(" ")))
-    # go back to the PR branch
-    if "GITHUB_HEAD_REF" in os.environ and os.environ["GITHUB_HEAD_REF"] != "":
-        session.run("git", "checkout", os.environ["GITHUB_HEAD_REF"], external=True)
+    setup_test_instances_from_main_branch(session)
     session.install(".[dev,test]")
+    try:
+        # cannot run from within pytest right now
+        model_definitions_match_ddl("lnschema_core", dialect_name="sqlite")
+    except Exception as e:
+        print(e)
+    url = "postgresql://postgres:pwd@0.0.0.0:5432/pgtest"
+    session.run(*f"lndb init --storage pgtest --db {url}".split(" "))
     session.run(
         "pytest",
         "-s",
