@@ -13,6 +13,16 @@ from typing import Any, Optional, Sequence, Tuple
 import sqlmodel as sqm
 from sqlalchemy.orm import declared_attr
 
+# add naming convention for alembic
+sqm.SQLModel.metadata.naming_convention = {
+    "ix": "ix_%(column_0_label)s",
+    "uq": "uq_%(table_name)s_%(column_0_name)s",
+    "ck": "ck_%(table_name)s_`%(constraint_name)s`",
+    "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+    "pk": "pk_%(table_name)s",
+}
+
+
 # it's tricky to deal with class variables in SQLModel children
 # hence, we're using a global variable, here
 SCHEMA_NAME = None
