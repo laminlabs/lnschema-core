@@ -22,9 +22,7 @@ class RunIn(SQLModel, table=True):  # type: ignore
     __tablename__ = f"{prefix}run_in"
 
     run_id: str = Field(foreign_key="core.run.id", primary_key=True)
-    """Link to :class:`~lnschema_core.Run`."""
     dobject_id: str = Field(foreign_key="core.dobject.id", primary_key=True)
-    """Link to :class:`~lnschema_core.DObject`."""
 
 
 class DObjectFeatures(SQLModel, table=True):  # type: ignore
@@ -42,9 +40,7 @@ class ProjectDSet(SQLModel, table=True):  # type: ignore
     __tablename__ = f"{prefix}project_dset"
 
     project_id: str = Field(foreign_key="core.project.id", primary_key=True)
-    """Link to :class:`~lnschema_core.dobject`."""
     dset_id: str = Field(foreign_key="core.dset.id", primary_key=True)
-    """Link to :class:`~lnschema_core.dset`."""
 
 
 class DSetDObject(SQLModel, table=True):  # type: ignore
@@ -53,6 +49,4 @@ class DSetDObject(SQLModel, table=True):  # type: ignore
     __tablename__ = f"{prefix}dset_dobject"
 
     dset_id: str = Field(foreign_key="core.dset.id", primary_key=True)
-    """Link to :class:`~lnschema_core.dset`."""
     dobject_id: str = Field(foreign_key="core.dobject.id", primary_key=True)
-    """Link to :class:`~lnschema_core.dobject`."""
