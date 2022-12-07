@@ -16,9 +16,9 @@ Entities:
 
    DObject
    Run
-   DSet
-   Jupynb
+   Notebook
    Pipeline
+   DSet
    User
    Storage
    Usage
@@ -44,7 +44,7 @@ from ._core import (
     DObject,
     DSet,
     Features,
-    Jupynb,
+    Notebook,
     Pipeline,
     Project,
     Run,
