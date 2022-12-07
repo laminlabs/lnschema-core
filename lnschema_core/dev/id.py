@@ -23,7 +23,7 @@ Entity-related generators:
    dobject
    run
    usage
-   jupynb
+   notebook
    pipeline
    project
    secret
@@ -35,7 +35,7 @@ from ._id import (  # noqa
     dobject,
     dset,
     instance,
-    jupynb,
+    notebook,
     pipeline,
     project,
     run,
