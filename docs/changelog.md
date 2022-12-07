@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+✅ Migration testing primitives on postgres | [72](https://github.com/laminlabs/lnschema-core/pull/72) | [falexwolf](https://github.com/falexwolf) | 2022-12-07 |
 🚚 Rename `Jupynb` to `Notebook` and add relationships | [69](https://github.com/laminlabs/lnschema-core/pull/69) | [falexwolf](https://github.com/falexwolf) | 2022-12-07 | 0.22.0
 🎨 Reorganize, more tests, change `size` to BigInt | [68](https://github.com/laminlabs/lnschema-core/pull/68) | [falexwolf](https://github.com/falexwolf) | 2022-12-07 |
 ✨ `add_relationship_keys` function | [67](https://github.com/laminlabs/lnschema-core/pull/67) | [falexwolf](https://github.com/falexwolf) | 2022-12-06 |
