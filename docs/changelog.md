@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚚 Rename jupynb to notebook and add relationships | [69](https://github.com/laminlabs/lnschema-core/pull/69) | [falexwolf](https://github.com/falexwolf) | 2022-12-07 |
 🎨 Reorganize, add more relationships, add more tests, change size to BigInt | [68](https://github.com/laminlabs/lnschema-core/pull/68) | [falexwolf](https://github.com/falexwolf) | 2022-12-07 |
 ✨ `add_relationship_keys` function | [67](https://github.com/laminlabs/lnschema-core/pull/67) | [falexwolf](https://github.com/falexwolf) | 2022-12-06 |
 🐛 Fix import | [66](https://github.com/laminlabs/lnschema-core/pull/66) | [falexwolf](https://github.com/falexwolf) | 2022-12-05 | 0.21.2
