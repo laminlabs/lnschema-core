@@ -76,6 +76,7 @@ def run_migrations_online() -> None:
             version_table=f"migration_{_schema_id}",
             render_as_batch=render_as_batch,
             compare_type=True,
+            include_schemas=True,
         )
 
         with context.begin_transaction():
