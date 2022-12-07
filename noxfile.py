@@ -21,11 +21,14 @@ def build(session):
     login_user_1 = "lndb login testuser1@lamin.ai --password cEvcwMJFX4OwbsYVaMt2Os6GxxGgDUlBGILs2RyS"  # noqa
     session.run(*(login_user_1.split(" ")))
     # init a test instance from the main branch
-    session.run("git", "checkout", os.environ["GITHUB_BASE_REF"], external=True)
+    if "GITHUB_BASE_REF" in os.environ:
+        session.run("git", "checkout", os.environ["GITHUB_BASE_REF"], external=True)
+    session.install(".")
     test_instance = "lndb init --storage testdb"
     session.run(*(test_instance.split(" ")))
     # go back to the PR branch
-    session.run("git", "checkout", os.environ["GITHUB_HEAD_REF"], external=True)
+    if "GITHUB_HEAD_REF" in os.environ:
+        session.run("git", "checkout", os.environ["GITHUB_HEAD_REF"], external=True)
     session.install(".[dev,test]")
     session.run(
         "pytest",
