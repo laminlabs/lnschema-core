@@ -111,7 +111,7 @@ def pipeline() -> str:
     return base62(n_char=9)
 
 
-def jupynb():
+def notebook():
     """Jupyter notebook: 12 base62.
 
     Collision probability is 2e-04 for 1B notebooks: 1M users with 1k notebooks/user.
