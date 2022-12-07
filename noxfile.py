@@ -47,8 +47,8 @@ def build(session):
         model_definitions_match_ddl("lnschema_core", dialect_name="sqlite")
     except Exception as e:
         print(e)
-    url = "postgresql://postgres:pwd@0.0.0.0:5432/pgtest"
-    session.run(*f"lndb init --storage pgtest --db {url}".split(" "))
+    # url = "postgresql://postgres:pwd@0.0.0.0:5432/pgtest"
+    # session.run(*f"lndb init --storage pgtest --db {url}".split(" "))
     session.run(
         "pytest",
         "-s",
