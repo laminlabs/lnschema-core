@@ -224,7 +224,7 @@ class Run(SQLModel, table=True):  # type: ignore
     name: Optional[str] = Field(default=None, index=True)
     pipeline_id: Optional[str] = Field(default=None, index=True)
     pipeline_v: Optional[str] = Field(default=None, index=True)
-    pipeline: Optional["Pipeline"] = Relationship()
+    pipeline: Optional["lnschema_core._core.Pipeline"] = Relationship()  # type: ignore # noqa
     """Link to :class:`~lnschema_core.Pipeline`."""
     notebook_id: Optional[str] = Field(default=None, index=True)
     notebook_v: Optional[str] = Field(default=None, index=True)
