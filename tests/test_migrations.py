@@ -9,7 +9,7 @@ package_name = get_package_name()
 
 
 def test_migration_id_is_consistent():
-    assert migration_id_is_consistent()
+    assert migration_id_is_consistent(package_name)
 
 
 def test_model_definitions_match_ddl_postgres():
