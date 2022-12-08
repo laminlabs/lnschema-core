@@ -1,28 +1,28 @@
-import yaml  # type: ignore
-from lndb_setup._test_migrate import migrate_test, model_definitions_match_ddl
+from lndb_setup.test import (
+    get_package_name,
+    migrate_clones,
+    migration_id_is_consistent,
+    model_definitions_match_ddl,
+)
 
-with open("./lamin-project.yaml") as f:
-    package_name = yaml.safe_load(f)["package_name"]
+package_name = get_package_name()
 
 
-# we can't run both the postgres and the sqlite test from the same process
-# right now as it seems to have a strange side effect on how indexes
-# are discovered, hence, we run this in the noxfile
-# def test_model_definitions_match_ddl_sqlite():
-#     model_definitions_match_ddl(package_name, dialect_name="sqlite")
+def test_migration_id_is_consistent():
+    assert migration_id_is_consistent(package_name)
 
 
 def test_model_definitions_match_ddl_postgres():
-    model_definitions_match_ddl(package_name, dialect_name="postgres")
+    model_definitions_match_ddl(package_name, dialect_name="postgresql")
 
 
-def test_migrate_sqlite():
-    results = migrate_test(package_name, n_instances=1, dialect_name="sqlite")
+def test_migrate_clones_sqlite():
+    results = migrate_clones(package_name, n_instances=1, dialect_name="sqlite")
     if "migrate-failed" in results:
-        raise RuntimeError("Migration failed.")
+        raise RuntimeError("Migration e2e test failed.")
 
 
-# def test_migrate_postgres():
-#     results = migrate_test(package_name, n_instances=1, dialect_name="postgresql")
+# def test_migrate_clones_postgres():
+#     results = migrate_clones(package_name, n_instances=1, dialect_name="postgresql")
 #     if "migrate-failed" in results:
-#          raise RuntimeError("Migration failed.")
+#          raise RuntimeError("Migration e2e test failed.")
