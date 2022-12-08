@@ -30,4 +30,4 @@ def build(session):
         "--cov-report=term-missing",
     )
     session.run("coverage", "xml")
-    build_docs()
+    build_docs(session)
