@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🥅 Fully module-qualified path for `Pipeline` | [75](https://github.com/laminlabs/lnschema-core/pull/75) | [falexwolf](https://github.com/falexwolf) | 2022-12-08 |
 :lipstick: Prettify noxfile | [74](https://github.com/laminlabs/lnschema-core/pull/74) | [falexwolf](https://github.com/falexwolf) | 2022-12-08 |
 ♻️ Clean up migration tests | [73](https://github.com/laminlabs/lnschema-core/pull/73) | [falexwolf](https://github.com/falexwolf) | 2022-12-08 | 0.22.1
 ✅ Migration testing primitives on postgres | [72](https://github.com/laminlabs/lnschema-core/pull/72) | [falexwolf](https://github.com/falexwolf) | 2022-12-07 |
