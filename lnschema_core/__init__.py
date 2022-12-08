@@ -33,7 +33,6 @@ Development tools:
    dev
    link
 """
-# This is lnschema-module yvzi.
 _schema_id = "yvzi"
 _name = "core"
 _migration = "db1df7b2aaad"
