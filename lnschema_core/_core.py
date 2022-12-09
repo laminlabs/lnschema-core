@@ -184,6 +184,19 @@ class DObject(SQLModel, table=True):  # type: ignore
         """Path on storage."""
         return filepath_from_dobject(self)
 
+    def load(self, stream: bool = False):
+        """Load data object.
+
+        Returns object associated with the stored `dobject`.
+
+        Populates `RunIn` when called from a notebook.
+
+        Guide: https://lamin.ai/docs/db/guide/select-load
+        """
+        from lamindb._load import load as lnload
+
+        return lnload(dobject=self, stream=stream)
+
     @overload
     def __init__(
         self,
