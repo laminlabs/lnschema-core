@@ -246,27 +246,25 @@ class DObject(SQLModel, table=True):  # type: ignore
         features: List["Features"] = [],
         targets: List["Run"] = [],
     ):
-        kwargs = locals()
         if data is not None:
-            from lamindb._record import create_dobject_from_data
+            from lamindb._record import get_dobject_kwargs_from_data
 
-            record = create_dobject_from_data(
+            kwargs, privates = get_dobject_kwargs_from_data(
                 data=data,
                 name=name,
                 features_ref=features_ref,
                 source=source,
-                id=id,
                 format=format,
             )
-            kwargs = record.dict()
-            # relationships
-            kwargs["features"] = record.features
-            kwargs["source"] = record.source
+            if id is not None:
+                kwargs["id"] = id
+        else:
+            kwargs = locals()
 
         super().__init__(**kwargs)
         if data is not None:
-            self._local_filepath = record._local_filepath
-            self._memory_rep = record._memory_rep
+            self._local_filepath = privates["_local_filepath"]
+            self._memory_rep = privates["_memory_rep"]
 
 
 class Run(SQLModel, table=True):  # type: ignore
