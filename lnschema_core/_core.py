@@ -259,8 +259,14 @@ class DObject(SQLModel, table=True):  # type: ignore
                 format=format,
             )
             kwargs = record.dict()
+            # relationships
+            kwargs["features"] = record.features
+            kwargs["source"] = record.source
 
         super().__init__(**kwargs)
+        if data is not None:
+            self._local_filepath = record._local_filepath
+            self._memory_rep = record._memory_rep
 
 
 class Run(SQLModel, table=True):  # type: ignore
