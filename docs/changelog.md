@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-✨ Combine record into DObject | [77](https://github.com/laminlabs/lnschema-core/pull/77) | [sunnyosun](https://github.com/sunnyosun) | 2022-12-09 |
+✨ Combine record into DObject | [77](https://github.com/laminlabs/lnschema-core/pull/77) | [sunnyosun](https://github.com/sunnyosun) | 2022-12-09 | 0.22.2
 🥅 Fully module-qualified path for `Pipeline` | [75](https://github.com/laminlabs/lnschema-core/pull/75) | [falexwolf](https://github.com/falexwolf) | 2022-12-08 |
 :lipstick: Prettify noxfile | [74](https://github.com/laminlabs/lnschema-core/pull/74) | [falexwolf](https://github.com/falexwolf) | 2022-12-08 |
 ♻️ Clean up migration tests | [73](https://github.com/laminlabs/lnschema-core/pull/73) | [falexwolf](https://github.com/falexwolf) | 2022-12-08 | 0.22.1
