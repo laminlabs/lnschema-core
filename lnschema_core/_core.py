@@ -232,7 +232,7 @@ class DObject(SQLModel, table=True):  # type: ignore
     ):
         kwargs = locals()
         if data is not None:
-            from lamindb._dobject import create_dobject_from_data
+            from lamindb._record import create_dobject_from_data
 
             record = create_dobject_from_data(
                 data=data,
