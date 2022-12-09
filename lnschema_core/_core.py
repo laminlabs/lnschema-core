@@ -1,7 +1,9 @@
 from datetime import datetime as datetime
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import Any, List, Optional, Union, overload  # noqa
 
+import anndata as ad
+import pandas as pd
 import sqlalchemy as sa
 from cloudpathlib import CloudPath
 from pydantic.fields import PrivateAttr
@@ -181,6 +183,81 @@ class DObject(SQLModel, table=True):  # type: ignore
     def path(self) -> Union[Path, CloudPath]:
         """Path on storage."""
         return filepath_from_dobject(self)
+
+    def load(self, stream: bool = False):
+        """Load data object.
+
+        Returns object associated with the stored `dobject`.
+
+        Populates `RunIn` when called from a notebook.
+
+        Guide: https://lamin.ai/docs/db/guide/select-load
+        """
+        from lamindb._load import load as lnload
+
+        return lnload(dobject=self, stream=stream)
+
+    @overload
+    def __init__(
+        self,
+        data: Union[Path, str, pd.DataFrame, ad.AnnData] = None,
+        *,
+        name: Optional[str] = None,
+        features_ref: Any = None,
+        source: Optional["Run"] = None,
+        id: Optional[str] = None,
+        format: Optional[str] = None,
+    ):
+        """Create a DObject record from data."""
+        ...
+
+    @overload
+    def __init__(
+        self,
+        id: Optional[str] = None,
+        name: Optional[str] = None,
+        source: Optional["Run"] = None,
+        suffix: Optional[str] = None,
+        hash: Optional[str] = None,
+        run_id: Optional[str] = None,
+        storage_id: Optional[str] = None,
+        features: List["Features"] = [],
+        targets: List["Run"] = [],
+    ):
+        """Create a DObject record from fields."""
+        ...
+
+    def __init__(  # type: ignore
+        self,
+        data: Union[Path, str, pd.DataFrame, ad.AnnData] = None,
+        *,
+        features_ref: Any = None,
+        source: Optional["Run"] = None,
+        format: Optional[str] = None,
+        id: Optional[str] = None,
+        name: Optional[str] = None,
+        suffix: Optional[str] = None,
+        hash: Optional[str] = None,
+        run_id: Optional[str] = None,
+        storage_id: Optional[str] = None,
+        features: List["Features"] = [],
+        targets: List["Run"] = [],
+    ):
+        kwargs = locals()
+        if data is not None:
+            from lamindb._record import create_dobject_from_data
+
+            record = create_dobject_from_data(
+                data=data,
+                name=name,
+                features_ref=features_ref,
+                source=source,
+                id=id,
+                format=format,
+            )
+            kwargs = record.dict()
+
+        super().__init__(**kwargs)
 
 
 class Run(SQLModel, table=True):  # type: ignore
