@@ -88,6 +88,40 @@ class Project(SQLModel, table=True):  # type: ignore
     """Time of last update."""
 
 
+def create_dobject_from_data(data):
+    return {"name": "test"}
+
+
+def init_sqlmodel_parent(model, pydantic_attrs):
+    if len(pydantic_attrs) == 0:
+        return
+
+    for k, v in pydantic_attrs.items():
+        if k not in model.__fields__:
+            continue
+        model.__setattr__(k, v)
+
+
+def record(original_class):
+    orig_init = original_class.__init__
+
+    def __init__(self, data=None, **kwargs):
+        local = locals()
+        if local.get("data") is not None:
+            kwargs = create_dobject_from_data(data=local["data"])
+        else:
+            kwargs = local.get("kwargs")
+
+        orig_init(self, **kwargs)
+
+        init_sqlmodel_parent(self, kwargs)
+
+    original_class.__init__ = __init__
+
+    return original_class
+
+
+@record
 class DObject(SQLModel, table=True):  # type: ignore
     """Data objects in storage & memory.
 
