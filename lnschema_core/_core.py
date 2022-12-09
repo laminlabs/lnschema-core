@@ -314,9 +314,9 @@ class Run(SQLModel, table=True):  # type: ignore
     notebook_v: Optional[str] = Field(default=None, index=True)
     notebook: Optional["Notebook"] = Relationship()
     """Link to :class:`~lnschema_core.Notebook`."""
-    output: List["DObject"] = Relationship(back_populates="source")
+    outputs: List["DObject"] = Relationship(back_populates="source")
     """Output data :class:`~lnschema_core.DObject`."""
-    input: List["DObject"] = Relationship(
+    inputs: List["DObject"] = Relationship(
         back_populates="targets", sa_relationship_kwargs=dict(secondary=RunIn.__table__)
     )
     """Input data :class:`~lnschema_core.DObject`."""
