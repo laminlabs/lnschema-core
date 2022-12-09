@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-🐛 Avoid double construction | [80](https://github.com/laminlabs/lnschema-core/pull/80) | [falexwolf](https://github.com/falexwolf) | 2022-12-09 |
+🐛 Avoid double construction | [80](https://github.com/laminlabs/lnschema-core/pull/80) | [falexwolf](https://github.com/falexwolf) | 2022-12-09 | 0.23.0
 🐛 Fix privates | [79](https://github.com/laminlabs/lnschema-core/pull/79) | [falexwolf](https://github.com/falexwolf) | 2022-12-09 | 0.22.4
 🐛 Fix size | [78](https://github.com/laminlabs/lnschema-core/pull/78) | [falexwolf](https://github.com/falexwolf) | 2022-12-09 | 0.22.3
 ✨ Combine `record` with `DObject` | [77](https://github.com/laminlabs/lnschema-core/pull/77) | [sunnyosun](https://github.com/sunnyosun) | 2022-12-09 | 0.22.2
