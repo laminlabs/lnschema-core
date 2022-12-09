@@ -208,7 +208,7 @@ class DObject(SQLModel, table=True):  # type: ignore
         id: Optional[str] = None,
         format: Optional[str] = None,
     ):
-        """Create a DObject record from data."""
+        """Initialize from data."""
         ...
 
     @overload
@@ -218,13 +218,14 @@ class DObject(SQLModel, table=True):  # type: ignore
         name: Optional[str] = None,
         source: Optional["Run"] = None,
         suffix: Optional[str] = None,
+        size: Optional[int] = None,
         hash: Optional[str] = None,
         run_id: Optional[str] = None,
         storage_id: Optional[str] = None,
         features: List["Features"] = [],
         targets: List["Run"] = [],
     ):
-        """Create a DObject record from fields."""
+        """Initialize from fields."""
         ...
 
     def __init__(  # type: ignore
@@ -234,9 +235,11 @@ class DObject(SQLModel, table=True):  # type: ignore
         features_ref: Any = None,
         source: Optional["Run"] = None,
         format: Optional[str] = None,
+        # continue with fields
         id: Optional[str] = None,
         name: Optional[str] = None,
         suffix: Optional[str] = None,
+        size: Optional[int] = None,
         hash: Optional[str] = None,
         run_id: Optional[str] = None,
         storage_id: Optional[str] = None,
