@@ -154,7 +154,7 @@ class DObject(SQLModel, table=True):  # type: ignore
     # We need the fully module-qualified path below, as there might be more
     # schema modules with an ORM called "Run"
     source: "lnschema_core._core.Run" = Relationship(  # type: ignore  # noqa
-        back_populates="output"
+        back_populates="outputs"
     )
     """Link to :class:`~lnschema_core.Run` that generated the `dobject`."""
     run_id: str = Field(foreign_key="core.run.id", index=True)
@@ -167,7 +167,7 @@ class DObject(SQLModel, table=True):  # type: ignore
     )
     """Link to feature sets."""
     targets: List["lnschema_core._core.Run"] = Relationship(  # type: ignore  # noqa
-        back_populates="input",
+        back_populates="inputs",
         sa_relationship_kwargs=dict(secondary=RunIn.__table__),
     )
     "Runs that use this dobject as input."
