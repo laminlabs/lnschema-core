@@ -93,7 +93,7 @@ class Project(SQLModel, table=True):  # type: ignore
 class DObject(SQLModel, table=True):  # type: ignore
     """Data objects in storage & memory.
 
-    Guide: <Data ingestion `https:///db/guide/ingest`>__.
+    Guide: `Data ingestion <https:///db/guide/ingest>`__.
 
     A `DObject` is typically instantiated from data using the arguments below.
     It can also be instantiated like any other SQLModel by passing all required
