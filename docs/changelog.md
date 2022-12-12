@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+:memo: Update docstring | [83](https://github.com/laminlabs/lnschema-core/pull/83) | [falexwolf](https://github.com/falexwolf) | 2022-12-12 |
 🚚 Rename input to inputs | [81](https://github.com/laminlabs/lnschema-core/pull/81) | [falexwolf](https://github.com/falexwolf) | 2022-12-09 | 0.23.1
 🐛 Avoid double construction | [80](https://github.com/laminlabs/lnschema-core/pull/80) | [falexwolf](https://github.com/falexwolf) | 2022-12-09 | 0.23.0
 🐛 Fix privates | [79](https://github.com/laminlabs/lnschema-core/pull/79) | [falexwolf](https://github.com/falexwolf) | 2022-12-09 | 0.22.4
