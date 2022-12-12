@@ -103,7 +103,7 @@ class DObject(SQLModel, table=True):  # type: ignore
         data: Filepath or in-memory data.
         name: Name of the data object, required if an in-memory object is passed.
         features_ref: Reference against which to link features.
-        source: The data transform that links to the data source of the data object.
+        source: The source of the data object (a :class:`~lnschema_core.Run`).
         id: The id of the dobject.
         format: Whether to use `h5ad` or `zarr` to store an `AnnData` object.
 
