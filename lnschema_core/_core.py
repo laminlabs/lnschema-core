@@ -199,11 +199,11 @@ class DObject(SQLModel, table=True):  # type: ignore
     def load(self, stream: bool = False):
         """Load data object.
 
-        Returns object associated with the stored `dobject`.
+        Returns in-memory representation if configured (say, an `AnnData` object
+        for an `h5ad` file).
 
-        Populates `RunIn` when called from a notebook.
-
-        Guide: https://lamin.ai/docs/db/guide/select-load
+        Otherwise, returns a path to a locally cached on-disk object (say, a
+        `.jpg` file).
         """
         from lamindb._load import load as lnload
 
