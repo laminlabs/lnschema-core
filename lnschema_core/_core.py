@@ -271,7 +271,7 @@ class DObject(SQLModel, table=True):  # type: ignore
             if id is not None:
                 kwargs["id"] = id
         else:
-            kwargs = locals()
+            kwargs = {k: v for k, v in locals().items() if v}
 
         super().__init__(**kwargs)
         if data is not None:
