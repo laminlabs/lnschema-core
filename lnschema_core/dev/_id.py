@@ -72,8 +72,8 @@ def user() -> str:
 
 
 def project() -> str:
-    """Project: 8 base64."""
-    return base64(n_char=8)
+    """Project: 8 base62."""
+    return base62(n_char=8)
 
 
 def usage() -> str:
