@@ -3,15 +3,15 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-🐛 Fixed bug in DObject not autogenerate id | [84](https://github.com/laminlabs/lnschema-core/pull/84) | [sunnyosun](https://github.com/sunnyosun) | 2022-12-14 |
-:memo: Update docstring | [83](https://github.com/laminlabs/lnschema-core/pull/83) | [falexwolf](https://github.com/falexwolf) | 2022-12-12 |
+🐛 Fixed bug in DObject not autogenerate id | [84](https://github.com/laminlabs/lnschema-core/pull/84) | [sunnyosun](https://github.com/sunnyosun) | 2022-12-14 | 0.23.2
+📝 Update docstring | [83](https://github.com/laminlabs/lnschema-core/pull/83) | [falexwolf](https://github.com/falexwolf) | 2022-12-12 |
 🚚 Rename input to inputs | [81](https://github.com/laminlabs/lnschema-core/pull/81) | [falexwolf](https://github.com/falexwolf) | 2022-12-09 | 0.23.1
 🐛 Avoid double construction | [80](https://github.com/laminlabs/lnschema-core/pull/80) | [falexwolf](https://github.com/falexwolf) | 2022-12-09 | 0.23.0
 🐛 Fix privates | [79](https://github.com/laminlabs/lnschema-core/pull/79) | [falexwolf](https://github.com/falexwolf) | 2022-12-09 | 0.22.4
 🐛 Fix size | [78](https://github.com/laminlabs/lnschema-core/pull/78) | [falexwolf](https://github.com/falexwolf) | 2022-12-09 | 0.22.3
 ✨ Combine `record` with `DObject` | [77](https://github.com/laminlabs/lnschema-core/pull/77) | [sunnyosun](https://github.com/sunnyosun) | 2022-12-09 | 0.22.2
 🥅 Fully module-qualified path for `Pipeline` | [75](https://github.com/laminlabs/lnschema-core/pull/75) | [falexwolf](https://github.com/falexwolf) | 2022-12-08 |
-:lipstick: Prettify noxfile | [74](https://github.com/laminlabs/lnschema-core/pull/74) | [falexwolf](https://github.com/falexwolf) | 2022-12-08 |
+💄 Prettify noxfile | [74](https://github.com/laminlabs/lnschema-core/pull/74) | [falexwolf](https://github.com/falexwolf) | 2022-12-08 |
 ♻️ Clean up migration tests | [73](https://github.com/laminlabs/lnschema-core/pull/73) | [falexwolf](https://github.com/falexwolf) | 2022-12-08 | 0.22.1
 ✅ Migration testing primitives on postgres | [72](https://github.com/laminlabs/lnschema-core/pull/72) | [falexwolf](https://github.com/falexwolf) | 2022-12-07 |
 🚚 Rename `Jupynb` to `Notebook` and add relationships | [69](https://github.com/laminlabs/lnschema-core/pull/69) | [falexwolf](https://github.com/falexwolf) | 2022-12-07 | 0.22.0
