@@ -45,14 +45,3 @@ from ._id import (  # noqa
     usage,
     user,
 )
-
-id_base62 = base62  # backward compat
-id_base26 = base26  # backward compat
-id_schema_module = schema  # backward compat
-id_dobject = dobject  # backward compat
-id_run = run  # backward compat
-id_user = user  # backward compat
-id_usage = usage  # backward compat
-id_secret = secret  # backward compat
-id_instance = instance  # backward compat
-id_storage = storage  # backward compat

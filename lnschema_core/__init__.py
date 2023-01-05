@@ -51,6 +51,3 @@ from ._core import (
     Usage,
     User,
 )
-from .dev import id  # backward compat
-
-storage = Storage  # backward compat
