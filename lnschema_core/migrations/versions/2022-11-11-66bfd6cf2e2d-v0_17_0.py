@@ -27,21 +27,11 @@ def upgrade() -> None:
         prefix, schema = "", "core"
 
     with op.batch_alter_table(f"{prefix}dtransform", schema=schema) as batch_op:
-        batch_op.add_column(
-            sa.Column("name", sqlmodel.sql.sqltypes.AutoString(), nullable=True)
-        )
-        batch_op.add_column(
-            sa.Column("pipeline_id", sqlmodel.sql.sqltypes.AutoString(), nullable=True)
-        )
-        batch_op.add_column(
-            sa.Column("pipeline_v", sqlmodel.sql.sqltypes.AutoString(), nullable=True)
-        )
-        batch_op.create_index(
-            batch_op.f("ix_core.dtransform_pipeline_id"), ["pipeline_id"], unique=False
-        )
-        batch_op.create_index(
-            batch_op.f("ix_core.dtransform_pipeline_v"), ["pipeline_v"], unique=False
-        )
+        batch_op.add_column(sa.Column("name", sqlmodel.sql.sqltypes.AutoString(), nullable=True))
+        batch_op.add_column(sa.Column("pipeline_id", sqlmodel.sql.sqltypes.AutoString(), nullable=True))
+        batch_op.add_column(sa.Column("pipeline_v", sqlmodel.sql.sqltypes.AutoString(), nullable=True))
+        batch_op.create_index(batch_op.f("ix_core.dtransform_pipeline_id"), ["pipeline_id"], unique=False)
+        batch_op.create_index(batch_op.f("ix_core.dtransform_pipeline_v"), ["pipeline_v"], unique=False)
         batch_op.add_column(
             sa.Column(
                 "created_by",
@@ -58,15 +48,9 @@ def upgrade() -> None:
                 nullable=False,
             )
         )
-        batch_op.create_index(
-            batch_op.f("ix_core.dtransform_created_at"), ["created_at"], unique=False
-        )
-        batch_op.create_index(
-            batch_op.f("ix_core.dtransform_created_by"), ["created_by"], unique=False
-        )
-        batch_op.create_index(
-            batch_op.f("ix_core.dtransform_name"), ["name"], unique=False
-        )
+        batch_op.create_index(batch_op.f("ix_core.dtransform_created_at"), ["created_at"], unique=False)
+        batch_op.create_index(batch_op.f("ix_core.dtransform_created_by"), ["created_by"], unique=False)
+        batch_op.create_index(batch_op.f("ix_core.dtransform_name"), ["name"], unique=False)
         if sqlite:
             batch_op.create_foreign_key(
                 batch_op.f("fk_core.dtransform_pipeline_id_pipeline"),
@@ -131,9 +115,7 @@ def upgrade() -> None:
     try:
         op.drop_index("ix_core.dtransform_run_id")
         op.drop_constraint("bfx_run_id_fkey", "run", schema="bfx")
-        op.drop_constraint(
-            "dtransform_pipeline_run_id_fkey", "dtransform", schema="core"
-        )
+        op.drop_constraint("dtransform_pipeline_run_id_fkey", "dtransform", schema="core")
     except Exception:
         pass
     op.drop_column(f"{prefix}dtransform", "run_id", schema=schema)

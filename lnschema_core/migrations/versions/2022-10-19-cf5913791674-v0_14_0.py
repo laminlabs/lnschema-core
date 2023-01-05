@@ -36,16 +36,10 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
     )
     with op.batch_alter_table("dset", schema=None) as batch_op:
-        batch_op.create_index(
-            batch_op.f("ix_dset_created_at"), ["created_at"], unique=False
-        )
-        batch_op.create_index(
-            batch_op.f("ix_dset_created_by"), ["created_by"], unique=False
-        )
+        batch_op.create_index(batch_op.f("ix_dset_created_at"), ["created_at"], unique=False)
+        batch_op.create_index(batch_op.f("ix_dset_created_by"), ["created_by"], unique=False)
         batch_op.create_index(batch_op.f("ix_dset_name"), ["name"], unique=False)
-        batch_op.create_index(
-            batch_op.f("ix_dset_updated_at"), ["updated_at"], unique=False
-        )
+        batch_op.create_index(batch_op.f("ix_dset_updated_at"), ["updated_at"], unique=False)
 
     op.create_table(
         "project",
@@ -66,16 +60,10 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
     )
     with op.batch_alter_table("project", schema=None) as batch_op:
-        batch_op.create_index(
-            batch_op.f("ix_project_created_at"), ["created_at"], unique=False
-        )
-        batch_op.create_index(
-            batch_op.f("ix_project_created_by"), ["created_by"], unique=False
-        )
+        batch_op.create_index(batch_op.f("ix_project_created_at"), ["created_at"], unique=False)
+        batch_op.create_index(batch_op.f("ix_project_created_by"), ["created_by"], unique=False)
         batch_op.create_index(batch_op.f("ix_project_name"), ["name"], unique=False)
-        batch_op.create_index(
-            batch_op.f("ix_project_updated_at"), ["updated_at"], unique=False
-        )
+        batch_op.create_index(batch_op.f("ix_project_updated_at"), ["updated_at"], unique=False)
 
     op.create_table(
         "project_dset",

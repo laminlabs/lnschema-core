@@ -20,13 +20,9 @@ def upgrade() -> None:
     with op.batch_alter_table("dobject") as batch_op:
         batch_op.drop_column("storage_root")
     op.add_column("pipeline", sa.Column("time_created", sa.DateTime(), nullable=False))
-    op.add_column(
-        "pipeline_run", sa.Column("time_created", sa.DateTime(), nullable=False)
-    )
+    op.add_column("pipeline_run", sa.Column("time_created", sa.DateTime(), nullable=False))
     with op.batch_alter_table("pipeline") as batch_op:
-        batch_op.create_foreign_key(
-            "pipeline_run", "pipeline", ["pipeline_id", "pipeline_v"], ["id", "v"]
-        )
+        batch_op.create_foreign_key("pipeline_run", "pipeline", ["pipeline_id", "pipeline_v"], ["id", "v"])
 
 
 def downgrade() -> None:
