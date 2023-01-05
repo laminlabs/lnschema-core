@@ -119,11 +119,7 @@ def upgrade() -> None:
     )
     op.drop_table("dobject")
     op.rename_table("dobject_", "dobject")
-    op.execute(
-        "update dobject set dsource_id = (select id from dtransform where"
-        " (dtransform.jupynb_id, dtransform.jupynb_v) = (dobject.jupynb_id,"
-        " dobject.jupynb_v))"
-    )
+    op.execute("update dobject set dsource_id = (select id from dtransform where (dtransform.jupynb_id, dtransform.jupynb_v) = (dobject.jupynb_id, dobject.jupynb_v))")
     # now we don't need these two columns anymore on dobject
     op.drop_column("dobject", "jupynb_v")
     op.drop_column("dobject", "jupynb_id")
@@ -151,9 +147,7 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.execute(
-        "insert into usage (id, type, user_id, time, dobject_id, dobject_v) select id, type, user_id, time, dobject_id, dobject_v from track_do"
-    )
+    op.execute("insert into usage (id, type, user_id, time, dobject_id, dobject_v) select id, type, user_id, time, dobject_id, dobject_v from track_do")
     op.drop_table("track_do")
 
     # jupynb table no longer has type

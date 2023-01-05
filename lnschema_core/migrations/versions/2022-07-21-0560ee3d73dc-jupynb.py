@@ -81,11 +81,7 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.execute(
-        "insert into track_do_ (id, type, user_id, jupynb_id, time, dobject_id) "
-        "select id, type, user_id, interface_id, time, dobject_id "
-        "from track_do"
-    )
+    op.execute("insert into track_do_ (id, type, user_id, jupynb_id, time, dobject_id) select id, type, user_id, interface_id, time, dobject_id from track_do")
     op.execute("update track_do_ SET jupynb_v = '1'")
     op.execute("update track_do_ SET dobject_v = '1'")
     op.drop_table("track_do")
