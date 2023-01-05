@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+👷 Reformat to 176 char line length | [85](https://github.com/laminlabs/lnschema-core/pull/85) | [falexwolf](https://github.com/falexwolf) | 2023-01-05 |
 🐛 Fixed bug in DObject not autogenerate id | [84](https://github.com/laminlabs/lnschema-core/pull/84) | [sunnyosun](https://github.com/sunnyosun) | 2022-12-14 | 0.23.2
 📝 Update docstring | [83](https://github.com/laminlabs/lnschema-core/pull/83) | [falexwolf](https://github.com/falexwolf) | 2022-12-12 |
 🚚 Rename input to inputs | [81](https://github.com/laminlabs/lnschema-core/pull/81) | [falexwolf](https://github.com/falexwolf) | 2022-12-09 | 0.23.1
