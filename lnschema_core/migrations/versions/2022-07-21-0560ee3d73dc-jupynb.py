@@ -51,9 +51,7 @@ def upgrade() -> None:
         sa.Column("jupynb_v", sqlmodel.sql.sqltypes.AutoString(), nullable=False),
         sa.Column("time_created", sa.DateTime(), nullable=False),
         sa.Column("time_updated", sa.DateTime(), nullable=False),
-        sa.ForeignKeyConstraint(
-            ["jupynb_id", "jupynb_v"], ["jupynb.id", "jupynb.v"], name="dobject_jupynb"
-        ),
+        sa.ForeignKeyConstraint(["jupynb_id", "jupynb_v"], ["jupynb.id", "jupynb.v"], name="dobject_jupynb"),
         sa.PrimaryKeyConstraint("id", "v"),
     )
     op.execute("insert into dobject_ select * from dobject")
@@ -76,9 +74,7 @@ def upgrade() -> None:
             ["dobject.id", "dobject.v"],
             name="track_do_dobject",
         ),
-        sa.ForeignKeyConstraint(
-            ["jupynb_id", "jupynb_v"], ["jupynb.id", "jupynb.v"], name="track_do_jupynb"
-        ),
+        sa.ForeignKeyConstraint(["jupynb_id", "jupynb_v"], ["jupynb.id", "jupynb.v"], name="track_do_jupynb"),
         sa.ForeignKeyConstraint(
             ["user_id"],
             ["user.id"],

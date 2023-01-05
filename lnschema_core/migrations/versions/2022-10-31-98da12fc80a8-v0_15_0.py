@@ -20,24 +20,16 @@ def upgrade() -> None:
         op.rename_table(old_table_name="dtransform", new_table_name="core.dtransform")
         op.rename_table(old_table_name="storage", new_table_name="core.storage")
         op.rename_table(old_table_name="user", new_table_name="core.user")
-        op.rename_table(
-            old_table_name="dtransform_in", new_table_name="core.dtransform_in"
-        )
+        op.rename_table(old_table_name="dtransform_in", new_table_name="core.dtransform_in")
         op.rename_table(old_table_name="dobject", new_table_name="core.dobject")
         op.rename_table(old_table_name="usage", new_table_name="core.usage")
         op.rename_table(old_table_name="jupynb", new_table_name="core.jupynb")
         op.rename_table(old_table_name="pipeline", new_table_name="core.pipeline")
-        op.rename_table(
-            old_table_name="pipeline_run", new_table_name="core.pipeline_run"
-        )
+        op.rename_table(old_table_name="pipeline_run", new_table_name="core.pipeline_run")
         op.rename_table(old_table_name="dset", new_table_name="core.dset")
         op.rename_table(old_table_name="project", new_table_name="core.project")
-        op.rename_table(
-            old_table_name="project_dset", new_table_name="core.project_dset"
-        )
-        op.rename_table(
-            old_table_name="dset_dobject", new_table_name="core.dset_dobject"
-        )
+        op.rename_table(old_table_name="project_dset", new_table_name="core.project_dset")
+        op.rename_table(old_table_name="dset_dobject", new_table_name="core.dset_dobject")
     else:
         op.execute("alter table public.dtransform set schema core")
         op.execute("alter table public.storage set schema core")

@@ -43,18 +43,11 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.execute(
-        "insert into dtransform_tmp (id, jupynb_id, jupynb_v) select id, jupynb_id,"
-        " jupynb_v from dtransform"
-    )
+    op.execute("insert into dtransform_tmp (id, jupynb_id, jupynb_v) select id, jupynb_id, jupynb_v from dtransform")
     op.drop_table("dtransform")
     op.rename_table("dtransform_tmp", "dtransform")
-    op.create_index(
-        op.f("ix_dtransform_jupynb_id"), "dtransform", ["jupynb_id"], unique=False
-    )
-    op.create_index(
-        op.f("ix_dtransform_jupynb_v"), "dtransform", ["jupynb_v"], unique=False
-    )
+    op.create_index(op.f("ix_dtransform_jupynb_id"), "dtransform", ["jupynb_id"], unique=False)
+    op.create_index(op.f("ix_dtransform_jupynb_v"), "dtransform", ["jupynb_v"], unique=False)
     op.create_index(
         op.f("ix_dtransform_pipeline_run_id"),
         "dtransform",
@@ -70,9 +63,7 @@ def upgrade() -> None:
         "dobject_tmp",
         sa.Column("id", sqlmodel.sql.sqltypes.AutoString(), nullable=True),
         sa.Column("v", sqlmodel.sql.sqltypes.AutoString(), nullable=True),
-        sa.Column(
-            "name", sqlmodel.sql.sqltypes.AutoString(), nullable=True, index=True
-        ),
+        sa.Column("name", sqlmodel.sql.sqltypes.AutoString(), nullable=True, index=True),
         sa.Column(
             "file_suffix",
             sqlmodel.sql.sqltypes.AutoString(),
@@ -103,12 +94,8 @@ def upgrade() -> None:
 
     # Create indexes on jupynb
     op.create_index(op.f("ix_jupynb_name"), "jupynb", ["name"], unique=False)
-    op.create_index(
-        op.f("ix_jupynb_time_created"), "jupynb", ["time_created"], unique=False
-    )
-    op.create_index(
-        op.f("ix_jupynb_time_updated"), "jupynb", ["time_updated"], unique=False
-    )
+    op.create_index(op.f("ix_jupynb_time_created"), "jupynb", ["time_created"], unique=False)
+    op.create_index(op.f("ix_jupynb_time_updated"), "jupynb", ["time_updated"], unique=False)
     op.create_index(op.f("ix_jupynb_user_id"), "jupynb", ["user_id"], unique=False)
 
     # Create indexes on usage

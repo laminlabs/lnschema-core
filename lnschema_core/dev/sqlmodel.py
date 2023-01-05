@@ -33,11 +33,7 @@ def __repr_args__(self) -> Sequence[Tuple[Optional[str], Any]]:
     return [
         (k, self.__dict__[k])
         for k in self.__fields__
-        if (
-            not k.startswith("_sa_")
-            and k in self.__dict__  # noqa
-            and self.__dict__[k] is not None  # noqa
-        )
+        if (not k.startswith("_sa_") and k in self.__dict__ and self.__dict__[k] is not None)  # noqa  # noqa
     ]
 
 

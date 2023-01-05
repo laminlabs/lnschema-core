@@ -18,12 +18,8 @@ depends_on = None
 
 def upgrade() -> None:
     with op.batch_alter_table("dobject", schema=None) as batch_op:
-        batch_op.add_column(
-            sa.Column("checksum", sqlmodel.sql.sqltypes.AutoString(), nullable=True)
-        )
-        batch_op.create_index(
-            batch_op.f("ix_dobject_checksum"), ["checksum"], unique=False
-        )
+        batch_op.add_column(sa.Column("checksum", sqlmodel.sql.sqltypes.AutoString(), nullable=True))
+        batch_op.create_index(batch_op.f("ix_dobject_checksum"), ["checksum"], unique=False)
 
 
 def downgrade() -> None:

@@ -153,9 +153,7 @@ class DObject(SQLModel, table=True):  # type: ignore
     It's `None` if the storage format doesn't have a canonical extension.
     """
 
-    size: Optional[int] = Field(
-        default=None, sa_column=sa.Column(sa.BigInteger(), index=True)
-    )
+    size: Optional[int] = Field(default=None, sa_column=sa.Column(sa.BigInteger(), index=True))
     """Size in bytes.
 
     Examples: 1KB is 1e3 bytes, 1MB is 1e6, 1GB is 1e9, 1TB is 1e12 etc.
@@ -165,9 +163,7 @@ class DObject(SQLModel, table=True):  # type: ignore
 
     # We need the fully module-qualified path below, as there might be more
     # schema modules with an ORM called "Run"
-    source: "lnschema_core._core.Run" = Relationship(  # type: ignore  # noqa
-        back_populates="outputs"
-    )
+    source: "lnschema_core._core.Run" = Relationship(back_populates="outputs")  # type: ignore  # noqa
     """Link to :class:`~lnschema_core.Run` that generated the `dobject`."""
     run_id: str = Field(foreign_key="core.run.id", index=True)
     """The source run id."""
@@ -328,9 +324,7 @@ class Run(SQLModel, table=True):  # type: ignore
     """Link to :class:`~lnschema_core.Notebook`."""
     outputs: List["DObject"] = Relationship(back_populates="source")
     """Output data :class:`~lnschema_core.DObject`."""
-    inputs: List["DObject"] = Relationship(
-        back_populates="targets", sa_relationship_kwargs=dict(secondary=RunIn.__table__)
-    )
+    inputs: List["DObject"] = Relationship(back_populates="targets", sa_relationship_kwargs=dict(secondary=RunIn.__table__))
     """Input data :class:`~lnschema_core.DObject`."""
     created_by: str = CreatedBy
     """Auto-populated link to :class:`~lnschema_core.User`."""

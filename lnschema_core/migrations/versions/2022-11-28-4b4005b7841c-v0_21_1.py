@@ -47,19 +47,13 @@ def upgrade() -> None:
             sa.PrimaryKeyConstraint("id", name=op.f("pk_core.features")),
         )
         with op.batch_alter_table("core.features", schema=None) as batch_op:
-            batch_op.create_index(
-                batch_op.f("ix_core.features_created_at"), ["created_at"], unique=False
-            )
-            batch_op.create_index(
-                batch_op.f("ix_core.features_created_by"), ["created_by"], unique=False
-            )
+            batch_op.create_index(batch_op.f("ix_core.features_created_at"), ["created_at"], unique=False)
+            batch_op.create_index(batch_op.f("ix_core.features_created_by"), ["created_by"], unique=False)
 
         op.create_table(
             "core.dobject_features",
             sa.Column("dobject_id", sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-            sa.Column(
-                "features_id", sqlmodel.sql.sqltypes.AutoString(), nullable=False
-            ),
+            sa.Column("features_id", sqlmodel.sql.sqltypes.AutoString(), nullable=False),
             sa.ForeignKeyConstraint(
                 ["dobject_id"],
                 ["core.dobject.id"],
@@ -70,9 +64,7 @@ def upgrade() -> None:
                 ["core.features.id"],
                 name=op.f("fk_core.dobject_features_features_id_features"),
             ),
-            sa.PrimaryKeyConstraint(
-                "dobject_id", "features_id", name=op.f("pk_core.dobject_features")
-            ),
+            sa.PrimaryKeyConstraint("dobject_id", "features_id", name=op.f("pk_core.dobject_features")),
         )
         with op.batch_alter_table("core.storage", schema=None) as batch_op:
             batch_op.drop_index("ix_core.storage_created_at")
@@ -94,25 +86,13 @@ def upgrade() -> None:
         batch_op.drop_index("ix_core.dtransform_name")
         batch_op.drop_index("ix_core.dtransform_pipeline_id")
         batch_op.drop_index("ix_core.dtransform_pipeline_v")
-        batch_op.create_index(
-            batch_op.f("ix_core.run_created_at"), ["created_at"], unique=False
-        )
-        batch_op.create_index(
-            batch_op.f("ix_core.run_created_by"), ["created_by"], unique=False
-        )
-        batch_op.create_index(
-            batch_op.f("ix_core.run_jupynb_id"), ["jupynb_id"], unique=False
-        )
-        batch_op.create_index(
-            batch_op.f("ix_core.run_jupynb_v"), ["jupynb_v"], unique=False
-        )
+        batch_op.create_index(batch_op.f("ix_core.run_created_at"), ["created_at"], unique=False)
+        batch_op.create_index(batch_op.f("ix_core.run_created_by"), ["created_by"], unique=False)
+        batch_op.create_index(batch_op.f("ix_core.run_jupynb_id"), ["jupynb_id"], unique=False)
+        batch_op.create_index(batch_op.f("ix_core.run_jupynb_v"), ["jupynb_v"], unique=False)
         batch_op.create_index(batch_op.f("ix_core.run_name"), ["name"], unique=False)
-        batch_op.create_index(
-            batch_op.f("ix_core.run_pipeline_id"), ["pipeline_id"], unique=False
-        )
-        batch_op.create_index(
-            batch_op.f("ix_core.run_pipeline_v"), ["pipeline_v"], unique=False
-        )
+        batch_op.create_index(batch_op.f("ix_core.run_pipeline_id"), ["pipeline_id"], unique=False)
+        batch_op.create_index(batch_op.f("ix_core.run_pipeline_v"), ["pipeline_v"], unique=False)
         batch_op.create_foreign_key(
             batch_op.f("fk_core.run_pipeline_id_pipeline"),
             "core.pipeline",
