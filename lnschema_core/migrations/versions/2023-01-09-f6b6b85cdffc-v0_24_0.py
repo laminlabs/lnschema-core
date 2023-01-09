@@ -1,4 +1,4 @@
-"""v0.23.0.
+"""v0.24.0.
 
 Revision ID: f6b6b85cdffc
 Revises: db1df7b2aaad
