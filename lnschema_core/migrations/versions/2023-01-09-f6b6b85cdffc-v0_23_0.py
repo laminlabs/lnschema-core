@@ -25,9 +25,13 @@ def upgrade() -> None:
     else:
         prefix, schema = "", "core"
 
-    with op.batch_alter_table(f"{prefix}notebook", schema=schema) as batch_op:
-        batch_op.add_column(sa.Column("title", sqlmodel.sql.sqltypes.AutoString(), nullable=False))
-        batch_op.create_index(batch_op.f("ix_core.notebook_title"), ["title"], unique=False)
+    if sqlite:
+        with op.batch_alter_table(f"{prefix}notebook", schema=schema) as batch_op:
+            batch_op.add_column(sa.Column("title", sqlmodel.sql.sqltypes.AutoString(), nullable=False))
+            batch_op.create_index(batch_op.f("ix_core.notebook_title"), ["title"], unique=False)
+    else:
+        op.add_column(f"{prefix}notebook", sa.Column("title", sqlmodel.sql.sqltypes.AutoString(), nullable=False), schema=schema)
+        op.create_index(op.f("ix_core_notebook_title"), "notebook", ["title"], unique=False, schema=schema)
 
 
 def downgrade() -> None:
