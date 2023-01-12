@@ -15,7 +15,7 @@ It is built with [SQLModel](https://sqlmodel.tiangolo.com/), a shallow wrapper t
 :maxdepth: 1
 :hidden:
 
-guide
+guide/index
 api
 changelog
 ```
