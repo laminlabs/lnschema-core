@@ -11,6 +11,7 @@ import os
 from typing import Any, Optional, Sequence, Tuple
 
 import sqlmodel as sqm
+from pydantic import create_model
 from sqlalchemy.orm import declared_attr
 
 # add naming convention for alembic
@@ -36,8 +37,26 @@ def __repr_args__(self) -> Sequence[Tuple[Optional[str], Any]]:
 sqm.SQLModel.__repr_args__ = __repr_args__
 
 
+def validate_with_pydantic(model):
+    annotations = model.__annotations__
+    kwargs = model.__dict__
+    pydantic_annotations = {}
+    for field, ann in annotations.items():
+        if getattr(ann, "__origin__", None) is None and type(None) in ann.__args__:
+            pydantic_annotations[field] = (ann, None)
+        else:
+            pydantic_annotations[field] = (ann, ...)
+    validation_model = create_model("ValidationModel", **pydantic_annotations)
+    validation_model.validate(kwargs)
+    return
+
+
 class SQLModelModule(sqm.SQLModel):
     """SQLModel for schema module."""
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        validate_with_pydantic(self)
 
     # this here is problematic for those tables that overwrite
     # __table_args__; we currently need to treat them manually
@@ -49,6 +68,10 @@ class SQLModelModule(sqm.SQLModel):
 
 class SQLModelPrefix(sqm.SQLModel):  # type: ignore
     """SQLModel prefixed by schema module name."""
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        validate_with_pydantic(self)
 
     @declared_attr
     def __tablename__(cls) -> str:  # type: ignore
