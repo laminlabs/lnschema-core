@@ -42,11 +42,13 @@ def validate_with_pydantic(model):
     kwargs = model.__dict__
     pydantic_annotations = {}
     for field, ann in annotations.items():
-        if getattr(ann, "__origin__", None) is None and type(None) in ann.__args__:
+        if ann.__module__ == "typing":
+            if getattr(ann, "__origin__", None) is None and type(None) in ann.__args__:
+                pydantic_annotations[field] = (ann, None)
             pydantic_annotations[field] = (ann, None)
         else:
             pydantic_annotations[field] = (ann, ...)
-    validation_model = create_model("ValidationModel", **pydantic_annotations)
+    validation_model = create_model(model.__class__.__name__, **pydantic_annotations)
     validation_model.validate(kwargs)
     return
 
