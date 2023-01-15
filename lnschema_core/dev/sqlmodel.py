@@ -63,7 +63,7 @@ def is_sqlite():
         from lndb_setup._settings_load import load_instance_settings
 
         isettings = load_instance_settings()
-        sqlite_true = isettings._dbconfig == "sqlite"
+        sqlite_true = isettings.dialect == "sqlite"
     except (ImportError, RuntimeError):
         sqlite_true = True
 
