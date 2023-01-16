@@ -30,7 +30,7 @@ dev = [
 test = [
     "pytest>=6.0",
     "pytest-cov",
-    "lndb_setup>=0.25.2",
+    "lndb_setup>=0.30.4",
     "pytest_alembic",
 ]
 
