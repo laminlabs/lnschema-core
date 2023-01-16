@@ -7,6 +7,7 @@
    SQLModelPrefix
 """
 
+import importlib
 import os
 from typing import Any, Optional, Sequence, Tuple
 
@@ -41,14 +42,24 @@ def validate_with_pydantic(model):
     annotations = model.__annotations__
     kwargs = model.__dict__
     pydantic_annotations = {}
+    forward_refs = {}
     for field, ann in annotations.items():
         if ann.__module__ == "typing":
+            # handle optional fields
             if getattr(ann, "__origin__", None) is None and type(None) in ann.__args__:
                 pydantic_annotations[field] = (ann, None)
             pydantic_annotations[field] = (ann, None)
+            # handle forward references
+            if "ForwardRef" in ann.__str__():
+                ref = ann.__str__().split("'")[1].split(".")[0]
+                try:
+                    forward_refs[ref] = importlib.import_module(ref)
+                except Exception:
+                    forward_refs[ref] = getattr(importlib.import_module(model.__module__), ref)
         else:
             pydantic_annotations[field] = (ann, ...)
     validation_model = create_model(model.__class__.__name__, **pydantic_annotations)
+    validation_model.update_forward_refs(**forward_refs)
     validation_model.validate(kwargs)
     return
 
