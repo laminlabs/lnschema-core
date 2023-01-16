@@ -48,11 +48,14 @@ def validate_with_pydantic(model):
             # handle optional fields
             if getattr(ann, "__origin__", None) is None and type(None) in ann.__args__:
                 pydantic_annotations[field] = (ann, None)
-            pydantic_annotations[field] = (ann, None)
+            else:
+                pydantic_annotations[field] = (ann, ...)
             # handle forward references
-            if "ForwardRef" in ann.__str__():
-                ref = ann.__str__().split("'")[1].split(".")[0]
+            required_ann = ann.__args__[0]
+            if "ForwardRef" in str(required_ann.__class__):  # typing.ForwardRef not available in python <= 3.6.12
+                ref = required_ann.__forward_arg__.split(".")[0]
                 try:
+                    # if reference is in another module
                     forward_refs[ref] = importlib.import_module(ref)
                 except Exception:
                     forward_refs[ref] = getattr(importlib.import_module(model.__module__), ref)
