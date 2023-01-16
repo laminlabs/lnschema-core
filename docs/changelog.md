@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-🩹 Fix `_dbconfig` | [90](https://github.com/laminlabs/lnschema-core/pull/90) | [falexwolf](https://github.com/falexwolf) | 2023-01-16 |
+🩹 Fix `_dbconfig` | [90](https://github.com/laminlabs/lnschema-core/pull/90) | [falexwolf](https://github.com/falexwolf) | 2023-01-16 | 0.24.1
 👷 Extend CI to py3.8-3.10 | [88](https://github.com/laminlabs/lnschema-core/pull/88) | [sunnyosun](https://github.com/sunnyosun) | 2023-01-12 |
 🚚 Add `title` field to `Notebook` | [87](https://github.com/laminlabs/lnschema-core/pull/87) | [falexwolf](https://github.com/falexwolf) | 2023-01-09 | 0.24.0
 🔥 Remove backward compat | [86](https://github.com/laminlabs/lnschema-core/pull/86) | [falexwolf](https://github.com/falexwolf) | 2023-01-05 |
