@@ -46,12 +46,11 @@ def validate_with_pydantic(model):
     for field, ann in annotations.items():
         if ann.__module__ == "typing":
             # handle optional and relationship fields
-            if getattr(ann, "__origin__", None) is None and type(None) in ann.__args__:
-                pydantic_annotations[field] = (ann, None)
-            elif field in model.__sqlmodel_relationships__:
-                pydantic_annotations[field] = (ann, None)
-            else:
-                pydantic_annotations[field] = (ann, ...)
+            if ann.__module__ == "typing":
+                if (type(None) in ann.__args__) or (field in model.__sqlmodel_relationships__):
+                    pydantic_annotations[field] = (ann, None)
+                else:
+                    pydantic_annotations[field] = (ann, ...)
             # handle forward references
             required_ann = ann.__args__[0]
             if "ForwardRef" in str(required_ann.__class__):  # typing.ForwardRef not available in python <= 3.6.12
