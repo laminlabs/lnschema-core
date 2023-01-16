@@ -45,8 +45,10 @@ def validate_with_pydantic(model):
     forward_refs = {}
     for field, ann in annotations.items():
         if ann.__module__ == "typing":
-            # handle optional fields
+            # handle optional and relationship fields
             if getattr(ann, "__origin__", None) is None and type(None) in ann.__args__:
+                pydantic_annotations[field] = (ann, None)
+            elif field in model.__sqlmodel_relationships__:
                 pydantic_annotations[field] = (ann, None)
             else:
                 pydantic_annotations[field] = (ann, ...)
