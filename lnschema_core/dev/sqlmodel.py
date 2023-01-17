@@ -38,9 +38,9 @@ def __repr_args__(self) -> Sequence[Tuple[Optional[str], Any]]:
 sqm.SQLModel.__repr_args__ = __repr_args__
 
 
-def validate_with_pydantic(model):
+def validate_with_pydantic(model, user_kwargs):
     annotations = model.__annotations__
-    kwargs = model.__dict__
+    kwargs = {**model.__dict__, **user_kwargs}
     pydantic_annotations = {}
     forward_refs = {}
     for field, ann in annotations.items():
@@ -61,6 +61,9 @@ def validate_with_pydantic(model):
                 except Exception:
                     forward_refs[ref] = getattr(importlib.import_module(model.__module__), ref)
         else:
+            # do not validate auto-populated (server-side) created_at fields
+            if field == "created_at" and "created_at" not in kwargs:
+                continue
             pydantic_annotations[field] = (ann, ...)
     validation_model = create_model(model.__class__.__name__, **pydantic_annotations)
     validation_model.update_forward_refs(**forward_refs)
@@ -71,9 +74,9 @@ def validate_with_pydantic(model):
 class SQLModelModule(sqm.SQLModel):
     """SQLModel for schema module."""
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        validate_with_pydantic(self)
+    def __init__(self, **user_kwargs):
+        super().__init__(**user_kwargs)
+        validate_with_pydantic(self, user_kwargs)
 
     # this here is problematic for those tables that overwrite
     # __table_args__; we currently need to treat them manually
@@ -86,9 +89,9 @@ class SQLModelModule(sqm.SQLModel):
 class SQLModelPrefix(sqm.SQLModel):  # type: ignore
     """SQLModel prefixed by schema module name."""
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        validate_with_pydantic(self)
+    def __init__(self, **user_kwargs):
+        super().__init__(**user_kwargs)
+        validate_with_pydantic(self, user_kwargs)
 
     @declared_attr
     def __tablename__(cls) -> str:  # type: ignore
