@@ -42,31 +42,39 @@ def validate_with_pydantic(model, user_kwargs):
     annotations = model.__annotations__
     kwargs = {**model.__dict__, **user_kwargs}
     pydantic_annotations = {}
-    forward_refs = {}
+    relationship_fields = {}
     for field, ann in annotations.items():
         if ann.__module__ == "typing":
-            # handle optional and relationship fields
-            if ann.__module__ == "typing":
-                if (type(None) in ann.__args__) or (field in model.__sqlmodel_relationships__):
-                    pydantic_annotations[field] = (ann, None)
-                else:
-                    pydantic_annotations[field] = (ann, ...)
             # handle forward references
             required_ann = ann.__args__[0]
             if "ForwardRef" in str(required_ann.__class__):  # typing.ForwardRef not available in python <= 3.6.12
-                ref = required_ann.__forward_arg__.split(".")[0]
+                ref = required_ann.__forward_arg__.split(".")
                 try:
                     # if reference is in another module
-                    forward_refs[ref] = importlib.import_module(ref)
+                    resolved_ann = getattr(importlib.import_module(ref[0]), ref[-1])
                 except Exception:
-                    forward_refs[ref] = getattr(importlib.import_module(model.__module__), ref)
+                    resolved_ann = getattr(importlib.import_module(model.__module__), ref[-1])
+            else:
+                resolved_ann = required_ann
+            # handle optional and relationship fields
+            if field in model.__sqlmodel_relationships__:
+                relationship_fields[field] = resolved_ann
+                pydantic_annotations[field] = (resolved_ann, None)
+            elif type(None) in ann.__args__:
+                pydantic_annotations[field] = (resolved_ann, None)
+            else:
+                pydantic_annotations[field] = (resolved_ann, ...)
         else:
             # do not validate auto-populated (server-side) created_at fields
-            if field == "created_at" and "created_at" not in kwargs:
+            if field == "created_at" and "created_at" not in user_kwargs:
                 continue
-            pydantic_annotations[field] = (ann, ...)
+            else:
+                pydantic_annotations[field] = (ann, ...)
+    # pydantic does not check for the type of complex objects, only their attributes
+    for key in relationship_fields.keys() & user_kwargs.keys():
+        if not isinstance(user_kwargs[key], relationship_fields[key]):
+            raise TypeError(f"Validation error for {model.__class__.__name__}: field {field} should be of type {relationship_fields[key].__name__}.")
     validation_model = create_model(model.__class__.__name__, **pydantic_annotations)
-    validation_model.update_forward_refs(**forward_refs)
     validation_model.validate(kwargs)
     return
 
