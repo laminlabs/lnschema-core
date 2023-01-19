@@ -44,7 +44,7 @@ def _resolve_forward_ref(ann, module):
     # fetch target type as string
     forward_args = []
     parent_ref = None
-    if _is_optional(ann):
+    if _is_ann_optional(ann):
         forward_args = [ann.__args__[0].__forward_arg__]
     else:
         try:
@@ -75,7 +75,7 @@ def _resolve_forward_ref(ann, module):
         return getattr(typing, parent_ref)[resolved_args[0], resolved_args[1]]
 
 
-def _is_optional(type_ann):
+def _is_ann_optional(type_ann):
     if type_ann.__module__ == "typing":
         try:
             if type_ann.__origin__ == Union:
@@ -84,6 +84,12 @@ def _is_optional(type_ann):
         except Exception:
             return False
     return False
+
+
+def _is_field_optional(model_field):
+    if model_field is None:
+        return False
+    return not model_field.required
 
 
 def validate_with_pydantic(model, user_kwargs):
@@ -107,12 +113,15 @@ def validate_with_pydantic(model, user_kwargs):
         if field in model.__sqlmodel_relationships__:
             relationship_fields[field] = resolved_ann
             pydantic_annotations[field] = (resolved_ann, None)
-        elif _is_optional(ann):
+        elif _is_ann_optional(ann) or _is_field_optional(model.__fields__.get(field)):
             pydantic_annotations[field] = (resolved_ann, None)
         else:
             # do not validate auto-populated (server-side) created_at fields
-            if field == "created_at" and "created_at" not in user_kwargs:
-                continue
+            if field in model.__fields__:
+                sa_column_kwargs = getattr(model.__fields__[field].field_info, "sa_column_kwargs", None)
+                if isinstance(sa_column_kwargs, dict):
+                    if "server_default" in sa_column_kwargs and field not in user_kwargs:
+                        continue
             pydantic_annotations[field] = (resolved_ann, ...)
 
     # pydantic does not check for the type of complex objects, only their attributes
