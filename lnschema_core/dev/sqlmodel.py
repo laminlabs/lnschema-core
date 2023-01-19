@@ -9,11 +9,13 @@
 
 import importlib
 import os
-from typing import Any, Optional, Sequence, Tuple
+import typing
+from typing import Any, Optional, Sequence, Tuple, Union
 
 import sqlmodel as sqm
 from pydantic import create_model
 from sqlalchemy.orm import declared_attr
+from typeguard import check_type
 
 # add naming convention for alembic
 sqm.SQLModel.metadata.naming_convention = {
@@ -38,42 +40,89 @@ def __repr_args__(self) -> Sequence[Tuple[Optional[str], Any]]:
 sqm.SQLModel.__repr_args__ = __repr_args__
 
 
+def _resolve_forward_ref(ann, module):
+    # fetch target type as string
+    forward_args = []
+    parent_ref = None
+    if _is_optional(ann):
+        forward_args = [ann.__args__[0].__forward_arg__]
+    else:
+        try:
+            for arg in ann.__args__:
+                if "ForwardRef" in str(arg):
+                    forward_args += [arg.__forward_arg__]
+            parent_ref = ann._name
+        except Exception:
+            forward_args = [ann.__forward_arg__]
+
+    # fetch target type from string
+    resolved_args = []
+    for arg in forward_args:
+        split_arg = arg.split(".")
+        try:
+            # if reference is in another module
+            resolved_args += [getattr(importlib.import_module(split_arg[0]), split_arg[-1])]
+        except Exception:
+            resolved_args += [getattr(importlib.import_module(module), split_arg[-1])]
+
+    # return resolved annotation
+    if len(resolved_args) == 1:
+        if parent_ref is None:
+            return resolved_args[0]
+        else:
+            return getattr(typing, parent_ref)[resolved_args[0]]
+    else:
+        return getattr(typing, parent_ref)[resolved_args[0], resolved_args[1]]
+
+
+def _is_optional(type_ann):
+    if type_ann.__module__ == "typing":
+        try:
+            if type_ann.__origin__ == Union:
+                if type(None) in type_ann.__args__:
+                    return True
+        except Exception:
+            return False
+    return False
+
+
 def validate_with_pydantic(model, user_kwargs):
     annotations = model.__annotations__
     kwargs = {**model.__dict__, **user_kwargs}
     pydantic_annotations = {}
     relationship_fields = {}
     for field, ann in annotations.items():
-        if ann.__module__ == "typing":
-            # handle forward references
-            required_ann = ann.__args__[0]
-            if "ForwardRef" in str(required_ann.__class__):  # typing.ForwardRef not available in python <= 3.6.12
-                ref = required_ann.__forward_arg__.split(".")
-                try:
-                    # if reference is in another module
-                    resolved_ann = getattr(importlib.import_module(ref[0]), ref[-1])
-                except Exception:
-                    resolved_ann = getattr(importlib.import_module(model.__module__), ref[-1])
-            else:
-                resolved_ann = required_ann
-            # handle optional and relationship fields
-            if field in model.__sqlmodel_relationships__:
-                relationship_fields[field] = resolved_ann
-                pydantic_annotations[field] = (resolved_ann, None)
-            elif type(None) in ann.__args__:
-                pydantic_annotations[field] = (resolved_ann, None)
-            else:
-                pydantic_annotations[field] = (resolved_ann, ...)
+        # ignore special fields
+        if field.startswith("_"):
+            kwargs.pop(field, None)
+            user_kwargs.pop(field, None)
+            continue
+
+        # resolve forward references
+        resolved_ann = ann
+        if "ForwardRef" in str(ann):  # typing.ForwardRef not available in python <= 3.6.12
+            resolved_ann = _resolve_forward_ref(ann, model.__module__)
+
+        # handle relationship and optional fields
+        if field in model.__sqlmodel_relationships__:
+            relationship_fields[field] = resolved_ann
+            pydantic_annotations[field] = (resolved_ann, None)
+        elif _is_optional(ann):
+            pydantic_annotations[field] = (resolved_ann, None)
         else:
             # do not validate auto-populated (server-side) created_at fields
             if field == "created_at" and "created_at" not in user_kwargs:
                 continue
-            else:
-                pydantic_annotations[field] = (ann, ...)
+            pydantic_annotations[field] = (resolved_ann, ...)
+
     # pydantic does not check for the type of complex objects, only their attributes
     for key in relationship_fields.keys() & user_kwargs.keys():
-        if not isinstance(user_kwargs[key], relationship_fields[key]):
+        try:
+            check_type(key, user_kwargs[key], relationship_fields[key])
+        except Exception:
             raise TypeError(f"Validation error for {model.__class__.__name__}: field {field} should be of type {relationship_fields[key].__name__}.")
+
+    # validate with pydantic
     validation_model = create_model(model.__class__.__name__, **pydantic_annotations)
     validation_model.validate(kwargs)
     return
@@ -83,7 +132,8 @@ class SQLModelModule(sqm.SQLModel):
     """SQLModel for schema module."""
 
     def __init__(self, **user_kwargs):
-        super().__init__(**user_kwargs)
+        sqm_kwargs = dict(user_kwargs)
+        super().__init__(**sqm_kwargs)
         validate_with_pydantic(self, user_kwargs)
 
     # this here is problematic for those tables that overwrite
@@ -98,7 +148,8 @@ class SQLModelPrefix(sqm.SQLModel):  # type: ignore
     """SQLModel prefixed by schema module name."""
 
     def __init__(self, **user_kwargs):
-        super().__init__(**user_kwargs)
+        sqm_kwargs = dict(user_kwargs)
+        super().__init__(**sqm_kwargs)
         validate_with_pydantic(self, user_kwargs)
 
     @declared_attr
