@@ -16,7 +16,8 @@ classifiers = [
 dependencies = [
     "nbproject",
     "sqlmodel",
-    "anndata"
+    "anndata",
+    "typeguard"
 ]
 
 [project.urls]
