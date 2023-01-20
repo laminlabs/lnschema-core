@@ -16,6 +16,7 @@ classifiers = [
 dependencies = [
     "nbproject",
     "sqlmodel",
+    "pydantic<2.0.0",
     "anndata",
     "typeguard"
 ]
