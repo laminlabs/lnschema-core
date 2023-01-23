@@ -146,7 +146,7 @@ def validate_with_pydantic(model, user_kwargs):
         try:
             check_type(key, user_kwargs[key], relationship_fields[key])
         except Exception:
-            raise TypeError(f"Validation error for {model.__class__.__name__}: field {field} should be of type {relationship_fields[key].__name__}.")
+            raise TypeError(f"Validation error for {model.__class__.__name__}: field {key} should be of type {relationship_fields[key].__name__}.")
 
     # validate with pydantic
     validation_model = create_model(model.__class__.__name__, **pydantic_annotations)
