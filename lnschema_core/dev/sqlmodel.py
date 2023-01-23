@@ -44,8 +44,9 @@ class SQLModelModule(sqm.SQLModel):
     """SQLModel for schema module."""
 
     def __init__(self, **user_kwargs):
-        sqm_kwargs = dict(user_kwargs)
-        super().__init__(**sqm_kwargs)
+        # pydantic does not enforce strict type checking for complex types, only their attributes
+        validate_relationship_types(self, user_kwargs)
+        super().__init__(**user_kwargs)
         validate_with_pydantic(self, user_kwargs)
 
     # this here is problematic for those tables that overwrite
@@ -60,8 +61,9 @@ class SQLModelPrefix(sqm.SQLModel):  # type: ignore
     """SQLModel prefixed by schema module name."""
 
     def __init__(self, **user_kwargs):
-        sqm_kwargs = dict(user_kwargs)
-        super().__init__(**sqm_kwargs)
+        # pydantic does not enforce strict type checking for complex types, only their attributes
+        validate_relationship_types(self, user_kwargs)
+        super().__init__(**user_kwargs)
         validate_with_pydantic(self, user_kwargs)
 
     @declared_attr
@@ -113,7 +115,6 @@ def validate_with_pydantic(model, user_kwargs):
     annotations = model.__annotations__
     kwargs = {**model.__dict__, **user_kwargs}
     pydantic_annotations = {}
-    relationship_fields = {}
     for field, ann in annotations.items():
         # ignore special fields
         if field.startswith("_"):
@@ -127,10 +128,7 @@ def validate_with_pydantic(model, user_kwargs):
             resolved_ann = _resolve_forward_ref(ann, model.__module__)
 
         # handle relationship and optional fields
-        if field in model.__sqlmodel_relationships__:
-            relationship_fields[field] = resolved_ann
-            pydantic_annotations[field] = (resolved_ann, None)
-        elif _is_ann_optional(ann) or _is_field_optional(model.__fields__.get(field)):
+        if field in model.__sqlmodel_relationships__ or _is_ann_optional(ann) or _is_field_optional(model.__fields__.get(field)):
             pydantic_annotations[field] = (resolved_ann, None)
         else:
             # do not validate auto-populated (server-side) created_at fields
@@ -141,17 +139,26 @@ def validate_with_pydantic(model, user_kwargs):
                         continue
             pydantic_annotations[field] = (resolved_ann, ...)
 
-    # pydantic does not check for the type of complex objects, only their attributes
-    for key in relationship_fields.keys() & user_kwargs.keys():
-        try:
-            check_type(key, user_kwargs[key], relationship_fields[key])
-        except Exception:
-            raise TypeError(f"Validation error for {model.__class__.__name__}: field {key} should be of type {relationship_fields[key].__name__}.")
-
     # validate with pydantic
     validation_model = create_model(model.__class__.__name__, **pydantic_annotations)
     validation_model.validate(kwargs)
     return
+
+
+def validate_relationship_types(model, user_kwargs):
+    user_relationship_keys = model.__sqlmodel_relationships__.keys() & user_kwargs.keys()
+    for key in user_relationship_keys:
+        rel_type = _resolve_forward_ref(model.__annotations__[key], model.__module__)
+        try:
+            check_type(key, user_kwargs[key], rel_type)
+        except TypeError:
+            error_message = (
+                f"Validation error for {model.__class__.__name__}\n"
+                f"{key}\n"
+                f"  should be of type {rel_type.__module__}.{rel_type.__name__}, got "
+                f"{user_kwargs[key].__module__}.{user_kwargs[key].__class__.__name__} instead."
+            )
+            raise TypeError(error_message) from None
 
 
 def _is_ann_optional(type_ann):
