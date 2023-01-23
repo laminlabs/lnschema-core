@@ -156,7 +156,7 @@ def validate_relationship_types(model, user_kwargs):
                 f"Validation error for {model.__class__.__name__}\n"
                 f"{key}\n"
                 f"  should be of type {rel_type.__module__}.{rel_type.__name__}, got "
-                f"{user_kwargs[key].__clas__.__module__}.{user_kwargs[key].__class__.__name__} instead."
+                f"{user_kwargs[key].__class__.__module__}.{user_kwargs[key].__class__.__name__} instead."
             )
             raise TypeError(error_message) from None
 
