@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+:bug: Fix strict type checking for relationships | [93](https://github.com/laminlabs/lnschema-core/pull/93) | [bpenteado](https://github.com/bpenteado) | 2023-01-24 |
 :adhesive_bandage: Fix error message in `Relationship` type checking | [92](https://github.com/laminlabs/lnschema-core/pull/92) | [bpenteado](https://github.com/bpenteado) | 2023-01-23 | 0.25.1
 ✨ Enable data validation with pydantic | [91](https://github.com/laminlabs/lnschema-core/pull/91) | [bpenteado](https://github.com/bpenteado) | 2023-01-20 | 0.25.0
 🩹 Fix `_dbconfig` | [90](https://github.com/laminlabs/lnschema-core/pull/90) | [falexwolf](https://github.com/falexwolf) | 2023-01-16 | 0.24.1
