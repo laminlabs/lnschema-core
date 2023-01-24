@@ -148,7 +148,10 @@ def validate_with_pydantic(model, user_kwargs):
 def validate_relationship_types(model, user_kwargs):
     user_relationship_keys = model.__sqlmodel_relationships__.keys() & user_kwargs.keys()
     for key in user_relationship_keys:
-        rel_type = _resolve_forward_ref(model.__annotations__[key], model.__module__)
+        if "ForwardRef" in str(model.__annotations__[key]):
+            rel_type = _resolve_forward_ref(model.__annotations__[key], model.__module__)
+        else:
+            rel_type = model.__annotations__[key]
         try:
             check_type(key, user_kwargs[key], rel_type)
         except TypeError:
