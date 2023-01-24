@@ -36,7 +36,7 @@ Development tools:
 _schema_id = "yvzi"
 _name = "core"
 _migration = "f6b6b85cdffc"
-__version__ = "0.25.1"
+__version__ = "0.25.2"
 
 from . import dev, link
 from ._core import (
