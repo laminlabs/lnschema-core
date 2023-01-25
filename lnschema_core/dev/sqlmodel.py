@@ -146,8 +146,13 @@ def validate_with_pydantic(model, user_kwargs):
 
 
 def validate_relationship_types(model, user_kwargs):
-    user_relationship_keys = model.__sqlmodel_relationships__.keys() & user_kwargs.keys()
-    for key in user_relationship_keys:
+    # this distinction is required to accomodate custom methods of defining relationships (custom relationships do not get validated)
+    standard_sqm_relationships = {k: v for k, v in model.__sqlmodel_relationships__.items() if v is not None}
+    custom_sqm_relationships = {k: v for k, v in model.__sqlmodel_relationships__.items() if v is None}
+
+    # only validate standard sqlmodel relationships passed by the user
+    standard_user_rel_keys = standard_sqm_relationships.keys() & user_kwargs.keys()
+    for key in standard_user_rel_keys:
         if "ForwardRef" in str(model.__annotations__[key]):
             rel_type = _resolve_forward_ref(model.__annotations__[key], model.__module__)
         else:
@@ -162,6 +167,20 @@ def validate_relationship_types(model, user_kwargs):
                 f"{user_kwargs[key].__class__.__module__}.{user_kwargs[key].__class__.__name__} instead."
             )
             raise TypeError(error_message) from None
+
+    # auto-populate foreign key fields associated with any relationship passed by the user (avoid missing key error during pydantic validation)
+    all_sqm_relationships = {**standard_sqm_relationships, **custom_sqm_relationships}
+    all_user_rel_keys = all_sqm_relationships.keys() & user_kwargs.keys()
+    for relationship_name in all_user_rel_keys:
+        # get names of foreign key fields associate with the relationship
+        fk_columns = getattr(model.__class__, relationship_name).property.target.primary_key.columns._all_columns
+        fk_col_names = [column.name for column in fk_columns]
+        rel_field_name = relationship_name.replace("_", "")  # this is delicate and relies on standards for naming fields
+        fk_fields = [(col_name, f"{rel_field_name}_{col_name}") for col_name in fk_col_names]
+        for col_name, field_name in fk_fields:
+            if hasattr(model, field_name):
+                if getattr(model, field_name) is None:
+                    setattr(model, field_name, getattr(user_kwargs[relationship_name], col_name))
 
 
 def _is_ann_optional(type_ann):
