@@ -146,8 +146,10 @@ def validate_with_pydantic(model, user_kwargs):
 
 
 def validate_relationship_types(model, user_kwargs):
-    user_relationship_keys = model.__sqlmodel_relationships__.keys() & user_kwargs.keys()
-    for key in user_relationship_keys:
+    # only validate standard sqlmodel relationships (typed) passed by the user
+    standard_sqm_relationships = {k: v for k, v in model.__sqlmodel_relationships__.items() if v is not None}
+    standard_user_rel_keys = standard_sqm_relationships.keys() & user_kwargs.keys()
+    for key in standard_user_rel_keys:
         if "ForwardRef" in str(model.__annotations__[key]):
             rel_type = _resolve_forward_ref(model.__annotations__[key], model.__module__)
         else:
@@ -162,6 +164,18 @@ def validate_relationship_types(model, user_kwargs):
                 f"{user_kwargs[key].__class__.__module__}.{user_kwargs[key].__class__.__name__} instead."
             )
             raise TypeError(error_message) from None
+
+    # auto-populate foreign key fields associated with any relationship passed by the user (avoid missing key error during pydantic validation)
+    all_user_rel_keys = model.__sqlmodel_relationships__.keys() & user_kwargs.keys()
+    for relationship_name in all_user_rel_keys:
+        rel_local_fields = getattr(model.__class__, relationship_name).property.local_columns  # model fields associated with the relationship
+        rel_fk_fields = [field for field in rel_local_fields if not field.primary_key]  # primary keys are returned as local fields in link table relationships
+        rel_fk_field_names = [field.name for field in rel_fk_fields]
+        target_col_names = [list(field.foreign_keys)[0].column.name for field in rel_fk_fields]
+        for field_name, col_name in zip(rel_fk_field_names, target_col_names):
+            if hasattr(model, field_name):
+                if getattr(model, field_name) is None:
+                    setattr(model, field_name, getattr(user_kwargs[relationship_name], col_name))
 
 
 def _is_ann_optional(type_ann):
