@@ -146,11 +146,8 @@ def validate_with_pydantic(model, user_kwargs):
 
 
 def validate_relationship_types(model, user_kwargs):
-    # this distinction is required to accomodate custom methods of defining relationships (custom relationships do not get validated)
+    # only validate standard sqlmodel relationships (typed) passed by the user
     standard_sqm_relationships = {k: v for k, v in model.__sqlmodel_relationships__.items() if v is not None}
-    custom_sqm_relationships = {k: v for k, v in model.__sqlmodel_relationships__.items() if v is None}
-
-    # only validate standard sqlmodel relationships passed by the user
     standard_user_rel_keys = standard_sqm_relationships.keys() & user_kwargs.keys()
     for key in standard_user_rel_keys:
         if "ForwardRef" in str(model.__annotations__[key]):
@@ -169,15 +166,13 @@ def validate_relationship_types(model, user_kwargs):
             raise TypeError(error_message) from None
 
     # auto-populate foreign key fields associated with any relationship passed by the user (avoid missing key error during pydantic validation)
-    all_sqm_relationships = {**standard_sqm_relationships, **custom_sqm_relationships}
-    all_user_rel_keys = all_sqm_relationships.keys() & user_kwargs.keys()
+    all_user_rel_keys = model.__sqlmodel_relationships__.keys() & user_kwargs.keys()
     for relationship_name in all_user_rel_keys:
-        # get names of foreign key fields associate with the relationship
-        fk_columns = getattr(model.__class__, relationship_name).property.target.primary_key.columns._all_columns
-        fk_col_names = [column.name for column in fk_columns]
-        rel_field_name = relationship_name.replace("_", "")  # this is delicate and relies on standards for naming fields
-        fk_fields = [(col_name, f"{rel_field_name}_{col_name}") for col_name in fk_col_names]
-        for col_name, field_name in fk_fields:
+        rel_local_fields = getattr(model.__class__, relationship_name).property.local_columns  # model fields associated with the relationship
+        rel_fk_fields = [field for field in rel_local_fields if not field.primary_key]  # primary keys are returned as local fields in link table relationships
+        rel_fk_field_names = [field.name for field in rel_fk_fields]
+        target_col_names = [list(field.foreign_keys)[0].column.name for field in rel_fk_fields]
+        for field_name, col_name in zip(rel_fk_field_names, target_col_names):
             if hasattr(model, field_name):
                 if getattr(model, field_name) is None:
                     setattr(model, field_name, getattr(user_kwargs[relationship_name], col_name))
