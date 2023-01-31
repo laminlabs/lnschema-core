@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-✨ Add rich string representation for ORM classes | [95](https://github.com/laminlabs/lnschema-core/pull/95) | [bpenteado](https://github.com/bpenteado) | 2023-01-31 |
+✨ Add rich string representation for ORM classes | [95](https://github.com/laminlabs/lnschema-core/pull/95) | [bpenteado](https://github.com/bpenteado) | 2023-01-31 | 0.25.4
 🚸 Auto populate fk constrained fields from `Relationship`s | [94](https://github.com/laminlabs/lnschema-core/pull/94) | [bpenteado](https://github.com/bpenteado) | 2023-01-26 | 0.25.3
 :bug: Fix strict type checking for relationships | [93](https://github.com/laminlabs/lnschema-core/pull/93) | [bpenteado](https://github.com/bpenteado) | 2023-01-24 | 0.25.2
 :adhesive_bandage: Fix error message in `Relationship` type checking | [92](https://github.com/laminlabs/lnschema-core/pull/92) | [bpenteado](https://github.com/bpenteado) | 2023-01-23 | 0.25.1
