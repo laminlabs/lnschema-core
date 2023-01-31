@@ -42,24 +42,30 @@ def __repr_args__(self) -> Sequence[Tuple[Optional[str], Any]]:
 def __repr__(self):
     relationships = inspect(self).mapper.relationships.items()
     if object_session(self) is not None:
-        rich_repr = "\n\nbound to session with relationships"
+        rich_repr = "\nbound to session with relationships"
         for rel in relationships:
             rel_inst = getattr(self, rel[0])
             # only print first three fields of each relationship
             if not isinstance(rel_inst, typing.List):
                 inst_repr = super(sqm.SQLModel, rel_inst).__repr__()
                 short_repr = ", ".join(inst_repr.split(", ")[:3]) + ", ...)"
-                rich_repr += f"\n  - {rel[0]}: {short_repr}"
+                rich_repr += f"\n- {rel[0]}: {short_repr}"
             else:
-                key = f"\n  - {rel[0]}: ["
+                key = f"\n- {rel[0]}: ["
                 inst_reprs = [super(sqm.SQLModel, inst).__repr__() for inst in rel_inst]
                 inst_short_reprs = [f"{', '.join(repr.split(', ')[:3])}, ...)" for repr in inst_reprs]
+                # only print first three instances of list relationships
+                if len(inst_short_reprs) > 3:
+                    inst_short_reprs = inst_short_reprs[:3]
+                    ellipsis_line = f",\n{(len(key)-2)*' '}..."
+                else:
+                    ellipsis_line = ""
                 aligned_short_reprs = f",\n{(len(key)-2)*' '}".join(inst_short_reprs)
-                rich_repr += f"{key}{aligned_short_reprs}]"
+                rich_repr += f"{key}{aligned_short_reprs}{ellipsis_line}]"
     else:
-        rich_repr = "\n\nnot bound to a session (ln.Session.select(...) to load relationships)"
+        rich_repr = "\nnot bound to a session"
         for rel in relationships:
-            rich_repr += f"\n  - {rel[0]}: no preview"
+            rich_repr += f"\n- {rel[0]}: ..."
     return super(sqm.SQLModel, self).__repr__() + rich_repr
 
 
