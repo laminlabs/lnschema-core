@@ -14,6 +14,7 @@ from typing import Any, Optional, Sequence, Tuple, Union
 
 import sqlmodel as sqm
 from pydantic import create_model
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import declared_attr
 from sqlalchemy.orm.session import object_session
@@ -44,7 +45,10 @@ def __repr__(self):
     if object_session(self) is not None:
         rich_repr = "\nbound to session with relationships"
         for rel in relationships:
-            rel_inst = getattr(self, rel[0])
+            try:
+                rel_inst = getattr(self, rel[0])
+            except OperationalError:
+                rel_inst = None
             if not isinstance(rel_inst, typing.List):
                 if rel_inst is None:
                     rich_repr += f"\n- {rel[0]}: None"
