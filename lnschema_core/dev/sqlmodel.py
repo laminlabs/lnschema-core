@@ -45,11 +45,14 @@ def __repr__(self):
         rich_repr = "\nbound to session with relationships"
         for rel in relationships:
             rel_inst = getattr(self, rel[0])
-            # only print first three fields of each relationship
             if not isinstance(rel_inst, typing.List):
-                inst_repr = super(sqm.SQLModel, rel_inst).__repr__()
-                short_repr = ", ".join(inst_repr.split(", ")[:3]) + ", ...)"
-                rich_repr += f"\n- {rel[0]}: {short_repr}"
+                if rel_inst is None:
+                    rich_repr += f"\n- {rel[0]}: None"
+                else:
+                    # only print first three fields of each relationship
+                    inst_repr = super(sqm.SQLModel, rel_inst).__repr__()
+                    short_repr = ", ".join(inst_repr.split(", ")[:3]) + ", ...)"
+                    rich_repr += f"\n- {rel[0]}: {short_repr}"
             else:
                 key = f"\n- {rel[0]}: ["
                 if len(rel_inst) > 3:
