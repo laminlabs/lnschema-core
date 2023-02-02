@@ -12,7 +12,10 @@ def get_name_suffix_from_filepath(filepath: Union[Path, CloudPath]):
 
 # add type annotations back asap when re-organizing the module
 def storage_key_from_dobject(dobj):
-    return f"{dobj.id}{dobj.suffix}"
+    if dobj._filekey is None:
+        return f"{dobj.id}{dobj.suffix}"
+    else:
+        return f"{dobj._filekey}{dobj.suffix}"
 
 
 # add type annotations back asap when re-organizing the module

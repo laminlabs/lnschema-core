@@ -5,6 +5,7 @@ from typing import Any, List, Optional, Union, overload  # noqa
 import anndata as ad
 import pandas as pd
 import sqlalchemy as sa
+import sqlmodel
 from cloudpathlib import CloudPath
 from pydantic.fields import PrivateAttr
 from sqlmodel import Field, ForeignKeyConstraint, Relationship
@@ -184,9 +185,10 @@ class DObject(SQLModel, table=True):  # type: ignore
     updated_at: Optional[datetime] = UpdatedAt
     """Time of last update."""
 
-    # private attributes
-    _local_filepath: Path = PrivateAttr()
-    _memory_rep: Path = PrivateAttr()
+    # private attributes are needed here to prevent sqlalchemy error
+    _local_filepath: Optional[Path] = PrivateAttr()
+    _cloud_filepath: Optional[CloudPath] = PrivateAttr()
+    _memory_rep: Any = PrivateAttr()
 
     def path(self) -> Union[Path, CloudPath]:
         """Path on storage."""
@@ -272,7 +274,11 @@ class DObject(SQLModel, table=True):  # type: ignore
         super().__init__(**kwargs)
         if data is not None:
             self._local_filepath = privates["_local_filepath"]
+            self._cloud_filepath = privates["_cloud_filepath"]
             self._memory_rep = privates["_memory_rep"]
+
+
+DObject._filekey = sa.Column("_filekey", sqlmodel.sql.sqltypes.AutoString(), index=True)
 
 
 class Run(SQLModel, table=True):  # type: ignore
