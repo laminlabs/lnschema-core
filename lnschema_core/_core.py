@@ -185,7 +185,8 @@ class DObject(SQLModel, table=True):  # type: ignore
     """Time of last update."""
 
     # private attributes
-    _local_filepath: Path = PrivateAttr()
+    _local_filepath: Optional[Path] = PrivateAttr()
+    _cloud_filepath: Optional[CloudPath] = PrivateAttr()
     _memory_rep: Path = PrivateAttr()
 
     def path(self) -> Union[Path, CloudPath]:
