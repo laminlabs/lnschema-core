@@ -52,15 +52,14 @@ def __repr__(self):
                 rich_repr += f"\n- {rel[0]}: {short_repr}"
             else:
                 key = f"\n- {rel[0]}: ["
-                inst_reprs = [super(sqm.SQLModel, inst).__repr__() for inst in rel_inst]
-                inst_short_reprs = [f"{', '.join(repr.split(', ')[:3])}, ...)" for repr in inst_reprs]
-                # only print first three instances of list relationships
-                if len(inst_short_reprs) > 3:
-                    inst_short_reprs = inst_short_reprs[:3]
-                    ellipsis_line = f",\n{(len(key)-2)*' '}..."
+                if len(rel_inst) > 3:
+                    rel_inst = rel_inst[:3]
+                    ellipsis_line = f",\n{(len(key)-1)*' '}..."
                 else:
                     ellipsis_line = ""
-                aligned_short_reprs = f",\n{(len(key)-2)*' '}".join(inst_short_reprs)
+                inst_reprs = [super(sqm.SQLModel, inst).__repr__() for inst in rel_inst]
+                inst_short_reprs = [f"{', '.join(repr.split(', ')[:3])}, ...)" for repr in inst_reprs]
+                aligned_short_reprs = f",\n{(len(key)-1)*' '}".join(inst_short_reprs)
                 rich_repr += f"{key}{aligned_short_reprs}{ellipsis_line}]"
     else:
         rich_repr = "\nnot bound to a session"
