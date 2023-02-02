@@ -185,10 +185,10 @@ class DObject(SQLModel, table=True):  # type: ignore
     updated_at: Optional[datetime] = UpdatedAt
     """Time of last update."""
 
-    # private attributes
+    # private attributes are needed here to prevent sqlalchemy error
     _local_filepath: Optional[Path] = PrivateAttr()
     _cloud_filepath: Optional[CloudPath] = PrivateAttr()
-    _memory_rep: Path = PrivateAttr()
+    _memory_rep: Any = PrivateAttr()
 
     def path(self) -> Union[Path, CloudPath]:
         """Path on storage."""
@@ -274,6 +274,7 @@ class DObject(SQLModel, table=True):  # type: ignore
         super().__init__(**kwargs)
         if data is not None:
             self._local_filepath = privates["_local_filepath"]
+            self._cloud_filepath = privates["_cloud_filepath"]
             self._memory_rep = privates["_memory_rep"]
 
 
