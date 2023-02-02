@@ -188,6 +188,7 @@ class DObject(SQLModel, table=True):  # type: ignore
     _local_filepath: Optional[Path] = PrivateAttr()
     _cloud_filepath: Optional[CloudPath] = PrivateAttr()
     _memory_rep: Path = PrivateAttr()
+    _filekey: Optional[str] = PrivateAttr()
 
     def path(self) -> Union[Path, CloudPath]:
         """Path on storage."""
