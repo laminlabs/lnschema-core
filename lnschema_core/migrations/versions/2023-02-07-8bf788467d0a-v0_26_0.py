@@ -55,28 +55,28 @@ def upgrade() -> None:
         op.drop_index("ix_core.dset_updated_at", table_name=f"{prefix}dfolder", schema=schema)
         op.create_index(
             op.f("ix_core.dfolder_created_at"),
-            "dfolder",
+            f"{prefix}dfolder",
             ["created_at"],
             unique=False,
             schema=schema,
         )
         op.create_index(
             op.f("ix_core.dfolder_created_by"),
-            "dfolder",
+            f"{prefix}dfolder",
             ["created_by"],
             unique=False,
             schema=schema,
         )
         op.create_index(
             op.f("ix_core.dfolder_name"),
-            "dfolder",
+            f"{prefix}dfolder",
             ["name"],
             unique=False,
             schema=schema,
         )
         op.create_index(
             op.f("ix_core.dfolder_updated_at"),
-            "dfolder",
+            f"{prefix}dfolder",
             ["updated_at"],
             unique=False,
             schema=schema,
@@ -88,28 +88,28 @@ def upgrade() -> None:
         op.drop_index("ix_core_dset_updated_at", table_name=f"{prefix}dfolder", schema=schema)
         op.create_index(
             op.f("ix_core_dfolder_created_at"),
-            "dfolder",
+            f"{prefix}dfolder",
             ["created_at"],
             unique=False,
             schema=schema,
         )
         op.create_index(
             op.f("ix_core_dfolder_created_by"),
-            "dfolder",
+            f"{prefix}dfolder",
             ["created_by"],
             unique=False,
             schema=schema,
         )
         op.create_index(
             op.f("ix_core_dfolder_name"),
-            "dfolder",
+            f"{prefix}dfolder",
             ["name"],
             unique=False,
             schema=schema,
         )
         op.create_index(
             op.f("ix_core_dfolder_updated_at"),
-            "dfolder",
+            f"{prefix}dfolder",
             ["updated_at"],
             unique=False,
             schema=schema,
