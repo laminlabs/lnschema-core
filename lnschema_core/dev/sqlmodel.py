@@ -43,7 +43,7 @@ def __repr__(self):
     relationships = inspect(self).mapper.relationships.items()
     if object_session(self) is not None:
         if not relationships:
-            rich_repr = "\nbound to session"
+            rich_repr = "\nbound to session without relationships"
         else:
             rich_repr = "\nbound to session with relationships"
         for rel in relationships:
