@@ -43,7 +43,7 @@ def upgrade() -> None:
         schema=schema,
     )
     op.alter_column(
-        f"{prefix}project_dset",
+        f"{prefix}project_dfolder",
         column_name="dset_id",
         new_column_name="dfolder_id",
         schema=schema,
