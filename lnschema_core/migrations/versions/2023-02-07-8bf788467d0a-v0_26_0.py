@@ -25,11 +25,29 @@ def upgrade() -> None:
     else:
         prefix, schema = "", "core"
 
-    op.rename_table(f"{prefix}dset", f"{prefix}dfolder", schema=schema)
-    op.rename_table(f"{prefix}dset_dobject", f"{prefix}dfolder_dobject", schema=schema)
-    op.rename_table(f"{prefix}project_dset", f"{prefix}project_dfolder", schema=schema)
-    op.alter_column(f"{prefix}dfolder_dobject", "dset_id", "dfolder_id", schema=schema)
-    op.alter_column(f"{prefix}project_dset", "dset_id", "dfolder_id", schema=schema)
+    op.rename_table(old_table_name=f"{prefix}dset", new_table_name=f"{prefix}dfolder", schema=schema)
+    op.rename_table(
+        old_table_name=f"{prefix}dset_dobject",
+        new_table_name=f"{prefix}dfolder_dobject",
+        schema=schema,
+    )
+    op.rename_table(
+        old_table_name=f"{prefix}project_dset",
+        new_table_name=f"{prefix}project_dfolder",
+        schema=schema,
+    )
+    op.alter_column(
+        f"{prefix}dfolder_dobject",
+        column_name="dset_id",
+        new_column_name="dfolder_id",
+        schema=schema,
+    )
+    op.alter_column(
+        f"{prefix}project_dset",
+        column_name="dset_id",
+        new_column_name="dfolder_id",
+        schema=schema,
+    )
 
 
 def downgrade() -> None:
