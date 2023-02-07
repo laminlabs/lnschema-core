@@ -42,7 +42,7 @@ def __repr__(self):
     if object_session(self) is not None:
         return "[session open] " + super(sqm.SQLModel, self).__repr__()
     else:
-        return "[session closed] " + super(sqm.SQLModel, self).__repr__()
+        return super(sqm.SQLModel, self).__repr__()
 
 
 sqm.SQLModel.__repr_args__ = __repr_args__
