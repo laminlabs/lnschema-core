@@ -39,8 +39,8 @@ def dobject() -> str:
     return base62(n_char=21)
 
 
-def dset() -> str:
-    """Data set: 21 base62."""
+def dfolder() -> str:
+    """Data folder: 21 base62."""
     return base62(n_char=21)
 
 

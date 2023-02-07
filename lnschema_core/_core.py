@@ -12,7 +12,7 @@ from sqlmodel import Field, ForeignKeyConstraint, Relationship
 from sqlmodel import SQLModel as SQLModelPublicSchema
 
 from . import _name as schema_name
-from ._link import DObjectFeatures, DSetDObject, ProjectDSet, RunIn  # noqa
+from ._link import DFolderDObject, DObjectFeatures, ProjectDFolder, RunIn  # noqa
 from ._timestamps import CreatedAt, UpdatedAt
 from ._users import CreatedBy
 from .dev import id as idg
@@ -62,13 +62,13 @@ class Storage(SQLModelPublicSchema, table=True):  # type: ignore
     updated_at: Optional[datetime] = UpdatedAt
 
 
-class DSet(SQLModel, table=True):  # type: ignore
-    """Datasets, collections of data objects.
+class DFolder(SQLModel, table=True):  # type: ignore
+    """Data folders, collections of data objects.
 
-    In LaminDB, a dataset is a collection of data objects (`DObject`).
+    In LaminDB, a data folder is a collection of data objects (`DObject`).
     """
 
-    id: str = Field(default_factory=idg.dset, primary_key=True)
+    id: str = Field(default_factory=idg.dfolder, primary_key=True)
     name: str = Field(index=True)
     created_by: str = CreatedBy
     """Auto-populated link to :class:`~lnschema_core.User`."""
