@@ -1,4 +1,4 @@
-"""v0.26.0.
+"""v0.25.9.
 
 Revision ID: 8bf788467d0a
 Revises: 9d283a1685a5

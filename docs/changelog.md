@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-🚚 Rename `DSet` to `DFolder` | [100](https://github.com/laminlabs/lnschema-core/pull/100) | [sunnyosun](https://github.com/sunnyosun) | 2023-02-07 |
+🚚 Rename `DSet` to `DFolder` | [100](https://github.com/laminlabs/lnschema-core/pull/100) | [sunnyosun](https://github.com/sunnyosun) | 2023-02-07 | 0.25.9
 🔥  Disable ORM relationship preview | [99](https://github.com/laminlabs/lnschema-core/pull/99) | [bpenteado](https://github.com/bpenteado) | 2023-02-02 | 0.25.8
 🐛 Fix assigning _cloud_filepath | [98](https://github.com/laminlabs/lnschema-core/pull/98) | [sunnyosun](https://github.com/sunnyosun) | 2023-02-02 | 0.25.7
 ✨ Added _filekey to DObject for custom file keys | [97](https://github.com/laminlabs/lnschema-core/pull/97) | [sunnyosun](https://github.com/sunnyosun) | 2023-02-02 | 0.25.6
