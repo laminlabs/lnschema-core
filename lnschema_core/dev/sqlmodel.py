@@ -14,7 +14,6 @@ from typing import Any, Optional, Sequence, Tuple, Union
 
 import sqlmodel as sqm
 from pydantic import create_model
-from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import declared_attr
 from sqlalchemy.orm.session import object_session
 from typeguard import check_type
@@ -40,38 +39,10 @@ def __repr_args__(self) -> Sequence[Tuple[Optional[str], Any]]:
 
 
 def __repr__(self):
-    relationships = inspect(self).mapper.relationships.items()
     if object_session(self) is not None:
-        if not relationships:
-            rich_repr = "\nbound to session without relationships"
-        else:
-            rich_repr = "\nbound to session with relationships"
-        for rel in relationships:
-            rel_inst = getattr(self, rel[0])
-            if not isinstance(rel_inst, typing.List):
-                if rel_inst is None:
-                    rich_repr += f"\n- {rel[0]}: None"
-                else:
-                    # only print first three fields of each relationship
-                    inst_repr = super(sqm.SQLModel, rel_inst).__repr__()
-                    short_repr = ", ".join(inst_repr.split(", ")[:3]) + ", ...)"
-                    rich_repr += f"\n- {rel[0]}: {short_repr}"
-            else:
-                key = f"\n- {rel[0]}: ["
-                if len(rel_inst) > 3:
-                    rel_inst = rel_inst[:3]
-                    ellipsis_line = f",\n{(len(key)-1)*' '}..."
-                else:
-                    ellipsis_line = ""
-                inst_reprs = [super(sqm.SQLModel, inst).__repr__() for inst in rel_inst]
-                inst_short_reprs = [f"{', '.join(repr.split(', ')[:3])}, ...)" for repr in inst_reprs]
-                aligned_short_reprs = f",\n{(len(key)-1)*' '}".join(inst_short_reprs)
-                rich_repr += f"{key}{aligned_short_reprs}{ellipsis_line}]"
+        return "[session open] " + super(sqm.SQLModel, self).__repr__()
     else:
-        rich_repr = "\nnot bound to a session"
-        for rel in relationships:
-            rich_repr += f"\n- {rel[0]}: ..."
-    return super(sqm.SQLModel, self).__repr__() + rich_repr
+        return "[session closed]" + super(sqm.SQLModel, self).__repr__()
 
 
 sqm.SQLModel.__repr_args__ = __repr_args__
