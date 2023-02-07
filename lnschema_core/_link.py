@@ -34,19 +34,19 @@ class DObjectFeatures(SQLModel, table=True):  # type: ignore
     features_id: str = Field(foreign_key="core.features.id", primary_key=True)
 
 
-class ProjectDSet(SQLModel, table=True):  # type: ignore
-    """Link table of project and dset."""
+class ProjectDFolder(SQLModel, table=True):  # type: ignore
+    """Link table of project and dfolder."""
 
-    __tablename__ = f"{prefix}project_dset"
+    __tablename__ = f"{prefix}project_dfolder"
 
     project_id: str = Field(foreign_key="core.project.id", primary_key=True)
-    dset_id: str = Field(foreign_key="core.dset.id", primary_key=True)
+    dfolder_id: str = Field(foreign_key="core.dfolder.id", primary_key=True)
 
 
-class DSetDObject(SQLModel, table=True):  # type: ignore
-    """Link table of dset and dobject."""
+class DFolderDObject(SQLModel, table=True):  # type: ignore
+    """Link table of dfolder and dobject."""
 
-    __tablename__ = f"{prefix}dset_dobject"
+    __tablename__ = f"{prefix}dfolder_dobject"
 
-    dset_id: str = Field(foreign_key="core.dset.id", primary_key=True)
+    dfolder_id: str = Field(foreign_key="core.dfolder.id", primary_key=True)
     dobject_id: str = Field(foreign_key="core.dobject.id", primary_key=True)
