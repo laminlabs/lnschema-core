@@ -48,6 +48,72 @@ def upgrade() -> None:
         new_column_name="dfolder_id",
         schema=schema,
     )
+    if sqlite:
+        op.drop_index("ix_core.dset_created_at", table_name="dfolder", schema=schema)
+        op.drop_index("ix_core.dset_created_by", table_name="dfolder", schema=schema)
+        op.drop_index("ix_core.dset_name", table_name="dfolder", schema=schema)
+        op.drop_index("ix_core.dset_updated_at", table_name="dfolder", schema=schema)
+        op.create_index(
+            op.f("ix_core.dfolder_created_at"),
+            "dfolder",
+            ["created_at"],
+            unique=False,
+            schema=schema,
+        )
+        op.create_index(
+            op.f("ix_core.dfolder_created_by"),
+            "dfolder",
+            ["created_by"],
+            unique=False,
+            schema=schema,
+        )
+        op.create_index(
+            op.f("ix_core.dfolder_name"),
+            "dfolder",
+            ["name"],
+            unique=False,
+            schema=schema,
+        )
+        op.create_index(
+            op.f("ix_core.dfolder_updated_at"),
+            "dfolder",
+            ["updated_at"],
+            unique=False,
+            schema=schema,
+        )
+    else:
+        op.drop_index("ix_core_dset_created_at", table_name="dfolder", schema=schema)
+        op.drop_index("ix_core_dset_created_by", table_name="dfolder", schema=schema)
+        op.drop_index("ix_core_dset_name", table_name="dfolder", schema=schema)
+        op.drop_index("ix_core_dset_updated_at", table_name="dfolder", schema=schema)
+        op.create_index(
+            op.f("ix_core_dfolder_created_at"),
+            "dfolder",
+            ["created_at"],
+            unique=False,
+            schema=schema,
+        )
+        op.create_index(
+            op.f("ix_core_dfolder_created_by"),
+            "dfolder",
+            ["created_by"],
+            unique=False,
+            schema=schema,
+        )
+        op.create_index(
+            op.f("ix_core_dfolder_name"),
+            "dfolder",
+            ["name"],
+            unique=False,
+            schema=schema,
+        )
+        op.create_index(
+            op.f("ix_core_dfolder_updated_at"),
+            "dfolder",
+            ["updated_at"],
+            unique=False,
+            schema=schema,
+        )
 
 
 def downgrade() -> None:
