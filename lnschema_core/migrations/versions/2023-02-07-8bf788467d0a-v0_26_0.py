@@ -49,10 +49,10 @@ def upgrade() -> None:
         schema=schema,
     )
     if sqlite:
-        op.drop_index("ix_core.dset_created_at", table_name="dfolder", schema=schema)
-        op.drop_index("ix_core.dset_created_by", table_name="dfolder", schema=schema)
-        op.drop_index("ix_core.dset_name", table_name="dfolder", schema=schema)
-        op.drop_index("ix_core.dset_updated_at", table_name="dfolder", schema=schema)
+        op.drop_index("ix_core.dset_created_at", table_name=f"{prefix}dfolder", schema=schema)
+        op.drop_index("ix_core.dset_created_by", table_name=f"{prefix}dfolder", schema=schema)
+        op.drop_index("ix_core.dset_name", table_name=f"{prefix}dfolder", schema=schema)
+        op.drop_index("ix_core.dset_updated_at", table_name=f"{prefix}dfolder", schema=schema)
         op.create_index(
             op.f("ix_core.dfolder_created_at"),
             "dfolder",
@@ -82,10 +82,10 @@ def upgrade() -> None:
             schema=schema,
         )
     else:
-        op.drop_index("ix_core_dset_created_at", table_name="dfolder", schema=schema)
-        op.drop_index("ix_core_dset_created_by", table_name="dfolder", schema=schema)
-        op.drop_index("ix_core_dset_name", table_name="dfolder", schema=schema)
-        op.drop_index("ix_core_dset_updated_at", table_name="dfolder", schema=schema)
+        op.drop_index("ix_core_dset_created_at", table_name=f"{prefix}dfolder", schema=schema)
+        op.drop_index("ix_core_dset_created_by", table_name=f"{prefix}dfolder", schema=schema)
+        op.drop_index("ix_core_dset_name", table_name=f"{prefix}dfolder", schema=schema)
+        op.drop_index("ix_core_dset_updated_at", table_name=f"{prefix}dfolder", schema=schema)
         op.create_index(
             op.f("ix_core_dfolder_created_at"),
             "dfolder",
