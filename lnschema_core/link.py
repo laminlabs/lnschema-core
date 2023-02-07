@@ -5,8 +5,8 @@
 
    RunIn
    DObjectFeatures
-   ProjectDSet
-   DSetDObject
+   ProjectDFolder
+   DFolderDObject
 
 """
-from ._link import DObjectFeatures, DSetDObject, ProjectDSet, RunIn  # noqa
+from ._link import DFolderDObject, DObjectFeatures, ProjectDFolder, RunIn  # noqa
