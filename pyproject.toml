@@ -16,7 +16,9 @@ classifiers = [
 dependencies = [
     "nbproject",
     "sqlmodel",
-    "anndata"
+    "pydantic<2.0.0",
+    "anndata",
+    "typeguard"
 ]
 
 [project.urls]
@@ -30,7 +32,7 @@ dev = [
 test = [
     "pytest>=6.0",
     "pytest-cov",
-    "lndb_setup>=0.30.5",
+    "lndb_setup>=0.30.6",
     "pytest_alembic",
 ]
 

@@ -5,12 +5,13 @@ from typing import Any, List, Optional, Union, overload  # noqa
 import anndata as ad
 import pandas as pd
 import sqlalchemy as sa
+import sqlmodel
 from cloudpathlib import CloudPath
 from pydantic.fields import PrivateAttr
 from sqlmodel import Field, ForeignKeyConstraint, Relationship
 
 from . import _name as schema_name
-from ._link import DObjectFeatures, DSetDObject, ProjectDSet, RunIn  # noqa
+from ._link import DFolderDObject, DObjectFeatures, ProjectDFolder, RunIn  # noqa
 from ._timestamps import CreatedAt, UpdatedAt
 from ._users import CreatedBy
 from .dev import id as idg
@@ -60,13 +61,13 @@ class Storage(SQLModel, table=True):  # type: ignore
     updated_at: Optional[datetime] = UpdatedAt
 
 
-class DSet(SQLModel, table=True):  # type: ignore
-    """Datasets, collections of data objects.
+class DFolder(SQLModel, table=True):  # type: ignore
+    """Data folders, collections of data objects.
 
-    In LaminDB, a dataset is a collection of data objects (`DObject`).
+    In LaminDB, a data folder is a collection of data objects (`DObject`).
     """
 
-    id: str = Field(default_factory=idg.dset, primary_key=True)
+    id: str = Field(default_factory=idg.dfolder, primary_key=True)
     name: str = Field(index=True)
     created_by: str = CreatedBy
     """Auto-populated link to :class:`~lnschema_core.User`."""
@@ -183,9 +184,10 @@ class DObject(SQLModel, table=True):  # type: ignore
     updated_at: Optional[datetime] = UpdatedAt
     """Time of last update."""
 
-    # private attributes
-    _local_filepath: Path = PrivateAttr()
-    _memory_rep: Path = PrivateAttr()
+    # private attributes are needed here to prevent sqlalchemy error
+    _local_filepath: Optional[Path] = PrivateAttr()
+    _cloud_filepath: Optional[CloudPath] = PrivateAttr()
+    _memory_rep: Any = PrivateAttr()
 
     def path(self) -> Union[Path, CloudPath]:
         """Path on storage."""
@@ -266,12 +268,16 @@ class DObject(SQLModel, table=True):  # type: ignore
             if id is not None:
                 kwargs["id"] = id
         else:
-            kwargs = {k: v for k, v in locals().items() if v}
+            kwargs = {k: v for k, v in locals().items() if v and k != "self"}
 
         super().__init__(**kwargs)
         if data is not None:
             self._local_filepath = privates["_local_filepath"]
+            self._cloud_filepath = privates["_cloud_filepath"]
             self._memory_rep = privates["_memory_rep"]
+
+
+DObject._filekey = sa.Column("_filekey", sqlmodel.sql.sqltypes.AutoString(), index=True)
 
 
 class Run(SQLModel, table=True):  # type: ignore

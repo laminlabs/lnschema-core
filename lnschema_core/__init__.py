@@ -18,7 +18,7 @@ Entities:
    Run
    Notebook
    Pipeline
-   DSet
+   DFolder
    User
    Storage
    Usage
@@ -35,13 +35,13 @@ Development tools:
 """
 _schema_id = "yvzi"
 _name = "core"
-_migration = "f6b6b85cdffc"
-__version__ = "0.24.1"
+_migration = "8bf788467d0a"
+__version__ = "0.25.9"
 
 from . import dev, link
 from ._core import (
+    DFolder,
     DObject,
-    DSet,
     Features,
     Notebook,
     Pipeline,
