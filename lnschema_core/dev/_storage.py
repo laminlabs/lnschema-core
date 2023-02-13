@@ -20,7 +20,7 @@ def storage_key_from_dobject(dobj):
 
 # add type annotations back asap when re-organizing the module
 def filepath_from_dobject(dobj):
-    from lndb_setup import settings
+    from lndb import settings
 
     storage_key = storage_key_from_dobject(dobj)
     filepath = settings.instance.storage.key_to_filepath(storage_key)
