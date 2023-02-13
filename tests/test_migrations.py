@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from lndb.test import (
     get_package_name,
     migrate_clones,
@@ -6,6 +8,12 @@ from lndb.test import (
 )
 
 package_name = get_package_name()
+
+
+def test_migrate_generate():
+    from lndb import migrate
+
+    migrate.generate(schema_root=Path(__file__).parent.parent, package_name=package_name)
 
 
 def test_migration_id_is_consistent():
