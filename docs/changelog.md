@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-✨ Added track_runin to DObject.load() | [103](https://github.com/laminlabs/lnschema-core/pull/103) | [sunnyosun](https://github.com/sunnyosun) | 2023-02-13 |
+✨ Added track_runin to DObject.load() | [103](https://github.com/laminlabs/lnschema-core/pull/103) | [sunnyosun](https://github.com/sunnyosun) | 2023-02-13 | 0.25.10
 💄 Fix ORM preview message | [102](https://github.com/laminlabs/lnschema-core/pull/102) | [bpenteado](https://github.com/bpenteado) | 2023-02-07 |
 🚸 Introduce ORM relationship previews | [101](https://github.com/laminlabs/lnschema-core/pull/101) | [bpenteado](https://github.com/bpenteado) | 2023-02-07 |
 🚚 Rename `DSet` to `DFolder` | [100](https://github.com/laminlabs/lnschema-core/pull/100) | [sunnyosun](https://github.com/sunnyosun) | 2023-02-07 | 0.25.9
