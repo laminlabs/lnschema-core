@@ -194,7 +194,7 @@ class DObject(SQLModel, table=True):  # type: ignore
         """Path on storage."""
         return filepath_from_dobject(self)
 
-    def load(self, stream: bool = False):
+    def load(self, stream: bool = False, track_runin: bool = False):
         """Load data object.
 
         Returns in-memory representation if configured (say, an `AnnData` object
@@ -205,7 +205,7 @@ class DObject(SQLModel, table=True):  # type: ignore
         """
         from lamindb._load import load as lnload
 
-        return lnload(dobject=self, stream=stream)
+        return lnload(dobject=self, stream=stream, track_runin=track_runin)
 
     @overload
     def __init__(
