@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from lndb._migrations import generate_module_files, get_package_info
+from lndb._migrations import generate_module_files
 from lndb.test import (
     get_package_name,
     migrate_clones,
@@ -8,9 +8,11 @@ from lndb.test import (
     model_definitions_match_ddl,
 )
 
+from lnschema_core import _schema_id as schema_id
+
 package_name = get_package_name()
-print(get_package_info(package_name))
-generate_module_files(package_name=package_name)
+migrations_path = Path(__file__).parent.parent / package_name / "migrations"
+generate_module_files(package_name=package_name, migrations_path=migrations_path, schema_id=schema_id)
 print((Path(__file__).parent.parent / package_name / "migrations/env.py").exists())
 
 
