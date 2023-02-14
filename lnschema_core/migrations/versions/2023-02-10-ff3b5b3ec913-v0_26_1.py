@@ -1,4 +1,4 @@
-"""vX.X.X.
+"""v0.26.1.
 
 Revision ID: ff3b5b3ec913
 Revises: 8bf788467d0a
