@@ -319,6 +319,8 @@ class Run(SQLModel, table=True):  # type: ignore
     id: str = Field(default_factory=idg.run, primary_key=True)
     """Base62 char ID & primary key, generated through :func:`~lnschema_core.dev.id.run`."""  # noqa
     name: Optional[str] = Field(default=None, index=True)
+    external_id: Optional[str] = Field(default=None, index=True)
+    """ID to reference external tools, e.g., a redun execution ID."""
     pipeline_id: Optional[str] = Field(default=None, index=True)
     pipeline_v: Optional[str] = Field(default=None, index=True)
     pipeline: Optional["lnschema_core._core.Pipeline"] = Relationship()  # type: ignore # noqa
