@@ -9,7 +9,6 @@ import sqlmodel
 from cloudpathlib import CloudPath
 from pydantic.fields import PrivateAttr
 from sqlmodel import Field, ForeignKeyConstraint, Relationship
-from sqlmodel import SQLModel as SQLModelPublicSchema
 
 from . import _name as schema_name
 from ._link import DFolderDObject, DObjectFeatures, ProjectDFolder, RunIn  # noqa
@@ -42,7 +41,7 @@ class User(SQLModel, table=True):  # type: ignore
     updated_at: Optional[datetime] = UpdatedAt
 
 
-class Storage(SQLModelPublicSchema, table=True):  # type: ignore
+class Storage(SQLModel, table=True):  # type: ignore
     """Storage locations.
 
     A dobject or run-associated file can be stored in any desired S3,
@@ -168,7 +167,7 @@ class DObject(SQLModel, table=True):  # type: ignore
     """Link to :class:`~lnschema_core.Run` that generated the `dobject`."""
     run_id: str = Field(foreign_key="core.run.id", index=True)
     """The source run id."""
-    storage_id: str = Field(foreign_key="storage.id", index=True)
+    storage_id: str = Field(foreign_key="core.storage.id", index=True)
     """The id of :class:`~lnschema_core.Storage` location that stores the `dobject`."""
     features: List["Features"] = Relationship(
         back_populates="dobjects",
