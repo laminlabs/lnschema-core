@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-🔥 Remove migration files | [107](https://github.com/laminlabs/lnschema-core/pull/107) | [sunnyosun](https://github.com/sunnyosun) | 2023-02-14 |
+🔥 Remove migration files | [107](https://github.com/laminlabs/lnschema-core/pull/107) | [sunnyosun](https://github.com/sunnyosun) | 2023-02-14 | 0.26.0
 ⬆️ Upgrade and rename `lndb_setup` to `lndb` (v0.32.0) | [105](https://github.com/laminlabs/lnschema-core/pull/105) | [bpenteado](https://github.com/bpenteado) | 2023-02-13 | 0.25.12
 🚚 Rename `track_runin` to `is_run_input` | [104](https://github.com/laminlabs/lnschema-core/pull/104) | [sunnyosun](https://github.com/sunnyosun) | 2023-02-13 | 0.25.11
 ✨ Added track_runin to DObject.load() | [103](https://github.com/laminlabs/lnschema-core/pull/103) | [sunnyosun](https://github.com/sunnyosun) | 2023-02-13 | 0.25.10
