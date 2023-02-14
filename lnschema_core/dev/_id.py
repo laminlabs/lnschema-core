@@ -1,3 +1,5 @@
+# Some IDs got updated on 2023-02-14 to be multiples of 4
+# for matching byte representation, should we ever go there.
 import secrets
 import string
 
@@ -32,21 +34,23 @@ def schema():
 
 
 def dobject() -> str:
-    """Data object: 21 base62.
+    """Data object: 20 base62.
 
-    21 characters (62**21=4e+37 possibilities) outperform UUID (2*122=5e+36).
+    20 characters (62**20=7e+35 possibilities) roughly matches UUID (2*122=5e+36).
+
+    Can be encoded as 15 bytes.
     """
-    return base62(n_char=21)
+    return base62(n_char=20)
 
 
 def dfolder() -> str:
-    """Data folder: 21 base62."""
-    return base62(n_char=21)
+    """Data folder: 20 base62."""
+    return base62(n_char=20)
 
 
 def run() -> str:
-    """Data transformation: 21 base62."""
-    return base62(n_char=21)
+    """Data transformation: 20 base62."""
+    return base62(n_char=20)
 
 
 def user() -> str:
@@ -87,28 +91,21 @@ def secret() -> str:
 
 
 def instance() -> str:
-    """LaminDB instance: 10 base62.
+    """LaminDB instance: 12 base62.
 
-    Collision probability is 6e-03 for 100M instances: 1M users with 100 instances/user.
+    Collision probability is 2e-04 for 1B instances: 1M users with 1k instances/user.
     """
-    return base62(n_char=10)
+    return base62(n_char=12)
 
 
 def storage() -> str:
-    """Storage root: 10 base62.
-
-    Collision probability is 6e-03 for 100M storage roots: 1M users with 100
-    storage roots/user.
-    """
-    return base62(n_char=10)
+    """Storage root: 8 base62."""
+    return base62(n_char=8)
 
 
 def pipeline() -> str:
-    """Pipeline: 9 base62.
-
-    Collision probability is low for 10M pipelines: 1M users with 10 pipelines/user.
-    """
-    return base62(n_char=9)
+    """Pipeline: 8 base62."""
+    return base62(n_char=8)
 
 
 def notebook():
