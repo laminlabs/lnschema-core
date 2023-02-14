@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from lndb._migrations import generate_module_files
 from lndb.test import (
     get_package_name,
@@ -7,6 +9,8 @@ from lndb.test import (
 )
 
 package_name = get_package_name()
+generate_module_files(package_name=package_name)
+print((Path(__file__).parent.parent / package_name / "migrations/env.py").exists())
 
 
 def test_migration_id_is_consistent():
@@ -14,12 +18,10 @@ def test_migration_id_is_consistent():
 
 
 def test_model_definitions_match_ddl_postgres():
-    generate_module_files(package_name=package_name)
     model_definitions_match_ddl(package_name, dialect_name="postgresql")
 
 
 def test_migrate_clones_sqlite():
-    generate_module_files(package_name=package_name)
     results = migrate_clones(package_name, n_instances=1, dialect_name="sqlite")
     if "migrate-failed" in results:
         raise RuntimeError("Migration e2e test failed.")
