@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from lndb._migrations import generate_module_files
 from lndb.test import (
     get_package_name,
@@ -8,11 +6,7 @@ from lndb.test import (
     model_definitions_match_ddl,
 )
 
-from lnschema_core import _schema_id
-
 package_name = get_package_name()
-migrations_path = Path(__file__).parent.parent / package_name / "migrations"
-schema_id = _schema_id
 
 
 def test_migration_id_is_consistent():
@@ -20,7 +14,7 @@ def test_migration_id_is_consistent():
 
 
 def test_model_definitions_match_ddl_postgres():
-    generate_module_files(package_name, migrations_path, schema_id)
+    generate_module_files(package_name=package_name)
     model_definitions_match_ddl(package_name, dialect_name="postgresql")
 
 
