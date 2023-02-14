@@ -2,7 +2,7 @@ from sqlmodel import Field
 
 
 def current_user_id():
-    from lndb_setup import settings
+    from lndb import settings
 
     return settings.user.id
 
