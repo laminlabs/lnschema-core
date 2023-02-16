@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+✨ Add relationship between `DFolder` and `DObject` | [110](https://github.com/laminlabs/lnschema-core/pull/110) | [bpenteado](https://github.com/bpenteado) | 2023-02-16 |
 🚚 Add column `external_id` to `Run` | [109](https://github.com/laminlabs/lnschema-core/pull/109) | [falexwolf](https://github.com/falexwolf) | 2023-02-14 | 0.27.0
 🔧 Ensure all id lengths are multiples of 4 | [108](https://github.com/laminlabs/lnschema-core/pull/108) | [falexwolf](https://github.com/falexwolf) | 2023-02-14 |
 🚚 Move `storage` table back to `core` module | [89](https://github.com/laminlabs/lnschema-core/pull/89) | [falexwolf](https://github.com/falexwolf) | 2023-02-14 | 0.26.1
