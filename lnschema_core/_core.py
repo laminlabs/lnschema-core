@@ -69,8 +69,8 @@ class DFolder(SQLModel, table=True):  # type: ignore
 
     id: str = Field(default_factory=idg.dfolder, primary_key=True)
     name: str = Field(index=True)
-    dobjects: List["lnschema_core._core.DObject"] = Relationship(  # type: ignore  # noqa
-        back_populates="folders",
+    dobjects: List["DObject"] = Relationship(  # type: ignore  # noqa
+        back_populates="dfolders",
         sa_relationship_kwargs=dict(secondary=DFolderDObject.__table__),
     )
     """Collection of :class:`~lnschema_core.DObject`."""
@@ -179,7 +179,7 @@ class DObject(SQLModel, table=True):  # type: ignore
         sa_relationship_kwargs=dict(secondary=DObjectFeatures.__table__),
     )
     """Link to feature sets."""
-    folders: List["DFolder"] = Relationship(
+    dfolders: List[DFolder] = Relationship(
         back_populates="dobjects",
         sa_relationship_kwargs=dict(secondary=DFolderDObject.__table__),
     )
