@@ -69,6 +69,11 @@ class DFolder(SQLModel, table=True):  # type: ignore
 
     id: str = Field(default_factory=idg.dfolder, primary_key=True)
     name: str = Field(index=True)
+    dobjects: List["lnschema_core._core.DObject"] = Relationship(  # type: ignore  # noqa
+        back_populates="folders",
+        sa_relationship_kwargs=dict(secondary=DFolderDObject.__table__),
+    )
+    """Collection of :class:`~lnschema_core.DObject`."""
     created_by: str = CreatedBy
     """Auto-populated link to :class:`~lnschema_core.User`."""
     created_at: datetime = CreatedAt
@@ -174,6 +179,11 @@ class DObject(SQLModel, table=True):  # type: ignore
         sa_relationship_kwargs=dict(secondary=DObjectFeatures.__table__),
     )
     """Link to feature sets."""
+    folders: List["DFolder"] = Relationship(
+        back_populates="dobjects",
+        sa_relationship_kwargs=dict(secondary=DFolderDObject.__table__),
+    )
+    """Collection of :class:`~lnschema_core.DFolder` that contain this dobject."""
     targets: List["lnschema_core._core.Run"] = Relationship(  # type: ignore  # noqa
         back_populates="inputs",
         sa_relationship_kwargs=dict(secondary=RunIn.__table__),
