@@ -85,7 +85,7 @@ def is_sqlite():
     # for this to work, lndb can't import lnschema_core statically
     # it can only import it dynamically like all other schema modules
     try:
-        from lndb._settings_load import load_instance_settings
+        from lndb.dev._settings_load import load_instance_settings
 
         isettings = load_instance_settings()
         sqlite_true = isettings.dialect == "sqlite"
