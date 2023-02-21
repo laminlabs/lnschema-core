@@ -19,7 +19,10 @@ def upgrade() -> None:
     op.alter_column(f"{prefix}dobject", column_name="run_id", new_column_name="source_id", schema=schema)
     if sqlite:
         with op.batch_alter_table("core.dobject", schema=None) as batch_op:
-            batch_op.drop_index("ix_core.dobject_run_id")
+            try:
+                batch_op.drop_index("ix_core.dobject_run_id")
+            except ValueError:
+                pass
             batch_op.create_index(batch_op.f("ix_core.dobject_source_id"), ["source_id"], unique=False)
             batch_op.create_foreign_key(batch_op.f("fk_core.dobject_source_id_run"), "core.run", ["source_id"], ["id"])
     else:
