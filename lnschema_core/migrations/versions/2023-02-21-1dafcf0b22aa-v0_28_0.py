@@ -8,7 +8,15 @@ down_revision = "8280855a5064"
 
 
 def upgrade() -> None:
-    op.alter_column("core.dobject", column_name="run_id", new_column_name="source_id")
+    bind = op.get_bind()
+    sqlite = bind.engine.name == "sqlite"
+
+    if sqlite:
+        prefix, schema = "core.", None
+    else:
+        prefix, schema = "", "core"
+
+    op.alter_column(f"{prefix}dobject", column_name="run_id", new_column_name="source_id", schema=schema)
 
 
 def downgrade() -> None:
