@@ -81,6 +81,49 @@ class DFolder(SQLModel, table=True):  # type: ignore
     updated_at: Optional[datetime] = UpdatedAt
     """Time of last update."""
 
+    @overload
+    def __init__(
+        self,
+        folder: Union[Path, str] = None,
+        *,
+        name: Optional[str] = None,
+    ):
+        """Initialize from folder."""
+        ...
+
+    @overload
+    def __init__(
+        self,
+        id: Optional[str] = None,
+        name: Optional[str] = None,
+        dobjects: List["DObject"] = [],
+    ):
+        """Initialize from fields."""
+        ...
+
+    def __init__(  # type: ignore
+        self,
+        folder: Union[Path, str] = None,
+        *,
+        # continue with fields
+        id: Optional[str] = None,
+        name: Optional[str] = None,
+        dobjects: List["DObject"] = [],
+    ):
+        if folder is not None:
+            from lamindb._folder import get_dfolder_kwargs_from_data
+
+            kwargs = get_dfolder_kwargs_from_data(
+                folder=folder,
+                name=name,
+            )
+            if id is not None:
+                kwargs["id"] = id
+        else:
+            kwargs = {k: v for k, v in locals().items() if v and k != "self"}
+
+        super().__init__(**kwargs)
+
 
 class Project(SQLModel, table=True):  # type: ignore
     """Projects."""
