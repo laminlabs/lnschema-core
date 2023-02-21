@@ -170,7 +170,7 @@ class DObject(SQLModel, table=True):  # type: ignore
     # schema modules with an ORM called "Run"
     source: "lnschema_core._core.Run" = Relationship(back_populates="outputs")  # type: ignore  # noqa
     """Link to :class:`~lnschema_core.Run` that generated the `dobject`."""
-    run_id: str = Field(foreign_key="core.run.id", index=True)
+    source_id: str = Field(foreign_key="core.run.id", index=True)
     """The source run id."""
     storage_id: str = Field(foreign_key="core.storage.id", index=True)
     """The id of :class:`~lnschema_core.Storage` location that stores the `dobject`."""
