@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚚 Rename `DObject.run_id` to `DObject.source_id` | [114](https://github.com/laminlabs/lnschema-core/pull/114) | [falexwolf](https://github.com/falexwolf) | 2023-02-21 | 0.28.0
 🚑 Fix determination of postgres vs sqlite | [112](https://github.com/laminlabs/lnschema-core/pull/112) | [falexwolf](https://github.com/falexwolf) | 2023-02-17 |
 ✨ Add relationship between `DFolder` and `DObject` | [110](https://github.com/laminlabs/lnschema-core/pull/110) | [bpenteado](https://github.com/bpenteado) | 2023-02-16 | 0.27.1
 🚚 Add column `external_id` to `Run` | [109](https://github.com/laminlabs/lnschema-core/pull/109) | [falexwolf](https://github.com/falexwolf) | 2023-02-14 | 0.27.0
