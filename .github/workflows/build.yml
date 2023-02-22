@@ -72,7 +72,10 @@ jobs:
           aws-region: eu-central-1
       - name: Build
         run: |
+          echo $IS_PUSH_TO_MAIN
           nox -s build --python ${{ matrix.python-version }}
+        env:
+          IS_PUSH_TO_MAIN: github.event_name == 'push'
       - name: Codecov
         if: matrix.python-version == '3.9'
         uses: codecov/codecov-action@v2

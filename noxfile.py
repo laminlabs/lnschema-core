@@ -1,3 +1,4 @@
+import os
 import shutil
 
 import lamindb as ln
@@ -17,6 +18,11 @@ nox.options.reuse_existing_virtualenvs = True
 
 
 def upload_run(session):
+    print(os.environ["IS_PUSH_TO_MAIN"])
+    # if os.environ["IS_PUSH_TO_MAIN"] != "true":
+    #     return
+    print(os.environ["IS_PUSH_TO_MAIN"] == "true")
+    print(os.environ["IS_PUSH_TO_MAIN"] == "false")
     package_name = get_package_name()
     filename = f"{package_name}_docs.zip"
     shutil.make_archive(filename, "zip", "./docs")
