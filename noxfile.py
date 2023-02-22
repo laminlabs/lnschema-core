@@ -1,5 +1,6 @@
 import os
 import shutil
+from pathlib import Path
 
 import lndb
 import nox
@@ -13,13 +14,13 @@ nox.options.reuse_existing_virtualenvs = True
 
 
 def upload_run():
-    print(os.environ["IS_PUSH_TO_MAIN"])
-    # if os.environ["IS_PUSH_TO_MAIN"] != "true":
+    print(os.environ["GITHUB_EVENT_NAME"])
+    # if os.environ["GITHUB_EVENT_NAME"] == "push":
     #     return
-    print(os.environ["IS_PUSH_TO_MAIN"] == "true")
-    print(os.environ["IS_PUSH_TO_MAIN"] == "false")
+    print(os.environ["GITHUB_EVENT_NAME"] == "push")
+    print(os.environ["GITHUB_EVENT_NAME"] != "push")
     package_name = get_package_name()
-    filename = f"{package_name}_docs.zip"
+    filename = f"./{package_name}_docs.zip"
     shutil.make_archive(filename, "zip", "./docs")
     lndb.load("testuser1/lamin-site-assets", migrate=True)
 
@@ -27,7 +28,7 @@ def upload_run():
     import lamindb.schema as lns
 
     with ln.Session() as ss:
-        dobject = ss.select(ln.DObject, name=filename).one_or_none()
+        dobject = ss.select(ln.DObject, name=Path(filename).stem).one_or_none()
         dobject_id = None if dobject is None else dobject.id
         pipeline = ln.add(lns.Pipeline, name=f"CI {package_name}")
         run = lns.Run(pipeline=pipeline)
