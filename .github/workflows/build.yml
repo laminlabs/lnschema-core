@@ -73,7 +73,7 @@ jobs:
           aws-region: eu-central-1
       - name: Build
         run: |
-          echo $IS_PUSH_TO_MAIN
+          echo $GITHUB_EVENT_NAME
           nox -s build --python ${{ matrix.python-version }}
         env:
           GITHUB_EVENT_NAME: ${{ github.event_name }}
