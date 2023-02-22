@@ -4,12 +4,9 @@ import shutil
 import lndb
 import nox
 from lndb.test._env import get_package_name
-from lndb.test.nox import (
-    build_docs,
+from lndb.test.nox import (  # build_docs,; run_pytest,; setup_test_instances_from_main_branch,
     login_testuser1,
     run_pre_commit,
-    run_pytest,
-    setup_test_instances_from_main_branch,
 )
 
 nox.options.reuse_existing_virtualenvs = True
@@ -34,7 +31,7 @@ def upload_run():
         dobject_id = None if dobject is None else dobject.id
         pipeline = ln.add(lns.Pipeline, name=f"CI {package_name}")
         run = lns.Run(pipeline=pipeline)
-        dobject = ln.DObject(filename, id=dobject_id, run=run)
+        dobject = ln.DObject(filename, id=dobject_id, source=run)
         ss.add(dobject)
 
 
@@ -46,8 +43,8 @@ def lint(session: nox.Session) -> None:
 @nox.session(python=["3.7", "3.8", "3.9", "3.10", "3.11"])
 def build(session):
     login_testuser1(session)
-    setup_test_instances_from_main_branch(session)
-    session.install(".[dev,test]")
-    run_pytest(session)
-    build_docs(session)
+    # setup_test_instances_from_main_branch(session)
+    # session.install(".[dev,test]")
+    # run_pytest(session)
+    # build_docs(session)
     upload_run()

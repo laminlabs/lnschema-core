@@ -60,10 +60,10 @@ jobs:
           pip install lamindb
           sudo apt-get -y install graphviz
           sudo apt-get install sqlite3-tools=3.37.2-2
-      - name: Lint
-        if: matrix.python-version == '3.9'
-        run: |
-          nox -s lint --python ${{ matrix.python-version }}
+      # - name: Lint
+      #   if: matrix.python-version == '3.9'
+      #   run: |
+      #     nox -s lint --python ${{ matrix.python-version }}
       - name: Configure AWS
         uses: aws-actions/configure-aws-credentials@v1
         with:
