@@ -1,8 +1,6 @@
 import os
 import shutil
 
-import lamindb as ln
-import lamindb.schema as lns
 import lndb
 import nox
 from lndb.test._env import get_package_name
@@ -17,7 +15,7 @@ from lndb.test.nox import (
 nox.options.reuse_existing_virtualenvs = True
 
 
-def upload_run(session):
+def upload_run():
     print(os.environ["IS_PUSH_TO_MAIN"])
     # if os.environ["IS_PUSH_TO_MAIN"] != "true":
     #     return
@@ -27,6 +25,10 @@ def upload_run(session):
     filename = f"{package_name}_docs.zip"
     shutil.make_archive(filename, "zip", "./docs")
     lndb.load("testuser1/lamin-site-assets", migrate=True)
+
+    import lamindb as ln
+    import lamindb.schema as lns
+
     with ln.Session() as ss:
         dobject = ss.select(ln.DObject, name=filename).one_or_none()
         dobject_id = None if dobject is None else dobject.id
@@ -48,3 +50,4 @@ def build(session):
     session.install(".[dev,test]")
     run_pytest(session)
     build_docs(session)
+    upload_run()
