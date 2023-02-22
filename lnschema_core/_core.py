@@ -81,6 +81,10 @@ class DFolder(SQLModel, table=True):  # type: ignore
     updated_at: Optional[datetime] = UpdatedAt
     """Time of last update."""
 
+    # private attributes are needed here to prevent sqlalchemy error
+    _local_filepath: Optional[Path] = PrivateAttr()
+    _cloud_filepath: Optional[CloudPath] = PrivateAttr()
+
     def path(self) -> Union[Path, CloudPath]:
         """Path on storage."""
         return filepath_from_dfolder(self)
@@ -133,7 +137,7 @@ class DFolder(SQLModel, table=True):  # type: ignore
         if folder is not None:
             from lamindb._folder import get_dfolder_kwargs_from_data
 
-            kwargs = get_dfolder_kwargs_from_data(
+            kwargs, privates = get_dfolder_kwargs_from_data(
                 folder=folder,
                 name=name,
             )
@@ -143,6 +147,9 @@ class DFolder(SQLModel, table=True):  # type: ignore
             kwargs = {k: v for k, v in locals().items() if v and k != "self"}
 
         super().__init__(**kwargs)
+        if folder is not None:
+            self._local_filepath = privates["_local_filepath"]
+            self._cloud_filepath = privates["_cloud_filepath"]
 
 
 DFolder._folderkey = sa.Column(
