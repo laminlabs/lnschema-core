@@ -15,7 +15,7 @@ from ._link import DFolderDObject, DObjectFeatures, ProjectDFolder, RunIn  # noq
 from ._timestamps import CreatedAt, UpdatedAt
 from ._users import CreatedBy
 from .dev import id as idg
-from .dev._storage import filepath_from_dobject
+from .dev._storage import filepath_from_dfolder, filepath_from_dobject
 from .dev.sqlmodel import schema_sqlmodel
 from .dev.type import usage as usage_type
 
@@ -80,6 +80,79 @@ class DFolder(SQLModel, table=True):  # type: ignore
     """Time of creation."""
     updated_at: Optional[datetime] = UpdatedAt
     """Time of last update."""
+
+    # private attributes are needed here to prevent sqlalchemy error
+    _local_filepath: Optional[Path] = PrivateAttr()
+    _cloud_filepath: Optional[CloudPath] = PrivateAttr()
+
+    def path(self) -> Union[Path, CloudPath]:
+        """Path on storage."""
+        return filepath_from_dfolder(self)
+
+    def tree(
+        self,
+        level: int = -1,
+        limit_to_directories: bool = False,
+        length_limit: int = 1000,
+    ) -> None:
+        """Print a visual tree structure."""
+        from lamindb._folder import tree
+
+        return tree(
+            dir_path=self.path(),
+            level=level,
+            limit_to_directories=limit_to_directories,
+            length_limit=length_limit,
+        )
+
+    @overload
+    def __init__(
+        self,
+        folder: Union[Path, str] = None,
+        *,
+        name: Optional[str] = None,
+    ):
+        """Initialize from folder."""
+        ...
+
+    @overload
+    def __init__(
+        self,
+        id: Optional[str] = None,
+        name: Optional[str] = None,
+        dobjects: List["DObject"] = [],
+    ):
+        """Initialize from fields."""
+        ...
+
+    def __init__(  # type: ignore
+        self,
+        folder: Union[Path, str] = None,
+        *,
+        # continue with fields
+        id: Optional[str] = None,
+        name: Optional[str] = None,
+        dobjects: List["DObject"] = [],
+    ):
+        if folder is not None:
+            from lamindb._folder import get_dfolder_kwargs_from_data
+
+            kwargs, privates = get_dfolder_kwargs_from_data(
+                folder=folder,
+                name=name,
+            )
+            if id is not None:
+                kwargs["id"] = id
+        else:
+            kwargs = {k: v for k, v in locals().items() if v and k != "self"}
+
+        super().__init__(**kwargs)
+        if folder is not None:
+            self._local_filepath = privates["_local_filepath"]
+            self._cloud_filepath = privates["_cloud_filepath"]
+
+
+DFolder._folderkey = sa.Column("_folderkey", sqlmodel.sql.sqltypes.AutoString(), index=True)
 
 
 class Project(SQLModel, table=True):  # type: ignore

@@ -25,3 +25,10 @@ def filepath_from_dobject(dobj):
     storage_key = storage_key_from_dobject(dobj)
     filepath = settings.instance.storage.key_to_filepath(storage_key)
     return filepath
+
+
+# add type annotations back asap when re-organizing the module
+def filepath_from_dfolder(dfolder):
+    from lndb import settings
+
+    return settings.instance.storage.key_to_filepath(dfolder._folderkey)
