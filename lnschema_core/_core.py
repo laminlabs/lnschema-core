@@ -15,7 +15,7 @@ from ._link import DFolderDObject, DObjectFeatures, ProjectDFolder, RunIn  # noq
 from ._timestamps import CreatedAt, UpdatedAt
 from ._users import CreatedBy
 from .dev import id as idg
-from .dev._storage import filepath_from_dobject, filepath_from_dfolder
+from .dev._storage import filepath_from_dfolder, filepath_from_dobject
 from .dev.sqlmodel import schema_sqlmodel
 from .dev.type import usage as usage_type
 
@@ -152,9 +152,7 @@ class DFolder(SQLModel, table=True):  # type: ignore
             self._cloud_filepath = privates["_cloud_filepath"]
 
 
-DFolder._folderkey = sa.Column(
-    "_folderkey", sqlmodel.sql.sqltypes.AutoString(), index=True
-)
+DFolder._folderkey = sa.Column("_folderkey", sqlmodel.sql.sqltypes.AutoString(), index=True)
 
 
 class Project(SQLModel, table=True):  # type: ignore
@@ -233,9 +231,7 @@ class DObject(SQLModel, table=True):  # type: ignore
     It's `None` if the storage format doesn't have a canonical extension.
     """
 
-    size: Optional[int] = Field(
-        default=None, sa_column=sa.Column(sa.BigInteger(), index=True)
-    )
+    size: Optional[int] = Field(default=None, sa_column=sa.Column(sa.BigInteger(), index=True))
     """Size in bytes.
 
     Examples: 1KB is 1e3 bytes, 1MB is 1e6, 1GB is 1e9, 1TB is 1e12 etc.
@@ -418,9 +414,7 @@ class Run(SQLModel, table=True):  # type: ignore
     """Link to :class:`~lnschema_core.Notebook`."""
     outputs: List["DObject"] = Relationship(back_populates="source")
     """Output data :class:`~lnschema_core.DObject`."""
-    inputs: List["DObject"] = Relationship(
-        back_populates="targets", sa_relationship_kwargs=dict(secondary=RunIn.__table__)
-    )
+    inputs: List["DObject"] = Relationship(back_populates="targets", sa_relationship_kwargs=dict(secondary=RunIn.__table__))
     """Input data :class:`~lnschema_core.DObject`."""
     created_by: str = CreatedBy
     """Auto-populated link to :class:`~lnschema_core.User`."""
