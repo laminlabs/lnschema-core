@@ -4,20 +4,20 @@ import shutil
 import lndb
 import nox
 from lndb.test._env import get_package_name
-from lndb.test.nox import (  # build_docs,; run_pytest,; setup_test_instances_from_main_branch,
+from lndb.test.nox import (
+    build_docs,
     login_testuser1,
     run_pre_commit,
+    run_pytest,
+    setup_test_instances_from_main_branch,
 )
 
 nox.options.reuse_existing_virtualenvs = True
 
 
 def upload_run():
-    print(os.environ["GITHUB_EVENT_NAME"])
-    # if os.environ["GITHUB_EVENT_NAME"] == "push":
-    #     return
-    print(os.environ["GITHUB_EVENT_NAME"] == "push")
-    print(os.environ["GITHUB_EVENT_NAME"] != "push")
+    if os.environ["GITHUB_EVENT_NAME"] == "push":
+        return
     package_name = get_package_name()
     filestem = f"{package_name}_docs"
     filename = shutil.make_archive(filestem, "zip", "./docs")
@@ -43,9 +43,8 @@ def lint(session: nox.Session) -> None:
 @nox.session(python=["3.7", "3.8", "3.9", "3.10", "3.11"])
 def build(session):
     login_testuser1(session)
-    session.install("lamin_logger>=0.3rc1")
-    # setup_test_instances_from_main_branch(session)
-    # session.install(".[dev,test]")
-    # run_pytest(session)
-    # build_docs(session)
+    setup_test_instances_from_main_branch(session)
+    session.install(".[dev,test]")
+    run_pytest(session)
+    build_docs(session)
     upload_run()
