@@ -15,7 +15,7 @@ from ._link import DFolderDObject, DObjectFeatures, ProjectDFolder, RunIn  # noq
 from ._timestamps import CreatedAt, UpdatedAt
 from ._users import CreatedBy
 from .dev import id as idg
-from .dev._storage import filepath_from_dobject
+from .dev._storage import filepath_from_dobject, filepath_from_dfolder
 from .dev.sqlmodel import schema_sqlmodel
 from .dev.type import usage as usage_type
 
@@ -81,6 +81,26 @@ class DFolder(SQLModel, table=True):  # type: ignore
     updated_at: Optional[datetime] = UpdatedAt
     """Time of last update."""
 
+    def path(self) -> Union[Path, CloudPath]:
+        """Path on storage."""
+        return filepath_from_dfolder(self)
+
+    def tree(
+        self,
+        level: int = -1,
+        limit_to_directories: bool = False,
+        length_limit: int = 1000,
+    ) -> None:
+        """Print a visual tree structure."""
+        from lamindb._folder import tree
+
+        return tree(
+            dir_path=self.path(),
+            level=level,
+            limit_to_directories=limit_to_directories,
+            length_limit=length_limit,
+        )
+
     @overload
     def __init__(
         self,
@@ -123,6 +143,11 @@ class DFolder(SQLModel, table=True):  # type: ignore
             kwargs = {k: v for k, v in locals().items() if v and k != "self"}
 
         super().__init__(**kwargs)
+
+
+DFolder._folderkey = sa.Column(
+    "_folderkey", sqlmodel.sql.sqltypes.AutoString(), index=True
+)
 
 
 class Project(SQLModel, table=True):  # type: ignore
@@ -201,7 +226,9 @@ class DObject(SQLModel, table=True):  # type: ignore
     It's `None` if the storage format doesn't have a canonical extension.
     """
 
-    size: Optional[int] = Field(default=None, sa_column=sa.Column(sa.BigInteger(), index=True))
+    size: Optional[int] = Field(
+        default=None, sa_column=sa.Column(sa.BigInteger(), index=True)
+    )
     """Size in bytes.
 
     Examples: 1KB is 1e3 bytes, 1MB is 1e6, 1GB is 1e9, 1TB is 1e12 etc.
@@ -384,7 +411,9 @@ class Run(SQLModel, table=True):  # type: ignore
     """Link to :class:`~lnschema_core.Notebook`."""
     outputs: List["DObject"] = Relationship(back_populates="source")
     """Output data :class:`~lnschema_core.DObject`."""
-    inputs: List["DObject"] = Relationship(back_populates="targets", sa_relationship_kwargs=dict(secondary=RunIn.__table__))
+    inputs: List["DObject"] = Relationship(
+        back_populates="targets", sa_relationship_kwargs=dict(secondary=RunIn.__table__)
+    )
     """Input data :class:`~lnschema_core.DObject`."""
     created_by: str = CreatedBy
     """Auto-populated link to :class:`~lnschema_core.User`."""
