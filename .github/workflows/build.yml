@@ -57,6 +57,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install nox
           pip install lndb>=0.32.0
+          pip install lamindb
           sudo apt-get -y install graphviz
           sudo apt-get install sqlite3-tools=3.37.2-2
       - name: Lint
