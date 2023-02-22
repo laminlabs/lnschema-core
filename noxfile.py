@@ -5,6 +5,7 @@ from lndb.test.nox import (
     run_pre_commit,
     run_pytest,
     setup_test_instances_from_main_branch,
+    upload_docs_dir,
 )
 
 nox.options.reuse_existing_virtualenvs = True
@@ -22,3 +23,4 @@ def build(session):
     session.install(".[dev,test]")
     run_pytest(session)
     build_docs(session)
+    upload_docs_dir()
