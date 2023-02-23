@@ -28,7 +28,7 @@ class RunIn(SQLModel, table=True):  # type: ignore
 class DObjectFeatures(SQLModel, table=True):  # type: ignore
     """Links `DObject` and `Features`."""
 
-    __tablename__ = f"{prefix}dobjects_features"
+    __tablename__ = f"{prefix}dobject_features"
 
     dobject_id: str = Field(foreign_key="core.dobject.id", primary_key=True)
     features_id: str = Field(foreign_key="core.features.id", primary_key=True)
