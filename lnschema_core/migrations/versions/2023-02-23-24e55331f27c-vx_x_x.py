@@ -51,7 +51,7 @@ def upgrade() -> None:
             "dfolder",
             ["_objectkey"],
             unique=False,
-            schema=schema,
+            schema="core",
         )
 
 
