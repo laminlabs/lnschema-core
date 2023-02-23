@@ -10,5 +10,5 @@ def test_id():
     assert len(id.instance()) == 12
 
 
-def test_filekey():
+def test_objectkey():
     assert "_objectkey" in DObject.__table__.columns.keys()
