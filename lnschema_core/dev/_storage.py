@@ -31,4 +31,4 @@ def filepath_from_dobject(dobj):
 def filepath_from_dfolder(dfolder):
     from lndb import settings
 
-    return settings.instance.storage.key_to_filepath(dfolder._folderkey)
+    return settings.instance.storage.key_to_filepath(dfolder._objectkey)
