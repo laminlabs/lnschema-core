@@ -1,11 +1,11 @@
 import nox
-from lndb.test.nox import (
+from laminci import move_built_docs_to_docs_slash_project_slug, upload_docs_dir
+from laminci.nox import (
     build_docs,
     login_testuser1,
     run_pre_commit,
     run_pytest,
     setup_test_instances_from_main_branch,
-    upload_docs_dir,
 )
 
 nox.options.reuse_existing_virtualenvs = True
@@ -24,3 +24,4 @@ def build(session):
     run_pytest(session)
     build_docs(session)
     upload_docs_dir()
+    move_built_docs_to_docs_slash_project_slug()
