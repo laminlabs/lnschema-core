@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-🚚 Rename _filekey and _folderkey to _objectkey | [119](https://github.com/laminlabs/lnschema-core/pull/119) | [sunnyosun](https://github.com/sunnyosun) | 2023-02-23 |
+🚚 Rename _filekey and _folderkey to _objectkey | [119](https://github.com/laminlabs/lnschema-core/pull/119) | [sunnyosun](https://github.com/sunnyosun) | 2023-02-23 | 0.28.2
 👷 Upload run outputs to `lamin-site-assets` | [116](https://github.com/laminlabs/lnschema-core/pull/116) | [falexwolf](https://github.com/falexwolf) | 2023-02-22 |
 ✨ Create DFolder from a folder | [113](https://github.com/laminlabs/lnschema-core/pull/113) | [sunnyosun](https://github.com/sunnyosun) | 2023-02-22 | 0.28.1
 🚚 Rename `DObject.run_id` to `DObject.source_id` | [114](https://github.com/laminlabs/lnschema-core/pull/114) | [falexwolf](https://github.com/falexwolf) | 2023-02-21 | 0.28.0
