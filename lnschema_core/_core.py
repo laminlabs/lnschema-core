@@ -152,7 +152,7 @@ class DFolder(SQLModel, table=True):  # type: ignore
             self._cloud_filepath = privates["_cloud_filepath"]
 
 
-DFolder._folderkey = sa.Column("_folderkey", sqlmodel.sql.sqltypes.AutoString(), index=True)
+DFolder._objectkey = sa.Column("_objectkey", sqlmodel.sql.sqltypes.AutoString(), index=True)
 
 
 class Project(SQLModel, table=True):  # type: ignore
@@ -360,7 +360,7 @@ class DObject(SQLModel, table=True):  # type: ignore
             self._memory_rep = privates["_memory_rep"]
 
 
-DObject._filekey = sa.Column("_filekey", sqlmodel.sql.sqltypes.AutoString(), index=True)
+DObject._objectkey = sa.Column("_objectkey", sqlmodel.sql.sqltypes.AutoString(), index=True)
 
 
 class Run(SQLModel, table=True):  # type: ignore

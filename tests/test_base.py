@@ -11,4 +11,4 @@ def test_id():
 
 
 def test_filekey():
-    assert "_filekey" in DObject.__table__.columns.keys()
+    assert "_objectkey" in DObject.__table__.columns.keys()
