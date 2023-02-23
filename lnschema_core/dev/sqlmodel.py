@@ -9,12 +9,15 @@
 
 import importlib
 import os
+import re
 import typing
 from typing import Any, Optional, Sequence, Tuple, Union
 
 import sqlmodel as sqm
 from pydantic import create_model
 from sqlalchemy.orm import declared_attr
+from sqlalchemy.orm import relationship as sa_relationship
+from sqlalchemy.orm.relationships import RelationshipProperty
 from sqlalchemy.orm.session import object_session
 from typeguard import check_type
 
@@ -120,6 +123,76 @@ def add_relationship_keys(table: sqm.SQLModel):  # type: ignore
             getattr(table, "__sqlmodel_relationships__")[i.key] = None
 
 
+def add_relationship(
+    origin_table: sqm.SQLModel,
+    origin_attr_name: str,
+    target_attr_name: Optional[str] = None,
+):
+    """Add relationship defined in the origin table to its respective target table.
+
+    Only valid for many-to-many relationships.
+
+    Args:
+        origin_table (sqlmodel.SQLModel): origin (input) table
+        origin_attr_name (str): name of the attribute in the origin table that defines the relationship
+        target_attr_name (str, optional): name of the corresponding attribute to be added in the relationship target table.
+            Defaults to either the back_populates parameter in the origin table relationship attribute (if set) or the snake-case, pluralized name of the origin table.
+
+    Returns:
+        None
+
+    Raises:
+        ValueError: if origin_attr_name does not correspond to a valid relationship attribute in the origin table
+        ValueError: if target_attr_name conflicts with the back_populates parameter set in the attribute of the origin table that defines the relationship
+    """
+    # raise error if there is no attribute with name origin_attr_name
+    origin_attr = getattr(origin_table, origin_attr_name)
+    # raise error if attr is not a relationship
+    relationship = getattr(origin_attr, "prop")
+    if not isinstance(relationship, RelationshipProperty):
+        raise ValueError("Input attribute must be a relationship.")
+    # make sure relationship key is in __sqlmodel_relationships__
+    if relationship not in getattr(origin_table, "__sqlmodel_relationships__"):
+        getattr(origin_table, "__sqlmodel_relationships__")[relationship.key] = None
+    # create relationship attribute in target table
+    target_table = relationship.entity.entity
+    target_attr_name = _derive_target_attr_name(origin_table, relationship, target_attr_name)
+    setattr(
+        target_table,
+        target_attr_name,  # type: ignore
+        sa_relationship(
+            origin_table,
+            back_populates=relationship.key,
+            secondary=relationship.secondary,
+        ),
+    )
+    # add relationship key to target table
+    getattr(target_table, "__sqlmodel_relationships__")[target_attr_name] = None
+
+
+def add_relationships(origin_table: sqm.SQLModel):
+    """Add all relationships defined in the origin table to their corresponding target tables.
+
+    Only valid for many-to-many relationships.
+
+    Args:
+        origin_table (sqlmodel.SQLModel): origin (input) table
+
+    Returns:
+        None
+    """
+    for attr in origin_table.__dict__.values():
+        # skip attributes that are not relationships
+        attr_property = getattr(attr, "prop", None)
+        if not isinstance(attr_property, RelationshipProperty):
+            continue
+        relationship = attr_property
+        # only configure relationships that are many-to-many
+        if getattr(relationship, "secondary") is not None:
+            origin_attr_name = relationship.key
+            add_relationship(origin_table, origin_attr_name)
+
+
 def validate_with_pydantic(model, user_kwargs):
     annotations = model.__annotations__
     kwargs = {**model.__dict__, **user_kwargs}
@@ -185,6 +258,23 @@ def validate_relationship_types(model, user_kwargs):
             if hasattr(model, field_name):
                 if getattr(model, field_name) is None:
                     setattr(model, field_name, getattr(user_kwargs[relationship_name], col_name))
+
+
+def _derive_target_attr_name(origin_table: sqm.SQLModel, origin_relationship: RelationshipProperty, custom_target_name):
+    """Derive the name of the relationship attribute in the target table."""
+    # If set, back_populates parameter in the origin relationship takes precedence over any custom naming
+    if origin_relationship.back_populates is not None:
+        if custom_target_name is not None and custom_target_name != origin_relationship.back_populates:
+            raise ValueError(
+                "Custom name for the relationship attribute in the target table conflicts with back_populates parameter set in the relationship attribute of the origin table."
+            )
+        return origin_relationship.back_populates
+    else:
+        if custom_target_name is not None:
+            return custom_target_name
+        else:
+            # Convert origin table name from camel to snake case and make it plural
+            return f"{re.sub(r'(?<!^)(?=[A-Z])', '_', origin_table.__name__).lower()}s"
 
 
 def _is_ann_optional(type_ann):
