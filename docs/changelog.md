@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+✏️ Fixed folderkey typo | [123](https://github.com/laminlabs/lnschema-core/pull/123) | [sunnyosun](https://github.com/sunnyosun) | 2023-02-23 |
 🐛 Fixed getting objectkey | [122](https://github.com/laminlabs/lnschema-core/pull/122) | [sunnyosun](https://github.com/sunnyosun) | 2023-02-23 | 0.28.4
 🚚 Rename dobjects_features to dobject_features | [120](https://github.com/laminlabs/lnschema-core/pull/120) | [sunnyosun](https://github.com/sunnyosun) | 2023-02-23 | 0.28.3
 🚚 Rename _filekey and _folderkey to _objectkey | [119](https://github.com/laminlabs/lnschema-core/pull/119) | [sunnyosun](https://github.com/sunnyosun) | 2023-02-23 | 0.28.2
