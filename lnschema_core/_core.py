@@ -361,6 +361,7 @@ class DObject(SQLModel, table=True):  # type: ignore
 
 
 DObject._objectkey = sa.Column("_objectkey", sqlmodel.sql.sqltypes.AutoString(), index=True)
+DObject.__table__.append_constraint(sa.UniqueConstraint("storage_id", "_objectkey", "suffix", name="uq_storage__objectkey_suffix"))
 
 
 class Run(SQLModel, table=True):  # type: ignore
