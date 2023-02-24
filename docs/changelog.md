@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-✨ Added `get_dobject` to DFolder | [126](https://github.com/laminlabs/lnschema-core/pull/126) | [sunnyosun](https://github.com/sunnyosun) | 2023-02-24 |
+✨ Added `get_dobject` to DFolder | [126](https://github.com/laminlabs/lnschema-core/pull/126) | [sunnyosun](https://github.com/sunnyosun) | 2023-02-24 | 0.28.7
 ✨ Added unique constraint uq_storage__objectkey_suffix | [125](https://github.com/laminlabs/lnschema-core/pull/125) | [sunnyosun](https://github.com/sunnyosun) | 2023-02-24 |
 👷 Use `laminci` | [124](https://github.com/laminlabs/lnschema-core/pull/124) | [falexwolf](https://github.com/falexwolf) | 2023-02-23 |
 ✨ Create helper functions to add relationships | [121](https://github.com/laminlabs/lnschema-core/pull/121) | [bpenteado](https://github.com/bpenteado) | 2023-02-23 | 0.28.6
