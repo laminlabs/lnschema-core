@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+✨ Added unique constraint uq_storage__objectkey_suffix | [125](https://github.com/laminlabs/lnschema-core/pull/125) | [sunnyosun](https://github.com/sunnyosun) | 2023-02-24 |
 👷 Use `laminci` | [124](https://github.com/laminlabs/lnschema-core/pull/124) | [falexwolf](https://github.com/falexwolf) | 2023-02-23 |
 ✨ Create helper functions to add relationships | [121](https://github.com/laminlabs/lnschema-core/pull/121) | [bpenteado](https://github.com/bpenteado) | 2023-02-23 | 0.28.6
 ✏️ Fixed folderkey typo | [123](https://github.com/laminlabs/lnschema-core/pull/123) | [sunnyosun](https://github.com/sunnyosun) | 2023-02-23 | 0.28.5
