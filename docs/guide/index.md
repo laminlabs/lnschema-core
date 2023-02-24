@@ -3,7 +3,7 @@
 ```{toctree}
 :maxdepth: 1
 
-get-started
-tables
-test-data-validation
+schema
+basic-orms
+data-validation
 ```
