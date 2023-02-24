@@ -3,10 +3,10 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-📝 Fix docs references | [130](https://github.com/laminlabs/lnschema-core/pull/130) | [falexwolf](https://github.com/falexwolf) | 2023-02-24 |
+📝 Fix docs references | [130](https://github.com/laminlabs/lnschema-core/pull/130) | [falexwolf](https://github.com/falexwolf) | 2023-02-24 | 0.29.0
 📝 Use lamin instead of lndb in guides | [129](https://github.com/laminlabs/lnschema-core/pull/129) | [falexwolf](https://github.com/falexwolf) | 2023-02-24 |
 👷 Minimal docs build | [128](https://github.com/laminlabs/lnschema-core/pull/128) | [falexwolf](https://github.com/falexwolf) | 2023-02-24 |
-:children_crossing: Change user id back to base62 | [127](https://github.com/laminlabs/lnschema-core/pull/127) | [falexwolf](https://github.com/falexwolf) | 2023-02-24 |
+🚸 Change user id back to base62 | [127](https://github.com/laminlabs/lnschema-core/pull/127) | [falexwolf](https://github.com/falexwolf) | 2023-02-24 |
 ✨ Added `get_dobject` to DFolder | [126](https://github.com/laminlabs/lnschema-core/pull/126) | [sunnyosun](https://github.com/sunnyosun) | 2023-02-24 | 0.28.7
 ✨ Added unique constraint uq_storage__objectkey_suffix | [125](https://github.com/laminlabs/lnschema-core/pull/125) | [sunnyosun](https://github.com/sunnyosun) | 2023-02-24 |
 👷 Use `laminci` | [124](https://github.com/laminlabs/lnschema-core/pull/124) | [falexwolf](https://github.com/falexwolf) | 2023-02-23 |
