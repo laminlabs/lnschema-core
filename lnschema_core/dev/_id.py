@@ -54,7 +54,7 @@ def run() -> str:
 
 
 def user() -> str:
-    """User: 8 base64.
+    """User: 8 base62.
 
     Consistent with 1M users producing 1k notebooks.
     Safe for 100k users producing 10k notebooks.
@@ -72,7 +72,7 @@ def user() -> str:
     1M      2e-03
     ======= ===========
     """
-    return base64(n_char=8)
+    return base62(n_char=8)
 
 
 def project() -> str:
