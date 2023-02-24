@@ -1,5 +1,5 @@
 project_name: lnschema-core
-description: Data provenance
+description: LaminDB core schema module. Defines data objects and tracks data lineage.
 project_slug: lnschema-core
 repository_name: lnschema-core
 package_name: lnschema_core
