@@ -1,6 +1,5 @@
+from lamindb.schema.dev.sqlmodel import schema_sqlmodel
 from sqlmodel import Field
-
-from lnschema_core.dev.sqlmodel import schema_sqlmodel
 
 from . import _name as schema_name
 

@@ -327,6 +327,6 @@ def _resolve_forward_ref(ann, module):
             return getattr(typing, parent_ref)[resolved_args[0]]
     else:
         # This code should never run. SQLmodel is incompatible with non-optional
-        # Union-like types (e.g. typing.Union[str, ForwardRef("lnschema_core._core.Pipeline")])
+        # Union-like types (e.g. typing.Union[str, ForwardRef("lamindb.schema._core.Pipeline")])
         # and raises an error at class definition when a field is typed as such.
         return getattr(typing, parent_ref)[resolved_args[0], resolved_args[1]]
