@@ -263,7 +263,7 @@ class DObject(SQLModel, table=True):  # type: ignore
         sa_relationship_kwargs=dict(secondary=DFolderDObject.__table__),
     )
     """Collection of :class:`~lamindb.DFolder` that contain this dobject."""
-    targets: List["lamindb.schema._core.Run"] = Relationship(  # type: ignore  # noqa
+    targets: List["lnschema_core._core.Run"] = Relationship(  # type: ignore  # noqa
         back_populates="inputs",
         sa_relationship_kwargs=dict(secondary=RunIn.__table__),
     )
@@ -413,7 +413,7 @@ class Run(SQLModel, table=True):  # type: ignore
     """ID to reference external tools, e.g., a redun execution ID."""
     pipeline_id: Optional[str] = Field(default=None, index=True)
     pipeline_v: Optional[str] = Field(default=None, index=True)
-    pipeline: Optional["lamindb.schema._core.Pipeline"] = Relationship()  # type: ignore # noqa
+    pipeline: Optional["lnschema_core._core.Pipeline"] = Relationship()  # type: ignore # noqa
     """Link to :class:`~lamindb.schema.Pipeline`."""
     notebook_id: Optional[str] = Field(default=None, index=True)
     notebook_v: Optional[str] = Field(default=None, index=True)
