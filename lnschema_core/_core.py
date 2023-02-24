@@ -247,7 +247,7 @@ class DObject(SQLModel, table=True):  # type: ignore
 
     # We need the fully module-qualified path below, as there might be more
     # schema modules with an ORM called "Run"
-    source: "lamindb.schema._core.Run" = Relationship(back_populates="outputs")  # type: ignore  # noqa
+    source: "lnschema_core._core.Run" = Relationship(back_populates="outputs")  # type: ignore  # noqa
     """Link to :class:`~lamindb.schema.Run` that generated the `dobject`."""
     source_id: str = Field(foreign_key="core.run.id", index=True)
     """The source run id."""
