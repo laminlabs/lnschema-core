@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+📝 Use lamin instead of lndb in guides | [129](https://github.com/laminlabs/lnschema-core/pull/129) | [falexwolf](https://github.com/falexwolf) | 2023-02-24 |
 👷 Minimal docs build | [128](https://github.com/laminlabs/lnschema-core/pull/128) | [falexwolf](https://github.com/falexwolf) | 2023-02-24 |
 :children_crossing: Change user id back to base62 | [127](https://github.com/laminlabs/lnschema-core/pull/127) | [falexwolf](https://github.com/falexwolf) | 2023-02-24 |
 ✨ Added `get_dobject` to DFolder | [126](https://github.com/laminlabs/lnschema-core/pull/126) | [sunnyosun](https://github.com/sunnyosun) | 2023-02-24 | 0.28.7
