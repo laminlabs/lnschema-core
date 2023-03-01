@@ -105,11 +105,11 @@ class DFolder(SQLModel, table=True):  # type: ignore
             length_limit=length_limit,
         )
 
-    def get_dobject(self, relpath: Union[str, Path]):
-        """Get dobject via relative path to dfolder."""
+    def get(self, relpath: Union[str, Path, List[Union[str, Path]]], **fields):
+        """Get dobjects via relative path to dfolder."""
         from lamindb._folder import get_dobject
 
-        return get_dobject(dfolder=self, relpath=relpath)
+        return get_dobject(dfolder=self, relpath=relpath, **fields)
 
     @overload
     def __init__(
