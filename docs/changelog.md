@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-🚚 Rename get_object to get | [132](https://github.com/laminlabs/lnschema-core/pull/132) | [sunnyosun](https://github.com/sunnyosun) | 2023-03-01 |
+🚚 Rename get_object to get | [132](https://github.com/laminlabs/lnschema-core/pull/132) | [sunnyosun](https://github.com/sunnyosun) | 2023-03-01 | 0.29.1
 📝 Fix docs references | [130](https://github.com/laminlabs/lnschema-core/pull/130) | [falexwolf](https://github.com/falexwolf) | 2023-02-24 | 0.29.0
 📝 Use lamin instead of lndb in guides | [129](https://github.com/laminlabs/lnschema-core/pull/129) | [falexwolf](https://github.com/falexwolf) | 2023-02-24 |
 👷 Minimal docs build | [128](https://github.com/laminlabs/lnschema-core/pull/128) | [falexwolf](https://github.com/falexwolf) | 2023-02-24 |
