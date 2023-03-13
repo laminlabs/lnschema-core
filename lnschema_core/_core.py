@@ -427,10 +427,14 @@ class Run(SQLModel, table=True):  # type: ignore
                 else:
                     raise RuntimeError("Please pass notebook or pipeline.")
             run = select_stmt.order_by(lns.Run.created_at.desc()).first()
-            if run is not None:
-                logger.info(f"Loaded run: {run.id}")  # type: ignore
-            else:
-                logger.info("Did not find a latest run.")
+        if id is not None:
+            run = ln.select(lns.Run, id=id).one_or_none()
+            if run is None:
+                raise NotImplementedError("You can currently only pass existing IDs.")
+        if run is not None:
+            logger.info(f"Loaded run: {run.id}")  # type: ignore
+        else:
+            logger.info("Did not find a latest run.")
 
         # create a new run if doesn't exist yet or is requested by the user
         if run is None:
