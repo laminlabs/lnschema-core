@@ -325,7 +325,17 @@ DObject.__table__.append_constraint(sa.UniqueConstraint("storage_id", "_objectke
 class Run(SQLModel, table=True):  # type: ignore
     """Code runs that transform data.
 
-    A data transformation (`run`) is _any_ transformation of a `dobject`.
+    A `run` is any transformation of a `dobject`.
+
+    Args:
+        id: Optional[str] = None,
+        name: Optional[str] = None,
+        global_context: bool = False,
+        load_latest: bool = False,
+        pipeline: Optional["Pipeline"] = None,
+        notebook: Optional["Notebook"] = None,
+        outputs: List[DObject] = [],
+        inputs: List[DObject] = [],
 
     For instance:
 
@@ -420,17 +430,19 @@ class Run(SQLModel, table=True):  # type: ignore
         # create a new run if doesn't exist yet or is requested by the user
         if run is None:
             if notebook is not None:
-                run = super().__init__(notebook_id=notebook.id, notebook_v=notebook.v)
+                super().__init__(notebook_id=notebook.id, notebook_v=notebook.v)
             elif pipeline is not None:
-                run = super().__init__(pipeline_id=pipeline.id, pipeline_v=pipeline.v)
+                super().__init__(pipeline_id=pipeline.id, pipeline_v=pipeline.v)
             else:
                 if global_context:
                     raise RuntimeError("Please set notebook or pipeline global context.")
                 else:
                     raise RuntimeError("Please pass notebook or pipeline.")
+        else:
+            self = run
 
         if global_context:
-            context.run = run
+            context.run = self
 
 
 class Notebook(SQLModel, table=True):  # type: ignore
