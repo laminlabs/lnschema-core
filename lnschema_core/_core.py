@@ -328,10 +328,11 @@ class Run(SQLModel, table=True):  # type: ignore
     A `run` is any transformation of a `dobject`.
 
     Args:
+        global_context: bool = False - Define a global run.
+        pipeline_name: Optional[str] = None
+        load_latest: bool = False - Load latest run for given notebook or pipeline.
         id: Optional[str] = None
         name: Optional[str] = None
-        global_context: bool = False
-        load_latest: bool = False
         pipeline: Optional[Pipeline] = None
         notebook: Optional[Notebook] = None
         inputs: List[DObject] = None
@@ -341,8 +342,6 @@ class Run(SQLModel, table=True):  # type: ignore
 
     - Jupyter notebooks (`notebook`)
     - Pipeline runs of software (workflows) and scripts (`run`).
-    - Physical instruments making measurements (needs to be configured).
-    - Human decisions based on data visualizations (needs to be configured).
 
     It typically has inputs and outputs:
 
@@ -400,6 +399,7 @@ class Run(SQLModel, table=True):  # type: ignore
         name: Optional[str] = None,
         global_context: bool = False,
         load_latest: bool = False,
+        pipeline_name: Optional[str] = None,
         external_id: Optional[str] = None,
         pipeline: Optional["Pipeline"] = None,
         notebook: Optional["Notebook"] = None,
@@ -413,6 +413,7 @@ class Run(SQLModel, table=True):  # type: ignore
         from lamindb import context
 
         if global_context:
+            context._track_notebook_pipeline(pipeline_name=pipeline_name, load_latest=load_latest)
             notebook = context.notebook
             pipeline = context.pipeline
 
@@ -454,6 +455,9 @@ class Run(SQLModel, table=True):  # type: ignore
             self._ln_identity_key = run.id  # simulate query result
 
         if global_context:
+            if run is None:
+                ln.add(run)
+                logger.info(f"Added run: {run.id}")  # type: ignore
             context.run = self
 
 
