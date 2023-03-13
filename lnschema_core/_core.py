@@ -328,14 +328,14 @@ class Run(SQLModel, table=True):  # type: ignore
     A `run` is any transformation of a `dobject`.
 
     Args:
-        id: Optional[str] = None,
-        name: Optional[str] = None,
-        global_context: bool = False,
-        load_latest: bool = False,
-        pipeline: Optional["Pipeline"] = None,
-        notebook: Optional["Notebook"] = None,
-        outputs: List[DObject] = [],
-        inputs: List[DObject] = [],
+        id: Optional[str] = None
+        name: Optional[str] = None
+        global_context: bool = False
+        load_latest: bool = False
+        pipeline: Optional[Pipeline] = None
+        notebook: Optional[Notebook] = None
+        inputs: List[DObject] = None
+        outputs: List[DObject] = None
 
     For instance:
 
@@ -368,7 +368,7 @@ class Run(SQLModel, table=True):  # type: ignore
         ),
         {"schema": schema_arg},
     )
-    id: str = Field(default_factory=idg.run, primary_key=True)
+    id: Optional[str] = Field(default_factory=idg.run, primary_key=True)
     """Base62 char ID & primary key, generated through :func:`~lamindb.schema.dev.id.run`."""  # noqa
     name: Optional[str] = Field(default=None, index=True)
     external_id: Optional[str] = Field(default=None, index=True)
@@ -397,28 +397,27 @@ class Run(SQLModel, table=True):  # type: ignore
         name: Optional[str] = None,
         global_context: bool = False,
         load_latest: bool = False,
+        external_id: Optional[str] = None,
         pipeline: Optional["Pipeline"] = None,
         notebook: Optional["Notebook"] = None,
         inputs: List[DObject] = None,
         outputs: List[DObject] = None,
     ):
+        kwargs = {k: v for k, v in locals().items() if v and k != "self"}
+
         import lamindb as ln
         import lamindb.schema as lns
         from lamindb import context
 
-        if inputs is None:
-            inputs = []
-        if outputs is None:
-            outputs = []
-
-        if pipeline is not None and not isinstance(pipeline, Pipeline):
-            raise TypeError(f"{pipeline} is no Pipeline")
-        if notebook is not None and not isinstance(notebook, Notebook):
-            raise TypeError(f"{notebook} is no Notebook")
-
         if global_context:
             notebook = context.notebook
             pipeline = context.pipeline
+
+        if notebook is None and pipeline is None:
+            if global_context:
+                raise RuntimeError("Please set notebook or pipeline global context.")
+            else:
+                raise RuntimeError("Please pass notebook or pipeline.")
 
         run = None
         if load_latest:
@@ -426,35 +425,24 @@ class Run(SQLModel, table=True):  # type: ignore
                 select_stmt = ln.select(lns.Run, notebook_id=notebook.id, notebook_v=notebook.v)
             elif pipeline is not None:
                 select_stmt = ln.select(lns.Run, pipeline_id=pipeline.id, pipeline_v=pipeline.v)
-            else:
-                if global_context:
-                    raise RuntimeError("Please set notebook or pipeline global context.")
-                else:
-                    raise RuntimeError("Please pass notebook or pipeline.")
             run = select_stmt.order_by(lns.Run.created_at.desc()).first()
-        if id is not None:
+            if run is not None:
+                logger.info(f"Loaded run: {run.id}")  # type: ignore
+            else:
+                logger.info("Did not find a latest run. Creating run.")
+        elif id is not None:
             run = ln.select(lns.Run, id=id).one_or_none()
             if run is None:
                 raise NotImplementedError("You can currently only pass existing IDs.")
-        if run is not None:
-            logger.info(f"Loaded run: {run.id}")  # type: ignore
-        else:
-            logger.info("Did not find a latest run.")
 
-        # create a new run if doesn't exist yet or is requested by the user
         if run is None:
-            # for some reason, super isn't smart enough to translate the relationship to id and v
             if notebook is not None:
-                super().__init__(name=name, notebook=notebook, notebook_id=notebook.id, notebook_v=notebook.v, inputs=inputs, outputs=outputs)
+                kwargs.update(dict(notebook_id=notebook.id, notebook_v=notebook.v))
             elif pipeline is not None:
-                super().__init__(name=name, pipeline=pipeline, pipeline_id=pipeline.id, pipeline_v=pipeline.v, inputs=inputs, outputs=outputs)
-            else:
-                if global_context:
-                    raise RuntimeError("Please set notebook or pipeline global context.")
-                else:
-                    raise RuntimeError("Please pass notebook or pipeline.")
+                kwargs.update(dict(pipeline_id=pipeline.id, pipeline_v=pipeline.v))
+            super().__init__(**kwargs)
         else:
-            self = run
+            super().__init__(**run.dict())
 
         if global_context:
             context.run = self
