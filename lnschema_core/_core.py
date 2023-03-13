@@ -403,9 +403,9 @@ class Run(SQLModel, table=True):  # type: ignore
         run = None
         if load_latest:
             if notebook is not None:
-                select_stmt = ln.select(self, notebook_id=notebook.id, notebook_v=notebook.v)
+                select_stmt = ln.select(lns.Run, notebook_id=notebook.id, notebook_v=notebook.v)
             elif pipeline is not None:
-                select_stmt = ln.select(self, pipeline_id=pipeline.id, pipeline_v=pipeline.v)
+                select_stmt = ln.select(lns.Run, pipeline_id=pipeline.id, pipeline_v=pipeline.v)
             else:
                 if global_context:
                     raise RuntimeError("Please set notebook or pipeline global context.")
