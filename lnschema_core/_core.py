@@ -399,8 +399,8 @@ class Run(SQLModel, table=True):  # type: ignore
         load_latest: bool = False,
         pipeline: Optional["Pipeline"] = None,
         notebook: Optional["Notebook"] = None,
-        outputs: List[DObject] = [],
         inputs: List[DObject] = [],
+        outputs: List[DObject] = [],
     ):
         import lamindb as ln
         import lamindb.schema as lns
@@ -430,9 +430,9 @@ class Run(SQLModel, table=True):  # type: ignore
         # create a new run if doesn't exist yet or is requested by the user
         if run is None:
             if notebook is not None:
-                super().__init__(notebook_id=notebook.id, notebook_v=notebook.v)
+                super().__init__(id=id, name=name, notebook=notebook, inputs=inputs, outputs=outputs)
             elif pipeline is not None:
-                super().__init__(pipeline_id=pipeline.id, pipeline_v=pipeline.v)
+                super().__init__(id=id, name=name, pipeline=pipeline, inputs=inputs, outputs=outputs)
             else:
                 if global_context:
                     raise RuntimeError("Please set notebook or pipeline global context.")
