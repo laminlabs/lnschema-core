@@ -399,12 +399,17 @@ class Run(SQLModel, table=True):  # type: ignore
         load_latest: bool = False,
         pipeline: Optional["Pipeline"] = None,
         notebook: Optional["Notebook"] = None,
-        inputs: List[DObject] = [],
-        outputs: List[DObject] = [],
+        inputs: List[DObject] = None,
+        outputs: List[DObject] = None,
     ):
         import lamindb as ln
         import lamindb.schema as lns
         from lamindb import context
+
+        if inputs is None:
+            inputs = []
+        if outputs is None:
+            outputs = []
 
         if global_context:
             notebook = context.notebook
