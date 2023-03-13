@@ -390,7 +390,8 @@ class Run(SQLModel, table=True):  # type: ignore
     created_at: datetime = CreatedAt
     """Time of creation."""
 
-    _has_identity: str = PrivateAttr()
+    _ln_identity_key: Optional[str] = PrivateAttr(default=None)
+    # simulate query result
 
     def __init__(  # type: ignore
         self,
@@ -443,10 +444,10 @@ class Run(SQLModel, table=True):  # type: ignore
             elif pipeline is not None:
                 kwargs.update(dict(pipeline_id=pipeline.id, pipeline_v=pipeline.v))
             super().__init__(**kwargs)
-            self._identity_key = None
+            self._ln_identity_key = None
         else:
             super().__init__(**run.dict())
-            self._identity_key = run.id  # needed within ln.add
+            self._ln_identity_key = run.id  # simulate query result
 
         if global_context:
             context.run = self
