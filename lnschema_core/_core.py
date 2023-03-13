@@ -435,9 +435,7 @@ class Run(SQLModel, table=True):  # type: ignore
                 select_stmt = ln.select(lns.Run, pipeline_id=pipeline.id, pipeline_v=pipeline.v)
             run = select_stmt.order_by(lns.Run.created_at.desc()).first()
             if run is not None:
-                logger.info(f"Loaded run: {run.id}")  # type: ignore
-            else:
-                logger.info("Did not find a latest run. Creating run.")
+                logger.info("Loaded run.")  # type: ignore
         elif id is not None:
             run = ln.select(lns.Run, id=id).one_or_none()
             if run is None:
@@ -456,8 +454,9 @@ class Run(SQLModel, table=True):  # type: ignore
 
         if global_context:
             if run is None:
-                ln.add(run)
-                logger.info(f"Added run: {run.id}")  # type: ignore
+                added_self = ln.add(self)
+                self._ln_identity_key = added_self.id
+                logger.info("Added run.")  # type: ignore
             context.run = self
 
 
