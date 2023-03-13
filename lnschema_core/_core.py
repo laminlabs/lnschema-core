@@ -421,6 +421,10 @@ class Run(SQLModel, table=True):  # type: ignore
                 raise RuntimeError("Please set notebook or pipeline global context.")
             else:
                 raise RuntimeError("Please pass notebook or pipeline.")
+        elif notebook is not None and not isinstance(notebook, Notebook):
+            raise TypeError("notebook needs to be of type Notebook")
+        elif pipeline is not None and not isinstance(pipeline, Pipeline):
+            raise TypeError("pipeline needs to be of type Pipeline")
 
         run = None
         if load_latest:
