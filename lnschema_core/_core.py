@@ -7,6 +7,7 @@ import pandas as pd
 import sqlalchemy as sa
 import sqlmodel
 from cloudpathlib import CloudPath
+from lamin_logger import logger
 from pydantic.fields import PrivateAttr
 from sqlmodel import Field, ForeignKeyConstraint, Relationship
 
@@ -378,6 +379,58 @@ class Run(SQLModel, table=True):  # type: ignore
     """Auto-populated link to :class:`~lamindb.schema.User`."""
     created_at: datetime = CreatedAt
     """Time of creation."""
+
+    def __init__(  # type: ignore
+        self,
+        *,
+        id: Optional[str] = None,
+        name: Optional[str] = None,
+        global_context: bool = False,
+        load_latest: bool = False,
+        pipeline: Optional["Pipeline"] = None,
+        notebook: Optional["Notebook"] = None,
+        outputs: List[DObject] = [],
+        inputs: List[DObject] = [],
+    ):
+        import lamindb as ln
+        import lamindb.schema as lns
+        from lamindb import context
+
+        if global_context:
+            notebook = context.notebook
+            pipeline = context.pipeline
+
+        run = None
+        if load_latest:
+            if notebook is not None:
+                select_stmt = ln.select(self, notebook_id=notebook.id, notebook_v=notebook.v)
+            elif pipeline is not None:
+                select_stmt = ln.select(self, pipeline_id=pipeline.id, pipeline_v=pipeline.v)
+            else:
+                if global_context:
+                    raise RuntimeError("Please set notebook or pipeline global context.")
+                else:
+                    raise RuntimeError("Please pass notebook or pipeline.")
+            run = select_stmt.order_by(lns.Run.created_at.desc()).first()
+            if run is not None:
+                logger.info(f"Loaded run: {run.id}")  # type: ignore
+            else:
+                logger.info("Did not find a latest run.")
+
+        # create a new run if doesn't exist yet or is requested by the user
+        if run is None:
+            if notebook is not None:
+                run = super().__init__(notebook_id=notebook.id, notebook_v=notebook.v)
+            elif pipeline is not None:
+                run = super().__init__(pipeline_id=pipeline.id, pipeline_v=pipeline.v)
+            else:
+                if global_context:
+                    raise RuntimeError("Please set notebook or pipeline global context.")
+                else:
+                    raise RuntimeError("Please pass notebook or pipeline.")
+
+        if global_context:
+            context.run = run
 
 
 class Notebook(SQLModel, table=True):  # type: ignore
