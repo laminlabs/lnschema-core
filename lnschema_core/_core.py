@@ -7,6 +7,7 @@ import pandas as pd
 import sqlalchemy as sa
 import sqlmodel
 from cloudpathlib import CloudPath
+from lamin_logger import logger
 from pydantic.fields import PrivateAttr
 from sqlmodel import Field, ForeignKeyConstraint, Relationship
 
@@ -324,14 +325,23 @@ DObject.__table__.append_constraint(sa.UniqueConstraint("storage_id", "_objectke
 class Run(SQLModel, table=True):  # type: ignore
     """Code runs that transform data.
 
-    A data transformation (`run`) is _any_ transformation of a `dobject`.
+    A `run` is any transformation of a `dobject`.
+
+    Args:
+        global_context: bool = False - Define a global run.
+        pipeline_name: Optional[str] = None
+        load_latest: bool = False - Load latest run for given notebook or pipeline.
+        id: Optional[str] = None
+        name: Optional[str] = None
+        pipeline: Optional[Pipeline] = None
+        notebook: Optional[Notebook] = None
+        inputs: List[DObject] = None
+        outputs: List[DObject] = None
 
     For instance:
 
     - Jupyter notebooks (`notebook`)
     - Pipeline runs of software (workflows) and scripts (`run`).
-    - Physical instruments making measurements (needs to be configured).
-    - Human decisions based on data visualizations (needs to be configured).
 
     It typically has inputs and outputs:
 
@@ -357,7 +367,7 @@ class Run(SQLModel, table=True):  # type: ignore
         ),
         {"schema": schema_arg},
     )
-    id: str = Field(default_factory=idg.run, primary_key=True)
+    id: Optional[str] = Field(default_factory=idg.run, primary_key=True)
     """Base62 char ID & primary key, generated through :func:`~lamindb.schema.dev.id.run`."""  # noqa
     name: Optional[str] = Field(default=None, index=True)
     external_id: Optional[str] = Field(default=None, index=True)
@@ -378,6 +388,76 @@ class Run(SQLModel, table=True):  # type: ignore
     """Auto-populated link to :class:`~lamindb.schema.User`."""
     created_at: datetime = CreatedAt
     """Time of creation."""
+
+    _ln_identity_key: Optional[str] = PrivateAttr(default=None)
+    # simulate query result
+
+    def __init__(  # type: ignore
+        self,
+        *,
+        id: Optional[str] = None,
+        name: Optional[str] = None,
+        global_context: bool = False,
+        load_latest: bool = False,
+        pipeline_name: Optional[str] = None,
+        external_id: Optional[str] = None,
+        pipeline: Optional["Pipeline"] = None,
+        notebook: Optional["Notebook"] = None,
+        inputs: List[DObject] = None,
+        outputs: List[DObject] = None,
+    ):
+        kwargs = {k: v for k, v in locals().items() if v and k != "self"}
+
+        import lamindb as ln
+        import lamindb.schema as lns
+        from lamindb import context
+
+        if global_context:
+            context._track_notebook_pipeline(pipeline_name=pipeline_name, load_latest=load_latest)
+            notebook = context.notebook
+            pipeline = context.pipeline
+
+        if notebook is None and pipeline is None:
+            if global_context:
+                raise RuntimeError("Please set notebook or pipeline global context.")
+            else:
+                raise RuntimeError("Please pass notebook or pipeline.")
+        elif notebook is not None and not isinstance(notebook, Notebook):
+            raise TypeError("notebook needs to be of type Notebook")
+        elif pipeline is not None and not isinstance(pipeline, Pipeline):
+            raise TypeError("pipeline needs to be of type Pipeline")
+
+        run = None
+        if load_latest:
+            if notebook is not None:
+                select_stmt = ln.select(lns.Run, notebook_id=notebook.id, notebook_v=notebook.v)
+            elif pipeline is not None:
+                select_stmt = ln.select(lns.Run, pipeline_id=pipeline.id, pipeline_v=pipeline.v)
+            run = select_stmt.order_by(lns.Run.created_at.desc()).first()
+            if run is not None:
+                logger.info("Loaded run.")  # type: ignore
+        elif id is not None:
+            run = ln.select(lns.Run, id=id).one_or_none()
+            if run is None:
+                raise NotImplementedError("You can currently only pass existing IDs.")
+
+        if run is None:
+            if notebook is not None:
+                kwargs.update(dict(notebook_id=notebook.id, notebook_v=notebook.v))
+            elif pipeline is not None:
+                kwargs.update(dict(pipeline_id=pipeline.id, pipeline_v=pipeline.v))
+            super().__init__(**kwargs)
+            self._ln_identity_key = None
+        else:
+            super().__init__(**run.dict())
+            self._ln_identity_key = run.id  # simulate query result
+
+        if global_context:
+            if run is None:
+                added_self = ln.add(self)
+                self._ln_identity_key = added_self.id
+                logger.info("Added run.")  # type: ignore
+            context.run = self
 
 
 class Notebook(SQLModel, table=True):  # type: ignore
