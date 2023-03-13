@@ -436,9 +436,9 @@ class Run(SQLModel, table=True):  # type: ignore
         if run is None:
             # for some reason, super isn't smart enough to translate the relationship to id and v
             if notebook is not None:
-                super().__init__(id=id, name=name, notebook=notebook, notebook_id=notebook.id, notebook_v=notebook.v, inputs=inputs, outputs=outputs)
+                super().__init__(name=name, notebook=notebook, notebook_id=notebook.id, notebook_v=notebook.v, inputs=inputs, outputs=outputs)
             elif pipeline is not None:
-                super().__init__(id=id, name=name, pipeline=pipeline, pipeline_id=pipeline.id, pipeline_v=pipeline.v, inputs=inputs, outputs=outputs)
+                super().__init__(name=name, pipeline=pipeline, pipeline_id=pipeline.id, pipeline_v=pipeline.v, inputs=inputs, outputs=outputs)
             else:
                 if global_context:
                     raise RuntimeError("Please set notebook or pipeline global context.")
