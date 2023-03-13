@@ -411,9 +411,9 @@ class Run(SQLModel, table=True):  # type: ignore
         if outputs is None:
             outputs = []
 
-        if not isinstance(pipeline, Pipeline):
+        if pipeline is not None and not isinstance(pipeline, Pipeline):
             raise TypeError(f"{pipeline} is no Pipeline")
-        if not isinstance(notebook, Notebook):
+        if notebook is not None and not isinstance(notebook, Notebook):
             raise TypeError(f"{notebook} is no Notebook")
 
         if global_context:
