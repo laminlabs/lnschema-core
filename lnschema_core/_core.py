@@ -470,7 +470,7 @@ class Run(SQLModel, table=True):  # type: ignore
             if run is None:
                 added_self = ln.add(self)
                 self._ln_identity_key = added_self.id
-                logger.info("Added run.")  # type: ignore
+                logger.info("Added run:")  # colon is on purpose!
             context.run = self
 
 
