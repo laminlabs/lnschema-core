@@ -3,8 +3,8 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-✨ Implement ln.Features | [134](https://github.com/laminlabs/lnschema-core/pull/134) | [sunnyosun](https://github.com/sunnyosun) | 2023-03-14 |
-:truck: Move track_run logic here | [133](https://github.com/laminlabs/lnschema-core/pull/133) | [falexwolf](https://github.com/falexwolf) | 2023-03-13 |
+✨ Implement ln.Features | [134](https://github.com/laminlabs/lnschema-core/pull/134) | [sunnyosun](https://github.com/sunnyosun) | 2023-03-14 | 0.29.3rc1
+🚚 Move track_run logic here | [133](https://github.com/laminlabs/lnschema-core/pull/133) | [falexwolf](https://github.com/falexwolf) | 2023-03-13 | 0.29.2
 🚚 Rename get_object to get | [132](https://github.com/laminlabs/lnschema-core/pull/132) | [sunnyosun](https://github.com/sunnyosun) | 2023-03-01 | 0.29.1
 📝 Fix docs references | [130](https://github.com/laminlabs/lnschema-core/pull/130) | [falexwolf](https://github.com/falexwolf) | 2023-02-24 | 0.29.0
 📝 Use lamin instead of lndb in guides | [129](https://github.com/laminlabs/lnschema-core/pull/129) | [falexwolf](https://github.com/falexwolf) | 2023-02-24 |
