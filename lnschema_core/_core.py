@@ -420,11 +420,11 @@ class Run(SQLModel, table=True):  # type: ignore
 
         if global_context is None:
             # am I being run from a notebook? if yes, global_context = True, else False
-            global_context = is_run_from_ipython and pipeline_name is None
+            global_context = is_run_from_ipython and pipeline_name is None and pipeline is None
 
         if load_latest is None:
             # am I being run from a notebook? if yes, load_latest = True, else False
-            load_latest = is_run_from_ipython and pipeline_name is None
+            load_latest = is_run_from_ipython and pipeline_name is None and pipeline is None
 
         if global_context:
             context._track_notebook_pipeline(pipeline_name=pipeline_name, load_latest=load_latest)
