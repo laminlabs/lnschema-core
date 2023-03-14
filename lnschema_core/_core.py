@@ -294,6 +294,8 @@ class DObject(SQLModel, table=True):  # type: ignore
         source_id: Optional[str] = None,
         storage_id: Optional[str] = None,
         targets: List["Run"] = [],
+        # backward compat
+        features_ref: Optional[Any] = None,
     ):
         if data is not None:
             from lamindb._record import get_dobject_kwargs_from_data
@@ -303,6 +305,7 @@ class DObject(SQLModel, table=True):  # type: ignore
                 name=name,
                 source=source,
                 format=format,
+                features_ref=features_ref,
             )
             if id is not None:
                 kwargs["id"] = id
@@ -532,7 +535,7 @@ class Features(SQLModel, table=True):  # type: ignore
     def __init__(
         self,
         data: Union[Path, str, pd.DataFrame, ad.AnnData] = None,
-        ref: Any = None,
+        reference: Any = None,
     ):
         """Initialize from data."""
         ...
@@ -550,7 +553,8 @@ class Features(SQLModel, table=True):  # type: ignore
     def __init__(  # type: ignore
         self,
         data: Union[Path, str, pd.DataFrame, ad.AnnData] = None,
-        ref: Any = None,
+        reference: Any = None,
+        *,
         id: str = None,
         type: Any = None,
         # continue with fields
@@ -562,7 +566,8 @@ class Features(SQLModel, table=True):  # type: ignore
     def __new__(
         cls,
         data: Union[Path, str, pd.DataFrame, ad.AnnData] = None,
-        ref: Any = None,
+        reference: Any = None,
+        *,
         id: str = None,
         type: Any = None,
         # continue with fields
@@ -573,7 +578,7 @@ class Features(SQLModel, table=True):  # type: ignore
 
             features = get_features_from_data(
                 data=data,
-                ref=ref,
+                reference=reference,
             )
         else:
             features = super().__new__(cls)
