@@ -449,7 +449,7 @@ class Run(SQLModel, table=True):  # type: ignore
                 select_stmt = ln.select(lns.Run, pipeline_id=pipeline.id, pipeline_v=pipeline.v)
             run = select_stmt.order_by(lns.Run.created_at.desc()).first()
             if run is not None:
-                logger.info("Loaded run.")  # type: ignore
+                logger.info("Loaded run:")  # colon is on purpose!
         elif id is not None:
             run = ln.select(lns.Run, id=id).one_or_none()
             if run is None:
