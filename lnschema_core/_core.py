@@ -201,7 +201,7 @@ class DObject(SQLModel, table=True):  # type: ignore
     # We need the fully module-qualified path below, as there might be more
     # schema modules with an ORM called "Run"
     source: "lnschema_core._core.Run" = Relationship(back_populates="outputs")  # type: ignore  # noqa
-    """Link to :class:`~lamindb.schema.Run` that generated the `dobject`."""
+    """Link to :class:`~lamindb.Run` that generated the `dobject`."""
     source_id: str = Field(foreign_key="core.run.id", index=True)
     """The source run id."""
     storage_id: str = Field(foreign_key="core.storage.id", index=True)
@@ -210,7 +210,7 @@ class DObject(SQLModel, table=True):  # type: ignore
         back_populates="dobjects",
         sa_relationship_kwargs=dict(secondary=DObjectFeatures.__table__),
     )
-    """Link to feature sets."""
+    """Link to feature sets :class:`~lamindb.Features`"""
     dfolders: List[DFolder] = Relationship(
         back_populates="dobjects",
         sa_relationship_kwargs=dict(secondary=DFolderDObject.__table__),
