@@ -50,6 +50,7 @@ def __repr__(self):
 
 sqm.SQLModel.__repr_args__ = __repr_args__
 sqm.SQLModel.__repr__ = __repr__
+sqm.SQLModel.__str__ = __repr__
 
 
 class SQLModelModule(sqm.SQLModel):
