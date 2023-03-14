@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-🚚 Rename ref to reference, added backward compat for features_ref | [135](https://github.com/laminlabs/lnschema-core/pull/135) | [sunnyosun](https://github.com/sunnyosun) | 2023-03-14 |
+🚚 Rename ref to reference, added backward compat for features_ref | [135](https://github.com/laminlabs/lnschema-core/pull/135) | [sunnyosun](https://github.com/sunnyosun) | 2023-03-14 | 0.29.3
 ✨ Implement ln.Features | [134](https://github.com/laminlabs/lnschema-core/pull/134) | [sunnyosun](https://github.com/sunnyosun) | 2023-03-14 | 0.29.3rc1
 🚚 Move track_run logic here | [133](https://github.com/laminlabs/lnschema-core/pull/133) | [falexwolf](https://github.com/falexwolf) | 2023-03-13 | 0.29.2
 🚚 Rename get_object to get | [132](https://github.com/laminlabs/lnschema-core/pull/132) | [sunnyosun](https://github.com/sunnyosun) | 2023-03-01 | 0.29.1
