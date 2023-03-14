@@ -313,9 +313,10 @@ class DObject(SQLModel, table=True):  # type: ignore
             self._local_filepath = privates["_local_filepath"]
             self._cloud_filepath = privates["_cloud_filepath"]
             self._memory_rep = privates["_memory_rep"]
+            # when features are passed with data
             if not isinstance(features, List):
                 features = [features]
-            self.features = features
+            self.features += features
 
 
 DObject._objectkey = sa.Column("_objectkey", sqlmodel.sql.sqltypes.AutoString(), index=True)
@@ -451,7 +452,7 @@ class Features(SQLModel, table=True):  # type: ignore
     def __init__(
         self,
         data: Union[Path, str, pd.DataFrame, ad.AnnData] = None,
-        type: Optional[str] = None,
+        ref: Any = None,
     ):
         """Initialize from data."""
         ...
@@ -483,7 +484,7 @@ class Features(SQLModel, table=True):  # type: ignore
         data: Union[Path, str, pd.DataFrame, ad.AnnData] = None,
         ref: Any = None,
         id: str = None,
-        type: str = None,
+        type: Any = None,
         # continue with fields
         dobjects: List["DObject"] = [],
     ):
@@ -495,7 +496,7 @@ class Features(SQLModel, table=True):  # type: ignore
                 ref=ref,
             )
         else:
-            features = super().__new__(cls, id=id, type=type)
+            features = super().__new__(cls)
         return features
 
 
