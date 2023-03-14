@@ -8,6 +8,7 @@ import sqlalchemy as sa
 import sqlmodel
 from cloudpathlib import CloudPath
 from lamin_logger import logger
+from nbproject._is_run_from_ipython import is_run_from_ipython
 from pydantic.fields import PrivateAttr
 from sqlmodel import Field, ForeignKeyConstraint, Relationship
 
@@ -333,9 +334,9 @@ class Run(SQLModel, table=True):  # type: ignore
     A `run` is any transformation of a `dobject`.
 
     Args:
-        global_context: bool = False - Define a global run.
+        global_context: bool = None - Define a global run. False when run in a non-notebooks, True when run from notebook.
         pipeline_name: Optional[str] = None
-        load_latest: bool = False - Load latest run for given notebook or pipeline.
+        load_latest: bool = None - Load latest run for given notebook or pipeline. False when run in a non-notebooks, True when run from notebook.
         id: Optional[str] = None
         name: Optional[str] = None
         pipeline: Optional[Pipeline] = None
@@ -402,8 +403,8 @@ class Run(SQLModel, table=True):  # type: ignore
         *,
         id: Optional[str] = None,
         name: Optional[str] = None,
-        global_context: bool = False,
-        load_latest: bool = False,
+        global_context: Optional[bool] = None,
+        load_latest: Optional[bool] = None,
         pipeline_name: Optional[str] = None,
         external_id: Optional[str] = None,
         pipeline: Optional["Pipeline"] = None,
@@ -416,6 +417,14 @@ class Run(SQLModel, table=True):  # type: ignore
         import lamindb as ln
         import lamindb.schema as lns
         from lamindb import context
+
+        if global_context is None:
+            # am I being run from a notebook? if yes, global_context = True, else False
+            global_context = is_run_from_ipython and pipeline_name is None
+
+        if load_latest is None:
+            # am I being run from a notebook? if yes, load_latest = True, else False
+            load_latest = is_run_from_ipython and pipeline_name is None
 
         if global_context:
             context._track_notebook_pipeline(pipeline_name=pipeline_name, load_latest=load_latest)
