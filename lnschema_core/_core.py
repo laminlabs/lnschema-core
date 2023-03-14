@@ -532,7 +532,7 @@ class Features(SQLModel, table=True):  # type: ignore
     def __init__(
         self,
         data: Union[Path, str, pd.DataFrame, ad.AnnData] = None,
-        ref: Any = None,
+        reference: Any = None,
     ):
         """Initialize from data."""
         ...
@@ -550,7 +550,8 @@ class Features(SQLModel, table=True):  # type: ignore
     def __init__(  # type: ignore
         self,
         data: Union[Path, str, pd.DataFrame, ad.AnnData] = None,
-        ref: Any = None,
+        reference: Any = None,
+        *,
         id: str = None,
         type: Any = None,
         # continue with fields
@@ -562,7 +563,8 @@ class Features(SQLModel, table=True):  # type: ignore
     def __new__(
         cls,
         data: Union[Path, str, pd.DataFrame, ad.AnnData] = None,
-        ref: Any = None,
+        reference: Any = None,
+        *,
         id: str = None,
         type: Any = None,
         # continue with fields
@@ -573,7 +575,7 @@ class Features(SQLModel, table=True):  # type: ignore
 
             features = get_features_from_data(
                 data=data,
-                ref=ref,
+                reference=reference,
             )
         else:
             features = super().__new__(cls)
