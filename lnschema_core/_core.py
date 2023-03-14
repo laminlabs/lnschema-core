@@ -254,7 +254,7 @@ class DObject(SQLModel, table=True):  # type: ignore
         data: Union[Path, str, pd.DataFrame, ad.AnnData] = None,
         *,
         name: Optional[str] = None,
-        features: List["Features"] = [],
+        features: List["Features"] = None,
         source: Optional["Run"] = None,
         id: Optional[str] = None,
         format: Optional[str] = None,
@@ -273,8 +273,8 @@ class DObject(SQLModel, table=True):  # type: ignore
         hash: Optional[str] = None,
         source_id: Optional[str] = None,
         storage_id: Optional[str] = None,
-        features: List["Features"] = [],
-        targets: List["Run"] = [],
+        features: List["Features"] = None,
+        targets: List["Run"] = None,
     ):
         """Initialize from fields."""
         ...
@@ -283,7 +283,7 @@ class DObject(SQLModel, table=True):  # type: ignore
         self,
         data: Union[Path, str, pd.DataFrame, ad.AnnData] = None,
         *,
-        features: List["Features"] = [],
+        features: List["Features"] = None,
         source: Optional["Run"] = None,
         format: Optional[str] = None,
         # continue with fields
@@ -294,7 +294,7 @@ class DObject(SQLModel, table=True):  # type: ignore
         hash: Optional[str] = None,
         source_id: Optional[str] = None,
         storage_id: Optional[str] = None,
-        targets: List["Run"] = [],
+        targets: List["Run"] = None,
         # backward compat
         features_ref: Optional[Any] = None,
     ):
@@ -318,8 +318,10 @@ class DObject(SQLModel, table=True):  # type: ignore
             self._local_filepath = privates["_local_filepath"]
             self._cloud_filepath = privates["_cloud_filepath"]
             self._memory_rep = privates["_memory_rep"]
+            if features is None:
+                features = []
             # when features are passed with data
-            if not isinstance(features, List):
+            elif not isinstance(features, List):
                 features = [features]
             self.features += features
 
