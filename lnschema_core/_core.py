@@ -139,7 +139,7 @@ class DFolder(SQLModel, table=True):  # type: ignore
         # continue with fields
         id: Optional[str] = None,
         name: Optional[str] = None,
-        dobjects: List["DObject"] = [],
+        x: List["DObject"] = [],
     ):
         if folder is not None:
             from lamindb._folder import get_dfolder_kwargs_from_data
@@ -253,7 +253,7 @@ class DObject(SQLModel, table=True):  # type: ignore
         data: Union[Path, str, pd.DataFrame, ad.AnnData] = None,
         *,
         name: Optional[str] = None,
-        features_ref: Any = None,
+        features: List["Features"] = [],
         source: Optional["Run"] = None,
         id: Optional[str] = None,
         format: Optional[str] = None,
@@ -282,7 +282,7 @@ class DObject(SQLModel, table=True):  # type: ignore
         self,
         data: Union[Path, str, pd.DataFrame, ad.AnnData] = None,
         *,
-        features_ref: Any = None,
+        features: List["Features"] = [],
         source: Optional["Run"] = None,
         format: Optional[str] = None,
         # continue with fields
@@ -293,7 +293,6 @@ class DObject(SQLModel, table=True):  # type: ignore
         hash: Optional[str] = None,
         source_id: Optional[str] = None,
         storage_id: Optional[str] = None,
-        features: List["Features"] = [],
         targets: List["Run"] = [],
     ):
         if data is not None:
@@ -302,7 +301,6 @@ class DObject(SQLModel, table=True):  # type: ignore
             kwargs, privates = get_dobject_kwargs_from_data(
                 data=data,
                 name=name,
-                features_ref=features_ref,
                 source=source,
                 format=format,
             )
@@ -316,6 +314,10 @@ class DObject(SQLModel, table=True):  # type: ignore
             self._local_filepath = privates["_local_filepath"]
             self._cloud_filepath = privates["_cloud_filepath"]
             self._memory_rep = privates["_memory_rep"]
+            # when features are passed with data
+            if not isinstance(features, List):
+                features = [features]
+            self.features += features
 
 
 DObject._objectkey = sa.Column("_objectkey", sqlmodel.sql.sqltypes.AutoString(), index=True)
@@ -525,6 +527,57 @@ class Features(SQLModel, table=True):  # type: ignore
         back_populates="features",
         sa_relationship_kwargs=dict(secondary=DObjectFeatures.__table__),
     )
+
+    @overload
+    def __init__(
+        self,
+        data: Union[Path, str, pd.DataFrame, ad.AnnData] = None,
+        ref: Any = None,
+    ):
+        """Initialize from data."""
+        ...
+
+    @overload
+    def __init__(
+        self,
+        id: Optional[str] = None,
+        type: Optional[str] = None,
+        dobjects: List["DObject"] = [],
+    ):
+        """Initialize from fields."""
+        ...
+
+    def __init__(  # type: ignore
+        self,
+        data: Union[Path, str, pd.DataFrame, ad.AnnData] = None,
+        ref: Any = None,
+        id: str = None,
+        type: Any = None,
+        # continue with fields
+        dobjects: List["DObject"] = [],
+    ):
+        kwargs = {k: v for k, v in locals().items() if v and k != "self"}
+        super().__init__(**kwargs)
+
+    def __new__(
+        cls,
+        data: Union[Path, str, pd.DataFrame, ad.AnnData] = None,
+        ref: Any = None,
+        id: str = None,
+        type: Any = None,
+        # continue with fields
+        dobjects: List["DObject"] = [],
+    ):
+        if data is not None:
+            from lamindb._record import get_features_from_data
+
+            features = get_features_from_data(
+                data=data,
+                ref=ref,
+            )
+        else:
+            features = super().__new__(cls)
+        return features
 
 
 class Usage(SQLModel, table=True):  # type: ignore
