@@ -32,9 +32,10 @@ dev = [
 test = [
     "pytest>=6.0",
     "pytest-cov",
-    "lamindb>=0.33.0",
+    "lamindb>=0.33.1rc1",
     "lndb>=0.32.3",
     "pytest_alembic",
+    "typeguard<3.0.0",
 ]
 
 [tool.black]
