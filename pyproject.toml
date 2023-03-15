@@ -18,7 +18,7 @@ dependencies = [
     "sqlmodel",
     "pydantic<2.0.0",
     "anndata",
-    "typeguard"
+    "typeguard<3.0.0",
 ]
 
 [project.urls]
