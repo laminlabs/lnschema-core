@@ -18,7 +18,7 @@ dependencies = [
     "sqlmodel",
     "pydantic<2.0.0",
     "anndata",
-    "typeguard"
+    "typeguard<3.0.0"
 ]
 
 [project.urls]
@@ -32,7 +32,7 @@ dev = [
 test = [
     "pytest>=6.0",
     "pytest-cov",
-    "lamindb>=0.33.1",
+    "lamindb>=0.33.2",
     "lndb>=0.32.3",
     "pytest_alembic",
 ]
