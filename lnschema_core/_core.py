@@ -298,6 +298,8 @@ class DObject(SQLModel, table=True):  # type: ignore
         # backward compat
         features_ref: Optional[Any] = None,
     ):
+        if features is None:
+            features = []
         if data is not None:
             from lamindb._record import get_dobject_kwargs_from_data
 
@@ -318,10 +320,8 @@ class DObject(SQLModel, table=True):  # type: ignore
             self._local_filepath = privates["_local_filepath"]
             self._cloud_filepath = privates["_cloud_filepath"]
             self._memory_rep = privates["_memory_rep"]
-            if features is None:
-                features = []
             # when features are passed with data
-            elif not isinstance(features, List):
+            if not isinstance(features, List):
                 features = [features]
             self.features += features
 
