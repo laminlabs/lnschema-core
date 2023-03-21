@@ -21,7 +21,6 @@ Entities:
    DFolder
    User
    Storage
-   Usage
    Project
    Features
 
@@ -48,6 +47,5 @@ from ._core import (
     Project,
     Run,
     Storage,
-    Usage,
     User,
 )
