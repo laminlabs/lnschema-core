@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-🔥 Remove Usage ORM | [143](https://github.com/laminlabs/lnschema-core/pull/143) | [falexwolf](https://github.com/falexwolf) | 2023-03-22 |
+🔥 Remove Usage ORM | [143](https://github.com/laminlabs/lnschema-core/pull/143) | [falexwolf](https://github.com/falexwolf) | 2023-03-22 | 0.30rc1
 ⬆️ typeguard<3.0.0 and update lamindb | [141](https://github.com/laminlabs/lnschema-core/pull/141) | [sunnyosun](https://github.com/sunnyosun) | 2023-03-15 | 0.29.7
 🚑 Fix __name__ of reltype | [137](https://github.com/laminlabs/lnschema-core/pull/137) | [falexwolf](https://github.com/falexwolf) | 2023-03-14 | 0.29.6
 📝 Fix docs reference | [commit](https://github.com/laminlabs/lnschema-core/commit/e5b7d5d0bc7180e7c145f5ad7eac75db5928fde5) | [falexwolf](https://github.com/falexwolf) | 2023-03-14 | 0.29.5
