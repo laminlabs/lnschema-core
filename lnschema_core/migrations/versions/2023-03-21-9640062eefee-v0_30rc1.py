@@ -17,7 +17,7 @@ def upgrade() -> None:
         prefix, schema, delim = "", "core", "_"
 
     with op.batch_alter_table(f"{prefix}usage", schema=schema) as batch_op:
-        batch_op.drop_index("ix_core_usage_dobject_id")
+        batch_op.drop_index(f"ix_core{delim}usage_dobject_id")
         batch_op.drop_index(f"ix_core{delim}usage_time")
         batch_op.drop_index(f"ix_core{delim}usage_type")
         batch_op.drop_index(f"ix_core{delim}usage_user_id")
