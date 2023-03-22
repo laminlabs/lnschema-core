@@ -21,7 +21,6 @@ Entities:
    DFolder
    User
    Storage
-   Usage
    Project
    Features
 
@@ -35,7 +34,7 @@ Development tools:
 """
 _schema_id = "yvzi"
 _name = "core"
-_migration = "873683a29806"
+_migration = "9640062eefee"
 __version__ = "0.29.7"
 
 from . import dev, link
@@ -48,6 +47,5 @@ from ._core import (
     Project,
     Run,
     Storage,
-    Usage,
     User,
 )
