@@ -4,6 +4,7 @@ import sqlmodel as sqm  # noqa
 from alembic import op
 
 from lnschema_core.dev.sqlmodel import get_sqlite_prefix_schema_delim_from_alembic
+from lnschema_core.dev.type import TransformType
 
 revision = "ebafd37fd6e1"
 down_revision = "9640062eefee"
@@ -20,6 +21,8 @@ set notebook_id = pipeline_id, notebook_v = pipeline_v
 where notebook_id is null
 """
 
+SATransformType = sa.Enum(TransformType)
+
 
 def upgrade() -> None:
     sqlite, prefix, schema, delim = get_sqlite_prefix_schema_delim_from_alembic()
@@ -31,7 +34,8 @@ def upgrade() -> None:
         core_notebook, core_pipeline, core_run = f"'{core_notebook}'", f"'{core_pipeline}'", f"'{core_run}'"
 
     # add the type column to the existing notebook table
-    op.add_column(f"{prefix}notebook", sa.Column("type", sa.Enum("pipeline", "notebook", name="transformtype"), nullable=False), schema=schema)
+    SATransformType.create(op.get_bind(), checkfirst=True)
+    op.add_column(f"{prefix}notebook", sa.Column("type", SATransformType, nullable=False), schema=schema)
 
     op.execute(f"update {core_notebook} set type = 'notebook'")
     op.execute(copy_pipeline_to_notebook.format(core_notebook=core_notebook, core_pipeline=core_pipeline))
@@ -59,9 +63,9 @@ def upgrade() -> None:
         batch_op.drop_column(table_name=f"{prefix}run", column_name="pipeline_id")
         batch_op.drop_column(table_name=f"{prefix}run", column_name="pipeline_v")
 
-    op.create_foreign_key(
-        op.f("fk_run_transform_id_transform"), f"{prefix}run", f"{prefix}transform", ["transform_id", "transform_v"], ["id", "v"], source_schema=schema, referent_schema=schema
-    )
+        batch_op.create_foreign_key(
+            op.f("fk_run_transform_id_transform"), f"{prefix}transform", ["transform_id", "transform_v"], ["id", "v"], source_schema=schema, referent_schema=schema
+        )
 
     op.drop_table(table_name=f"{prefix}pipeline", schema=schema)
     op.rename_table(old_table_name=f"{prefix}notebook", new_table_name=f"{prefix}transform", schema=schema)
