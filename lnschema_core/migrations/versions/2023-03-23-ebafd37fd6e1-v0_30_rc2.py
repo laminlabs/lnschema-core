@@ -70,17 +70,17 @@ def upgrade() -> None:
         batch_op.create_foreign_key(op.f("fk_run_transform_id_transform"), f"{prefix}transform", ["transform_id", "transform_v"], ["id", "v"], referent_schema=schema)
 
     with op.batch_alter_table(f"{prefix}transform", schema=schema) as batch_op:
-        op.drop_index("ix_core_notebook_created_at")
-        op.drop_index("ix_core_notebook_created_by")
-        op.drop_index("ix_core_notebook_name")
-        op.drop_index("ix_core_notebook_title")
-        op.drop_index("ix_core_notebook_updated_at")
-        op.create_index(op.f("ix_core_transform_created_at"), ["created_at"], unique=False)
-        op.create_index(op.f("ix_core_transform_created_by"), ["created_by"], unique=False)
-        op.create_index(op.f("ix_core_transform_name"), ["name"], unique=False)
-        op.create_index(op.f("ix_core_transform_title"), ["title"], unique=False)
-        op.create_index(op.f("ix_core_transform_type"), ["type"], unique=False)
-        op.create_index(op.f("ix_core_transform_updated_at"), ["updated_at"], unique=False)
+        batch_op.drop_index("ix_core_notebook_created_at")
+        batch_op.drop_index("ix_core_notebook_created_by")
+        batch_op.drop_index("ix_core_notebook_name")
+        batch_op.drop_index("ix_core_notebook_title")
+        batch_op.drop_index("ix_core_notebook_updated_at")
+        batch_op.create_index(op.f("ix_core_transform_created_at"), ["created_at"], unique=False)
+        batch_op.create_index(op.f("ix_core_transform_created_by"), ["created_by"], unique=False)
+        batch_op.create_index(op.f("ix_core_transform_name"), ["name"], unique=False)
+        batch_op.create_index(op.f("ix_core_transform_title"), ["title"], unique=False)
+        batch_op.create_index(op.f("ix_core_transform_type"), ["type"], unique=False)
+        batch_op.create_index(op.f("ix_core_transform_updated_at"), ["updated_at"], unique=False)
 
 
 def downgrade() -> None:
