@@ -87,12 +87,12 @@ def upgrade() -> None:
         batch_op.drop_index(f"ix_core{delim}notebook_name")
         batch_op.drop_index(f"ix_core{delim}notebook_title")
         batch_op.drop_index(f"ix_core{delim}notebook_updated_at")
-        batch_op.create_index(op.f("ix_core{delim}transform_created_at"), ["created_at"], unique=False)
-        batch_op.create_index(op.f("ix_core{delim}transform_created_by"), ["created_by"], unique=False)
-        batch_op.create_index(op.f("ix_core{delim}transform_name"), ["name"], unique=False)
-        batch_op.create_index(op.f("ix_core{delim}transform_title"), ["title"], unique=False)
-        batch_op.create_index(op.f("ix_core{delim}transform_type"), ["type"], unique=False)
-        batch_op.create_index(op.f("ix_core{delim}transform_updated_at"), ["updated_at"], unique=False)
+        batch_op.create_index(op.f(f"ix_core{delim}transform_created_at"), ["created_at"], unique=False)
+        batch_op.create_index(op.f(f"ix_core{delim}transform_created_by"), ["created_by"], unique=False)
+        batch_op.create_index(op.f(f"ix_core{delim}transform_name"), ["name"], unique=False)
+        batch_op.create_index(op.f(f"ix_core{delim}transform_title"), ["title"], unique=False)
+        batch_op.create_index(op.f(f"ix_core{delim}transform_type"), ["type"], unique=False)
+        batch_op.create_index(op.f(f"ix_core{delim}transform_updated_at"), ["updated_at"], unique=False)
         batch_op.alter_column("type", nullable=False)
 
 
