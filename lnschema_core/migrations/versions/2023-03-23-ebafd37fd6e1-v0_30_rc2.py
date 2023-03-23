@@ -2,6 +2,7 @@
 import sqlalchemy as sa  # noqa
 import sqlmodel as sqm  # noqa
 from alembic import op
+from sqlalchemy.engine.reflection import Inspector
 
 from lnschema_core.dev.sqlmodel import get_sqlite_prefix_schema_delim_from_alembic
 from lnschema_core.dev.type import TransformType
@@ -26,6 +27,9 @@ SATransformType = sa.Enum(TransformType)
 
 def upgrade() -> None:
     sqlite, prefix, schema, delim = get_sqlite_prefix_schema_delim_from_alembic()
+
+    engine = op.get_bind().engine
+    inspector = Inspector.from_engine(engine)
 
     core_notebook = "core.notebook"
     core_pipeline = "core.pipeline"
@@ -54,8 +58,11 @@ def upgrade() -> None:
     op.drop_index(f"ix_core{delim}run_notebook_v", table_name=f"{prefix}run", schema=schema)
 
     with op.batch_alter_table(f"{prefix}run", schema=schema) as batch_op:
-        batch_op.drop_constraint("fk_run_notebook_id_notebook", type_="foreignkey")
-        batch_op.drop_constraint("fk_run_pipeline_id_pipeline", type_="foreignkey")
+        for constraint in inspector.get_fk_constraint(f"{prefix}run", schema=schema):
+            if constraint["name"] == "fk_run_notebook_id_notebook":
+                batch_op.drop_constraint("fk_run_notebook_id_notebook", type_="foreignkey")
+            if constraint["name"] == "fk_run_pipeline_id_pipeline":
+                batch_op.drop_constraint("fk_run_pipeline_id_pipeline", type_="foreignkey")
 
         batch_op.drop_column(column_name="pipeline_id")
         batch_op.drop_column(column_name="pipeline_v")
