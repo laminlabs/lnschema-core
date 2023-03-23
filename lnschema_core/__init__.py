@@ -34,7 +34,7 @@ Development tools:
 _schema_id = "yvzi"
 _name = "core"
 _migration = "ebafd37fd6e1"
-__version__ = "0.30rc1"
+__version__ = "0.30rc2"
 
 from . import dev, link
 from ._core import DFolder, DObject, Features, Project, Run, Storage, Transform, User
