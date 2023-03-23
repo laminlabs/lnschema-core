@@ -449,10 +449,10 @@ class Run(SQLModel, table=True):  # type: ignore
         global_context = False
         if transform is None:
             if ln.context.transform is not None:
-                logger.info(f"Using ln.context.transform: {ln.context.transform}")
                 global_context = True
+                transform = ln.context.transform
             else:
-                raise ValueError("Either pass `transform` or set `ln.context.transform`.")
+                raise ValueError("Either call `ln.Run(transform=transform)` or set `ln.context.transform`.")
 
         if not isinstance(transform, Transform):
             raise TypeError("transform needs to be of type Transform")
