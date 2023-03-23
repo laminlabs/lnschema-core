@@ -59,7 +59,6 @@ def upgrade() -> None:
 
     with op.batch_alter_table(f"{prefix}run", schema=schema) as batch_op:
         for constraint in inspector.get_foreign_keys(f"{prefix}run", schema=schema):
-            print(constraint)
             if constraint["name"] == "fk_run_notebook_id_notebook":
                 batch_op.drop_constraint("fk_run_notebook_id_notebook", type_="foreignkey")
             if constraint["name"] == "fk_run_pipeline_id_pipeline":
@@ -75,23 +74,25 @@ def upgrade() -> None:
         batch_op.alter_column(column_name="notebook_id", new_column_name="transform_id")
         batch_op.alter_column(column_name="notebook_v", new_column_name="transform_v")
 
+    # need another batch_op as the rename is not yet complete up there
+    with op.batch_alter_table(f"{prefix}run", schema=schema) as batch_op:
         batch_op.create_index(op.f("ix_core_run_transform_id"), ["transform_id"], unique=False)
         batch_op.create_index(op.f("ix_core_run_transform_v"), ["transform_v"], unique=False)
 
         batch_op.create_foreign_key(op.f("fk_run_transform_id_transform"), f"{prefix}transform", ["transform_id", "transform_v"], ["id", "v"], referent_schema=schema)
 
     with op.batch_alter_table(f"{prefix}transform", schema=schema) as batch_op:
-        batch_op.drop_index("ix_core_notebook_created_at")
-        batch_op.drop_index("ix_core_notebook_created_by")
-        batch_op.drop_index("ix_core_notebook_name")
-        batch_op.drop_index("ix_core_notebook_title")
-        batch_op.drop_index("ix_core_notebook_updated_at")
-        batch_op.create_index(op.f("ix_core_transform_created_at"), ["created_at"], unique=False)
-        batch_op.create_index(op.f("ix_core_transform_created_by"), ["created_by"], unique=False)
-        batch_op.create_index(op.f("ix_core_transform_name"), ["name"], unique=False)
-        batch_op.create_index(op.f("ix_core_transform_title"), ["title"], unique=False)
-        batch_op.create_index(op.f("ix_core_transform_type"), ["type"], unique=False)
-        batch_op.create_index(op.f("ix_core_transform_updated_at"), ["updated_at"], unique=False)
+        batch_op.drop_index(f"ix_core{delim}notebook_created_at")
+        batch_op.drop_index(f"ix_core{delim}notebook_created_by")
+        batch_op.drop_index(f"ix_core{delim}notebook_name")
+        batch_op.drop_index(f"ix_core{delim}notebook_title")
+        batch_op.drop_index(f"ix_core{delim}notebook_updated_at")
+        batch_op.create_index(op.f("ix_core{delim}transform_created_at"), ["created_at"], unique=False)
+        batch_op.create_index(op.f("ix_core{delim}transform_created_by"), ["created_by"], unique=False)
+        batch_op.create_index(op.f("ix_core{delim}transform_name"), ["name"], unique=False)
+        batch_op.create_index(op.f("ix_core{delim}transform_title"), ["title"], unique=False)
+        batch_op.create_index(op.f("ix_core{delim}transform_type"), ["type"], unique=False)
+        batch_op.create_index(op.f("ix_core{delim}transform_updated_at"), ["updated_at"], unique=False)
         batch_op.alter_column("type", nullable=False)
 
 
