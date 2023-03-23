@@ -11,3 +11,8 @@ class usage(str, Enum):
     delete = "delete"
     load = "load"
     link = "link"
+
+
+class TransformType(Enum):
+    pipeline = "pipeline"
+    notebook = "notebook"

@@ -338,7 +338,6 @@ class Run(SQLModel, table=True):  # type: ignore
         load_latest: bool = None - Load latest run for given notebook or pipeline. False when run in a non-notebooks, True when run from notebook.
         id: Optional[str] = None
         name: Optional[str] = None
-        pipeline: Optional[Pipeline] = None
         notebook: Optional[Notebook] = None
         inputs: List[DObject] = None
         outputs: List[DObject] = None
@@ -363,10 +362,6 @@ class Run(SQLModel, table=True):  # type: ignore
 
     __table_args__ = (
         ForeignKeyConstraint(
-            ["pipeline_id", "pipeline_v"],
-            ["core.pipeline.id", "core.pipeline.v"],
-        ),
-        ForeignKeyConstraint(
             ["notebook_id", "notebook_v"],
             ["core.notebook.id", "core.notebook.v"],
         ),
@@ -376,11 +371,6 @@ class Run(SQLModel, table=True):  # type: ignore
     """Base62 char ID & primary key, generated through :func:`~lamindb.schema.dev.id.run`."""  # noqa
     name: Optional[str] = Field(default=None, index=True)
     external_id: Optional[str] = Field(default=None, index=True)
-    """ID to reference external tools, e.g., a redun execution ID."""
-    pipeline_id: Optional[str] = Field(default=None, index=True)
-    pipeline_v: Optional[str] = Field(default=None, index=True)
-    pipeline: Optional["lnschema_core._core.Pipeline"] = Relationship()  # type: ignore # noqa
-    """Link to :class:`~lamindb.schema.Pipeline`."""
     notebook_id: Optional[str] = Field(default=None, index=True)
     notebook_v: Optional[str] = Field(default=None, index=True)
     notebook: Optional["Notebook"] = Relationship()
@@ -406,7 +396,6 @@ class Run(SQLModel, table=True):  # type: ignore
         load_latest: Optional[bool] = None,
         pipeline_name: Optional[str] = None,
         external_id: Optional[str] = None,
-        pipeline: Optional["Pipeline"] = None,
         notebook: Optional["Notebook"] = None,
         inputs: List[DObject] = None,
         outputs: List[DObject] = None,
@@ -419,26 +408,24 @@ class Run(SQLModel, table=True):  # type: ignore
 
         if global_context is None:
             # am I being run from a notebook? if yes, global_context = True, else False
-            global_context = is_run_from_ipython and pipeline_name is None and pipeline is None
+            global_context = is_run_from_ipython and pipeline_name is None
 
         if load_latest is None:
             # am I being run from a notebook? if yes, load_latest = True, else False
-            load_latest = is_run_from_ipython and pipeline_name is None and pipeline is None
+            load_latest = is_run_from_ipython and pipeline_name is None
 
         if global_context:
             context._track_notebook_pipeline(pipeline_name=pipeline_name, load_latest=load_latest)
             notebook = context.notebook
             pipeline = context.pipeline
 
-        if notebook is None and pipeline is None:
+        if notebook is None:
             if global_context:
                 raise RuntimeError("Please set notebook or pipeline global context.")
             else:
                 raise RuntimeError("Please pass notebook or pipeline.")
         elif notebook is not None and not isinstance(notebook, Notebook):
             raise TypeError("notebook needs to be of type Notebook")
-        elif pipeline is not None and not isinstance(pipeline, Pipeline):
-            raise TypeError("pipeline needs to be of type Pipeline")
 
         run = None
         if load_latest:
@@ -480,6 +467,13 @@ class Notebook(SQLModel, table=True):  # type: ignore
     (`run`) and have a unique correspondence in `run`.
 
     IDs for Jupyter notebooks are generated through nbproject.
+
+    Pipelines.
+
+    A pipeline is typically versioned software that can perform a data
+    transformation/processing workflow. This can be anything from typical
+    workflow tools (Nextflow, Snakemake, Prefect, Apache Airflow, etc.) to
+    simple (versioned) scripts.
     """
 
     id: str = Field(default=None, primary_key=True)
@@ -505,26 +499,6 @@ class Notebook(SQLModel, table=True):  # type: ignore
     """Time of creation."""
     updated_at: Optional[datetime] = UpdatedAt
     """Time of last update."""
-
-
-class Pipeline(SQLModel, table=True):  # type: ignore
-    """Pipelines.
-
-    A pipeline is typically versioned software that can perform a data
-    transformation/processing workflow. This can be anything from typical
-    workflow tools (Nextflow, Snakemake, Prefect, Apache Airflow, etc.) to
-    simple (versioned) scripts.
-    """
-
-    id: str = Field(default_factory=idg.pipeline, primary_key=True)
-    v: str = Field(default="1", primary_key=True)
-    name: Optional[str] = Field(default=None, index=True)
-    reference: Optional[str] = Field(default=None, index=True)
-    created_by: str = CreatedBy
-    """Auto-populated link to :class:`~lamindb.schema.User`."""
-    created_at: datetime = CreatedAt
-    """Auto-populated time stamp."""
-    updated_at: Optional[datetime] = UpdatedAt
 
 
 class Features(SQLModel, table=True):  # type: ignore

@@ -17,7 +17,6 @@ Entities:
    DObject
    Run
    Notebook
-   Pipeline
    DFolder
    User
    Storage
@@ -38,14 +37,4 @@ _migration = "9640062eefee"
 __version__ = "0.30rc1"
 
 from . import dev, link
-from ._core import (
-    DFolder,
-    DObject,
-    Features,
-    Notebook,
-    Pipeline,
-    Project,
-    Run,
-    Storage,
-    User,
-)
+from ._core import DFolder, DObject, Features, Notebook, Project, Run, Storage, User
