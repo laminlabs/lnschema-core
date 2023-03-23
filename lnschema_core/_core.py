@@ -376,20 +376,15 @@ class Transform(SQLModel, table=True):  # type: ignore
 class Run(SQLModel, table=True):  # type: ignore
     """Runs of data transforms.
 
-    A `run` is any transformation of a `dobject`.
+    A `run` is any transform of a `dobject`.
 
     Args:
-        load_latest: bool = None - Load latest run for given notebook or pipeline. False when run in a non-notebooks, True when run from notebook.
         id: Optional[str] = None
         name: Optional[str] = None
+        load_latest: bool = False - Load latest run for given notebook or pipeline.
         transform: Optional[Transform] = None
         inputs: List[DObject] = None
         outputs: List[DObject] = None
-
-    For instance:
-
-    - Jupyter notebooks (`notebook`)
-    - Pipeline runs of software (workflows) and scripts (`run`).
 
     It typically has inputs and outputs:
 
