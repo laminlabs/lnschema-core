@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🎨 Simplify `Run` | [145](https://github.com/laminlabs/lnschema-core/pull/145) | [falexwolf](https://github.com/falexwolf) | 2023-03-23 |
 🏗️ Combine `Notebook` and `Pipeline` into `Transform` | [144](https://github.com/laminlabs/lnschema-core/pull/144) | [falexwolf](https://github.com/falexwolf) | 2023-03-23 | 0.30rc2
 🔥 Remove Usage ORM | [143](https://github.com/laminlabs/lnschema-core/pull/143) | [falexwolf](https://github.com/falexwolf) | 2023-03-22 | 0.30rc1
 ⬆️ typeguard<3.0.0 and update lamindb | [141](https://github.com/laminlabs/lnschema-core/pull/141) | [sunnyosun](https://github.com/sunnyosun) | 2023-03-15 | 0.29.7
