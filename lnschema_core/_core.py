@@ -359,7 +359,7 @@ class Transform(SQLModel, table=True):  # type: ignore
     name: str = Field(index=True)
     """File name of the transform.
     """
-    type: TransformType = Field(index=True)
+    type: TransformType = Field(index=True, default=TransformType.pipeline)
     """File name of the transform.
     """
     title: Optional[str] = Field(index=True)
