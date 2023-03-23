@@ -35,7 +35,7 @@ def upgrade() -> None:
 
     # add the type column to the existing notebook table
     SATransformType.create(op.get_bind(), checkfirst=True)
-    op.add_column(f"{prefix}notebook", sa.Column("type", SATransformType, nullable=False), schema=schema)
+    op.add_column(f"{prefix}notebook", sa.Column("type", SATransformType), schema=schema)
 
     op.execute(f"update {core_notebook} set type = 'notebook'")
     op.execute(copy_pipeline_to_notebook.format(core_notebook=core_notebook, core_pipeline=core_pipeline))
