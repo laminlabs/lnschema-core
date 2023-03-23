@@ -67,6 +67,9 @@ def upgrade() -> None:
         batch_op.alter_column(column_name="notebook_id", new_column_name="transform_id")
         batch_op.alter_column(column_name="notebook_v", new_column_name="transform_v")
 
+        batch_op.create_index(op.f("ix_core_run_transform_id"), ["transform_id"], unique=False)
+        batch_op.create_index(op.f("ix_core_run_transform_v"), ["transform_v"], unique=False)
+
         batch_op.create_foreign_key(op.f("fk_run_transform_id_transform"), f"{prefix}transform", ["transform_id", "transform_v"], ["id", "v"], referent_schema=schema)
 
     with op.batch_alter_table(f"{prefix}transform", schema=schema) as batch_op:
@@ -81,6 +84,7 @@ def upgrade() -> None:
         batch_op.create_index(op.f("ix_core_transform_title"), ["title"], unique=False)
         batch_op.create_index(op.f("ix_core_transform_type"), ["type"], unique=False)
         batch_op.create_index(op.f("ix_core_transform_updated_at"), ["updated_at"], unique=False)
+        batch_op.alter_column("type", nullable=False)
 
 
 def downgrade() -> None:
