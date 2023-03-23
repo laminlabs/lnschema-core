@@ -38,9 +38,9 @@ def upgrade() -> None:
     if sqlite:
         op.drop_index(index_name=f"ix_core{delim}run_pipeline_id")
         op.drop_index(index_name=f"ix_core{delim}run_pipeline_v")
-    op.drop_column(table_name=f"{prefix}run", column_name="pipeline_id", schema=schema)
-    op.drop_column(table_name=f"{prefix}run", column_name="pipeline_v", schema=schema)
-    op.drop_table(table_name=f"{prefix}pipeline", schema=schema)
+    # op.drop_column(table_name=f"{prefix}run", column_name="pipeline_id", schema=schema)
+    # op.drop_column(table_name=f"{prefix}run", column_name="pipeline_v", schema=schema)
+    # op.drop_table(table_name=f"{prefix}pipeline", schema=schema)
     op.rename_table(old_table_name=f"{prefix}notebook", new_table_name=f"{prefix}transform", schema=schema)
 
 
