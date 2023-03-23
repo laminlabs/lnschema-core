@@ -31,7 +31,7 @@ def upgrade() -> None:
         core_notebook, core_pipeline, core_run = f"'{core_notebook}'", f"'{core_pipeline}'", f"'{core_run}'"
 
     # add the type column to the existing notebook table
-    op.alter_column(f"{prefix}notebook", "type", existing_type=sa.VARCHAR(), type_=sa.Enum("pipeline", "notebook", name="transformtype"), nullable=False, schema=schema)
+    op.add_column(f"{prefix}notebook", sa.Column("type", sa.Enum("pipeline", "notebook", name="transformtype"), nullable=False), schema=schema)
 
     op.execute(f"update {core_notebook} set type = 'notebook'")
     op.execute(copy_pipeline_to_notebook.format(core_notebook=core_notebook, core_pipeline=core_pipeline))
@@ -65,6 +65,19 @@ def upgrade() -> None:
 
     op.drop_table(table_name=f"{prefix}pipeline", schema=schema)
     op.rename_table(old_table_name=f"{prefix}notebook", new_table_name=f"{prefix}transform", schema=schema)
+
+    with op.batch_alter_table(f"{prefix}transform", schema=schema) as batch_op:
+        op.drop_index("ix_core_notebook_created_at")
+        op.drop_index("ix_core_notebook_created_by")
+        op.drop_index("ix_core_notebook_name")
+        op.drop_index("ix_core_notebook_title")
+        op.drop_index("ix_core_notebook_updated_at")
+        op.create_index(op.f("ix_core_transform_created_at"), ["created_at"], unique=False)
+        op.create_index(op.f("ix_core_transform_created_by"), ["created_by"], unique=False)
+        op.create_index(op.f("ix_core_transform_name"), ["name"], unique=False)
+        op.create_index(op.f("ix_core_transform_title"), ["title"], unique=False)
+        op.create_index(op.f("ix_core_transform_type"), ["type"], unique=False)
+        op.create_index(op.f("ix_core_transform_updated_at"), ["updated_at"], unique=False)
 
 
 def downgrade() -> None:
