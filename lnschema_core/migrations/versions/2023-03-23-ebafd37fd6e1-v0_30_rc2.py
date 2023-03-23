@@ -4,7 +4,6 @@ import sqlmodel as sqm  # noqa
 from alembic import op
 
 from lnschema_core.dev.sqlmodel import get_sqlite_prefix_schema_delim_from_alembic
-from lnschema_core.dev.type import TransformType
 
 revision = "ebafd37fd6e1"
 down_revision = "9640062eefee"
@@ -31,7 +30,7 @@ def upgrade() -> None:
     if sqlite:  # sqlite needs quotes
         core_notebook, core_pipeline, core_run = f"'{core_notebook}'", f"'{core_pipeline}'", f"'{core_run}'"
 
-    op.add_column(table_name=f"{prefix}notebook", column=sa.Column("type", sa.Enum(TransformType)), schema=schema)
+    op.add_column(table_name=f"{prefix}notebook", column=sa.Column("type", sa.String), schema=schema)
     op.execute(f"update {core_notebook} set type = 'notebook'")
     op.execute(copy_pipeline_to_notebook.format(core_notebook=core_notebook, core_pipeline=core_pipeline))
     op.execute(f"update {core_notebook} set type = 'pipeline' where type is null")
