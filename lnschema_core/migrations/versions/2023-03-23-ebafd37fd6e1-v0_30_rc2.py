@@ -60,8 +60,8 @@ def upgrade() -> None:
         batch_op.alter_column(column_name="notebook_id", new_column_name="transform_id")
         batch_op.alter_column(column_name="notebook_v", new_column_name="transform_v")
 
-        batch_op.drop_column(table_name=f"{prefix}run", column_name="pipeline_id")
-        batch_op.drop_column(table_name=f"{prefix}run", column_name="pipeline_v")
+        batch_op.drop_column(column_name="pipeline_id")
+        batch_op.drop_column(column_name="pipeline_v")
 
         batch_op.create_foreign_key(
             op.f("fk_run_transform_id_transform"), f"{prefix}transform", ["transform_id", "transform_v"], ["id", "v"], source_schema=schema, referent_schema=schema
