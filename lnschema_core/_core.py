@@ -8,7 +8,6 @@ import sqlalchemy as sa
 import sqlmodel
 from cloudpathlib import CloudPath
 from lamin_logger import logger
-from nbproject._is_run_from_ipython import is_run_from_ipython
 from pydantic.fields import PrivateAttr
 from sqlmodel import Field, ForeignKeyConstraint, Relationship
 
@@ -375,13 +374,11 @@ class Transform(SQLModel, table=True):  # type: ignore
 
 
 class Run(SQLModel, table=True):  # type: ignore
-    """Code runs that transform data.
+    """Runs of data transforms.
 
     A `run` is any transformation of a `dobject`.
 
     Args:
-        global_context: bool = None - Define a global run. False when run in a non-notebooks, True when run from notebook.
-        pipeline_name: Optional[str] = None
         load_latest: bool = None - Load latest run for given notebook or pipeline. False when run in a non-notebooks, True when run from notebook.
         id: Optional[str] = None
         name: Optional[str] = None
@@ -397,13 +394,13 @@ class Run(SQLModel, table=True):  # type: ignore
     It typically has inputs and outputs:
 
     - References to outputs are stored in the `dobject` table in the
-      `run_id` column, which stores a foreign key into the `run`
+      `source_id` column as a foreign key the `run`
       table. This is possible as every given `dobject` has a unique data source:
-      the `run` that produced the `dobject`. Note that a given
+      the `run` that produced the `dobject`. However, note that a given
       `run` may output several `dobjects`.
-    - References to input `dobjects` are stored in the `run_in` table, a
+    - References to inputs are stored in the `run_in` table, a
       many-to-many link table between the `dobject` and `run` tables. Any
-      `dobject` might serve as an input for many `run`. Similarly, any
+      `dobject` might serve as an input for many `runs`. Similarly, any
       `run` might have many `dobjects` as inputs.
     """
 
@@ -439,9 +436,7 @@ class Run(SQLModel, table=True):  # type: ignore
         *,
         id: Optional[str] = None,
         name: Optional[str] = None,
-        global_context: Optional[bool] = None,
-        load_latest: Optional[bool] = None,
-        pipeline_name: Optional[str] = None,
+        load_latest: bool = False,
         external_id: Optional[str] = None,
         transform: Optional[Transform] = None,
         inputs: List[DObject] = None,
@@ -450,38 +445,27 @@ class Run(SQLModel, table=True):  # type: ignore
         kwargs = {k: v for k, v in locals().items() if v and k != "self"}
 
         import lamindb as ln
-        import lamindb.schema as lns
-        from lamindb import context
 
-        if global_context is None:
-            # am I being run from a notebook? if yes, global_context = True, else False
-            global_context = is_run_from_ipython and pipeline_name is None
-
-        if load_latest is None:
-            # am I being run from a notebook? if yes, load_latest = True, else False
-            load_latest = is_run_from_ipython and pipeline_name is None
-
-        if global_context:
-            context._track_notebook_pipeline(pipeline_name=pipeline_name, load_latest=load_latest)
-            transform = context.transform
-
+        global_context = False
         if transform is None:
-            if global_context:
-                raise RuntimeError("Please set notebook or pipeline global context.")
+            if ln.context.transform is not None:
+                logger.info(f"Using ln.context.transform: {ln.context.transform}")
+                global_context = True
             else:
-                raise RuntimeError("Please pass notebook or pipeline.")
-        elif not isinstance(transform, Transform):
+                raise ValueError("Either pass `transform` or set `ln.context.transform`.")
+
+        if not isinstance(transform, Transform):
             raise TypeError("transform needs to be of type Transform")
 
         run = None
         if load_latest:
-            run = ln.select(lns.Run, transform_id=transform.id, transform_v=transform.v).order_by(lns.Run.created_at.desc()).first()
+            run = ln.select(ln.Run, transform_id=transform.id, transform_v=transform.v).order_by(ln.Run.created_at.desc()).first()
             if run is not None:
                 logger.info("Loaded run:")  # colon is on purpose!
         elif id is not None:
-            run = ln.select(lns.Run, id=id).one_or_none()
+            run = ln.select(ln.Run, id=id).one_or_none()
             if run is None:
-                raise NotImplementedError("You can currently only pass existing IDs.")
+                raise NotImplementedError("You can currently only pass existing ids")
 
         if run is None:
             kwargs.update(dict(transform_id=transform.id, transform_v=transform.v))
@@ -496,7 +480,7 @@ class Run(SQLModel, table=True):  # type: ignore
                 added_self = ln.add(self)
                 self._ln_identity_key = added_self.id
                 logger.info("Added run:")  # colon is on purpose!
-            context.run = self
+            ln.context.run = self
 
 
 class Features(SQLModel, table=True):  # type: ignore
