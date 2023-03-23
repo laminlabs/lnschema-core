@@ -35,9 +35,12 @@ def upgrade() -> None:
     op.execute(copy_pipeline_to_notebook.format(core_notebook=core_notebook, core_pipeline=core_pipeline))
     op.execute(f"update {core_notebook} set type = 'pipeline' where type is null")
     op.execute(make_pipeline_references_notebook_references_in_run.format(core_run=core_run))
-    op.drop_index(index_name=f"ix_core{delim}run_pipeline_id")
+    try:
+        op.drop_index(index_name=f"ix_core{delim}run_pipeline_id")
+        op.drop_index(index_name=f"ix_core{delim}run_pipeline_v")
+    except Exception:
+        pass
     op.drop_column(table_name=f"{prefix}run", column_name="pipeline_id", schema=schema)
-    op.drop_index(index_name=f"ix_core{delim}run_pipeline_v")
     op.drop_column(table_name=f"{prefix}run", column_name="pipeline_v", schema=schema)
     op.drop_table(table_name=f"{prefix}pipeline", schema=schema)
     op.rename_table(old_table_name=f"{prefix}notebook", new_table_name=f"{prefix}transform", schema=schema)
