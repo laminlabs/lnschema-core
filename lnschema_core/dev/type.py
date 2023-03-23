@@ -4,5 +4,6 @@
    :toctree: .
 
    usage
+   TransformType
 """
-from ._type import usage  # noqa
+from ._type import TransformType, usage  # noqa

@@ -3,7 +3,6 @@
 ```{toctree}
 :maxdepth: 1
 
-schema
-basic-orms
+core-schema
 data-validation
 ```

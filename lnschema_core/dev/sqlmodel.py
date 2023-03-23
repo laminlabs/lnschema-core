@@ -117,6 +117,20 @@ def schema_sqlmodel(schema_name: str):
         return SQLModelModule, prefix, schema_arg
 
 
+def get_sqlite_prefix_schema_delim_from_alembic() -> Tuple[bool, str, Optional[str], str]:
+    from alembic import op
+
+    bind = op.get_bind()
+    sqlite = bind.engine.name == "sqlite"
+
+    if sqlite:
+        prefix, schema, delim = f"{SCHEMA_NAME}.", None, "."
+    else:
+        prefix, schema, delim = "", SCHEMA_NAME, "_"
+
+    return sqlite, prefix, schema, delim
+
+
 def add_relationship_keys(table: sqm.SQLModel):  # type: ignore
     """add all relationship keys to __sqlmodel_relationships__."""
     for i in getattr(table, "__mapper__").relationships:
