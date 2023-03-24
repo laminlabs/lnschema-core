@@ -49,8 +49,8 @@ def upgrade() -> None:
 
     with op.batch_alter_table(f"{prefix}run_in", schema=schema) as batch_op:
         batch_op.alter_column(column_name="dobject_id", new_column_name="file_id")
-        op.drop_constraint("fk_run_in_dobject_id_dobject", type_="foreignkey")
-        op.create_foreign_key(op.f("fk_run_in_file_id_file"), f"{prefix}file", ["file_id"], ["id"], referent_schema=schema)
+        batch_op.drop_constraint("fk_run_in_dobject_id_dobject", type_="foreignkey")
+        batch_op.create_foreign_key(op.f("fk_run_in_file_id_file"), f"{prefix}file", ["file_id"], ["id"], referent_schema=schema)
 
 
 def downgrade() -> None:
