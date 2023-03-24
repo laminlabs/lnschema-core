@@ -1,9 +1,9 @@
-from lnschema_core import DObject
+from lnschema_core import File
 from lnschema_core.dev import id
 
 
 def test_id():
-    assert len(id.dobject()) == 20
+    assert len(id.file()) == 20
     assert len(id.user()) == 8
     assert len(id.secret()) == 40
     assert len(id.usage()) == 24
@@ -11,4 +11,4 @@ def test_id():
 
 
 def test_objectkey():
-    assert "_objectkey" in DObject.__table__.columns.keys()
+    assert "_objectkey" in File.__table__.columns.keys()

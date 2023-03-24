@@ -33,7 +33,7 @@ def schema():
     return base26(4)
 
 
-def dobject() -> str:
+def file() -> str:
     """Data object: 20 base62.
 
     20 characters (62**20=7e+35 possibilities) roughly matches UUID (2*122=5e+36).

@@ -10,27 +10,27 @@ SQLModel, prefix, schema_arg = schema_sqlmodel(schema_name)
 class RunIn(SQLModel, table=True):  # type: ignore
     """Inputs of runs.
 
-    This is a many-to-many link table for `run` and `dobject` storing the
+    This is a many-to-many link table for `run` and `file` storing the
     inputs of data transformations.
 
     A data transformation can have an arbitrary number of data objects as inputs.
 
-    - The same `dobject` can be used as input in many different `runs`.
-    - One `run` can have several `dobjects` as inputs.
+    - The same `file` can be used as input in many different `runs`.
+    - One `run` can have several `files` as inputs.
     """
 
     __tablename__ = f"{prefix}run_in"
 
     run_id: str = Field(foreign_key="core.run.id", primary_key=True)
-    dobject_id: str = Field(foreign_key="core.dobject.id", primary_key=True)
+    file_id: str = Field(foreign_key="core.file.id", primary_key=True)
 
 
-class DObjectFeatures(SQLModel, table=True):  # type: ignore
-    """Links `DObject` and `Features`."""
+class FileFeatures(SQLModel, table=True):  # type: ignore
+    """Links `File` and `Features`."""
 
-    __tablename__ = f"{prefix}dobject_features"
+    __tablename__ = f"{prefix}file_features"
 
-    dobject_id: str = Field(foreign_key="core.dobject.id", primary_key=True)
+    file_id: str = Field(foreign_key="core.file.id", primary_key=True)
     features_id: str = Field(foreign_key="core.features.id", primary_key=True)
 
 
@@ -43,10 +43,10 @@ class ProjectDFolder(SQLModel, table=True):  # type: ignore
     dfolder_id: str = Field(foreign_key="core.dfolder.id", primary_key=True)
 
 
-class DFolderDObject(SQLModel, table=True):  # type: ignore
-    """Link table of dfolder and dobject."""
+class DFolderFile(SQLModel, table=True):  # type: ignore
+    """Link table of dfolder and file."""
 
-    __tablename__ = f"{prefix}dfolder_dobject"
+    __tablename__ = f"{prefix}dfolder_file"
 
     dfolder_id: str = Field(foreign_key="core.dfolder.id", primary_key=True)
-    dobject_id: str = Field(foreign_key="core.dobject.id", primary_key=True)
+    file_id: str = Field(foreign_key="core.file.id", primary_key=True)
