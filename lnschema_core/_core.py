@@ -447,7 +447,7 @@ class Run(SQLModel, table=True):  # type: ignore
                 global_context = True
                 transform = ln.context.transform
             else:
-                raise ValueError("Either call `ln.Run(transform=transform)` or set `ln.context.transform`.")
+                raise ValueError("Either call `ln.Run(transform=transform)` or `ln.track(transform=...)`.")
 
         if not isinstance(transform, Transform):
             raise TypeError("transform needs to be of type Transform")
@@ -456,7 +456,7 @@ class Run(SQLModel, table=True):  # type: ignore
         if load_latest:
             run = ln.select(ln.Run, transform_id=transform.id, transform_v=transform.v).order_by(ln.Run.created_at.desc()).first()
             if run is not None:
-                logger.info("Loaded run:")  # colon is on purpose!
+                logger.info(f"Loaded run: {run}")
         elif id is not None:
             run = ln.select(ln.Run, id=id).one_or_none()
             if run is None:
@@ -474,7 +474,7 @@ class Run(SQLModel, table=True):  # type: ignore
             if run is None:
                 added_self = ln.add(self)
                 self._ln_identity_key = added_self.id
-                logger.info("Added run:")  # colon is on purpose!
+                logger.info(f"Added run: {self}")
             ln.context.run = self
 
 
