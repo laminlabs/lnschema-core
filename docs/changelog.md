@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-🚚 Rename `DObject` to `File` and `DFolder` to `Folder` | [146](https://github.com/laminlabs/lnschema-core/pull/146) | [falexwolf](https://github.com/falexwolf) | 2023-03-24 |
+🚚 Rename `DObject` to `File` and `DFolder` to `Folder` | [146](https://github.com/laminlabs/lnschema-core/pull/146) | [falexwolf](https://github.com/falexwolf) | 2023-03-24 | 0.30rc3
 🎨 Simplify `Run` | [145](https://github.com/laminlabs/lnschema-core/pull/145) | [falexwolf](https://github.com/falexwolf) | 2023-03-23 |
 🏗️ Combine `Notebook` and `Pipeline` into `Transform` | [144](https://github.com/laminlabs/lnschema-core/pull/144) | [falexwolf](https://github.com/falexwolf) | 2023-03-23 | 0.30rc2
 🔥 Remove Usage ORM | [143](https://github.com/laminlabs/lnschema-core/pull/143) | [falexwolf](https://github.com/falexwolf) | 2023-03-22 | 0.30rc1
