@@ -56,24 +56,36 @@ def upgrade() -> None:
     with op.batch_alter_table(f"{prefix}folder_file", schema=schema) as batch_op:
         batch_op.alter_column(column_name="dobject_id", new_column_name="file_id")
         batch_op.alter_column(column_name="dfolder_id", new_column_name="folder_id")
-        batch_op.drop_constraint("fk_dfolder_dobject_dobject_id_dobject", type_="foreignkey")
-        batch_op.drop_constraint("fk_dfolder_dobject_dfolder_id_dfolder", type_="foreignkey")
+        try:
+            batch_op.drop_constraint("fk_dfolder_dobject_dobject_id_dobject", type_="foreignkey")
+            batch_op.drop_constraint("fk_dfolder_dobject_dfolder_id_dfolder", type_="foreignkey")
+        except Exception:
+            pass
         batch_op.create_foreign_key(op.f("fk_folder_file_file_id_file"), f"{prefix}file", ["file_id"], ["id"], referent_schema=schema)
         batch_op.create_foreign_key(op.f("fk_folder_file_folder_id_folder"), f"{prefix}folder", ["folder_id"], ["id"], referent_schema=schema)
 
     with op.batch_alter_table(f"{prefix}file_features", schema=schema) as batch_op:
         batch_op.alter_column(column_name="dobject_id", new_column_name="file_id")
-        batch_op.drop_constraint("fk_dobject_features_dobject_id_dobject", type_="foreignkey")
+        try:
+            batch_op.drop_constraint("fk_dobject_features_dobject_id_dobject", type_="foreignkey")
+        except Exception:
+            pass
         batch_op.create_foreign_key(op.f("fk_file_features_file_id_file"), f"{prefix}file", ["file_id"], ["id"], referent_schema=schema)
 
     with op.batch_alter_table(f"{prefix}project_folder", schema=schema) as batch_op:
         batch_op.alter_column(column_name="dfolder_id", new_column_name="folder_id")
-        batch_op.drop_constraint("fk_project_dfolder_dfolder_id_dfolder", type_="foreignkey")
+        try:
+            batch_op.drop_constraint("fk_project_dfolder_dfolder_id_dfolder", type_="foreignkey")
+        except Exception:
+            pass
         batch_op.create_foreign_key(op.f("fk_project_folder_folder_id_folder"), f"{prefix}folder", ["folder_id"], ["id"], referent_schema=schema)
 
     with op.batch_alter_table(f"{prefix}run_in", schema=schema) as batch_op:
         batch_op.alter_column(column_name="dobject_id", new_column_name="file_id")
-        batch_op.drop_constraint("fk_run_in_dobject_id_dobject", type_="foreignkey")
+        try:
+            batch_op.drop_constraint("fk_run_in_dobject_id_dobject", type_="foreignkey")
+        except Exception:
+            pass
         batch_op.create_foreign_key(op.f("fk_run_in_file_id_file"), f"{prefix}file", ["file_id"], ["id"], referent_schema=schema)
 
 
