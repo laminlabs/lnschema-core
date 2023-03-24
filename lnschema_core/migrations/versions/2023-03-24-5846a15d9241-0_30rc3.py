@@ -30,15 +30,15 @@ def upgrade() -> None:
         op.drop_index(f"ix_core{delim}dobject_updated_at", table_name=f"{prefix}file", schema=schema)
     except Exception:
         pass
-    op.create_index(op.f(f"ix_core{delim}file__objectkey"), "file", ["_objectkey"], unique=False, schema=schema)
-    op.create_index(op.f(f"ix_core{delim}file_created_at"), "file", ["created_at"], unique=False, schema=schema)
-    op.create_index(op.f(f"ix_core{delim}file_hash"), "file", ["hash"], unique=False, schema=schema)
-    op.create_index(op.f(f"ix_core{delim}file_name"), "file", ["name"], unique=False, schema=schema)
-    op.create_index(op.f(f"ix_core{delim}file_size"), "file", ["size"], unique=False, schema=schema)
-    op.create_index(op.f(f"ix_core{delim}file_source_id"), "file", ["source_id"], unique=False, schema=schema)
-    op.create_index(op.f(f"ix_core{delim}file_storage_id"), "file", ["storage_id"], unique=False, schema=schema)
-    op.create_index(op.f(f"ix_core{delim}file_suffix"), "file", ["suffix"], unique=False, schema=schema)
-    op.create_index(op.f(f"ix_core{delim}file_updated_at"), "file", ["updated_at"], unique=False, schema=schema)
+    op.create_index(op.f(f"ix_core{delim}file__objectkey"), f"{prefix}file", ["_objectkey"], unique=False, schema=schema)
+    op.create_index(op.f(f"ix_core{delim}file_created_at"), f"{prefix}file", ["created_at"], unique=False, schema=schema)
+    op.create_index(op.f(f"ix_core{delim}file_hash"), f"{prefix}file", ["hash"], unique=False, schema=schema)
+    op.create_index(op.f(f"ix_core{delim}file_name"), f"{prefix}file", ["name"], unique=False, schema=schema)
+    op.create_index(op.f(f"ix_core{delim}file_size"), f"{prefix}file", ["size"], unique=False, schema=schema)
+    op.create_index(op.f(f"ix_core{delim}file_source_id"), f"{prefix}file", ["source_id"], unique=False, schema=schema)
+    op.create_index(op.f(f"ix_core{delim}file_storage_id"), f"{prefix}file", ["storage_id"], unique=False, schema=schema)
+    op.create_index(op.f(f"ix_core{delim}file_suffix"), f"{prefix}file", ["suffix"], unique=False, schema=schema)
+    op.create_index(op.f(f"ix_core{delim}file_updated_at"), f"{prefix}file", ["updated_at"], unique=False, schema=schema)
     try:
         op.drop_index(f"ix_core{delim}dfolder__objectkey", table_name=f"{prefix}folder", schema=schema)
         op.drop_index(f"ix_core{delim}dfolder_created_at", table_name=f"{prefix}folder", schema=schema)
@@ -47,11 +47,11 @@ def upgrade() -> None:
         op.drop_index(f"ix_core{delim}dfolder_updated_at", table_name=f"{prefix}folder", schema=schema)
     except Exception:
         pass
-    op.create_index(op.f(f"ix_core{delim}folder__objectkey"), "folder", ["_objectkey"], unique=False, schema=schema)
-    op.create_index(op.f(f"ix_core{delim}folder_created_at"), "folder", ["created_at"], unique=False, schema=schema)
-    op.create_index(op.f(f"ix_core{delim}folder_created_by"), "folder", ["created_by"], unique=False, schema=schema)
-    op.create_index(op.f(f"ix_core{delim}folder_name"), "folder", ["name"], unique=False, schema=schema)
-    op.create_index(op.f(f"ix_core{delim}folder_updated_at"), "folder", ["updated_at"], unique=False, schema=schema)
+    op.create_index(op.f(f"ix_core{delim}folder__objectkey"), f"{prefix}folder", ["_objectkey"], unique=False, schema=schema)
+    op.create_index(op.f(f"ix_core{delim}folder_created_at"), f"{prefix}folder", ["created_at"], unique=False, schema=schema)
+    op.create_index(op.f(f"ix_core{delim}folder_created_by"), f"{prefix}folder", ["created_by"], unique=False, schema=schema)
+    op.create_index(op.f(f"ix_core{delim}folder_name"), f"{prefix}folder", ["name"], unique=False, schema=schema)
+    op.create_index(op.f(f"ix_core{delim}folder_updated_at"), f"{prefix}folder", ["updated_at"], unique=False, schema=schema)
 
     with op.batch_alter_table(f"{prefix}folder_file", schema=schema) as batch_op:
         batch_op.alter_column(column_name="dobject_id", new_column_name="file_id")
