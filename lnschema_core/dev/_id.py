@@ -43,7 +43,7 @@ def file() -> str:
     return base62(n_char=20)
 
 
-def dfolder() -> str:
+def folder() -> str:
     """Data folder: 20 base62."""
     return base62(n_char=20)
 

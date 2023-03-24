@@ -34,19 +34,19 @@ class FileFeatures(SQLModel, table=True):  # type: ignore
     features_id: str = Field(foreign_key="core.features.id", primary_key=True)
 
 
-class ProjectDFolder(SQLModel, table=True):  # type: ignore
-    """Link table of project and dfolder."""
+class ProjectFolder(SQLModel, table=True):  # type: ignore
+    """Link table of project and folder."""
 
-    __tablename__ = f"{prefix}project_dfolder"
+    __tablename__ = f"{prefix}project_folder"
 
     project_id: str = Field(foreign_key="core.project.id", primary_key=True)
-    dfolder_id: str = Field(foreign_key="core.dfolder.id", primary_key=True)
+    folder_id: str = Field(foreign_key="core.folder.id", primary_key=True)
 
 
-class DFolderFile(SQLModel, table=True):  # type: ignore
-    """Link table of dfolder and file."""
+class FolderFile(SQLModel, table=True):  # type: ignore
+    """Link table of folder and file."""
 
-    __tablename__ = f"{prefix}dfolder_file"
+    __tablename__ = f"{prefix}folder_file"
 
-    dfolder_id: str = Field(foreign_key="core.dfolder.id", primary_key=True)
+    folder_id: str = Field(foreign_key="core.folder.id", primary_key=True)
     file_id: str = Field(foreign_key="core.file.id", primary_key=True)

@@ -21,7 +21,7 @@ Entity-related generators:
    instance
    storage
    file
-   dfolder
+   folder
    run
    usage
    notebook
@@ -33,8 +33,8 @@ from ._id import (  # noqa
     base26,
     base62,
     base64,
-    dfolder,
     file,
+    folder,
     instance,
     notebook,
     pipeline,

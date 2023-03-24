@@ -5,8 +5,8 @@
 
    RunIn
    FileFeatures
-   ProjectDFolder
-   DFolderFile
+   ProjectFolder
+   FolderFile
 
 """
-from ._link import DFolderFile, FileFeatures, ProjectDFolder, RunIn  # noqa
+from ._link import FileFeatures, FolderFile, ProjectFolder, RunIn  # noqa

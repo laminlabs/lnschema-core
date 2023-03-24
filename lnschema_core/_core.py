@@ -12,11 +12,11 @@ from pydantic.fields import PrivateAttr
 from sqlmodel import Field, ForeignKeyConstraint, Relationship
 
 from . import _name as schema_name
-from ._link import DFolderFile, FileFeatures, ProjectDFolder, RunIn  # noqa
+from ._link import FileFeatures, FolderFile, ProjectFolder, RunIn  # noqa
 from ._timestamps import CreatedAt, UpdatedAt
 from ._users import CreatedBy
 from .dev import id as idg
-from .dev._storage import filepath_from_dfolder, filepath_from_file
+from .dev._storage import filepath_from_file, filepath_from_folder
 from .dev.sqlmodel import schema_sqlmodel
 from .dev.type import TransformType
 
@@ -62,17 +62,17 @@ class Storage(SQLModel, table=True):  # type: ignore
     updated_at: Optional[datetime] = UpdatedAt
 
 
-class DFolder(SQLModel, table=True):  # type: ignore
+class Folder(SQLModel, table=True):  # type: ignore
     """Data folders, collections of data objects.
 
     In LaminDB, a data folder is a collection of data objects (`File`).
     """
 
-    id: str = Field(default_factory=idg.dfolder, primary_key=True)
+    id: str = Field(default_factory=idg.folder, primary_key=True)
     name: str = Field(index=True)
     files: List["File"] = Relationship(  # type: ignore  # noqa
-        back_populates="dfolders",
-        sa_relationship_kwargs=dict(secondary=DFolderFile.__table__),
+        back_populates="folders",
+        sa_relationship_kwargs=dict(secondary=FolderFile.__table__),
     )
     """Collection of :class:`~lamindb.File`."""
     created_by: str = CreatedBy
@@ -88,7 +88,7 @@ class DFolder(SQLModel, table=True):  # type: ignore
 
     def path(self) -> Union[Path, CloudPath]:
         """Path on storage."""
-        return filepath_from_dfolder(self)
+        return filepath_from_folder(self)
 
     def tree(
         self,
@@ -107,10 +107,10 @@ class DFolder(SQLModel, table=True):  # type: ignore
         )
 
     def get(self, relpath: Union[str, Path, List[Union[str, Path]]], **fields):
-        """Get files via relative path to dfolder."""
+        """Get files via relative path to folder."""
         from lamindb._folder import get_file
 
-        return get_file(dfolder=self, relpath=relpath, **fields)
+        return get_file(folder=self, relpath=relpath, **fields)
 
     @overload
     def __init__(
@@ -142,9 +142,9 @@ class DFolder(SQLModel, table=True):  # type: ignore
         x: List["File"] = [],
     ):
         if folder is not None:
-            from lamindb._folder import get_dfolder_kwargs_from_data
+            from lamindb._folder import get_folder_kwargs_from_data
 
-            kwargs, privates = get_dfolder_kwargs_from_data(
+            kwargs, privates = get_folder_kwargs_from_data(
                 folder=folder,
                 name=name,
             )
@@ -159,7 +159,7 @@ class DFolder(SQLModel, table=True):  # type: ignore
             self._cloud_filepath = privates["_cloud_filepath"]
 
 
-DFolder._objectkey = sa.Column("_objectkey", sqlmodel.sql.sqltypes.AutoString(), index=True)
+Folder._objectkey = sa.Column("_objectkey", sqlmodel.sql.sqltypes.AutoString(), index=True)
 
 
 class Project(SQLModel, table=True):  # type: ignore
@@ -210,11 +210,11 @@ class File(SQLModel, table=True):  # type: ignore
         sa_relationship_kwargs=dict(secondary=FileFeatures.__table__),
     )
     """Link to feature sets :class:`~lamindb.Features`"""
-    dfolders: List[DFolder] = Relationship(
+    folders: List[Folder] = Relationship(
         back_populates="files",
-        sa_relationship_kwargs=dict(secondary=DFolderFile.__table__),
+        sa_relationship_kwargs=dict(secondary=FolderFile.__table__),
     )
-    """Collection of :class:`~lamindb.DFolder` that contain this file."""
+    """Collection of :class:`~lamindb.Folder` that contain this file."""
     targets: List["lnschema_core._core.Run"] = Relationship(  # type: ignore  # noqa
         back_populates="inputs",
         sa_relationship_kwargs=dict(secondary=RunIn.__table__),

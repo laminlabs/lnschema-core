@@ -17,7 +17,7 @@ Entities:
    File
    Run
    Transform
-   DFolder
+   Folder
    User
    Storage
    Project
@@ -37,4 +37,4 @@ _migration = "ebafd37fd6e1"
 __version__ = "0.30rc2"
 
 from . import dev, link
-from ._core import DFolder, Features, File, Project, Run, Storage, Transform, User
+from ._core import Features, File, Folder, Project, Run, Storage, Transform, User
