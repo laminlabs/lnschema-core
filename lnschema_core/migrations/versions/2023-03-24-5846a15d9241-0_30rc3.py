@@ -60,7 +60,7 @@ def upgrade() -> None:
     with op.batch_alter_table(f"{prefix}folder_file", schema=schema) as batch_op:
         batch_op.alter_column(column_name="dobject_id", new_column_name="file_id")
         batch_op.alter_column(column_name="dfolder_id", new_column_name="folder_id")
-        for constraint in inspector.get_foreign_keys(f"{prefix}folder_file", schema=schema):
+        for constraint in inspector.get_foreign_keys(f"{prefix}dfolder_dobject", schema=schema):
             if constraint["name"] == "fk_dfolder_dobject_dobject_id_dobject":
                 batch_op.drop_constraint("fk_dfolder_dobject_dobject_id_dobject", type_="foreignkey")
             if constraint["name"] == "fk_dfolder_dobject_dfolder_id_dfolder":
@@ -70,14 +70,14 @@ def upgrade() -> None:
 
     with op.batch_alter_table(f"{prefix}file_features", schema=schema) as batch_op:
         batch_op.alter_column(column_name="dobject_id", new_column_name="file_id")
-        for constraint in inspector.get_foreign_keys(f"{prefix}file_features", schema=schema):
+        for constraint in inspector.get_foreign_keys(f"{prefix}dobject_features", schema=schema):
             if constraint["name"] == "fk_dobject_features_dobject_id_dobject":
                 batch_op.drop_constraint("fk_dobject_features_dobject_id_dobject", type_="foreignkey")
         batch_op.create_foreign_key(op.f("fk_file_features_file_id_file"), f"{prefix}file", ["file_id"], ["id"], referent_schema=schema)
 
     with op.batch_alter_table(f"{prefix}project_folder", schema=schema) as batch_op:
         batch_op.alter_column(column_name="dfolder_id", new_column_name="folder_id")
-        for constraint in inspector.get_foreign_keys(f"{prefix}project_folder", schema=schema):
+        for constraint in inspector.get_foreign_keys(f"{prefix}project_dfolder", schema=schema):
             if constraint["name"] == "fk_project_dfolder_dfolder_id_dfolder":
                 batch_op.drop_constraint("fk_project_dfolder_dfolder_id_dfolder", type_="foreignkey")
         batch_op.create_foreign_key(op.f("fk_project_folder_folder_id_folder"), f"{prefix}folder", ["folder_id"], ["id"], referent_schema=schema)
