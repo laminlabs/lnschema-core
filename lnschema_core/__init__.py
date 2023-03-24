@@ -14,10 +14,10 @@ Entities:
 .. autosummary::
    :toctree: .
 
-   DObject
+   File
    Run
    Transform
-   DFolder
+   Folder
    User
    Storage
    Project
@@ -33,8 +33,8 @@ Development tools:
 """
 _schema_id = "yvzi"
 _name = "core"
-_migration = "ebafd37fd6e1"
+_migration = "5846a15d9241"
 __version__ = "0.30rc2"
 
 from . import dev, link
-from ._core import DFolder, DObject, Features, Project, Run, Storage, Transform, User
+from ._core import Features, File, Folder, Project, Run, Storage, Transform, User

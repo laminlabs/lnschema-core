@@ -4,9 +4,9 @@
    :toctree: .
 
    RunIn
-   DObjectFeatures
-   ProjectDFolder
-   DFolderDObject
+   FileFeatures
+   ProjectFolder
+   FolderFile
 
 """
-from ._link import DFolderDObject, DObjectFeatures, ProjectDFolder, RunIn  # noqa
+from ._link import FileFeatures, FolderFile, ProjectFolder, RunIn  # noqa
