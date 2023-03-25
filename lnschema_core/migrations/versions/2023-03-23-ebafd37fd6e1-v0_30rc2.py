@@ -12,8 +12,8 @@ down_revision = "9640062eefee"
 
 
 copy_pipeline_to_notebook = """\
-insert into {core_notebook} (id, v, name, created_by, created_at, updated_at)
-select id, v, name, created_by, created_at, updated_at from {core_pipeline}
+insert into {core_notebook} (id, v, name, reference, created_by, created_at, updated_at)
+select id, v, name, reference, created_by, created_at, updated_at from {core_pipeline}
 """
 
 make_pipeline_references_notebook_references_in_run = """\
