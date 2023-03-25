@@ -31,6 +31,8 @@ def upgrade() -> None:
     engine = op.get_bind().engine
     inspector = Inspector.from_engine(engine)
 
+    op.add_column(f"{prefix}notebook", sa.Column("reference", sqm.sql.sqltypes.AutoString(), nullable=True), schema=schema)
+
     core_notebook = "core.notebook"
     core_pipeline = "core.pipeline"
     core_run = "core.run"
