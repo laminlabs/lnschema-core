@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-🚚 Add `reference` to `Transform` | [147](https://github.com/laminlabs/lnschema-core/pull/147) | [falexwolf](https://github.com/falexwolf) | 2023-03-25 |
+🚚 Add `reference` to `Transform` | [147](https://github.com/laminlabs/lnschema-core/pull/147) | [falexwolf](https://github.com/falexwolf) | 2023-03-25 | 0.30rc5
 💚 Add weak backward compat | [commit](https://github.com/laminlabs/lnschema-core/commit/aa5ce2c272f0d9f14d7fa36a1298705c8ae6dda2) | [falexwolf](https://github.com/falexwolf) | 2023-03-24 | 0.30rc4
 🚚 Rename `DObject` to `File` and `DFolder` to `Folder` | [146](https://github.com/laminlabs/lnschema-core/pull/146) | [falexwolf](https://github.com/falexwolf) | 2023-03-24 | 0.30rc3
 🎨 Simplify `Run` | [145](https://github.com/laminlabs/lnschema-core/pull/145) | [falexwolf](https://github.com/falexwolf) | 2023-03-23 |
