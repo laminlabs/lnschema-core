@@ -416,7 +416,7 @@ class Run(SQLModel, table=True):  # type: ignore
     transform_id: Optional[str] = Field(default=None, index=True)
     transform_v: Optional[str] = Field(default=None, index=True)
     transform: Transform = Relationship()
-    """Link to :class:`~lamindb.schema.Notebook`."""
+    """Link to :class:`~lamindb.schema.Transform`."""
     outputs: List["File"] = Relationship(back_populates="source")
     """Output data :class:`~lamindb.File`."""
     inputs: List["File"] = Relationship(back_populates="targets", sa_relationship_kwargs=dict(secondary=RunIn.__table__))
