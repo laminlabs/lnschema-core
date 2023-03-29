@@ -217,10 +217,14 @@ class Run(SQLModel, table=True):  # type: ignore
 class Features(SQLModel, table=True):  # type: ignore
     """Feature sets.
 
-    A feature set is represent by the hash of the set of primary keys and the feature type.
+    A feature set is represented by the hash of the set of primary keys and the feature type.
 
     The current supported feature types are lnschema_bionty.Gene,
     lnschema_bionty.Protein & lnschema_bionty.CellMarker.
+
+    Guides:
+    - :doc:`/guide/scrna`
+    - :doc:`guide/flow`
 
     Examples:
     >>> import lnschema_bionty as bt
