@@ -215,7 +215,26 @@ class Run(SQLModel, table=True):  # type: ignore
 
 
 class Features(SQLModel, table=True):  # type: ignore
-    """Sets of features."""
+    """Feature sets.
+
+    A feature set is represent by the hash of the set of primary keys and the feature type.
+
+    The current supported feature types are lnschema_bionty.Gene,
+    lnschema_bionty.Protein & lnschema_bionty.CellMarker.
+
+    Examples:
+    >>> import lnschema_bionty as bt
+    >>> reference = bt.Gene(species="mouse")
+    >>> features = ln.Features(adata, reference=reference)
+    >>> file = ln.File(adata, name="Mouse Lymph Node scRNA-seq", features=features)
+
+    Args:
+        data: [Path, str, pd.DataFrame, ad.AnnData] - DataFrame or AnnData to parse.
+        reference: Any = None - Reference for mapping features.
+        id: str = None - Primary key.
+        type: Any = None - Type of reference.
+        files: List[File] - Files to link against.
+    """
 
     id: str = Field(primary_key=True)  # use a hash
     type: str  # was called entity_type
@@ -497,6 +516,8 @@ class File(SQLModel, table=True):  # type: ignore
             features = []
         if targets is None:
             targets = []
+        if not isinstance(features, List):
+            features = [features]
 
         if data is not None:
             from lamindb._file import get_file_kwargs_from_data
@@ -510,8 +531,6 @@ class File(SQLModel, table=True):  # type: ignore
             if id is not None:
                 kwargs["id"] = id
             if features is not None:
-                if not isinstance(features, List):
-                    features = [features]
                 kwargs["features"] = features
         else:
             kwargs = {k: v for k, v in locals().items() if v and k != "self"}
@@ -521,10 +540,6 @@ class File(SQLModel, table=True):  # type: ignore
             self._local_filepath = privates["_local_filepath"]
             self._cloud_filepath = privates["_cloud_filepath"]
             self._memory_rep = privates["_memory_rep"]
-            # when features are passed with data
-            if not isinstance(features, List):
-                features = [features]
-            self.features += features
 
 
 File._objectkey = sa.Column("_objectkey", sqlmodel.sql.sqltypes.AutoString(), index=True)
