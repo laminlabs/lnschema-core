@@ -510,6 +510,8 @@ class File(SQLModel, table=True):  # type: ignore
             if id is not None:
                 kwargs["id"] = id
             if features is not None:
+                if not isinstance(features, List):
+                    features = [features]
                 kwargs["features"] = features
         else:
             kwargs = {k: v for k, v in locals().items() if v and k != "self"}
