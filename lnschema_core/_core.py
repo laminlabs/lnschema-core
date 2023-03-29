@@ -223,10 +223,12 @@ class Features(SQLModel, table=True):  # type: ignore
     lnschema_bionty.Protein & lnschema_bionty.CellMarker.
 
     Guides:
+
     - :doc:`/guide/scrna`
     - :doc:`guide/flow`
 
     Examples:
+
     >>> import lnschema_bionty as bt
     >>> reference = bt.Gene(species="mouse")
     >>> features = ln.Features(adata, reference=reference)
@@ -315,7 +317,7 @@ class Folder(SQLModel, table=True):  # type: ignore
         back_populates="folders",
         sa_relationship_kwargs=dict(secondary=FolderFile.__table__),
     )
-    """Files: :class:`~lamindb.File`."""
+    """:class:`~lamindb.File`."""
     created_by: str = CreatedBy
     created_at: datetime = CreatedAt
     updated_at: Optional[datetime] = UpdatedAt
