@@ -269,7 +269,7 @@ class Features(SQLModel, table=True):  # type: ignore
         files: List["File"] = [],
     ):
         if data is not None:
-            from lamindb._features import get_features_from_data
+            from lamindb._file import get_features_from_data
 
             features = get_features_from_data(
                 data=data,
