@@ -1,36 +1,4 @@
-"""Data lineage (`yvzi`).
-
-.. note::
-   Please see the documented API reference `here <https://lamin.ai/docs/db/lamindb.schema>`__.
-
-   This page just provides a list of entities.
-
-Import the package::
-
-   import lnschema_core
-
-Entities:
-
-.. autosummary::
-   :toctree: .
-
-   File
-   Run
-   Transform
-   Folder
-   User
-   Storage
-   Project
-   Features
-
-Development tools:
-
-.. autosummary::
-   :toctree: .
-
-   dev
-   link
-"""
+"""Data lineage (`yvzi`)."""
 _schema_id = "yvzi"
 _name = "core"
 _migration = "5846a15d9241"
