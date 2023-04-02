@@ -469,6 +469,16 @@ class File(SQLModel, table=True):  # type: ignore
         self.size = size
         self.hash = hash
 
+    def stage(self, is_run_input: bool = False):
+        """Download from storage if newer than in the cache.
+
+        Returns a path to a locally cached on-disk object (say, a
+        `.jpg` file).
+        """
+        from lamindb._load import stage as lnstage
+
+        return lnstage(file=self, is_run_input=is_run_input)
+
     def load(self, stream: bool = False, is_run_input: bool = False):
         """Load from storage (stage on local disk or load to memory).
 
