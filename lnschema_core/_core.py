@@ -451,6 +451,24 @@ class File(SQLModel, table=True):  # type: ignore
         """Path on storage."""
         return filepath_from_file(self)
 
+    def replace(self, data: Union[Path, str, pd.DataFrame, ad.AnnData], source: Optional[Run] = None, format: Optional[str] = None):
+        """Replace data."""
+        from lamindb._file import get_path_size_hash, serialize
+
+        if source is not None:
+            self.source = source
+            self.source_id = source.id  # type: ignore
+
+        memory_rep, filepath, _, suffix = serialize(data, self.name, format)
+        self._memory_rep = memory_rep
+        self.suffix = suffix
+
+        localpath, cloudpath, size, hash = get_path_size_hash(filepath, memory_rep, suffix)
+        self._local_filepath = localpath
+        self._cloud_filepath = cloudpath
+        self.size = size
+        self.hash = hash
+
     def load(self, stream: bool = False, is_run_input: bool = False):
         """Load from storage (stage on local disk or load to memory).
 
