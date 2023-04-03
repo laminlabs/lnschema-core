@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-✨ Add replace and stage for File | [149](https://github.com/laminlabs/lnschema-core/pull/149) | [Koncopd](https://github.com/Koncopd) | 2023-04-03 |
+✨ Add `File.replace()` and `File.stage()` | [149](https://github.com/laminlabs/lnschema-core/pull/149) | [Koncopd](https://github.com/Koncopd) | 2023-04-03 | 0.31.0
 ♻️ Refactor ORM defintions | [148](https://github.com/laminlabs/lnschema-core/pull/148) | [falexwolf](https://github.com/falexwolf) | 2023-03-29 | 0.30.0
 🚚 Add `reference` to `Transform` | [147](https://github.com/laminlabs/lnschema-core/pull/147) | [falexwolf](https://github.com/falexwolf) | 2023-03-25 | 0.30rc5
 💚 Add weak backward compat | [commit](https://github.com/laminlabs/lnschema-core/commit/aa5ce2c272f0d9f14d7fa36a1298705c8ae6dda2) | [falexwolf](https://github.com/falexwolf) | 2023-03-24 | 0.30rc4
