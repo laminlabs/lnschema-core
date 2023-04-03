@@ -452,22 +452,31 @@ class File(SQLModel, table=True):  # type: ignore
         return filepath_from_file(self)
 
     def replace(self, data: Union[Path, str, pd.DataFrame, ad.AnnData], source: Optional[Run] = None, format: Optional[str] = None):
-        """Replace data."""
-        from lamindb._file import get_path_size_hash, serialize
+        """Replace data object."""
+        from lamindb._file import get_file_kwargs_from_data
 
-        if source is not None:
-            self.source = source
-            self.source_id = source.id  # type: ignore
+        if isinstance(data, (Path, str)):
+            name_to_pass = None
+        else:
+            name_to_pass = self.name
 
-        memory_rep, filepath, _, suffix = serialize(data, self.name, format)
-        self._memory_rep = memory_rep
-        self.suffix = suffix
+        kwargs, privates = get_file_kwargs_from_data(
+            data=data,
+            name=name_to_pass,
+            source=source,
+            format=format,
+        )
 
-        localpath, cloudpath, size, hash = get_path_size_hash(filepath, memory_rep, suffix)
-        self._local_filepath = localpath
-        self._cloud_filepath = cloudpath
-        self.size = size
-        self.hash = hash
+        if kwargs["name"] != name_to_pass:
+            logger.warning("Your new filename does not match the previous filename. If you want to update in the DB, update it manually!")
+
+        self.size = kwargs["size"]
+        self.hash = kwargs["hash"]
+        self.suffix = kwargs["suffix"]
+        self.source = kwargs["source"]
+        self._local_filepath = privates["_local_filepath"]
+        self._cloud_filepath = privates["_cloud_filepath"]
+        self._memory_rep = privates["_memory_rep"]
 
     def stage(self, is_run_input: bool = False):
         """Download from storage if newer than in the cache.
