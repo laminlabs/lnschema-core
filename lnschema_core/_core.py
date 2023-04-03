@@ -471,6 +471,7 @@ class File(SQLModel, table=True):  # type: ignore
         if kwargs["name"] != name_to_pass:
             logger.warning("Your new filename does not match the previous filename. If you want to update in the DB, update it manually!")
 
+        # we don't delete storage objects added through _objectkey
         if self._objectkey is None and self.suffix != kwargs["suffix"]:
             self._clear_storagekey = f"{self.id}{self.suffix}"
 
@@ -481,6 +482,9 @@ class File(SQLModel, table=True):  # type: ignore
         self._local_filepath = privates["_local_filepath"]
         self._cloud_filepath = privates["_cloud_filepath"]
         self._memory_rep = privates["_memory_rep"]
+
+        # new _objectkey will be written in ln.add
+        sa.orm.attributes.set_attribute(self, "_objectkey", None)
 
     def stage(self, is_run_input: bool = False):
         """Download from storage if newer than in the cache.
