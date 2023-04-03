@@ -445,11 +445,56 @@ class File(SQLModel, table=True):  # type: ignore
     # private attributes are needed here to prevent sqlalchemy error
     _local_filepath: Optional[Path] = PrivateAttr()
     _cloud_filepath: Optional[CloudPath] = PrivateAttr()
+    _clear_storagekey: Optional[str] = PrivateAttr()
     _memory_rep: Any = PrivateAttr()
 
     def path(self) -> Union[Path, CloudPath]:
         """Path on storage."""
         return filepath_from_file(self)
+
+    def replace(self, data: Union[Path, str, pd.DataFrame, ad.AnnData], source: Optional[Run] = None, format: Optional[str] = None):
+        """Replace data object."""
+        from lamindb._file import get_file_kwargs_from_data
+
+        if isinstance(data, (Path, str)):
+            name_to_pass = None
+        else:
+            name_to_pass = self.name
+
+        kwargs, privates = get_file_kwargs_from_data(
+            data=data,
+            name=name_to_pass,
+            source=source,
+            format=format,
+        )
+
+        if kwargs["name"] != name_to_pass:
+            logger.warning("Your new filename does not match the previous filename. If you want to update in the DB, update it manually!")
+
+        # we don't delete storage objects added through _objectkey
+        if self._objectkey is None and self.suffix != kwargs["suffix"]:
+            self._clear_storagekey = f"{self.id}{self.suffix}"
+
+        self.size = kwargs["size"]
+        self.hash = kwargs["hash"]
+        self.suffix = kwargs["suffix"]
+        self.source = kwargs["source"]
+        self._local_filepath = privates["_local_filepath"]
+        self._cloud_filepath = privates["_cloud_filepath"]
+        self._memory_rep = privates["_memory_rep"]
+
+        # new _objectkey will be written in ln.add
+        sa.orm.attributes.set_attribute(self, "_objectkey", None)
+
+    def stage(self, is_run_input: bool = False):
+        """Download from storage if newer than in the cache.
+
+        Returns a path to a locally cached on-disk object (say, a
+        `.jpg` file).
+        """
+        from lamindb._load import stage as lnstage
+
+        return lnstage(file=self, is_run_input=is_run_input)
 
     def load(self, stream: bool = False, is_run_input: bool = False):
         """Load from storage (stage on local disk or load to memory).
