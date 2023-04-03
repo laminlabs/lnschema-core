@@ -445,6 +445,7 @@ class File(SQLModel, table=True):  # type: ignore
     # private attributes are needed here to prevent sqlalchemy error
     _local_filepath: Optional[Path] = PrivateAttr()
     _cloud_filepath: Optional[CloudPath] = PrivateAttr()
+    _clear_storagekey: Optional[str] = PrivateAttr()
     _memory_rep: Any = PrivateAttr()
 
     def path(self) -> Union[Path, CloudPath]:
@@ -469,6 +470,9 @@ class File(SQLModel, table=True):  # type: ignore
 
         if kwargs["name"] != name_to_pass:
             logger.warning("Your new filename does not match the previous filename. If you want to update in the DB, update it manually!")
+
+        if self._objectkey is None and self.suffix != kwargs["suffix"]:
+            self._clear_storagekey = f"{self.id}{self.suffix}"
 
         self.size = kwargs["size"]
         self.hash = kwargs["hash"]
