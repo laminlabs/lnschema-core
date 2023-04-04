@@ -1,15 +1,3 @@
-from pathlib import Path
-from typing import Union
-
-from cloudpathlib import CloudPath
-
-
-def get_name_suffix_from_filepath(filepath: Union[Path, CloudPath]):
-    suffix = "".join(filepath.suffixes)
-    name = filepath.name.replace(suffix, "")
-    return name, suffix
-
-
 # add type annotations back asap when re-organizing the module
 def storage_key_from_file(dobj):
     if dobj._objectkey is None:
