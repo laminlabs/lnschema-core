@@ -84,7 +84,7 @@ class Transform(SQLModel, table=True):  # type: ignore
     """
 
     id: str = Field(default_factory=idg.pipeline, primary_key=True)
-    v: str = Field(default="1", primary_key=True)
+    version: str = Field(default="1", primary_key=True)
     """Version identifier, defaults to `"1"`.
 
     Use this to label different versions of the same transform.
@@ -102,7 +102,7 @@ class Transform(SQLModel, table=True):  # type: ignore
     """An additional title, like a notebook title.
     """
     reference: Optional[str] = Field(index=True)
-    """Reference for the transform, e.g., a URL.
+    """Reference for the transform, e.g., a GitHub URL.
     """
     created_by: str = CreatedBy
     created_at: datetime = CreatedAt
