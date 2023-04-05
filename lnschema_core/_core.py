@@ -5,7 +5,6 @@ from typing import Any, List, Optional, Union, overload  # noqa
 import anndata as ad
 import pandas as pd
 import sqlalchemy as sa
-import sqlmodel
 from cloudpathlib import CloudPath
 from lamin_logger import logger
 from pydantic.fields import PrivateAttr
@@ -300,13 +299,21 @@ class Features(SQLModel, table=True):  # type: ignore
 
 
 class Folder(SQLModel, table=True):  # type: ignore
-    """Data folders, collections of data objects.
+    """Folders, collections of files.
 
-    In LaminDB, a data folder is a collection of data objects (`File`).
+    A LaminDB `Folder` may have a 1:1 correspondence to folders in a file system.
+
+    But unlike a `Folder` on a file system, a file can be linked to multiple LaminDB folders.
     """
+
+    __table_args__ = (
+        sa.UniqueConstraint("storage_id", "key", name="uq_folder_storage_key"),
+        {"schema": schema_arg},
+    )
 
     id: str = Field(default_factory=idg.folder, primary_key=True)
     name: str = Field(index=True)
+    key: Optional[str] = Field(default=None, index=True)
     files: List["File"] = Relationship(  # type: ignore  # noqa
         back_populates="folders",
         sa_relationship_kwargs=dict(secondary=FolderFile.__table__),
@@ -373,6 +380,7 @@ class Folder(SQLModel, table=True):  # type: ignore
         # continue with fields
         id: Optional[str] = None,
         name: Optional[str] = None,
+        key: Optional[str] = None,
         x: List["File"] = [],
     ):
         if folder is not None:
@@ -381,6 +389,7 @@ class Folder(SQLModel, table=True):  # type: ignore
             kwargs, privates = get_folder_kwargs_from_data(
                 folder=folder,
                 name=name,
+                key=key,
             )
             if id is not None:
                 kwargs["id"] = id
@@ -393,14 +402,11 @@ class Folder(SQLModel, table=True):  # type: ignore
             self._cloud_filepath = privates["_cloud_filepath"]
 
 
-Folder._objectkey = sa.Column("_objectkey", sqlmodel.sql.sqltypes.AutoString(), index=True)
-
-
 class File(SQLModel, table=True):  # type: ignore
     """See lamindb for docstring."""
 
     __table_args__ = (
-        sa.UniqueConstraint("storage_id", "key", name="uq_storage_key"),
+        sa.UniqueConstraint("storage_id", "key", name="uq_file_storage_key"),
         {"schema": schema_arg},
     )
 
