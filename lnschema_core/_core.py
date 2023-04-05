@@ -399,6 +399,11 @@ Folder._objectkey = sa.Column("_objectkey", sqlmodel.sql.sqltypes.AutoString(), 
 class File(SQLModel, table=True):  # type: ignore
     """See lamindb for docstring."""
 
+    __table_args__ = (
+        sa.UniqueConstraint("storage_id", "key", name="uq_storage_key"),
+        {"schema": schema_arg},
+    )
+
     id: str = Field(default_factory=idg.file, primary_key=True)
     name: Optional[str] = Field(index=True)
     suffix: Optional[str] = Field(default=None, index=True)
@@ -415,9 +420,8 @@ class File(SQLModel, table=True):  # type: ignore
     """
     hash: Optional[str] = Field(default=None, index=True)
     """Hash (md5)."""
-
-    # We need the fully module-qualified path below, as there might be more
-    # schema modules with an ORM called "Run"
+    key: Optional[str] = Field(default=None, index=True)
+    """Relative path within storage location."""
     source: Run = Relationship(back_populates="outputs")  # type: ignore
     """:class:`~lamindb.Run` that generated the `file`."""
     source_id: str = Field(foreign_key="core.run.id", index=True)
@@ -447,6 +451,7 @@ class File(SQLModel, table=True):  # type: ignore
     _cloud_filepath: Optional[CloudPath] = PrivateAttr()
     _clear_storagekey: Optional[str] = PrivateAttr()
     _memory_rep: Any = PrivateAttr()
+    _check_path_in_storage: bool = PrivateAttr()
 
     def path(self) -> Union[Path, CloudPath]:
         """Path on storage."""
@@ -544,9 +549,10 @@ class File(SQLModel, table=True):  # type: ignore
         self,
         data: Union[Path, str, pd.DataFrame, ad.AnnData] = None,
         *,
-        features: List[Features] = None,
+        key: Optional[str] = None,
         source: Optional[Run] = None,
         format: Optional[str] = None,
+        features: List[Features] = None,
         # continue with fields
         id: Optional[str] = None,
         name: Optional[str] = None,
@@ -570,6 +576,7 @@ class File(SQLModel, table=True):  # type: ignore
             kwargs, privates = get_file_kwargs_from_data(
                 data=data,
                 name=name,
+                key=key,
                 source=source,
                 format=format,
             )
@@ -585,7 +592,4 @@ class File(SQLModel, table=True):  # type: ignore
             self._local_filepath = privates["_local_filepath"]
             self._cloud_filepath = privates["_cloud_filepath"]
             self._memory_rep = privates["_memory_rep"]
-
-
-File._objectkey = sa.Column("_objectkey", sqlmodel.sql.sqltypes.AutoString(), index=True)
-File.__table__.append_constraint(sa.UniqueConstraint("storage_id", "_objectkey", "suffix", name="uq_storage__objectkey_suffix"))
+            self._check_path_in_storage = privates["_check_path_in_storage"]
