@@ -301,9 +301,9 @@ class Features(SQLModel, table=True):  # type: ignore
 class Folder(SQLModel, table=True):  # type: ignore
     """Folders, collections of files.
 
-    A LaminDB `Folder` may have a 1:1 correspondence to folders in a file system.
-
-    But unlike a `Folder` on a file system, a file can be linked to multiple LaminDB folders.
+    Real vs. virtual folders:
+    - A real LaminDB `Folder` can have a 1:1 correspondence to folders in a file system.
+    - A virtual LaminDB `Folder` is a mere way of grouping files. A file can be linked to multiple virtual folders, but only reside in one real folder.
     """
 
     __table_args__ = (
