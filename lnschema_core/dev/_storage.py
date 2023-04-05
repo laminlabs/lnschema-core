@@ -1,9 +1,9 @@
 # add type annotations back asap when re-organizing the module
-def storage_key_from_file(dobj):
-    if dobj._objectkey is None:
-        return f"{dobj.id}{dobj.suffix}"
+def storage_key_from_file(file):
+    if file.key is None:
+        return f"{file.id}{file.suffix}"
     else:
-        return f"{dobj._objectkey}{dobj.suffix}"
+        return f"{file.key}"
 
 
 # add type annotations back asap when re-organizing the module
