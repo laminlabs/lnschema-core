@@ -5,10 +5,10 @@ from typing import Any, List, Optional, Union, overload  # noqa
 import anndata as ad
 import pandas as pd
 import sqlalchemy as sa
-from cloudpathlib import CloudPath
 from lamin_logger import logger
 from pydantic.fields import PrivateAttr
 from sqlmodel import Field, ForeignKeyConstraint, Relationship
+from upath import UPath
 
 from . import _name as schema_name
 from ._link import FileFeatures, FolderFile, ProjectFolder, RunIn  # noqa
@@ -325,9 +325,9 @@ class Folder(SQLModel, table=True):  # type: ignore
 
     # private attributes are needed here to prevent sqlalchemy error
     _local_filepath: Optional[Path] = PrivateAttr()
-    _cloud_filepath: Optional[CloudPath] = PrivateAttr()
+    _cloud_filepath: Optional[UPath] = PrivateAttr()
 
-    def path(self) -> Union[Path, CloudPath]:
+    def path(self) -> Union[Path, UPath]:
         """Path on storage."""
         return filepath_from_folder(self)
 
@@ -356,7 +356,7 @@ class Folder(SQLModel, table=True):  # type: ignore
     @overload
     def __init__(
         self,
-        folder: Union[Path, str] = None,
+        folder: Union[Path, UPath, str] = None,
         *,
         name: Optional[str] = None,
     ):
@@ -375,7 +375,7 @@ class Folder(SQLModel, table=True):  # type: ignore
 
     def __init__(  # type: ignore
         self,
-        folder: Union[Path, str] = None,
+        folder: Union[Path, UPath, str] = None,
         *,
         # continue with fields
         id: Optional[str] = None,
@@ -454,12 +454,12 @@ class File(SQLModel, table=True):  # type: ignore
 
     # private attributes are needed here to prevent sqlalchemy error
     _local_filepath: Optional[Path] = PrivateAttr()
-    _cloud_filepath: Optional[CloudPath] = PrivateAttr()
+    _cloud_filepath: Optional[UPath] = PrivateAttr()
     _clear_storagekey: Optional[str] = PrivateAttr()
     _memory_rep: Any = PrivateAttr()
     _check_path_in_storage: bool = PrivateAttr()
 
-    def path(self) -> Union[Path, CloudPath]:
+    def path(self) -> Union[Path, UPath]:
         """Path on storage."""
         return filepath_from_file(self)
 
@@ -523,7 +523,7 @@ class File(SQLModel, table=True):  # type: ignore
     @overload
     def __init__(
         self,
-        data: Union[Path, str, pd.DataFrame, ad.AnnData] = None,
+        data: Union[Path, UPath, str, pd.DataFrame, ad.AnnData] = None,
         *,
         name: Optional[str] = None,
         features: List[Features] = [],
@@ -553,7 +553,7 @@ class File(SQLModel, table=True):  # type: ignore
 
     def __init__(  # type: ignore
         self,
-        data: Union[Path, str, pd.DataFrame, ad.AnnData] = None,
+        data: Union[Path, UPath, str, pd.DataFrame, ad.AnnData] = None,
         *,
         key: Optional[str] = None,
         source: Optional[Run] = None,
