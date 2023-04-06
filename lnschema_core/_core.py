@@ -302,8 +302,8 @@ class Folder(SQLModel, table=True):  # type: ignore
     """Folders, collections of files.
 
     Real vs. virtual folders:
-    - A real LaminDB `Folder` can have a 1:1 correspondence to folders in a file system.
-    - A virtual LaminDB `Folder` is a mere way of grouping files. A file can be linked to multiple virtual folders, but only reside in one real folder.
+    - A real LaminDB `Folder` has a 1:1 correspondence to a folder on a file system or in object storage, and a `.key` that is not `None`.
+    - A virtual LaminDB `Folder` is a mere way of grouping files. A file can be linked to multiple virtual folders, but only to one real folder.
     """
 
     __table_args__ = (
@@ -314,6 +314,8 @@ class Folder(SQLModel, table=True):  # type: ignore
     id: str = Field(default_factory=idg.folder, primary_key=True)
     name: str = Field(index=True)
     key: Optional[str] = Field(default=None, index=True)
+    storage_id: Optional[str] = Field(default=None, foreign_key="core.storage.id", index=True)
+    """Storage root id."""
     files: List["File"] = Relationship(  # type: ignore  # noqa
         back_populates="folders",
         sa_relationship_kwargs=dict(secondary=FolderFile.__table__),
