@@ -22,7 +22,7 @@ def upgrade() -> None:
 
     with op.batch_alter_table(f"{prefix}folder", schema=schema) as batch_op:
         batch_op.add_column(sa.Column("storage_id", sqm.sql.sqltypes.AutoString(), nullable=True))
-        batch_op.create_index(op.f("ix_core{delim}folder_storage_id"), ["storage_id"], unique=False)
+        batch_op.create_index(op.f(f"ix_core{delim}folder_storage_id"), ["storage_id"], unique=False)
         batch_op.drop_index(f"ix_core{delim}folder__objectkey")
         batch_op.create_index(batch_op.f(f"ix_core{delim}folder_key"), ["key"], unique=False)
         batch_op.create_unique_constraint("uq_folder_storage_key", ["storage_id", "key"])
