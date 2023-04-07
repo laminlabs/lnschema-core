@@ -465,6 +465,7 @@ class File(SQLModel, table=True):  # type: ignore
         """Path on storage."""
         return filepath_from_file_or_folder(self)
 
+    # likely needs an arg `key`
     def replace(self, data: Union[Path, str, pd.DataFrame, ad.AnnData], source: Optional[Run] = None, format: Optional[str] = None):
         """Replace data object."""
         from lamindb._file import get_file_kwargs_from_data
@@ -495,9 +496,6 @@ class File(SQLModel, table=True):  # type: ignore
         self._local_filepath = privates["local_filepath"]
         self._cloud_filepath = privates["cloud_filepath"]
         self._memory_rep = privates["memory_rep"]
-
-        # new _objectkey will be written in ln.add
-        sa.orm.attributes.set_attribute(self, "_objectkey", None)
 
     def stage(self, is_run_input: bool = False):
         """Download from storage if newer than in the cache.
