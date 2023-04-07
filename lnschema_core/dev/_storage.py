@@ -38,3 +38,7 @@ def filepath_from_file_or_folder(file_or_folder):
         storage_settings = StorageSettings(storage.root, instance_settings=None)
         path = storage_settings.key_to_filepath(storage_key)
     return path
+
+
+# below for backward compat
+filepath_from_file = filepath_from_file_or_folder
