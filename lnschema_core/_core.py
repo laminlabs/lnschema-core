@@ -15,7 +15,7 @@ from ._link import FileFeatures, FolderFile, ProjectFolder, RunIn  # noqa
 from ._timestamps import CreatedAt, UpdatedAt
 from ._users import CreatedBy
 from .dev import id as idg
-from .dev._storage import filepath_from_file, filepath_from_folder
+from .dev._storage import filepath_from_file_or_folder
 from .dev.sqlmodel import schema_sqlmodel
 from .dev.type import TransformType
 
@@ -331,7 +331,7 @@ class Folder(SQLModel, table=True):  # type: ignore
 
     def path(self) -> Union[Path, UPath]:
         """Path on storage."""
-        return filepath_from_folder(self)
+        return filepath_from_file_or_folder(self)
 
     def tree(
         self,
@@ -463,7 +463,7 @@ class File(SQLModel, table=True):  # type: ignore
 
     def path(self) -> Union[Path, UPath]:
         """Path on storage."""
-        return filepath_from_file(self)
+        return filepath_from_file_or_folder(self)
 
     def replace(self, data: Union[Path, str, pd.DataFrame, ad.AnnData], source: Optional[Run] = None, format: Optional[str] = None):
         """Replace data object."""
