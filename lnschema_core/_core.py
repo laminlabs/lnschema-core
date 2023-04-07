@@ -492,9 +492,9 @@ class File(SQLModel, table=True):  # type: ignore
         self.hash = kwargs["hash"]
         self.suffix = kwargs["suffix"]
         self.source = kwargs["source"]
-        self._local_filepath = privates["_local_filepath"]
-        self._cloud_filepath = privates["_cloud_filepath"]
-        self._memory_rep = privates["_memory_rep"]
+        self._local_filepath = privates["local_filepath"]
+        self._cloud_filepath = privates["cloud_filepath"]
+        self._memory_rep = privates["memory_rep"]
 
         # new _objectkey will be written in ln.add
         sa.orm.attributes.set_attribute(self, "_objectkey", None)
@@ -578,6 +578,18 @@ class File(SQLModel, table=True):  # type: ignore
         if not isinstance(features, List):
             features = [features]
 
+        def log_hint(*, check_path_in_storage: bool, key: str, id: str, suffix: str) -> None:
+            hint = ""
+            if check_path_in_storage:
+                hint += "file in storage ✓"
+            else:
+                hint += "file will be copied to storage upon `ln.add()`"
+            if key is None:
+                hint += f"using storage key = {id}{suffix}"
+            else:
+                hint += f"using storage key = {key}"
+            logger.hint(hint)
+
         if data is not None:
             from lamindb._file import get_file_kwargs_from_data
 
@@ -588,16 +600,21 @@ class File(SQLModel, table=True):  # type: ignore
                 source=source,
                 format=format,
             )
-            if id is not None:
-                kwargs["id"] = id
+            kwargs["id"] = idg.file() if id is None else id
             if features is not None:
                 kwargs["features"] = features
+            log_hint(
+                check_path_in_storage=privates["check_path_in_storage"],
+                key=kwargs["key"],
+                id=kwargs["id"],
+                suffix=kwargs["suffix"],
+            )
         else:
             kwargs = {k: v for k, v in locals().items() if v and k != "self"}
 
         super().__init__(**kwargs)
         if data is not None:
-            self._local_filepath = privates["_local_filepath"]
-            self._cloud_filepath = privates["_cloud_filepath"]
-            self._memory_rep = privates["_memory_rep"]
-            self._check_path_in_storage = privates["_check_path_in_storage"]
+            self._local_filepath = privates["local_filepath"]
+            self._cloud_filepath = privates["cloud_filepath"]
+            self._memory_rep = privates["memory_rep"]
+            self._check_path_in_storage = privates["check_path_in_storage"]
