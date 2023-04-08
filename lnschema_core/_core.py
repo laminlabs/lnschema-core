@@ -361,7 +361,7 @@ class Folder(SQLModel, table=True):  # type: ignore
     @overload
     def __init__(
         self,
-        folder: Union[Path, UPath, str] = None,
+        path: Union[Path, UPath, str] = None,
         *,
         name: Optional[str] = None,
     ):
@@ -380,7 +380,7 @@ class Folder(SQLModel, table=True):  # type: ignore
 
     def __init__(  # type: ignore
         self,
-        folder: Union[Path, UPath, str] = None,
+        path: Optional[Union[Path, UPath, str]] = None,
         *,
         # continue with fields
         id: Optional[str] = None,
@@ -389,11 +389,11 @@ class Folder(SQLModel, table=True):  # type: ignore
         storage_id: Optional[str] = None,
         files: List["File"] = [],
     ):
-        if folder is not None:
+        if path is not None:
             from lamindb._folder import get_folder_kwargs_from_data
 
             kwargs, privates = get_folder_kwargs_from_data(
-                folder=folder,
+                path=path,
                 name=name,
                 key=key,
             )
@@ -403,7 +403,7 @@ class Folder(SQLModel, table=True):  # type: ignore
             kwargs = {k: v for k, v in locals().items() if v and k != "self"}
 
         super().__init__(**kwargs)
-        if folder is not None:
+        if path is not None:
             self._local_filepath = privates["local_filepath"]
             self._cloud_filepath = privates["cloud_filepath"]
 
@@ -561,7 +561,7 @@ class File(SQLModel, table=True):  # type: ignore
 
     def __init__(  # type: ignore
         self,
-        data: Union[Path, UPath, str, pd.DataFrame, ad.AnnData] = None,
+        data: Optional[Union[Path, UPath, str, pd.DataFrame, ad.AnnData]] = None,
         *,
         key: Optional[str] = None,
         source: Optional[Run] = None,
