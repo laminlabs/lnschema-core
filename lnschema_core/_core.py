@@ -386,7 +386,8 @@ class Folder(SQLModel, table=True):  # type: ignore
         id: Optional[str] = None,
         name: Optional[str] = None,
         key: Optional[str] = None,
-        x: List["File"] = [],
+        storage_id: Optional[str] = None,
+        files: List["File"] = [],
     ):
         if folder is not None:
             from lamindb._folder import get_folder_kwargs_from_data
