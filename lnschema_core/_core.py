@@ -489,8 +489,8 @@ class File(SQLModel, table=True):  # type: ignore
         if kwargs["name"] != name_to_pass:
             logger.warning("Your new filename does not match the previous filename. If you want to update in the DB, update it manually!")
 
-        # we don't delete storage objects added through _objectkey
-        if self._objectkey is None and self.suffix != kwargs["suffix"]:
+        # we don't delete storage objects added through key
+        if self.key is None and self.suffix != kwargs["suffix"]:
             self._clear_storagekey = f"{self.id}{self.suffix}"
 
         self.size = kwargs["size"]
