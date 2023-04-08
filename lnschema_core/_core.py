@@ -329,6 +329,10 @@ class Folder(SQLModel, table=True):  # type: ignore
     _local_filepath: Optional[Path] = PrivateAttr()
     _cloud_filepath: Optional[UPath] = PrivateAttr()
 
+    @property
+    def __name__(cls) -> str:
+        return "Folder"
+
     def path(self) -> Union[Path, UPath]:
         """Path on storage."""
         return filepath_from_file_or_folder(self)
@@ -520,6 +524,10 @@ class File(SQLModel, table=True):  # type: ignore
 
         return lnload(file=self, stream=stream, is_run_input=is_run_input)
 
+    @property
+    def __name__(cls) -> str:
+        return "File"
+
     @overload
     def __init__(
         self,
@@ -583,9 +591,9 @@ class File(SQLModel, table=True):  # type: ignore
             else:
                 hint += "file will be copied to storage upon `ln.add()`"
             if key is None:
-                hint += f"using storage key = {id}{suffix}"
+                hint += f" using storage key = {id}{suffix}"
             else:
-                hint += f"using storage key = {key}"
+                hint += f" using storage key = {key}"
             logger.hint(hint)
 
         if data is not None:
