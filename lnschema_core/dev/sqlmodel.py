@@ -8,11 +8,11 @@
 """
 
 import importlib
-import os
 import re
 import typing
 from typing import Any, Optional, Sequence, Tuple, Union
 
+import lndb
 import sqlmodel as sqm
 from pydantic import create_model
 from sqlalchemy.orm import declared_attr
@@ -86,28 +86,14 @@ class SQLModelPrefix(sqm.SQLModel):  # type: ignore
 
 
 def is_sqlite():
-    # for this to work, lndb can't import lnschema_core statically
-    # it can only import it dynamically like all other schema modules
-    try:
-        from lndb.dev._settings_load import load_instance_settings
-
-        isettings = load_instance_settings()
-        sqlite_true = isettings.dialect == "sqlite"
-    except (ImportError, RuntimeError):
-        sqlite_true = True
-
-    return sqlite_true
+    return lndb.settings.instance.dialect == "sqlite"
 
 
 def schema_sqlmodel(schema_name: str):
     global SCHEMA_NAME
     SCHEMA_NAME = schema_name
 
-    if "hub" in os.environ and os.environ["hub"] == "true":
-        prefix = ""
-        schema_arg = schema_name
-        return SQLModelModule, prefix, schema_arg
-    elif is_sqlite():
+    if is_sqlite():
         prefix = f"{schema_name}."
         schema_arg = None
         return SQLModelPrefix, prefix, schema_arg

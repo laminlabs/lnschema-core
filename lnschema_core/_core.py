@@ -5,18 +5,16 @@ from typing import Any, List, Optional, Union, overload  # noqa
 import anndata as ad
 import pandas as pd
 import sqlalchemy as sa
-import sqlmodel
-from cloudpathlib import CloudPath
 from lamin_logger import logger
 from pydantic.fields import PrivateAttr
 from sqlmodel import Field, ForeignKeyConstraint, Relationship
+from upath import UPath
 
 from . import _name as schema_name
 from ._link import FileFeatures, FolderFile, ProjectFolder, RunIn  # noqa
 from ._timestamps import CreatedAt, UpdatedAt
 from ._users import CreatedBy
 from .dev import id as idg
-from .dev._storage import filepath_from_file, filepath_from_folder
 from .dev.sqlmodel import schema_sqlmodel
 from .dev.type import TransformType
 
@@ -300,13 +298,23 @@ class Features(SQLModel, table=True):  # type: ignore
 
 
 class Folder(SQLModel, table=True):  # type: ignore
-    """Data folders, collections of data objects.
+    """Folders, collections of files.
 
-    In LaminDB, a data folder is a collection of data objects (`File`).
+    Real vs. virtual folders:
+    - A real LaminDB `Folder` has a 1:1 correspondence to a folder on a file system or in object storage, and a `.key` that is not `None`.
+    - A virtual LaminDB `Folder` is a mere way of grouping files. A file can be linked to multiple virtual folders, but only to one real folder.
     """
+
+    __table_args__ = (
+        sa.UniqueConstraint("storage_id", "key", name="uq_folder_storage_key"),
+        {"schema": schema_arg},
+    )
 
     id: str = Field(default_factory=idg.folder, primary_key=True)
     name: str = Field(index=True)
+    key: Optional[str] = Field(default=None, index=True)
+    storage_id: Optional[str] = Field(default=None, foreign_key="core.storage.id", index=True)
+    """Storage root id."""
     files: List["File"] = Relationship(  # type: ignore  # noqa
         back_populates="folders",
         sa_relationship_kwargs=dict(secondary=FolderFile.__table__),
@@ -318,11 +326,15 @@ class Folder(SQLModel, table=True):  # type: ignore
 
     # private attributes are needed here to prevent sqlalchemy error
     _local_filepath: Optional[Path] = PrivateAttr()
-    _cloud_filepath: Optional[CloudPath] = PrivateAttr()
+    _cloud_filepath: Optional[UPath] = PrivateAttr()
 
-    def path(self) -> Union[Path, CloudPath]:
+    @property
+    def __name__(cls) -> str:
+        return "Folder"
+
+    def path(self) -> Union[Path, UPath]:
         """Path on storage."""
-        return filepath_from_folder(self)
+        return filepath_from_file_or_folder(self)
 
     def tree(
         self,
@@ -340,16 +352,16 @@ class Folder(SQLModel, table=True):  # type: ignore
             length_limit=length_limit,
         )
 
-    def get(self, relpath: Union[str, Path, List[Union[str, Path]]], **fields):
+    def subset(self, *, prefix: str, **fields):
         """Get files via relative path to folder."""
-        from lamindb._folder import get_file
+        from lamindb._folder import subset
 
-        return get_file(folder=self, relpath=relpath, **fields)
+        return subset(folder=self, prefix=prefix, **fields)
 
     @overload
     def __init__(
         self,
-        folder: Union[Path, str] = None,
+        path: Union[Path, UPath, str] = None,
         *,
         name: Optional[str] = None,
     ):
@@ -368,19 +380,22 @@ class Folder(SQLModel, table=True):  # type: ignore
 
     def __init__(  # type: ignore
         self,
-        folder: Union[Path, str] = None,
+        path: Optional[Union[Path, UPath, str]] = None,
         *,
         # continue with fields
         id: Optional[str] = None,
         name: Optional[str] = None,
-        x: List["File"] = [],
+        key: Optional[str] = None,
+        storage_id: Optional[str] = None,
+        files: List["File"] = [],
     ):
-        if folder is not None:
+        if path is not None:
             from lamindb._folder import get_folder_kwargs_from_data
 
             kwargs, privates = get_folder_kwargs_from_data(
-                folder=folder,
+                path=path,
                 name=name,
+                key=key,
             )
             if id is not None:
                 kwargs["id"] = id
@@ -388,16 +403,18 @@ class Folder(SQLModel, table=True):  # type: ignore
             kwargs = {k: v for k, v in locals().items() if v and k != "self"}
 
         super().__init__(**kwargs)
-        if folder is not None:
-            self._local_filepath = privates["_local_filepath"]
-            self._cloud_filepath = privates["_cloud_filepath"]
-
-
-Folder._objectkey = sa.Column("_objectkey", sqlmodel.sql.sqltypes.AutoString(), index=True)
+        if path is not None:
+            self._local_filepath = privates["local_filepath"]
+            self._cloud_filepath = privates["cloud_filepath"]
 
 
 class File(SQLModel, table=True):  # type: ignore
     """See lamindb for docstring."""
+
+    __table_args__ = (
+        sa.UniqueConstraint("storage_id", "key", name="uq_file_storage_key"),
+        {"schema": schema_arg},
+    )
 
     id: str = Field(default_factory=idg.file, primary_key=True)
     name: Optional[str] = Field(index=True)
@@ -415,9 +432,8 @@ class File(SQLModel, table=True):  # type: ignore
     """
     hash: Optional[str] = Field(default=None, index=True)
     """Hash (md5)."""
-
-    # We need the fully module-qualified path below, as there might be more
-    # schema modules with an ORM called "Run"
+    key: Optional[str] = Field(default=None, index=True)
+    """Relative path within storage location."""
     source: Run = Relationship(back_populates="outputs")  # type: ignore
     """:class:`~lamindb.Run` that generated the `file`."""
     source_id: str = Field(foreign_key="core.run.id", index=True)
@@ -444,14 +460,16 @@ class File(SQLModel, table=True):  # type: ignore
 
     # private attributes are needed here to prevent sqlalchemy error
     _local_filepath: Optional[Path] = PrivateAttr()
-    _cloud_filepath: Optional[CloudPath] = PrivateAttr()
+    _cloud_filepath: Optional[UPath] = PrivateAttr()
     _clear_storagekey: Optional[str] = PrivateAttr()
     _memory_rep: Any = PrivateAttr()
+    _to_store: bool = PrivateAttr()  # indicate whether upload needed
 
-    def path(self) -> Union[Path, CloudPath]:
+    def path(self) -> Union[Path, UPath]:
         """Path on storage."""
-        return filepath_from_file(self)
+        return filepath_from_file_or_folder(self)
 
+    # likely needs an arg `key`
     def replace(self, data: Union[Path, str, pd.DataFrame, ad.AnnData], source: Optional[Run] = None, format: Optional[str] = None):
         """Replace data object."""
         from lamindb._file import get_file_kwargs_from_data
@@ -469,22 +487,20 @@ class File(SQLModel, table=True):  # type: ignore
         )
 
         if kwargs["name"] != name_to_pass:
-            logger.warning("Your new filename does not match the previous filename. If you want to update in the DB, update it manually!")
+            logger.warning("Your new filename does not match the previous filename: to update the name, set file.name = new_name")
 
-        # we don't delete storage objects added through _objectkey
-        if self._objectkey is None and self.suffix != kwargs["suffix"]:
+        # we don't delete storage objects added through key
+        if self.key is None and self.suffix != kwargs["suffix"]:
             self._clear_storagekey = f"{self.id}{self.suffix}"
 
         self.size = kwargs["size"]
         self.hash = kwargs["hash"]
         self.suffix = kwargs["suffix"]
         self.source = kwargs["source"]
-        self._local_filepath = privates["_local_filepath"]
-        self._cloud_filepath = privates["_cloud_filepath"]
-        self._memory_rep = privates["_memory_rep"]
-
-        # new _objectkey will be written in ln.add
-        sa.orm.attributes.set_attribute(self, "_objectkey", None)
+        self._local_filepath = privates["local_filepath"]
+        self._cloud_filepath = privates["cloud_filepath"]
+        self._memory_rep = privates["memory_rep"]
+        self._to_store = True
 
     def stage(self, is_run_input: bool = False):
         """Download from storage if newer than in the cache.
@@ -509,10 +525,14 @@ class File(SQLModel, table=True):  # type: ignore
 
         return lnload(file=self, stream=stream, is_run_input=is_run_input)
 
+    @property
+    def __name__(cls) -> str:
+        return "File"
+
     @overload
     def __init__(
         self,
-        data: Union[Path, str, pd.DataFrame, ad.AnnData] = None,
+        data: Union[Path, UPath, str, pd.DataFrame, ad.AnnData] = None,
         *,
         name: Optional[str] = None,
         features: List[Features] = [],
@@ -542,11 +562,12 @@ class File(SQLModel, table=True):  # type: ignore
 
     def __init__(  # type: ignore
         self,
-        data: Union[Path, str, pd.DataFrame, ad.AnnData] = None,
+        data: Optional[Union[Path, UPath, str, pd.DataFrame, ad.AnnData]] = None,
         *,
-        features: List[Features] = None,
+        key: Optional[str] = None,
         source: Optional[Run] = None,
         format: Optional[str] = None,
+        features: List[Features] = None,
         # continue with fields
         id: Optional[str] = None,
         name: Optional[str] = None,
@@ -564,28 +585,82 @@ class File(SQLModel, table=True):  # type: ignore
         if not isinstance(features, List):
             features = [features]
 
+        def log_hint(*, check_path_in_storage: bool, key: str, id: str, suffix: str) -> None:
+            hint = ""
+            if check_path_in_storage:
+                hint += "file in storage ✓"
+            else:
+                hint += "file will be copied to storage upon `ln.add()`"
+            if key is None:
+                hint += f" using storage key = {id}{suffix}"
+            else:
+                hint += f" using storage key = {key}"
+            logger.hint(hint)
+
         if data is not None:
             from lamindb._file import get_file_kwargs_from_data
 
             kwargs, privates = get_file_kwargs_from_data(
                 data=data,
                 name=name,
+                key=key,
                 source=source,
                 format=format,
             )
-            if id is not None:
-                kwargs["id"] = id
+            kwargs["id"] = idg.file() if id is None else id
             if features is not None:
                 kwargs["features"] = features
+            log_hint(
+                check_path_in_storage=privates["check_path_in_storage"],
+                key=kwargs["key"],
+                id=kwargs["id"],
+                suffix=kwargs["suffix"],
+            )
         else:
             kwargs = {k: v for k, v in locals().items() if v and k != "self"}
 
         super().__init__(**kwargs)
         if data is not None:
-            self._local_filepath = privates["_local_filepath"]
-            self._cloud_filepath = privates["_cloud_filepath"]
-            self._memory_rep = privates["_memory_rep"]
+            self._local_filepath = privates["local_filepath"]
+            self._cloud_filepath = privates["cloud_filepath"]
+            self._memory_rep = privates["memory_rep"]
+            self._to_store = not privates["check_path_in_storage"]
 
 
-File._objectkey = sa.Column("_objectkey", sqlmodel.sql.sqltypes.AutoString(), index=True)
-File.__table__.append_constraint(sa.UniqueConstraint("storage_id", "_objectkey", "suffix", name="uq_storage__objectkey_suffix"))
+# add type annotations back asap when re-organizing the module
+def storage_key_from_file(file: File):
+    if file.key is None:
+        return f"{file.id}{file.suffix}"
+    else:
+        return f"{file.key}"
+
+
+# add type annotations back asap when re-organizing the module
+def filepath_from_file_or_folder(file_or_folder: Union[File, Folder]):
+    from lndb import settings
+    from lndb.dev import StorageSettings
+
+    # using __name__ for type check to avoid need of
+    # dynamically importing the type
+    if file_or_folder.__name__ == "File":
+        storage_key = storage_key_from_file(file_or_folder)
+    else:
+        storage_key = file_or_folder.key
+        if storage_key is None:
+            raise ValueError("Only real folders have a path!")
+    if file_or_folder.storage_id == settings.storage.id:
+        path = settings.storage.key_to_filepath(storage_key)
+    else:
+        logger.warning(
+            "file.path() is slow for files outside the currently configured storage location\n"
+            "consider joining for the set of files you're interested in: ln.select(ln.File, ln.Storage)"
+            "the path is storage.root / file.key if file.key is not None\n"
+            "otherwise storage.root / (file.id + file.suffix)"
+        )
+        import lamindb as ln
+
+        storage = ln.select(ln.Storage, id=file_or_folder.storage_id).one()
+        # find a better way than passing None to instance_settings in the future!
+        storage_settings = StorageSettings(storage.root, instance_settings=None)
+        path = storage_settings.key_to_filepath(storage_key)
+    return path
