@@ -404,8 +404,8 @@ class Folder(SQLModel, table=True):  # type: ignore
 
         super().__init__(**kwargs)
         if folder is not None:
-            self._local_filepath = privates["_local_filepath"]
-            self._cloud_filepath = privates["_cloud_filepath"]
+            self._local_filepath = privates["local_filepath"]
+            self._cloud_filepath = privates["cloud_filepath"]
 
 
 class File(SQLModel, table=True):  # type: ignore
