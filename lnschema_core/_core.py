@@ -352,11 +352,11 @@ class Folder(SQLModel, table=True):  # type: ignore
             length_limit=length_limit,
         )
 
-    def get(self, relpath: Union[str, Path, List[Union[str, Path]]], **fields):
+    def subset(self, *, prefix: str, **fields):
         """Get files via relative path to folder."""
-        from lamindb._folder import get_file
+        from lamindb._folder import subset
 
-        return get_file(folder=self, relpath=relpath, **fields)
+        return subset(folder=self, prefix=prefix, **fields)
 
     @overload
     def __init__(
