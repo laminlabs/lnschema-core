@@ -463,7 +463,7 @@ class File(SQLModel, table=True):  # type: ignore
     _cloud_filepath: Optional[UPath] = PrivateAttr()
     _clear_storagekey: Optional[str] = PrivateAttr()
     _memory_rep: Any = PrivateAttr()
-    _check_path_in_storage: bool = PrivateAttr()
+    _to_store: bool = PrivateAttr()  # indicate whether upload needed
 
     def path(self) -> Union[Path, UPath]:
         """Path on storage."""
@@ -500,6 +500,7 @@ class File(SQLModel, table=True):  # type: ignore
         self._local_filepath = privates["local_filepath"]
         self._cloud_filepath = privates["cloud_filepath"]
         self._memory_rep = privates["memory_rep"]
+        self._to_store = True
 
     def stage(self, is_run_input: bool = False):
         """Download from storage if newer than in the cache.
@@ -623,7 +624,7 @@ class File(SQLModel, table=True):  # type: ignore
             self._local_filepath = privates["local_filepath"]
             self._cloud_filepath = privates["cloud_filepath"]
             self._memory_rep = privates["memory_rep"]
-            self._check_path_in_storage = privates["check_path_in_storage"]
+            self._to_store = not privates["check_path_in_storage"]
 
 
 # add type annotations back asap when re-organizing the module
