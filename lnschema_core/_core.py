@@ -497,12 +497,12 @@ class File(SQLModel, table=True):  # type: ignore
         self.hash = kwargs["hash"]
         self.suffix = kwargs["suffix"]
         self.source = kwargs["source"]
-        self.key = kwargs["key"]
+        # self.key = kwargs["key"]  # need to discuss! for as long as no new key is passed, kwargs cannot contain an old key
 
         self._local_filepath = privates["local_filepath"]
         self._cloud_filepath = privates["cloud_filepath"]
         self._memory_rep = privates["memory_rep"]
-        self._to_store = not privates["check_path_in_storage"]
+        self._to_store = True  # need to discuss this! Alex believes this should always be true for .replace()
 
     def stage(self, is_run_input: bool = False):
         """Download from storage if newer than in the cache.
