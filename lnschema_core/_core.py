@@ -497,10 +497,12 @@ class File(SQLModel, table=True):  # type: ignore
         self.hash = kwargs["hash"]
         self.suffix = kwargs["suffix"]
         self.source = kwargs["source"]
+        self.key = kwargs["key"]
+
         self._local_filepath = privates["local_filepath"]
         self._cloud_filepath = privates["cloud_filepath"]
         self._memory_rep = privates["memory_rep"]
-        self._to_store = True
+        self._to_store = not privates["check_path_in_storage"]
 
     def stage(self, is_run_input: bool = False):
         """Download from storage if newer than in the cache.
