@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+✨ Overwrite key in replace if needed | [152](https://github.com/laminlabs/lnschema-core/pull/152) | [Koncopd](https://github.com/Koncopd) | 2023-04-10 |
 🚸 Use full filename to populate `File.name`, introduce `File.key` and `Folder.key` | [150](https://github.com/laminlabs/lnschema-core/pull/150) | [falexwolf](https://github.com/falexwolf) | 2023-04-08 | 0.32.0
 ✨ Add `File.replace()` and `File.stage()` | [149](https://github.com/laminlabs/lnschema-core/pull/149) | [Koncopd](https://github.com/Koncopd) | 2023-04-03 | 0.31.0
 ♻️ Refactor ORM defintions | [148](https://github.com/laminlabs/lnschema-core/pull/148) | [falexwolf](https://github.com/falexwolf) | 2023-03-29 | 0.30.0
