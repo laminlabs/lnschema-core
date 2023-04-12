@@ -18,7 +18,7 @@ def upgrade() -> None:
     sqlite, prefix, schema, delim = get_sqlite_prefix_schema_delim_from_alembic()
     if not sqlite:
         with op.get_context().autocommit_block():
-            op.execute("ALTER TYPE status ADD VALUE 'app'")
+            op.execute("ALTER TYPE transformtype ADD VALUE 'app'")
 
 
 def downgrade() -> None:
