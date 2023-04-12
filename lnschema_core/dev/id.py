@@ -23,9 +23,7 @@ Entity-related generators:
    file
    folder
    run
-   usage
-   notebook
-   pipeline
+   transform
    project
    secret
 """
@@ -36,13 +34,15 @@ from ._id import (  # noqa
     file,
     folder,
     instance,
-    notebook,
-    pipeline,
     project,
     run,
     schema,
     secret,
     storage,
-    usage,
+    transform,
     user,
 )
+
+# backward compat
+pipeline = transform
+notebook = transform

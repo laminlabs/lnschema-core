@@ -68,6 +68,7 @@ class Project(SQLModel, table=True):  # type: ignore
     updated_at: Optional[datetime] = UpdatedAt
 
 
+# defaults are set within ln.add
 class Transform(SQLModel, table=True):  # type: ignore
     """Data transformations.
 
@@ -81,8 +82,8 @@ class Transform(SQLModel, table=True):  # type: ignore
     Data can also be ingested & transformed through an app.
     """
 
-    id: str = Field(default_factory=idg.pipeline, primary_key=True)
-    v: str = Field(default="1", primary_key=True)
+    id: Optional[str] = Field(primary_key=True)
+    v: Optional[str] = Field(primary_key=True)
     """Version identifier, defaults to `"1"`.
 
     Use this to label different versions of the same transform.

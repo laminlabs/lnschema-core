@@ -103,15 +103,10 @@ def storage() -> str:
     return base62(n_char=8)
 
 
-def pipeline() -> str:
-    """Pipeline: 12 base62."""
-    return base62(n_char=12)
+def transform():
+    """Transforms: 12 base62.
 
-
-def notebook():
-    """Jupyter notebook: 12 base62.
-
-    Collision probability is 2e-04 for 1B notebooks: 1M users with 1k notebooks/user.
+    Collision probability is 2e-04 for 1B transforms: 1M users with 1k transforms/user.
 
     Is the same as nbproject ID!
     """
