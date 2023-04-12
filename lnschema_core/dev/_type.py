@@ -16,7 +16,6 @@ class usage(str, Enum):
 class TransformType(Enum):
     pipeline = "pipeline"
     notebook = "notebook"
-    app = "app"
 
     def __repr__(self):
         return self.name
