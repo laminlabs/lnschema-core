@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-🎨 Set `Transform` id upon insert, update `Transform` default | [154](https://github.com/laminlabs/lnschema-core/pull/154) | [falexwolf](https://github.com/falexwolf) | 2023-04-12 |
+🎨 Set `Transform` id upon insert, update `Transform` default | [154](https://github.com/laminlabs/lnschema-core/pull/154) | [falexwolf](https://github.com/falexwolf) | 2023-04-12 | 0.32.1
 🚚 Add app type | [155](https://github.com/laminlabs/lnschema-core/pull/155) | [falexwolf](https://github.com/falexwolf) | 2023-04-12 |
 🩹 Fix name check in replace | [153](https://github.com/laminlabs/lnschema-core/pull/153) | [Koncopd](https://github.com/Koncopd) | 2023-04-10 |
 ✨ Overwrite key in replace if needed | [152](https://github.com/laminlabs/lnschema-core/pull/152) | [Koncopd](https://github.com/Koncopd) | 2023-04-10 |
