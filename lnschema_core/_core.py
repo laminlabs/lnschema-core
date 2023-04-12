@@ -6,6 +6,7 @@ import anndata as ad
 import pandas as pd
 import sqlalchemy as sa
 from lamin_logger import logger
+from nbproject._is_run_from_ipython import is_run_from_ipython
 from pydantic.fields import PrivateAttr
 from sqlmodel import Field, ForeignKeyConstraint, Relationship
 from upath import UPath
@@ -94,8 +95,8 @@ class Transform(SQLModel, table=True):  # type: ignore
     name: str = Field(index=True)
     """A name for the transform, a pipeline name, or a file name of a notebook or script.
     """
-    type: TransformType = Field(index=True, default=TransformType.pipeline)
-    """The transform type.
+    type: TransformType = Field(index=True, default=TransformType.notebook if is_run_from_ipython else TransformType.pipeline)
+    """Transform type: defaults to `notebook` if run from IPython and otherwise to `pipeline`.
     """
     title: Optional[str] = Field(index=True)
     """An additional title, like a notebook title.
