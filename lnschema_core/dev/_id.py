@@ -104,8 +104,8 @@ def storage() -> str:
 
 
 def pipeline() -> str:
-    """Pipeline: 8 base62."""
-    return base62(n_char=8)
+    """Pipeline: 12 base62."""
+    return base62(n_char=12)
 
 
 def notebook():
