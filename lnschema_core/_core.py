@@ -83,8 +83,8 @@ class Transform(SQLModel, table=True):  # type: ignore
     Data can also be ingested & transformed through an app.
     """
 
-    id: Optional[str] = Field(primary_key=True)
-    v: Optional[str] = Field(primary_key=True)
+    id: Optional[str] = Field(sa_column=sa.Column(sa.String, primary_key=True, default=idg.transform))
+    v: Optional[str] = Field(sa_column=sa.Column(sa.String, primary_key=True, default="0"))
     """Version identifier, defaults to `"1"`.
 
     Use this to label different versions of the same transform.
