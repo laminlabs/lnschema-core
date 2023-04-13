@@ -499,7 +499,8 @@ class File(SQLModel, table=True):  # type: ignore
         self.hash = kwargs["hash"]
         self.suffix = kwargs["suffix"]
         self.source = kwargs["source"]
-        self.key = kwargs["key"]  # in case data is a filepath contained in storage, point the key to it
+        if kwargs["key"] is not None:  # only update key in case filepath is already in storage, then we can point the key to it
+            self.key = kwargs["key"]  # otherwise, self.key remains unchanged through .replace()
 
         self._local_filepath = privates["local_filepath"]
         self._cloud_filepath = privates["cloud_filepath"]
