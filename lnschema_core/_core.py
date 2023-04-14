@@ -186,7 +186,7 @@ class Run(SQLModel, table=True):  # type: ignore
         if load_latest:
             run = ln.select(ln.Run, transform_id=transform.id, transform_v=transform.v).order_by(ln.Run.created_at.desc()).first()
             if run is not None:
-                logger.info(f"Loaded run: {run}")
+                logger.info(f"Loaded: {run}")
         elif id is not None:
             run = ln.select(ln.Run, id=id).one_or_none()
             if run is None:
@@ -204,7 +204,7 @@ class Run(SQLModel, table=True):  # type: ignore
             if run is None:
                 added_self = ln.add(self)
                 self._ln_identity_key = added_self.id
-                logger.info(f"Added run: {self}")
+                logger.success(f"Added: {self}")
             ln.context.run = self
 
 
