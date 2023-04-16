@@ -74,7 +74,6 @@ class Project(SQLModel, table=True):  # type: ignore
     updated_at: Optional[datetime] = UpdatedAt
 
 
-# defaults are set within ln.add
 class Transform(SQLModel, table=True):  # type: ignore
     """Data transformations.
 
