@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚚 Better names, more relationships directly on `File` | [157](https://github.com/laminlabs/lnschema-core/pull/157) | [falexwolf](https://github.com/falexwolf) | 2023-04-16 |
 🐛 Fix `.replace()` for key != None | [156](https://github.com/laminlabs/lnschema-core/pull/156) | [falexwolf](https://github.com/falexwolf) | 2023-04-13 | 0.32.2
 🎨 Set `Transform` id upon insert, update `Transform` default | [154](https://github.com/laminlabs/lnschema-core/pull/154) | [falexwolf](https://github.com/falexwolf) | 2023-04-12 | 0.32.1
 🚚 Add app type | [155](https://github.com/laminlabs/lnschema-core/pull/155) | [falexwolf](https://github.com/falexwolf) | 2023-04-12 |
