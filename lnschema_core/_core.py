@@ -108,6 +108,7 @@ class Transform(SQLModel, table=True):  # type: ignore
     """Reference for the transform, e.g., a URL.
     """
     created_by_id: str = CreatedBy
+    created_by: User = Relationship()
     created_at: datetime = CreatedAt
     updated_at: Optional[datetime] = UpdatedAt
 
@@ -153,6 +154,7 @@ class Run(SQLModel, table=True):  # type: ignore
     transform: Transform = Relationship()
     outputs: List["File"] = Relationship(back_populates="run")
     inputs: List["File"] = Relationship(back_populates="targets", sa_relationship_kwargs=dict(secondary=RunIn.__table__))
+    created_by: User = Relationship()
     created_by_id: str = CreatedBy
     created_at: datetime = CreatedAt
 
@@ -241,6 +243,7 @@ class Features(SQLModel, table=True):  # type: ignore
 
     id: str = Field(primary_key=True)  # use a hash
     type: str  # was called entity_type
+    created_by: User = Relationship()
     created_by_id: str = CreatedBy
     created_at: datetime = CreatedAt
     files: List["File"] = Relationship(
@@ -325,6 +328,7 @@ class Folder(SQLModel, table=True):  # type: ignore
         sa_relationship_kwargs=dict(secondary=FolderFile.__table__),
     )
     """:class:`~lamindb.File`."""
+    created_by: User = Relationship()
     created_by_id: str = CreatedBy
     created_at: datetime = CreatedAt
     updated_at: Optional[datetime] = UpdatedAt
@@ -468,6 +472,7 @@ class File(SQLModel, table=True):  # type: ignore
     """Runs that use this file as input."""
     created_at: datetime = CreatedAt
     updated_at: Optional[datetime] = UpdatedAt
+    created_by: User = Relationship()
     created_by_id: Optional[str] = CreatedBy  # make non-optional over time
 
     # private attributes are needed here to prevent sqlalchemy error
