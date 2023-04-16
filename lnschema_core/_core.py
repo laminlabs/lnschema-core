@@ -59,6 +59,7 @@ class Storage(SQLModel, table=True):  # type: ignore
     updated_at: Optional[datetime] = UpdatedAt
 
 
+#     created_by: User = Relationship()
 #     created_by_id: Optional[str] = CreatedBy  # make non-optional over time
 
 
@@ -67,6 +68,7 @@ class Project(SQLModel, table=True):  # type: ignore
 
     id: str = Field(default_factory=idg.project, primary_key=True)
     name: str = Field(index=True)
+    created_by: User = Relationship()
     created_by_id: str = CreatedBy
     created_at: datetime = CreatedAt
     updated_at: Optional[datetime] = UpdatedAt
@@ -107,8 +109,8 @@ class Transform(SQLModel, table=True):  # type: ignore
     reference: Optional[str] = Field(index=True)
     """Reference for the transform, e.g., a URL.
     """
-    created_by_id: str = CreatedBy
     created_by: User = Relationship()
+    created_by_id: str = CreatedBy
     created_at: datetime = CreatedAt
     updated_at: Optional[datetime] = UpdatedAt
 
