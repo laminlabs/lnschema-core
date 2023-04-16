@@ -438,11 +438,17 @@ class File(SQLModel, table=True):  # type: ignore
     hash: Optional[str] = Field(default=None, index=True)
     """Hash (md5)."""
     key: Optional[str] = Field(default=None, index=True)
-    """Relative path within storage location."""
+    """Storage key: relative path within storage location."""
     run: Run = Relationship(back_populates="outputs")  # type: ignore
     """:class:`~lamindb.Run` that generated the `file`."""
     run_id: Optional[str] = Field(foreign_key="core.run.id", index=True)
     """Source run id."""
+    transform: Transform = Relationship()  # type: ignore
+    """:class:`~lamindb.Transform` whose run generated the `file`."""
+    transform_id: Optional[str] = Field(foreign_key="core.transform.id", index=True)
+    """Source transform id."""
+    storage: Storage = Relationship()  # type: ignore
+    """:class:`~lamindb.Storage` location of `file`, see `.path()` for full path."""
     storage_id: str = Field(foreign_key="core.storage.id", index=True)
     """Storage root id."""
     features: List[Features] = Relationship(
