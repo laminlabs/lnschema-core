@@ -13,8 +13,8 @@ def upgrade() -> None:
     sqlite, prefix, schema, delim = get_sqlite_prefix_schema_delim_from_alembic()
 
     op.alter_column(f"{prefix}file", column_name="source_id", new_column_name="run_id", schema=schema)
-    op.drop_index("ix_core{delim}file_source_id", table_name="file", schema=schema)
-    op.create_index(op.f("ix_core{delim}file_run_id"), "file", ["run_id"], unique=False, schema=schema)
+    op.drop_index(f"ix_core{delim}file_source_id", table_name="file", schema=schema)
+    op.create_index(op.f(f"ix_core{delim}file_run_id"), "file", ["run_id"], unique=False, schema=schema)
 
     op.alter_column(f"{prefix}folder", column_name="created_by", new_column_name="created_by_id", schema=schema)
     op.alter_column(f"{prefix}run", column_name="created_by", new_column_name="created_by_id", schema=schema)
