@@ -19,29 +19,23 @@ def upgrade() -> None:
     op.alter_column(f"{prefix}folder", column_name="created_by", new_column_name="created_by_id", schema=schema)
     op.alter_column(f"{prefix}run", column_name="created_by", new_column_name="created_by_id", schema=schema)
     op.alter_column(f"{prefix}features", column_name="created_by", new_column_name="created_by_id", schema=schema)
-    op.drop_index(f"ix_core{delim}features_created_by", table_name=f"{prefix}features", schema="core")
     op.create_index(op.f(f"ix_core{delim}features_created_by_id"), f"{prefix}features", ["created_by_id"], unique=False, schema=schema)
-
+    op.alter_column(f"{prefix}file", "run_id", existing_type=sqm.sql.sqltypes.AutoString(), nullable=True, schema=schema)
     op.alter_column(f"{prefix}transform", column_name="created_by", new_column_name="created_by_id", schema=schema)
     op.alter_column(f"{prefix}project", column_name="created_by", new_column_name="created_by_id", schema=schema)
     op.add_column(f"{prefix}file", sa.Column("created_by_id", sqm.sql.sqltypes.AutoString(), nullable=True), schema=schema)
     op.add_column(f"{prefix}file", sa.Column("transform_id", sqm.sql.sqltypes.AutoString(), nullable=True), schema=schema)
     op.add_column(f"{prefix}file", sa.Column("transform_version", sqm.sql.sqltypes.AutoString(), nullable=True), schema=schema)
-    op.alter_column(f"{prefix}file", "run_id", existing_type=sqm.sql.sqltypes.AutoString(), nullable=True, schema="core")
-    op.create_index(op.f(f"ix_core{delim}file_created_by_id"), f"{prefix}file", ["created_by_id"], unique=False, schema="core")
+    op.create_index(op.f(f"ix_core{delim}file_created_by_id"), f"{prefix}file", ["created_by_id"], unique=False, schema=schema)
     # op.add_column(f"{prefix}storage", sa.Column("created_by_id", sqm.sql.sqltypes.AutoString(), nullable=True), schema=schema)
 
     with op.batch_alter_table(f"{prefix}file", schema=schema) as batch_op:
         batch_op.create_foreign_key(op.f(f"fk_file{delim}created_by_id_user"), "user", ["created_by_id"], ["id"], referent_schema=schema)
 
-    op.drop_index(f"ix_core{delim}project_created_by", table_name=f"{prefix}project", schema="core")
-    op.create_index(op.f(f"ix_core{delim}project_created_by_id"), f"{prefix}project", ["created_by_id"], unique=False, schema="core")
-    op.drop_index(f"ix_core{delim}run_created_by", table_name=f"{prefix}run", schema="core")
-    op.create_index(op.f(f"ix_core{delim}run_created_by_id"), f"{prefix}run", ["created_by_id"], unique=False, schema="core")
-    op.drop_index(f"ix_core{delim}transform_created_by", table_name=f"{prefix}transform", schema="core")
-    op.create_index(op.f(f"ix_core{delim}transform_created_by_id"), f"{prefix}transform", ["created_by_id"], unique=False, schema="core")
-    op.drop_index(f"ix_core{delim}folder_created_by", table_name=f"{prefix}folder", schema="core")
-    op.create_index(op.f(f"ix_core{delim}folder_created_by_id"), f"{prefix}folder", ["created_by_id"], unique=False, schema="core")
+    op.create_index(op.f(f"ix_core{delim}project_created_by_id"), f"{prefix}project", ["created_by_id"], unique=False, schema=schema)
+    op.create_index(op.f(f"ix_core{delim}run_created_by_id"), f"{prefix}run", ["created_by_id"], unique=False, schema=schema)
+    op.create_index(op.f(f"ix_core{delim}transform_created_by_id"), f"{prefix}transform", ["created_by_id"], unique=False, schema=schema)
+    op.create_index(op.f(f"ix_core{delim}folder_created_by_id"), f"{prefix}folder", ["created_by_id"], unique=False, schema=schema)
     op.create_index(op.f(f"ix_core{delim}file_transform_id"), f"{prefix}file", ["transform_id"], unique=False, schema=schema)
 
     op.alter_column(f"{prefix}transform", column_name="v", new_column_name="version", schema=schema)
@@ -53,8 +47,17 @@ def upgrade() -> None:
         )
 
     op.create_index(op.f(f"ix_core{delim}file_transform_version"), f"{prefix}file", ["transform_version"], unique=False, schema=schema)
-    op.drop_index(f"ix_core{delim}run_transform_v", f"{prefix}run", schema=schema)
     op.create_index(op.f(f"ix_core{delim}run_transform_version"), f"{prefix}run", ["transform_version"], unique=False, schema=schema)
+
+    try:
+        op.drop_index(f"ix_core{delim}features_created_by", table_name=f"{prefix}features", schema=schema)
+        op.drop_index(f"ix_core{delim}run_transform_v", f"{prefix}run", schema=schema)
+        op.drop_index(f"ix_core{delim}project_created_by", table_name=f"{prefix}project", schema=schema)
+        op.drop_index(f"ix_core{delim}run_created_by", table_name=f"{prefix}run", schema=schema)
+        op.drop_index(f"ix_core{delim}transform_created_by", table_name=f"{prefix}transform", schema=schema)
+        op.drop_index(f"ix_core{delim}folder_created_by", table_name=f"{prefix}folder", schema=schema)
+    except Exception:
+        pass
 
 
 def downgrade() -> None:
