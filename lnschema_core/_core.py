@@ -59,17 +59,21 @@ class Storage(SQLModel, table=True):  # type: ignore
     updated_at: Optional[datetime] = UpdatedAt
 
 
+#     created_by: User = Relationship()
+#     created_by_id: Optional[str] = CreatedBy  # make non-optional over time
+
+
 class Project(SQLModel, table=True):  # type: ignore
     """Projects."""
 
     id: str = Field(default_factory=idg.project, primary_key=True)
     name: str = Field(index=True)
-    created_by: str = CreatedBy
+    created_by: User = Relationship()
+    created_by_id: str = CreatedBy
     created_at: datetime = CreatedAt
     updated_at: Optional[datetime] = UpdatedAt
 
 
-# defaults are set within ln.add
 class Transform(SQLModel, table=True):  # type: ignore
     """Data transformations.
 
@@ -84,7 +88,7 @@ class Transform(SQLModel, table=True):  # type: ignore
     """
 
     id: Optional[str] = Field(sa_column=sa.Column(sa.String, primary_key=True, default=idg.transform))
-    v: Optional[str] = Field(sa_column=sa.Column(sa.String, primary_key=True, default="0"))
+    version: Optional[str] = Field(sa_column=sa.Column(sa.String, primary_key=True, default="0"))
     """Version identifier, defaults to `"1"`.
 
     Use this to label different versions of the same transform.
@@ -104,7 +108,8 @@ class Transform(SQLModel, table=True):  # type: ignore
     reference: Optional[str] = Field(index=True)
     """Reference for the transform, e.g., a URL.
     """
-    created_by: str = CreatedBy
+    created_by: User = Relationship()
+    created_by_id: str = CreatedBy
     created_at: datetime = CreatedAt
     updated_at: Optional[datetime] = UpdatedAt
 
@@ -125,8 +130,8 @@ class Run(SQLModel, table=True):  # type: ignore
     It typically has inputs and outputs:
 
     - References to outputs are stored in the `file` table in the
-      `source_id` column as a foreign key the `run`
-      table. This is possible as every given `file` has a unique data source:
+      `run_id` column as a foreign key the `run`
+      table. This is possible as every given `file` has a unique data run:
       the `run` that produced the `file`. However, note that a given
       `run` may output several `files`.
     - References to inputs are stored in the `run_in` table, a
@@ -137,8 +142,8 @@ class Run(SQLModel, table=True):  # type: ignore
 
     __table_args__ = (
         ForeignKeyConstraint(
-            ["transform_id", "transform_v"],
-            ["core.transform.id", "core.transform.v"],
+            ["transform_id", "transform_version"],
+            ["core.transform.id", "core.transform.version"],
         ),
         {"schema": schema_arg},
     )
@@ -146,11 +151,12 @@ class Run(SQLModel, table=True):  # type: ignore
     name: Optional[str] = Field(default=None, index=True)
     external_id: Optional[str] = Field(default=None, index=True)
     transform_id: Optional[str] = Field(default=None, index=True)
-    transform_v: Optional[str] = Field(default=None, index=True)
+    transform_version: Optional[str] = Field(default=None, index=True)
     transform: Transform = Relationship()
-    outputs: List["File"] = Relationship(back_populates="source")
-    inputs: List["File"] = Relationship(back_populates="targets", sa_relationship_kwargs=dict(secondary=RunIn.__table__))
-    created_by: str = CreatedBy
+    outputs: List["File"] = Relationship(back_populates="run")
+    inputs: List["File"] = Relationship(back_populates="input_of", sa_relationship_kwargs=dict(secondary=RunIn.__table__))
+    created_by: User = Relationship()
+    created_by_id: str = CreatedBy
     created_at: datetime = CreatedAt
 
     _ln_identity_key: Optional[str] = PrivateAttr(default=None)
@@ -184,7 +190,7 @@ class Run(SQLModel, table=True):  # type: ignore
 
         run = None
         if load_latest:
-            run = ln.select(ln.Run, transform_id=transform.id, transform_v=transform.v).order_by(ln.Run.created_at.desc()).first()
+            run = ln.select(ln.Run, transform_id=transform.id, transform_version=transform.version).order_by(ln.Run.created_at.desc()).first()
             if run is not None:
                 logger.info(f"Loaded: {run}")
         elif id is not None:
@@ -193,7 +199,7 @@ class Run(SQLModel, table=True):  # type: ignore
                 raise NotImplementedError("You can currently only pass existing ids")
 
         if run is None:
-            kwargs.update(dict(transform_id=transform.id, transform_v=transform.v))
+            kwargs.update(dict(transform_id=transform.id, transform_version=transform.version))
             super().__init__(**kwargs)
             self._ln_identity_key = None
         else:
@@ -238,7 +244,8 @@ class Features(SQLModel, table=True):  # type: ignore
 
     id: str = Field(primary_key=True)  # use a hash
     type: str  # was called entity_type
-    created_by: str = CreatedBy
+    created_by: User = Relationship()
+    created_by_id: str = CreatedBy
     created_at: datetime = CreatedAt
     files: List["File"] = Relationship(
         back_populates="features",
@@ -322,7 +329,8 @@ class Folder(SQLModel, table=True):  # type: ignore
         sa_relationship_kwargs=dict(secondary=FolderFile.__table__),
     )
     """:class:`~lamindb.File`."""
-    created_by: str = CreatedBy
+    created_by: User = Relationship()
+    created_by_id: str = CreatedBy
     created_at: datetime = CreatedAt
     updated_at: Optional[datetime] = UpdatedAt
 
@@ -415,6 +423,7 @@ class File(SQLModel, table=True):  # type: ignore
 
     __table_args__ = (
         sa.UniqueConstraint("storage_id", "key", name="uq_file_storage_key"),
+        ForeignKeyConstraint(["transform_id", "transform_version"], ["core.transform.id", "core.transform.version"], name="fk_file_transform_id_version_transform"),
         {"schema": schema_arg},
     )
 
@@ -435,11 +444,19 @@ class File(SQLModel, table=True):  # type: ignore
     hash: Optional[str] = Field(default=None, index=True)
     """Hash (md5)."""
     key: Optional[str] = Field(default=None, index=True)
-    """Relative path within storage location."""
-    source: Run = Relationship(back_populates="outputs")  # type: ignore
+    """Storage key: relative path within storage location."""
+    run: Run = Relationship(back_populates="outputs")  # type: ignore
     """:class:`~lamindb.Run` that generated the `file`."""
-    source_id: str = Field(foreign_key="core.run.id", index=True)
+    run_id: Optional[str] = Field(foreign_key="core.run.id", index=True)
     """Source run id."""
+    transform: Transform = Relationship()  # type: ignore
+    """:class:`~lamindb.Transform` whose run generated the `file`."""
+    transform_id: Optional[str] = Field(index=True)
+    """Source transform id."""
+    transform_version: Optional[str] = Field(index=True)
+    """Source transform id."""
+    storage: Storage = Relationship()  # type: ignore
+    """:class:`~lamindb.Storage` location of `file`, see `.path()` for full path."""
     storage_id: str = Field(foreign_key="core.storage.id", index=True)
     """Storage root id."""
     features: List[Features] = Relationship(
@@ -452,13 +469,15 @@ class File(SQLModel, table=True):  # type: ignore
         sa_relationship_kwargs=dict(secondary=FolderFile.__table__),
     )
     """Folders that contain this file."""
-    targets: List[Run] = Relationship(  # type: ignore
+    input_of: List[Run] = Relationship(  # type: ignore
         back_populates="inputs",
         sa_relationship_kwargs=dict(secondary=RunIn.__table__),
     )
     """Runs that use this file as input."""
     created_at: datetime = CreatedAt
     updated_at: Optional[datetime] = UpdatedAt
+    created_by: User = Relationship()
+    created_by_id: Optional[str] = CreatedBy  # make non-optional over time
 
     # private attributes are needed here to prevent sqlalchemy error
     _local_filepath: Optional[Path] = PrivateAttr()
@@ -472,7 +491,7 @@ class File(SQLModel, table=True):  # type: ignore
         return filepath_from_file_or_folder(self)
 
     # likely needs an arg `key`
-    def replace(self, data: Union[Path, str, pd.DataFrame, ad.AnnData], source: Optional[Run] = None, format: Optional[str] = None):
+    def replace(self, data: Union[Path, str, pd.DataFrame, ad.AnnData], run: Optional[Run] = None, format: Optional[str] = None):
         """Replace data object."""
         from lamindb._file import get_file_kwargs_from_data
 
@@ -484,7 +503,7 @@ class File(SQLModel, table=True):  # type: ignore
         kwargs, privates = get_file_kwargs_from_data(
             data=data,
             name=name_to_pass,
-            source=source,
+            run=run,
             format=format,
         )
 
@@ -498,7 +517,7 @@ class File(SQLModel, table=True):  # type: ignore
         self.size = kwargs["size"]
         self.hash = kwargs["hash"]
         self.suffix = kwargs["suffix"]
-        self.source = kwargs["source"]
+        self.run = kwargs["run"]
         if kwargs["key"] is not None:  # only update key in case filepath is already in storage, then we can point the key to it
             self.key = kwargs["key"]  # otherwise, self.key remains unchanged through .replace()
 
@@ -541,7 +560,7 @@ class File(SQLModel, table=True):  # type: ignore
         *,
         name: Optional[str] = None,
         features: List[Features] = [],
-        source: Optional[Run] = None,
+        run: Optional[Run] = None,
         id: Optional[str] = None,
         format: Optional[str] = None,
     ):
@@ -553,11 +572,11 @@ class File(SQLModel, table=True):  # type: ignore
         self,
         id: Optional[str] = None,
         name: Optional[str] = None,
-        source: Optional[Run] = None,
+        run: Optional[Run] = None,
         suffix: Optional[str] = None,
         size: Optional[int] = None,
         hash: Optional[str] = None,
-        source_id: Optional[str] = None,
+        run_id: Optional[str] = None,
         storage_id: Optional[str] = None,
         features: List[Features] = [],
         targets: List[Run] = [],
@@ -570,7 +589,7 @@ class File(SQLModel, table=True):  # type: ignore
         data: Optional[Union[Path, UPath, str, pd.DataFrame, ad.AnnData]] = None,
         *,
         key: Optional[str] = None,
-        source: Optional[Run] = None,
+        run: Optional[Run] = None,
         format: Optional[str] = None,
         features: List[Features] = None,
         # continue with fields
@@ -579,7 +598,7 @@ class File(SQLModel, table=True):  # type: ignore
         suffix: Optional[str] = None,
         size: Optional[int] = None,
         hash: Optional[str] = None,
-        source_id: Optional[str] = None,
+        run_id: Optional[str] = None,
         storage_id: Optional[str] = None,
         targets: List[Run] = None,
     ):
@@ -609,7 +628,7 @@ class File(SQLModel, table=True):  # type: ignore
                 data=data,
                 name=name,
                 key=key,
-                source=source,
+                run=run,
                 format=format,
             )
             kwargs["id"] = idg.file() if id is None else id
