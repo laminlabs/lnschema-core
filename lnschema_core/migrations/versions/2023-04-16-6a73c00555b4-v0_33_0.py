@@ -30,8 +30,8 @@ def upgrade() -> None:
     op.create_index(op.f(f"ix_core{delim}file_created_by_id"), "file", ["created_by_id"], unique=False, schema="core")
     # op.add_column(f"{prefix}storage", sa.Column("created_by_id", sqm.sql.sqltypes.AutoString(), nullable=True), schema=schema)
 
-    with op.batch_alter_table(f"{prefix}file", schema=schema):
-        op.create_foreign_key(op.f(f"fk_file{delim}created_by_id_user"), "user", ["created_by_id"], ["id"], referent_schema=schema)
+    with op.batch_alter_table(f"{prefix}file", schema=schema) as batch_op:
+        batch_op.create_foreign_key(op.f(f"fk_file{delim}created_by_id_user"), "user", ["created_by_id"], ["id"], referent_schema=schema)
 
     op.drop_index(f"ix_core{delim}project_created_by", table_name="project", schema="core")
     op.create_index(op.f(f"ix_core{delim}project_created_by_id"), "project", ["created_by_id"], unique=False, schema="core")
