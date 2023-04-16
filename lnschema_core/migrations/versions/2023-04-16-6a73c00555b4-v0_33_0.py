@@ -52,6 +52,10 @@ def upgrade() -> None:
             op.f("fk_file_transform_id_version_transform"), "transform", ["transform_id", "transform_version"], ["id", "version"], referent_schema=schema
         )
 
+    op.create_index(op.f(f"ix_core{delim}file_transform_version"), "file", ["transform_version"], unique=False, schema=schema)
+    op.drop_index(f"ix_core{delim}run_transform_v", "run", schema=schema)
+    op.create_index(op.f(f"ix_core{delim}run_transform_version"), "run", ["transform_version"], unique=False, schema=schema)
+
 
 def downgrade() -> None:
     pass
