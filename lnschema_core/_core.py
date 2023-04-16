@@ -125,8 +125,8 @@ class Run(SQLModel, table=True):  # type: ignore
     It typically has inputs and outputs:
 
     - References to outputs are stored in the `file` table in the
-      `source_id` column as a foreign key the `run`
-      table. This is possible as every given `file` has a unique data source:
+      `run_id` column as a foreign key the `run`
+      table. This is possible as every given `file` has a unique data run:
       the `run` that produced the `file`. However, note that a given
       `run` may output several `files`.
     - References to inputs are stored in the `run_in` table, a
@@ -148,7 +148,7 @@ class Run(SQLModel, table=True):  # type: ignore
     transform_id: Optional[str] = Field(default=None, index=True)
     transform_v: Optional[str] = Field(default=None, index=True)
     transform: Transform = Relationship()
-    outputs: List["File"] = Relationship(back_populates="source")
+    outputs: List["File"] = Relationship(back_populates="run")
     inputs: List["File"] = Relationship(back_populates="targets", sa_relationship_kwargs=dict(secondary=RunIn.__table__))
     created_by: str = CreatedBy
     created_at: datetime = CreatedAt
@@ -436,9 +436,9 @@ class File(SQLModel, table=True):  # type: ignore
     """Hash (md5)."""
     key: Optional[str] = Field(default=None, index=True)
     """Relative path within storage location."""
-    source: Run = Relationship(back_populates="outputs")  # type: ignore
+    run: Run = Relationship(back_populates="outputs")  # type: ignore
     """:class:`~lamindb.Run` that generated the `file`."""
-    source_id: str = Field(foreign_key="core.run.id", index=True)
+    run_id: str = Field(foreign_key="core.run.id", index=True)
     """Source run id."""
     storage_id: str = Field(foreign_key="core.storage.id", index=True)
     """Storage root id."""
@@ -472,7 +472,7 @@ class File(SQLModel, table=True):  # type: ignore
         return filepath_from_file_or_folder(self)
 
     # likely needs an arg `key`
-    def replace(self, data: Union[Path, str, pd.DataFrame, ad.AnnData], source: Optional[Run] = None, format: Optional[str] = None):
+    def replace(self, data: Union[Path, str, pd.DataFrame, ad.AnnData], run: Optional[Run] = None, format: Optional[str] = None):
         """Replace data object."""
         from lamindb._file import get_file_kwargs_from_data
 
@@ -484,7 +484,7 @@ class File(SQLModel, table=True):  # type: ignore
         kwargs, privates = get_file_kwargs_from_data(
             data=data,
             name=name_to_pass,
-            source=source,
+            run=run,
             format=format,
         )
 
@@ -498,7 +498,7 @@ class File(SQLModel, table=True):  # type: ignore
         self.size = kwargs["size"]
         self.hash = kwargs["hash"]
         self.suffix = kwargs["suffix"]
-        self.source = kwargs["source"]
+        self.run = kwargs["run"]
         if kwargs["key"] is not None:  # only update key in case filepath is already in storage, then we can point the key to it
             self.key = kwargs["key"]  # otherwise, self.key remains unchanged through .replace()
 
@@ -541,7 +541,7 @@ class File(SQLModel, table=True):  # type: ignore
         *,
         name: Optional[str] = None,
         features: List[Features] = [],
-        source: Optional[Run] = None,
+        run: Optional[Run] = None,
         id: Optional[str] = None,
         format: Optional[str] = None,
     ):
@@ -553,11 +553,11 @@ class File(SQLModel, table=True):  # type: ignore
         self,
         id: Optional[str] = None,
         name: Optional[str] = None,
-        source: Optional[Run] = None,
+        run: Optional[Run] = None,
         suffix: Optional[str] = None,
         size: Optional[int] = None,
         hash: Optional[str] = None,
-        source_id: Optional[str] = None,
+        run_id: Optional[str] = None,
         storage_id: Optional[str] = None,
         features: List[Features] = [],
         targets: List[Run] = [],
@@ -570,7 +570,7 @@ class File(SQLModel, table=True):  # type: ignore
         data: Optional[Union[Path, UPath, str, pd.DataFrame, ad.AnnData]] = None,
         *,
         key: Optional[str] = None,
-        source: Optional[Run] = None,
+        run: Optional[Run] = None,
         format: Optional[str] = None,
         features: List[Features] = None,
         # continue with fields
@@ -579,7 +579,7 @@ class File(SQLModel, table=True):  # type: ignore
         suffix: Optional[str] = None,
         size: Optional[int] = None,
         hash: Optional[str] = None,
-        source_id: Optional[str] = None,
+        run_id: Optional[str] = None,
         storage_id: Optional[str] = None,
         targets: List[Run] = None,
     ):
@@ -609,7 +609,7 @@ class File(SQLModel, table=True):  # type: ignore
                 data=data,
                 name=name,
                 key=key,
-                source=source,
+                run=run,
                 format=format,
             )
             kwargs["id"] = idg.file() if id is None else id
