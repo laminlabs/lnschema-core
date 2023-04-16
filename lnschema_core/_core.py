@@ -153,7 +153,7 @@ class Run(SQLModel, table=True):  # type: ignore
     transform_v: Optional[str] = Field(default=None, index=True)
     transform: Transform = Relationship()
     outputs: List["File"] = Relationship(back_populates="run")
-    inputs: List["File"] = Relationship(back_populates="targets", sa_relationship_kwargs=dict(secondary=RunIn.__table__))
+    inputs: List["File"] = Relationship(back_populates="input_of", sa_relationship_kwargs=dict(secondary=RunIn.__table__))
     created_by: User = Relationship()
     created_by_id: str = CreatedBy
     created_at: datetime = CreatedAt
