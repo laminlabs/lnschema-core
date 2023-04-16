@@ -57,7 +57,9 @@ class Storage(SQLModel, table=True):  # type: ignore
     """Cloud storage region if applicable."""
     created_at: datetime = CreatedAt
     updated_at: Optional[datetime] = UpdatedAt
-    created_by_id: Optional[str] = CreatedBy  # make non-optional over time
+
+
+#     created_by_id: Optional[str] = CreatedBy  # make non-optional over time
 
 
 class Project(SQLModel, table=True):  # type: ignore
