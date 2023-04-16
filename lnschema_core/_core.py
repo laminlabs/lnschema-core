@@ -452,7 +452,7 @@ class File(SQLModel, table=True):  # type: ignore
     transform_id: Optional[str] = Field(index=True)
     """Source transform id."""
     transform_version: Optional[str] = Field(index=True)
-    """Source transform id."""
+    """Source transform version."""
     storage: Storage = Relationship()  # type: ignore
     """:class:`~lamindb.Storage` location of `file`, see `.path()` for full path."""
     storage_id: str = Field(foreign_key="core.storage.id", index=True)
@@ -640,6 +640,13 @@ class File(SQLModel, table=True):  # type: ignore
             )
         else:
             kwargs = {k: v for k, v in locals().items() if v and k != "self"}
+
+        # transform cannot be directly passed, just via run
+        # it's directly stored in the file table to avoid another join
+        # mediate by the run table
+        if kwargs["run"] is not None:
+            kwargs["transform_id"] = kwargs["run"].transform_id
+            kwargs["transform_version"] = kwargs["run"].transform_version
 
         super().__init__(**kwargs)
         if data is not None:
