@@ -44,7 +44,9 @@ def upgrade() -> None:
 
     op.create_index(op.f(f"ix_core{delim}file_transform_id"), "file", ["transform_id"], unique=False, schema=schema)
     with op.batch_alter_table(f"{prefix}file", schema=schema) as batch_op:
-        batch_op.create_foreign_key(op.f("fk_file_transform_id_transform"), "transform", ["transform_id"], ["id"], referent_schema=schema)
+        batch_op.create_foreign_key(
+            op.f("fk_file_transform_id_version_transform"), "transform", ["transform_id", "transform_version"], ["id", "version"], referent_schema=schema
+        )
 
     op.alter_column(f"{prefix}transform", column_name="v", new_column_name="version", schema=schema)
     op.alter_column(f"{prefix}run", column_name="transform_v", new_column_name="transform_version", schema=schema)
