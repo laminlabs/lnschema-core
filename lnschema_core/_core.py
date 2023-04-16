@@ -423,6 +423,7 @@ class File(SQLModel, table=True):  # type: ignore
 
     __table_args__ = (
         sa.UniqueConstraint("storage_id", "key", name="uq_file_storage_key"),
+        ForeignKeyConstraint(["transform_id", "transform_version"], ["core.transform.id", "core.transform.version"], name="fk_file_transform_id_version_transform"),
         {"schema": schema_arg},
     )
 
@@ -450,7 +451,9 @@ class File(SQLModel, table=True):  # type: ignore
     """Source run id."""
     transform: Transform = Relationship()  # type: ignore
     """:class:`~lamindb.Transform` whose run generated the `file`."""
-    transform_id: Optional[str] = Field(foreign_key="core.transform.id", index=True)
+    transform_id: Optional[str] = Field(index=True)
+    """Source transform id."""
+    transform_version: Optional[str] = Field(index=True)
     """Source transform id."""
     storage: Storage = Relationship()  # type: ignore
     """:class:`~lamindb.Storage` location of `file`, see `.path()` for full path."""
