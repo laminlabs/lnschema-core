@@ -461,7 +461,7 @@ class File(SQLModel, table=True):  # type: ignore
         sa_relationship_kwargs=dict(secondary=FolderFile.__table__),
     )
     """Folders that contain this file."""
-    targets: List[Run] = Relationship(  # type: ignore
+    input_of: List[Run] = Relationship(  # type: ignore
         back_populates="inputs",
         sa_relationship_kwargs=dict(secondary=RunIn.__table__),
     )
