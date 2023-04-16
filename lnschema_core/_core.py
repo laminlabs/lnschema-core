@@ -57,6 +57,7 @@ class Storage(SQLModel, table=True):  # type: ignore
     """Cloud storage region if applicable."""
     created_at: datetime = CreatedAt
     updated_at: Optional[datetime] = UpdatedAt
+    created_by_id: Optional[str] = CreatedBy  # make non-optional over time
 
 
 class Project(SQLModel, table=True):  # type: ignore
@@ -64,7 +65,7 @@ class Project(SQLModel, table=True):  # type: ignore
 
     id: str = Field(default_factory=idg.project, primary_key=True)
     name: str = Field(index=True)
-    created_by: str = CreatedBy
+    created_by_id: str = CreatedBy
     created_at: datetime = CreatedAt
     updated_at: Optional[datetime] = UpdatedAt
 
@@ -104,7 +105,7 @@ class Transform(SQLModel, table=True):  # type: ignore
     reference: Optional[str] = Field(index=True)
     """Reference for the transform, e.g., a URL.
     """
-    created_by: str = CreatedBy
+    created_by_id: str = CreatedBy
     created_at: datetime = CreatedAt
     updated_at: Optional[datetime] = UpdatedAt
 
@@ -150,7 +151,7 @@ class Run(SQLModel, table=True):  # type: ignore
     transform: Transform = Relationship()
     outputs: List["File"] = Relationship(back_populates="run")
     inputs: List["File"] = Relationship(back_populates="targets", sa_relationship_kwargs=dict(secondary=RunIn.__table__))
-    created_by: str = CreatedBy
+    created_by_id: str = CreatedBy
     created_at: datetime = CreatedAt
 
     _ln_identity_key: Optional[str] = PrivateAttr(default=None)
@@ -238,7 +239,7 @@ class Features(SQLModel, table=True):  # type: ignore
 
     id: str = Field(primary_key=True)  # use a hash
     type: str  # was called entity_type
-    created_by: str = CreatedBy
+    created_by_id: str = CreatedBy
     created_at: datetime = CreatedAt
     files: List["File"] = Relationship(
         back_populates="features",
@@ -322,7 +323,7 @@ class Folder(SQLModel, table=True):  # type: ignore
         sa_relationship_kwargs=dict(secondary=FolderFile.__table__),
     )
     """:class:`~lamindb.File`."""
-    created_by: str = CreatedBy
+    created_by_id: str = CreatedBy
     created_at: datetime = CreatedAt
     updated_at: Optional[datetime] = UpdatedAt
 
@@ -459,6 +460,7 @@ class File(SQLModel, table=True):  # type: ignore
     """Runs that use this file as input."""
     created_at: datetime = CreatedAt
     updated_at: Optional[datetime] = UpdatedAt
+    created_by_id: Optional[str] = CreatedBy  # make non-optional over time
 
     # private attributes are needed here to prevent sqlalchemy error
     _local_filepath: Optional[Path] = PrivateAttr()

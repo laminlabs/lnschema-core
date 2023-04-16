@@ -16,6 +16,14 @@ def upgrade() -> None:
     op.drop_index("ix_core{delim}file_source_id", table_name="file", schema=schema)
     op.create_index(op.f("ix_core{delim}file_run_id"), "file", ["run_id"], unique=False, schema=schema)
 
+    op.alter_column(f"{prefix}folder", column_name="created_by", new_column_name="created_by_id", schema=schema)
+    op.alter_column(f"{prefix}run", column_name="created_by", new_column_name="created_by_id", schema=schema)
+    op.alter_column(f"{prefix}features", column_name="created_by", new_column_name="created_by_id", schema=schema)
+    op.alter_column(f"{prefix}transform", column_name="created_by", new_column_name="created_by_id", schema=schema)
+    op.alter_column(f"{prefix}project", column_name="created_by", new_column_name="created_by_id", schema=schema)
+    op.add_column(f"{prefix}file", sa.Column("created_by_id", sqm.sql.sqltypes.AutoString(), nullable=True))
+    op.add_column(f"{prefix}storage", sa.Column("created_by_id", sqm.sql.sqltypes.AutoString(), nullable=True))
+
 
 def downgrade() -> None:
     pass
