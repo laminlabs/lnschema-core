@@ -144,7 +144,7 @@ class Run(SQLModel, table=True):  # type: ignore
     __table_args__ = (
         ForeignKeyConstraint(
             ["transform_id", "transform_version"],
-            ["core.transform.id", "core.transform.versionersion"],
+            ["core.transform.id", "core.transform.version"],
         ),
         {"schema": schema_arg},
     )
