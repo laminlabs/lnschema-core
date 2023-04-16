@@ -438,7 +438,7 @@ class File(SQLModel, table=True):  # type: ignore
     """Relative path within storage location."""
     run: Run = Relationship(back_populates="outputs")  # type: ignore
     """:class:`~lamindb.Run` that generated the `file`."""
-    run_id: str = Field(foreign_key="core.run.id", index=True)
+    run_id: Optional[str] = Field(foreign_key="core.run.id", index=True)
     """Source run id."""
     storage_id: str = Field(foreign_key="core.storage.id", index=True)
     """Storage root id."""
