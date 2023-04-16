@@ -87,7 +87,7 @@ class Transform(SQLModel, table=True):  # type: ignore
     """
 
     id: Optional[str] = Field(sa_column=sa.Column(sa.String, primary_key=True, default=idg.transform))
-    v: Optional[str] = Field(sa_column=sa.Column(sa.String, primary_key=True, default="0"))
+    version: Optional[str] = Field(sa_column=sa.Column(sa.String, primary_key=True, default="0"))
     """Version identifier, defaults to `"1"`.
 
     Use this to label different versions of the same transform.
@@ -141,8 +141,8 @@ class Run(SQLModel, table=True):  # type: ignore
 
     __table_args__ = (
         ForeignKeyConstraint(
-            ["transform_id", "transform_v"],
-            ["core.transform.id", "core.transform.v"],
+            ["transform_id", "transform_version"],
+            ["core.transform.id", "core.transform.versionersion"],
         ),
         {"schema": schema_arg},
     )
@@ -150,7 +150,7 @@ class Run(SQLModel, table=True):  # type: ignore
     name: Optional[str] = Field(default=None, index=True)
     external_id: Optional[str] = Field(default=None, index=True)
     transform_id: Optional[str] = Field(default=None, index=True)
-    transform_v: Optional[str] = Field(default=None, index=True)
+    transform_version: Optional[str] = Field(default=None, index=True)
     transform: Transform = Relationship()
     outputs: List["File"] = Relationship(back_populates="run")
     inputs: List["File"] = Relationship(back_populates="input_of", sa_relationship_kwargs=dict(secondary=RunIn.__table__))
@@ -189,7 +189,7 @@ class Run(SQLModel, table=True):  # type: ignore
 
         run = None
         if load_latest:
-            run = ln.select(ln.Run, transform_id=transform.id, transform_v=transform.v).order_by(ln.Run.created_at.desc()).first()
+            run = ln.select(ln.Run, transform_id=transform.id, transform_version=transform.version).order_by(ln.Run.created_at.desc()).first()
             if run is not None:
                 logger.info(f"Loaded: {run}")
         elif id is not None:
@@ -198,7 +198,7 @@ class Run(SQLModel, table=True):  # type: ignore
                 raise NotImplementedError("You can currently only pass existing ids")
 
         if run is None:
-            kwargs.update(dict(transform_id=transform.id, transform_v=transform.v))
+            kwargs.update(dict(transform_id=transform.id, transform_version=transform.version))
             super().__init__(**kwargs)
             self._ln_identity_key = None
         else:
