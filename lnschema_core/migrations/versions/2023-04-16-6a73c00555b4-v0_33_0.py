@@ -26,6 +26,7 @@ def upgrade() -> None:
     op.alter_column(f"{prefix}project", column_name="created_by", new_column_name="created_by_id", schema=schema)
     op.add_column(f"{prefix}file", sa.Column("created_by_id", sqm.sql.sqltypes.AutoString(), nullable=True), schema=schema)
     op.add_column(f"{prefix}file", sa.Column("transform_id", sqm.sql.sqltypes.AutoString(), nullable=True), schema=schema)
+    op.add_column(f"{prefix}file", sa.Column("transform_version", sqm.sql.sqltypes.AutoString(), nullable=True), schema=schema)
     op.alter_column("file", "run_id", existing_type=sqm.sql.sqltypes.AutoString(), nullable=True, schema="core")
     op.create_index(op.f(f"ix_core{delim}file_created_by_id"), "file", ["created_by_id"], unique=False, schema="core")
     # op.add_column(f"{prefix}storage", sa.Column("created_by_id", sqm.sql.sqltypes.AutoString(), nullable=True), schema=schema)
