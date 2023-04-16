@@ -40,6 +40,9 @@ def upgrade() -> None:
     op.drop_index(f"ix_core{delim}transform_created_by", table_name="transform", schema="core")
     op.create_index(op.f(f"ix_core{delim}transform_created_by_id"), "transform", ["created_by_id"], unique=False, schema="core")
 
+    op.alter_column(f"{prefix}transform", column_name="v", new_column_name="version", schema=schema)
+    op.alter_column(f"{prefix}run", column_name="transform_v", new_column_name="transform_version", schema=schema)
+
 
 def downgrade() -> None:
     pass
