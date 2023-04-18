@@ -547,6 +547,25 @@ class File(SQLModel, table=True):  # type: ignore
 
         return lnload(file=self, stream=stream, is_run_input=is_run_input)
 
+    def subset(self, query_obs=None, query_var=None) -> ad.AnnData:
+        """Subset the AnnData File and stream the result into memory.
+
+        Args:
+            query_obs: The pandas query to evaluate on `.obs` of the
+            underlying `AnnData` object.
+            query_var: The pandas query to evaluate on `.var` of the
+            underlying `AnnData` object.
+        """
+        from lndb_storage.object import _subset_anndata_file
+
+        if query_obs is None and query_var is None:
+            raise ValueError("Please specify at least one of query_obs or query_var.")
+
+        if self.suffix not in (".h5ad", ".zarr"):
+            raise ValueError("File should have an AnnData object as the underlying data.")
+
+        return _subset_anndata_file(self, query_obs, query_var)
+
     @property
     def __name__(cls) -> str:
         return "File"
