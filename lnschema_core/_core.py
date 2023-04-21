@@ -653,8 +653,8 @@ class File(SQLModel, table=True):  # type: ignore
                 # accessing the relationship should always be possible if
                 # the above if clause was false as then, we should have a fresh
                 # Transform object that is not queried from the DB
-                if kwargs["run"].transform is not None:
-                    kwargs["transform"] = kwargs["run"].transform
+                assert kwargs["run"].transform is not None
+                kwargs["transform"] = kwargs["run"].transform
 
         super().__init__(**kwargs)
         if data is not None:
