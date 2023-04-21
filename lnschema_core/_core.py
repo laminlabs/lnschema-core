@@ -579,27 +579,24 @@ class File(SQLModel, table=True):  # type: ignore
                 hint += f" using storage key = {key}"
             logger.hint(hint)
 
-        if data is not None:
-            from lamindb._file import get_file_kwargs_from_data
+        from lamindb._file import get_file_kwargs_from_data
 
-            kwargs, privates = get_file_kwargs_from_data(
-                data=data,
-                name=name,
-                key=key,
-                run=run,
-                format=format,
-            )
-            kwargs["id"] = idg.file() if id is None else id
-            if features is not None:
-                kwargs["features"] = features
-            log_hint(
-                check_path_in_storage=privates["check_path_in_storage"],
-                key=kwargs["key"],
-                id=kwargs["id"],
-                suffix=kwargs["suffix"],
-            )
-        else:
-            kwargs = {k: v for k, v in locals().items() if v and k != "self"}
+        kwargs, privates = get_file_kwargs_from_data(
+            data=data,
+            name=name,
+            key=key,
+            run=run,
+            format=format,
+        )
+        kwargs["id"] = idg.file() if id is None else id
+        if features is not None:
+            kwargs["features"] = features
+        log_hint(
+            check_path_in_storage=privates["check_path_in_storage"],
+            key=kwargs["key"],
+            id=kwargs["id"],
+            suffix=kwargs["suffix"],
+        )
 
         # transform cannot be directly passed, just via run
         # it's directly stored in the file table to avoid another join
