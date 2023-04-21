@@ -645,8 +645,16 @@ class File(SQLModel, table=True):  # type: ignore
         # it's directly stored in the file table to avoid another join
         # mediate by the run table
         if kwargs["run"] is not None:
-            kwargs["transform_id"] = kwargs["run"].transform_id
-            kwargs["transform_version"] = kwargs["run"].transform_version
+            if kwargs["run"].transform_id is not None:
+                kwargs["transform_id"] = kwargs["run"].transform_id
+                assert kwargs["run"].transform_version is not None
+                kwargs["transform_version"] = kwargs["run"].transform_version
+            else:
+                # accessing the relationship should always be possible if
+                # the above if clause was false as then, we should have a fresh
+                # Transform object that is not queried from the DB
+                if kwargs["run"].transform is not None:
+                    kwargs["transform"] = kwargs["run"].transform
 
         super().__init__(**kwargs)
         if data is not None:
