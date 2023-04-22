@@ -1,6 +1,6 @@
 from datetime import datetime as datetime
 from pathlib import Path
-from typing import Any, List, Optional, Union, overload  # noqa
+from typing import Any, List, Optional, TypeVar, Union, overload  # noqa
 
 import anndata as ad
 import pandas as pd
@@ -19,6 +19,8 @@ from .dev import id as idg
 from .dev.sqlmodel import schema_sqlmodel
 from .dev.type import TransformType
 
+PathLike = TypeVar("PathLike", str, Path, UPath)
+DataLike = TypeVar("DataLike", ad.AnnData, pd.DataFrame)
 SQLModel, prefix, schema_arg = schema_sqlmodel(schema_name)
 
 
@@ -305,12 +307,7 @@ class Features(SQLModel, table=True):  # type: ignore
 
 
 class Folder(SQLModel, table=True):  # type: ignore
-    """Folders, collections of files.
-
-    Real vs. virtual folders:
-    - A real LaminDB `Folder` has a 1:1 correspondence to a folder on a file system or in object storage, and a `.key` that is not `None`.
-    - A virtual LaminDB `Folder` is a mere way of grouping files. A file can be linked to multiple virtual folders, but only to one real folder.
-    """
+    """See lamindb for docstring."""
 
     __table_args__ = (
         sa.UniqueConstraint("storage_id", "key", name="uq_folder_storage_key"),
@@ -570,59 +567,22 @@ class File(SQLModel, table=True):  # type: ignore
     def __name__(cls) -> str:
         return "File"
 
-    @overload
-    def __init__(
-        self,
-        data: Union[Path, UPath, str, pd.DataFrame, ad.AnnData] = None,
-        *,
-        name: Optional[str] = None,
-        features: List[Features] = [],
-        run: Optional[Run] = None,
-        id: Optional[str] = None,
-        format: Optional[str] = None,
-    ):
-        """Initialize from data."""
-        ...
-
-    @overload
-    def __init__(
-        self,
-        id: Optional[str] = None,
-        name: Optional[str] = None,
-        run: Optional[Run] = None,
-        suffix: Optional[str] = None,
-        size: Optional[int] = None,
-        hash: Optional[str] = None,
-        run_id: Optional[str] = None,
-        storage_id: Optional[str] = None,
-        features: List[Features] = [],
-        targets: List[Run] = [],
-    ):
-        """Initialize from fields."""
-        ...
-
     def __init__(  # type: ignore
         self,
-        data: Optional[Union[Path, UPath, str, pd.DataFrame, ad.AnnData]] = None,
+        data: Union[PathLike, DataLike] = None,
         *,
         key: Optional[str] = None,
+        name: Optional[str] = None,
         run: Optional[Run] = None,
         format: Optional[str] = None,
         features: List[Features] = None,
-        # continue with fields
         id: Optional[str] = None,
-        name: Optional[str] = None,
-        suffix: Optional[str] = None,
-        size: Optional[int] = None,
-        hash: Optional[str] = None,
-        run_id: Optional[str] = None,
-        storage_id: Optional[str] = None,
-        targets: List[Run] = None,
+        input_of: List[Run] = None,
     ):
         if features is None:
             features = []
-        if targets is None:
-            targets = []
+        if input_of is None:
+            input_of = []
         if not isinstance(features, List):
             features = [features]
 
@@ -638,34 +598,39 @@ class File(SQLModel, table=True):  # type: ignore
                 hint += f" using storage key = {key}"
             logger.hint(hint)
 
-        if data is not None:
-            from lamindb._file import get_file_kwargs_from_data
+        from lamindb._file import get_file_kwargs_from_data
 
-            kwargs, privates = get_file_kwargs_from_data(
-                data=data,
-                name=name,
-                key=key,
-                run=run,
-                format=format,
-            )
-            kwargs["id"] = idg.file() if id is None else id
-            if features is not None:
-                kwargs["features"] = features
-            log_hint(
-                check_path_in_storage=privates["check_path_in_storage"],
-                key=kwargs["key"],
-                id=kwargs["id"],
-                suffix=kwargs["suffix"],
-            )
-        else:
-            kwargs = {k: v for k, v in locals().items() if v and k != "self"}
+        kwargs, privates = get_file_kwargs_from_data(
+            data=data,
+            name=name,
+            key=key,
+            run=run,
+            format=format,
+        )
+        kwargs["id"] = idg.file() if id is None else id
+        if features is not None:
+            kwargs["features"] = features
+        log_hint(
+            check_path_in_storage=privates["check_path_in_storage"],
+            key=kwargs["key"],
+            id=kwargs["id"],
+            suffix=kwargs["suffix"],
+        )
 
         # transform cannot be directly passed, just via run
         # it's directly stored in the file table to avoid another join
         # mediate by the run table
         if kwargs["run"] is not None:
-            kwargs["transform_id"] = kwargs["run"].transform_id
-            kwargs["transform_version"] = kwargs["run"].transform_version
+            if kwargs["run"].transform_id is not None:
+                kwargs["transform_id"] = kwargs["run"].transform_id
+                assert kwargs["run"].transform_version is not None
+                kwargs["transform_version"] = kwargs["run"].transform_version
+            else:
+                # accessing the relationship should always be possible if
+                # the above if clause was false as then, we should have a fresh
+                # Transform object that is not queried from the DB
+                assert kwargs["run"].transform is not None
+                kwargs["transform"] = kwargs["run"].transform
 
         super().__init__(**kwargs)
         if data is not None:
