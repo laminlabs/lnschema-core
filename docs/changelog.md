@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚚 Move `Folder.subset` to lamindb | [160](https://github.com/laminlabs/lnschema-core/pull/160) | [falexwolf](https://github.com/falexwolf) | 2023-04-22 |
 🐛 Fix population of `transform_id` in `File` in edge cases | [159](https://github.com/laminlabs/lnschema-core/pull/159) | [falexwolf](https://github.com/falexwolf) | 2023-04-21 | 0.33.1
 🚚 Better names, more relationships directly on `File` | [157](https://github.com/laminlabs/lnschema-core/pull/157) | [falexwolf](https://github.com/falexwolf) | 2023-04-16 | 0.33.0
 🐛 Fix `.replace()` for key != None | [156](https://github.com/laminlabs/lnschema-core/pull/156) | [falexwolf](https://github.com/falexwolf) | 2023-04-13 | 0.32.2
