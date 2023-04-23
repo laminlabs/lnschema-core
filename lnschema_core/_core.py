@@ -503,7 +503,7 @@ class File(SQLModel, table=True):  # type: ignore
             key_path = PurePosixPath(self.key)
             new_name = kwargs["name"]
             if PurePosixPath(new_name).suffixes == []:
-                new_name = f"{new_name}.{kwargs['suffix']}"
+                new_name = f"{new_name}{kwargs['suffix']}"
             if key_path.name != new_name:
                 self._clear_storagekey = self.key
                 self.key = str(key_path.with_name(new_name))
