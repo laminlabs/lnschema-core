@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+⚡️ Do not change key for in-memory data replace | [162](https://github.com/laminlabs/lnschema-core/pull/162) | [Koncopd](https://github.com/Koncopd) | 2023-04-23 |
 ✨ Change File.replace handling of key | [161](https://github.com/laminlabs/lnschema-core/pull/161) | [Koncopd](https://github.com/Koncopd) | 2023-04-23 |
 🚚 Move `Folder.subset` to lamindb | [160](https://github.com/laminlabs/lnschema-core/pull/160) | [falexwolf](https://github.com/falexwolf) | 2023-04-22 |
 🐛 Fix population of `transform_id` in `File` in edge cases | [159](https://github.com/laminlabs/lnschema-core/pull/159) | [falexwolf](https://github.com/falexwolf) | 2023-04-21 | 0.33.1
