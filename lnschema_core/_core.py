@@ -501,7 +501,11 @@ class File(SQLModel, table=True):  # type: ignore
 
         if self.key is not None:
             key_path = PurePosixPath(self.key)
-            new_name = kwargs["name"]
+            if isinstance(data, (Path, str)):
+                new_name = kwargs["name"]  # use the name from the data filepath
+            else:
+                # do not change the key stem to file.name
+                new_name = key_path.stem  # use the stem of the key for in-memory data
             if PurePosixPath(new_name).suffixes == []:
                 new_name = f"{new_name}{kwargs['suffix']}"
             if key_path.name != new_name:
