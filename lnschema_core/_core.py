@@ -1,5 +1,5 @@
 from datetime import datetime as datetime
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any, List, Optional, TypeVar, Union, overload  # noqa
 
 import anndata as ad
@@ -497,19 +497,28 @@ class File(SQLModel, table=True):  # type: ignore
         )
 
         if kwargs["name"] != self.name:
-            logger.warning("Your new filename does not match the previous filename: to update the name, set file.name = new_name")
+            logger.warning(f"Your new filename '{kwargs['name']}' does not match the previous filename '{self.name}': to update the name, set file.name = '{kwargs['name']}'")
 
-        # we don't delete storage objects added through key
-        if self.key is None and self.suffix != kwargs["suffix"]:
-            self._clear_storagekey = f"{self.id}{self.suffix}"
+        if self.key is not None:
+            key_path = PurePosixPath(self.key)
+            new_name = kwargs["name"]
+            if PurePosixPath(new_name).suffixes == []:
+                new_name = f"{new_name}.{kwargs['suffix']}"
+            if key_path.name != new_name:
+                self._clear_storagekey = self.key
+                self.key = str(key_path.with_name(new_name))
+                logger.warning(f"Replacing the file will also replace the key from '{key_path}' to '{self.key}', and delete '{key_path}' upon `ln.add`")
+        else:
+            self.key = kwargs["key"]
+            old_storage = f"{self.id}{self.suffix}"
+            new_storage = self.key if self.key is not None else f"{self.id}{kwargs['suffix']}"
+            if old_storage != new_storage:
+                self._clear_storagekey = old_storage
 
+        self.suffix = kwargs["suffix"]
         self.size = kwargs["size"]
         self.hash = kwargs["hash"]
-        self.suffix = kwargs["suffix"]
         self.run = kwargs["run"]
-        if kwargs["key"] is not None:  # only update key in case filepath is already in storage, then we can point the key to it
-            self.key = kwargs["key"]  # otherwise, self.key remains unchanged through .replace()
-
         self._local_filepath = privates["local_filepath"]
         self._cloud_filepath = privates["cloud_filepath"]
         self._memory_rep = privates["memory_rep"]
@@ -620,7 +629,7 @@ def storage_key_from_file(file: File):
     if file.key is None:
         return f"{file.id}{file.suffix}"
     else:
-        return f"{file.key}"
+        return file.key
 
 
 # add type annotations back asap when re-organizing the module
