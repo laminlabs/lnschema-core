@@ -6,10 +6,10 @@ import anndata as ad
 import pandas as pd
 import sqlalchemy as sa
 from lamin_logger import logger
+from lndb.dev.upath import UPath
 from nbproject._is_run_from_ipython import is_run_from_ipython
 from pydantic.fields import PrivateAttr
 from sqlmodel import Field, ForeignKeyConstraint, Relationship
-from upath import UPath
 
 from . import _name as schema_name
 from ._link import FileFeatures, FolderFile, ProjectFolder, RunIn  # noqa
@@ -17,10 +17,8 @@ from ._timestamps import CreatedAt, UpdatedAt
 from ._users import CreatedBy
 from .dev import id as idg
 from .dev.sqlmodel import schema_sqlmodel
-from .dev.type import TransformType
+from .types import DataLike, PathLike, TransformType
 
-PathLike = TypeVar("PathLike", str, Path, UPath)
-DataLike = TypeVar("DataLike", ad.AnnData, pd.DataFrame)
 SQLModel, prefix, schema_arg = schema_sqlmodel(schema_name)
 
 
@@ -480,7 +478,7 @@ class File(SQLModel, table=True):  # type: ignore
         return filepath_from_file_or_folder(self)
 
     # likely needs an arg `key`
-    def replace(self, data: Union[Path, str, pd.DataFrame, ad.AnnData], run: Optional[Run] = None, format: Optional[str] = None):
+    def replace(self, data: Union[PathLike, DataLike], run: Optional[Run] = None, format: Optional[str] = None) -> None:
         """Replace data object."""
         from lamindb._file import get_file_kwargs_from_data
 
@@ -527,29 +525,6 @@ class File(SQLModel, table=True):  # type: ignore
         self._cloud_filepath = privates["cloud_filepath"]
         self._memory_rep = privates["memory_rep"]
         self._to_store = not privates["check_path_in_storage"]  # no need to upload if new file is already in storage
-
-    def stage(self, is_run_input: bool = False):
-        """Download from storage if newer than in the cache.
-
-        Returns a path to a locally cached on-disk object (say, a
-        `.jpg` file).
-        """
-        from lamindb._load import stage as lnstage
-
-        return lnstage(file=self, is_run_input=is_run_input)
-
-    def load(self, stream: bool = False, is_run_input: bool = False):
-        """Load from storage (stage on local disk or load to memory).
-
-        Returns in-memory representation if configured (say, an `AnnData` object
-        for an `h5ad` file).
-
-        Otherwise, returns a path to a locally cached on-disk object (say, a
-        `.jpg` file).
-        """
-        from lamindb._load import load as lnload
-
-        return lnload(file=self, stream=stream, is_run_input=is_run_input)
 
     @property
     def __name__(cls) -> str:
