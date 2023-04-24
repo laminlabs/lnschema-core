@@ -97,7 +97,10 @@ class Transform(SQLModel, table=True):  # type: ignore
     name: str = Field(index=True)
     """A name for the transform, a pipeline name, or a file name of a notebook or script.
     """
-    type: TransformType = Field(index=True, default=TransformType.notebook if is_run_from_ipython else TransformType.pipeline)
+    type: TransformType = Field(
+        index=True,
+        default=(TransformType.notebook if is_run_from_ipython else TransformType.pipeline),
+    )
     """Transform type: defaults to `notebook` if run from IPython and otherwise to `pipeline`.
     """
     title: Optional[str] = Field(index=True)
@@ -152,7 +155,10 @@ class Run(SQLModel, table=True):  # type: ignore
     transform_version: Optional[str] = Field(default=None, index=True)
     transform: Transform = Relationship()
     outputs: List["File"] = Relationship(back_populates="run")
-    inputs: List["File"] = Relationship(back_populates="input_of", sa_relationship_kwargs=dict(secondary=RunIn.__table__))
+    inputs: List["File"] = Relationship(
+        back_populates="input_of",
+        sa_relationship_kwargs=dict(secondary=RunIn.__table__),
+    )
     created_by: User = Relationship()
     created_by_id: str = CreatedBy
     created_at: datetime = CreatedAt
@@ -188,7 +194,15 @@ class Run(SQLModel, table=True):  # type: ignore
 
         run = None
         if load_latest:
-            run = ln.select(ln.Run, transform_id=transform.id, transform_version=transform.version).order_by(ln.Run.created_at.desc()).first()
+            run = (
+                ln.select(
+                    ln.Run,
+                    transform_id=transform.id,
+                    transform_version=transform.version,
+                )
+                .order_by(ln.Run.created_at.desc())
+                .first()
+            )
             if run is not None:
                 logger.info(f"Loaded: {run}")
         elif id is not None:
@@ -410,7 +424,11 @@ class File(SQLModel, table=True):  # type: ignore
 
     __table_args__ = (
         sa.UniqueConstraint("storage_id", "key", name="uq_file_storage_key"),
-        ForeignKeyConstraint(["transform_id", "transform_version"], ["core.transform.id", "core.transform.version"], name="fk_file_transform_id_version_transform"),
+        ForeignKeyConstraint(
+            ["transform_id", "transform_version"],
+            ["core.transform.id", "core.transform.version"],
+            name="fk_file_transform_id_version_transform",
+        ),
         {"schema": schema_arg},
     )
 
@@ -478,7 +496,12 @@ class File(SQLModel, table=True):  # type: ignore
         return filepath_from_file_or_folder(self)
 
     # likely needs an arg `key`
-    def replace(self, data: Union[PathLike, DataLike], run: Optional[Run] = None, format: Optional[str] = None) -> None:
+    def replace(
+        self,
+        data: Union[PathLike, DataLike],
+        run: Optional[Run] = None,
+        format: Optional[str] = None,
+    ) -> None:
         """Replace data object."""
         from lamindb._file import get_file_kwargs_from_data
 
@@ -628,10 +651,10 @@ def filepath_from_file_or_folder(file_or_folder: Union[File, Folder]):
         path = settings.storage.key_to_filepath(storage_key)
     else:
         logger.warning(
-            "file.path() is slow for files outside the currently configured storage location\n"
-            "consider joining for the set of files you're interested in: ln.select(ln.File, ln.Storage)"
-            "the path is storage.root / file.key if file.key is not None\n"
-            "otherwise storage.root / (file.id + file.suffix)"
+            "file.path() is slow for files outside the currently configured storage"
+            " location\nconsider joining for the set of files you're interested in:"
+            " ln.select(ln.File, ln.Storage)the path is storage.root / file.key if"
+            " file.key is not None\notherwise storage.root / (file.id + file.suffix)"
         )
         import lamindb as ln
 
