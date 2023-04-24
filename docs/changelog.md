@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-✨ Enable database lookup and df | [164](https://github.com/laminlabs/lnschema-core/pull/164) | [sunnyosun](https://github.com/sunnyosun) | 2023-04-24 |
+✨ Enable database lookup and df | [164](https://github.com/laminlabs/lnschema-core/pull/164) | [sunnyosun](https://github.com/sunnyosun) | 2023-04-24 | 0.33.4
 🎨 Refactor `ln.File` | [163](https://github.com/laminlabs/lnschema-core/pull/163) | [falexwolf](https://github.com/falexwolf) | 2023-04-24 | 0.33.3
 ⚡️ Do not change key for in-memory data replace | [162](https://github.com/laminlabs/lnschema-core/pull/162) | [Koncopd](https://github.com/Koncopd) | 2023-04-23 | 0.33.2
 ✨ Change File.replace handling of key | [161](https://github.com/laminlabs/lnschema-core/pull/161) | [Koncopd](https://github.com/Koncopd) | 2023-04-23 |
