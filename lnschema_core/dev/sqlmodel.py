@@ -10,7 +10,8 @@
 import importlib
 import re
 import typing
-from typing import Any, Optional, Sequence, Tuple, Union
+from collections import namedtuple
+from typing import Any, Iterable, Optional, Sequence, Tuple, Union
 
 import lndb
 import sqlmodel as sqm
@@ -53,14 +54,45 @@ sqm.SQLModel.__repr__ = __repr__
 sqm.SQLModel.__str__ = __repr__
 
 
-class SQLModelModule(sqm.SQLModel):
-    """SQLModel for schema module."""
+class SQLModelLamin(sqm.SQLModel):  # type: ignore
+    """SQLModel at Lamin."""
 
     def __init__(self, **user_kwargs):
         # pydantic does not enforce strict type checking for complex types, only their attributes
         validate_relationship_types(self, user_kwargs)
         super().__init__(**user_kwargs)
         validate_with_pydantic(self, user_kwargs)
+
+    @classmethod
+    def df(cls):
+        import lamindb as ln
+
+        return ln.select(cls).df()
+
+    @classmethod
+    def lookup(cls, field: Optional[str] = None):
+        if field is None:
+            # by default use the name field
+            if "name" in cls.__fields__:
+                field = "name"
+            else:
+                non_ids = [i for i in cls.__fields__.keys() if "id" not in i]
+                if len(non_ids) > 0:
+                    # the first field isn't named with id
+                    field = non_ids[0]
+                else:
+                    # the first field
+                    field = next(iter(cls.__fields__.keys()))
+        values = set(cls.df()[field].values)
+        keys = _to_lookup_keys(values, padding=cls.__name__)
+        return _namedtuple_from_dict(d=dict(zip(keys, values)), name=cls.__name__)
+
+
+class SQLModelSchemaModule(SQLModelLamin):
+    """SQLModel for schema module."""
+
+    def __init__(self, **user_kwargs):
+        super().__init__(**user_kwargs)
 
     # this here is problematic for those tables that overwrite
     # __table_args__; we currently need to treat them manually
@@ -70,14 +102,11 @@ class SQLModelModule(sqm.SQLModel):
         return dict(schema=f"{SCHEMA_NAME}")  # type: ignore
 
 
-class SQLModelPrefix(sqm.SQLModel):  # type: ignore
-    """SQLModel prefixed by schema module name."""
+class SQLModelSchemaModulePrefix(SQLModelLamin):
+    """SQLModel for schema module with prefixed table names."""
 
     def __init__(self, **user_kwargs):
-        # pydantic does not enforce strict type checking for complex types, only their attributes
-        validate_relationship_types(self, user_kwargs)
         super().__init__(**user_kwargs)
-        validate_with_pydantic(self, user_kwargs)
 
     @declared_attr
     def __tablename__(cls) -> str:  # type: ignore
@@ -96,11 +125,11 @@ def schema_sqlmodel(schema_name: str):
     if is_sqlite():
         prefix = f"{schema_name}."
         schema_arg = None
-        return SQLModelPrefix, prefix, schema_arg
+        return SQLModelSchemaModulePrefix, prefix, schema_arg
     else:
         prefix = ""
         schema_arg = schema_name
-        return SQLModelModule, prefix, schema_arg
+        return SQLModelSchemaModule, prefix, schema_arg
 
 
 def get_sqlite_prefix_schema_delim_from_alembic() -> Tuple[bool, str, Optional[str], str]:
@@ -258,10 +287,18 @@ def validate_relationship_types(model, user_kwargs):
         for field_name, col_name in zip(rel_fk_field_names, target_col_names):
             if hasattr(model, field_name):
                 if getattr(model, field_name) is None:
-                    setattr(model, field_name, getattr(user_kwargs[relationship_name], col_name))
+                    setattr(
+                        model,
+                        field_name,
+                        getattr(user_kwargs[relationship_name], col_name),
+                    )
 
 
-def _derive_target_attr_name(origin_table: sqm.SQLModel, origin_relationship: RelationshipProperty, custom_target_name):
+def _derive_target_attr_name(
+    origin_table: sqm.SQLModel,
+    origin_relationship: RelationshipProperty,
+    custom_target_name,
+):
     """Derive the name of the relationship attribute in the target table."""
     # If set, back_populates parameter in the origin relationship takes precedence over any custom naming
     if origin_relationship.back_populates is not None:
@@ -331,3 +368,38 @@ def _resolve_forward_ref(ann, module):
         # Union-like types (e.g. typing.Union[str, ForwardRef("lnschema_core._core.Transform")])
         # and raises an error at class definition when a field is typed as such.
         return getattr(typing, parent_ref)[resolved_args[0], resolved_args[1]]
+
+
+# # as a decorator
+# def db_lookup(lookup_field: str = 'name'):
+#     def wrapper(sqlmodel_class):
+#         @classproperty
+#         def df(cls):
+#             import lamindb as ln
+
+#             return ln.select(sqlmodel_class).df()
+
+#         @classproperty
+#         def lookup(cls):
+#             return lookup_field
+
+#         sqlmodel_class.df = df
+#         sqlmodel_class.lookup = lookup
+#         return sqlmodel_class
+
+#     return wrapper
+
+
+def _to_lookup_keys(x: Iterable[str], padding: str = "LOOKUP") -> list:
+    """Convert a list of strings to tab-completion allowed formats."""
+    lookup = [re.sub("[^0-9a-zA-Z]+", "_", str(i)) for i in x]
+    for i, value in enumerate(lookup):
+        if value == "" or (not value[0].isalpha()):
+            lookup[i] = f"{padding}_{value}"
+    return lookup
+
+
+def _namedtuple_from_dict(d: dict, name: str = "entity") -> tuple:
+    """Create a namedtuple from a dict to allow autocompletion."""
+    nt = namedtuple(name, d.keys())  # type:ignore
+    return nt(**d)
