@@ -432,7 +432,7 @@ class File(SQLModel, table=True):  # type: ignore
     """Hash (md5)."""
     key: Optional[str] = Field(default=None, index=True)
     """Storage key: relative path within storage location."""
-    run: Run = Relationship(back_populates="outputs")  # type: ignore
+    run: Optional[Run] = Relationship(back_populates="outputs")  # type: ignore
     """:class:`~lamindb.Run` that generated the `file`."""
     run_id: Optional[str] = Field(foreign_key="core.run.id", index=True)
     """Source run id."""

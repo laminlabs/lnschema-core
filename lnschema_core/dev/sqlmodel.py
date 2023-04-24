@@ -258,7 +258,10 @@ def validate_relationship_types(model, user_kwargs):
         for field_name, col_name in zip(rel_fk_field_names, target_col_names):
             if hasattr(model, field_name):
                 if getattr(model, field_name) is None:
-                    setattr(model, field_name, getattr(user_kwargs[relationship_name], col_name))
+                    try:
+                        setattr(model, field_name, getattr(user_kwargs[relationship_name], col_name))
+                    except AttributeError:
+                        pass
 
 
 def _derive_target_attr_name(origin_table: sqm.SQLModel, origin_relationship: RelationshipProperty, custom_target_name):
