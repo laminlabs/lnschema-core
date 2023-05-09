@@ -268,7 +268,8 @@ class Features(SQLModel, table=True):  # type: ignore
     def __init__(
         self,
         data: Union[Path, str, pd.DataFrame, ad.AnnData] = None,
-        reference: Any = None,
+        field: Any = None,
+        **map_kwargs,
     ):
         """Initialize from data."""
         ...
@@ -286,12 +287,13 @@ class Features(SQLModel, table=True):  # type: ignore
     def __init__(  # type: ignore
         self,
         data: Union[Path, str, pd.DataFrame, ad.AnnData] = None,
-        reference: Any = None,
+        field: Any = None,
         *,
         id: str = None,
         type: Any = None,
         # continue with fields
         files: List["File"] = [],
+        **map_kwargs,
     ):
         kwargs = {k: v for k, v in locals().items() if v and k != "self"}
         super().__init__(**kwargs)
@@ -299,19 +301,21 @@ class Features(SQLModel, table=True):  # type: ignore
     def __new__(
         cls,
         data: Union[Path, str, pd.DataFrame, ad.AnnData] = None,
-        reference: Any = None,
+        field: Any = None,
         *,
         id: str = None,
         type: Any = None,
         # continue with fields
         files: List["File"] = [],
+        **map_kwargs,
     ):
         if data is not None:
             from lamindb._file import get_features_from_data
 
             features = get_features_from_data(
                 data=data,
-                reference=reference,
+                field=field,
+                **map_kwargs,
             )
         else:
             features = super().__new__(cls)
