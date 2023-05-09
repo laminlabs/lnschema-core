@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-🎨 Replace reference with field in features | [166](https://github.com/laminlabs/lnschema-core/pull/166) | [sunnyosun](https://github.com/sunnyosun) | 2023-05-09 |
+🎨 Replace reference with field in features | [166](https://github.com/laminlabs/lnschema-core/pull/166) | [sunnyosun](https://github.com/sunnyosun) | 2023-05-09 | 0.33.5
 ✅ Use nbproject-test directly in test_notebooks.py | [165](https://github.com/laminlabs/lnschema-core/pull/165) | [Koncopd](https://github.com/Koncopd) | 2023-05-04 |
 ✨ Enable database lookup and df | [164](https://github.com/laminlabs/lnschema-core/pull/164) | [sunnyosun](https://github.com/sunnyosun) | 2023-04-24 | 0.33.4
 🎨 Refactor `ln.File` | [163](https://github.com/laminlabs/lnschema-core/pull/163) | [falexwolf](https://github.com/falexwolf) | 2023-04-24 | 0.33.3
