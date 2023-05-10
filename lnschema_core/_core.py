@@ -1,14 +1,16 @@
 from datetime import datetime as datetime
 from pathlib import Path, PurePosixPath
-from typing import Any, List, Optional, TypeVar, Union, overload  # noqa
+from typing import Any, Callable, List, Optional, TypeVar, Union, overload  # noqa
 
 import anndata as ad
+import numpy as np
 import pandas as pd
 import sqlalchemy as sa
 from lamin_logger import logger
 from lndb.dev.upath import UPath
 from nbproject._is_run_from_ipython import is_run_from_ipython
 from pydantic.fields import PrivateAttr
+from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlmodel import Field, ForeignKeyConstraint, Relationship
 
 from . import _name as schema_name
@@ -20,6 +22,9 @@ from .dev.sqlmodel import schema_sqlmodel
 from .types import DataLike, PathLike, TransformType
 
 SQLModel, prefix, schema_arg = schema_sqlmodel(schema_name)
+
+ListLike = TypeVar("ListLike", pd.Series, list, np.array)
+SQLModelField = TypeVar("SQLModelField", Callable, InstrumentedAttribute)
 
 
 class User(SQLModel, table=True):  # type: ignore
@@ -267,8 +272,8 @@ class Features(SQLModel, table=True):  # type: ignore
     @overload
     def __init__(
         self,
-        data: Union[Path, str, pd.DataFrame, ad.AnnData] = None,
-        field: Any = None,
+        iterable: ListLike = None,
+        field: SQLModelField = None,
         **map_kwargs,
     ):
         """Initialize from data."""
@@ -286,35 +291,48 @@ class Features(SQLModel, table=True):  # type: ignore
 
     def __init__(  # type: ignore
         self,
-        data: Union[Path, str, pd.DataFrame, ad.AnnData] = None,
-        field: Any = None,
+        iterable: ListLike = None,
+        field: SQLModelField = None,
         *,
         id: str = None,
         type: Any = None,
         # continue with fields
         files: List["File"] = [],
+        # deprecated
+        data: Union[Path, str, pd.DataFrame, ad.AnnData] = None,
         **map_kwargs,
     ):
-        kwargs = {k: v for k, v in locals().items() if v and k != "self"}
+        kwargs = locals()
+
+        # needed for erroring when passing pd.index
+        if kwargs["data"] is not None:
+            kwargs.pop("data")
+        if kwargs["iterable"] is not None:
+            kwargs.pop("iterable")
+
+        kwargs = {k: v for k, v in kwargs.items() if v and k != "self"}
         super().__init__(**kwargs)
 
     def __new__(
         cls,
-        data: Union[Path, str, pd.DataFrame, ad.AnnData] = None,
-        field: Any = None,
+        iterable: ListLike = None,
+        field: SQLModelField = None,
         *,
         id: str = None,
         type: Any = None,
         # continue with fields
         files: List["File"] = [],
+        # deprecated
+        data: Union[Path, str, pd.DataFrame, ad.AnnData] = None,
         **map_kwargs,
     ):
-        if data is not None:
+        if data is not None or iterable is not None:
             from lamindb._file import get_features_from_data
 
             features = get_features_from_data(
-                data=data,
+                iterable=iterable,
                 field=field,
+                data=data,  # deprecated
                 **map_kwargs,
             )
         else:
