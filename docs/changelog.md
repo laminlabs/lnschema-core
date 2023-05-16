@@ -3,11 +3,11 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-🚸 Add `lazy="joined"` to some cheap joins | [168](https://github.com/laminlabs/lnschema-core/pull/168) | [falexwolf](https://github.com/falexwolf) | 2023-05-16 |
-🎨 Deprecated data in Features and replace with iterable | [167](https://github.com/laminlabs/lnschema-core/pull/167) | [sunnyosun](https://github.com/sunnyosun) | 2023-05-10 | 0.33.6
-🎨 Replace reference with field in features | [166](https://github.com/laminlabs/lnschema-core/pull/166) | [sunnyosun](https://github.com/sunnyosun) | 2023-05-09 | 0.33.5
-✅ Use nbproject-test directly in test_notebooks.py | [165](https://github.com/laminlabs/lnschema-core/pull/165) | [Koncopd](https://github.com/Koncopd) | 2023-05-04 |
-✨ Enable database lookup and df | [164](https://github.com/laminlabs/lnschema-core/pull/164) | [sunnyosun](https://github.com/sunnyosun) | 2023-04-24 | 0.33.4
+🚸 Add `lazy="joined"` to some cheap joins | [168](https://github.com/laminlabs/lnschema-core/pull/168) | [falexwolf](https://github.com/falexwolf) | 2023-05-16 | 0.33.7
+🎨 Replace `data` in `Features` with iterable | [167](https://github.com/laminlabs/lnschema-core/pull/167) | [sunnyosun](https://github.com/sunnyosun) | 2023-05-10 | 0.33.6
+🎨 Replace `reference` with `field` in `Features` | [166](https://github.com/laminlabs/lnschema-core/pull/166) | [sunnyosun](https://github.com/sunnyosun) | 2023-05-09 | 0.33.5
+✅ Use `nbproject-test` directly | [165](https://github.com/laminlabs/lnschema-core/pull/165) | [Koncopd](https://github.com/Koncopd) | 2023-05-04 |
+✨ Enable `.lookup()` | [164](https://github.com/laminlabs/lnschema-core/pull/164) | [sunnyosun](https://github.com/sunnyosun) | 2023-04-24 | 0.33.4
 🎨 Refactor `ln.File` | [163](https://github.com/laminlabs/lnschema-core/pull/163) | [falexwolf](https://github.com/falexwolf) | 2023-04-24 | 0.33.3
 ⚡️ Do not change key for in-memory data replace | [162](https://github.com/laminlabs/lnschema-core/pull/162) | [Koncopd](https://github.com/Koncopd) | 2023-04-23 | 0.33.2
 ✨ Change File.replace handling of key | [161](https://github.com/laminlabs/lnschema-core/pull/161) | [Koncopd](https://github.com/Koncopd) | 2023-04-23 |
