@@ -158,7 +158,7 @@ class Run(SQLModel, table=True):  # type: ignore
     external_id: Optional[str] = Field(default=None, index=True)
     transform_id: Optional[str] = Field(default=None, index=True)
     transform_version: Optional[str] = Field(default=None, index=True)
-    transform: Transform = Relationship()
+    transform: Transform = Relationship(sa_relationship_kwargs=dict(lazy="joined"))
     outputs: List["File"] = Relationship(back_populates="run")
     inputs: List["File"] = Relationship(
         back_populates="input_of",
@@ -472,17 +472,17 @@ class File(SQLModel, table=True):  # type: ignore
     """Hash (md5)."""
     key: Optional[str] = Field(default=None, index=True)
     """Storage key: relative path within storage location."""
-    run: Optional[Run] = Relationship(back_populates="outputs")  # type: ignore
+    run: Optional[Run] = Relationship(back_populates="outputs", sa_relationship_kwargs=dict(lazy="joined"))  # type: ignore
     """:class:`~lamindb.Run` that generated the `file`."""
     run_id: Optional[str] = Field(foreign_key="core.run.id", index=True)
     """Source run id."""
-    transform: Transform = Relationship()  # type: ignore
+    transform: Transform = Relationship(sa_relationship_kwargs=dict(lazy="joined"))  # type: ignore
     """:class:`~lamindb.Transform` whose run generated the `file`."""
     transform_id: Optional[str] = Field(index=True)
     """Source transform id."""
     transform_version: Optional[str] = Field(index=True)
     """Source transform version."""
-    storage: Storage = Relationship()  # type: ignore
+    storage: Storage = Relationship(sa_relationship_kwargs=dict(lazy="joined"))  # type: ignore
     """:class:`~lamindb.Storage` location of `file`, see `.path()` for full path."""
     storage_id: str = Field(foreign_key="core.storage.id", index=True)
     """Storage root id."""
@@ -503,7 +503,7 @@ class File(SQLModel, table=True):  # type: ignore
     """Runs that use this file as input."""
     created_at: datetime = CreatedAt
     updated_at: Optional[datetime] = UpdatedAt
-    created_by: User = Relationship()
+    created_by: User = Relationship(sa_relationship_kwargs=dict(lazy="joined"))
     created_by_id: Optional[str] = CreatedBy  # make non-optional over time
 
     # private attributes are needed here to prevent sqlalchemy error
