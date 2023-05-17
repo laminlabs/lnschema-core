@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-♻️ Refactor `BaseORM` | [169](https://github.com/laminlabs/lnschema-core/pull/169) | [falexwolf](https://github.com/falexwolf) | 2023-05-17 |
+♻️ Refactor `BaseORM` | [169](https://github.com/laminlabs/lnschema-core/pull/169) | [falexwolf](https://github.com/falexwolf) | 2023-05-17 | 0.33.8
 🚸 Add `lazy="joined"` to some cheap joins | [168](https://github.com/laminlabs/lnschema-core/pull/168) | [falexwolf](https://github.com/falexwolf) | 2023-05-16 | 0.33.7
 🎨 Replace `data` in `Features` with iterable | [167](https://github.com/laminlabs/lnschema-core/pull/167) | [sunnyosun](https://github.com/sunnyosun) | 2023-05-10 | 0.33.6
 🎨 Replace `reference` with `field` in `Features` | [166](https://github.com/laminlabs/lnschema-core/pull/166) | [sunnyosun](https://github.com/sunnyosun) | 2023-05-09 | 0.33.5
