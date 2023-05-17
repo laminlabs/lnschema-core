@@ -1,16 +1,14 @@
 from datetime import datetime as datetime
 from pathlib import Path, PurePosixPath
-from typing import Any, Callable, List, Optional, TypeVar, Union, overload  # noqa
+from typing import Any, List, Optional, TypeVar, Union, overload  # noqa
 
 import anndata as ad
-import numpy as np
 import pandas as pd
 import sqlalchemy as sa
 from lamin_logger import logger
 from lndb.dev.upath import UPath
 from nbproject._is_run_from_ipython import is_run_from_ipython
 from pydantic.fields import PrivateAttr
-from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlmodel import Field, ForeignKeyConstraint, Relationship
 
 from . import _name as schema_name
@@ -19,12 +17,9 @@ from ._timestamps import CreatedAt, UpdatedAt
 from ._users import CreatedBy
 from .dev import id as idg
 from .dev.sqlmodel import schema_sqlmodel
-from .types import DataLike, PathLike, TransformType
+from .types import DataLike, ListLike, PathLike, SQLModelField, TransformType
 
 SQLModel, prefix, schema_arg = schema_sqlmodel(schema_name)
-
-ListLike = TypeVar("ListLike", pd.Series, list, np.array)
-SQLModelField = TypeVar("SQLModelField", Callable, InstrumentedAttribute)
 
 
 class User(SQLModel, table=True):  # type: ignore
