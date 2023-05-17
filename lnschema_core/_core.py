@@ -101,7 +101,7 @@ class Transform(SQLModel, table=True):  # type: ignore
         index=True,
         default=(TransformType.notebook if is_run_from_ipython else TransformType.pipeline),
     )
-    """Transform type: defaults to `notebook` if run from IPython and otherwise to `pipeline`.
+    """Transform type. Defaults to `notebook` if run from IPython, otherwise to `pipeline`.
     """
     title: Optional[str] = Field(index=True)
     """An additional title, like a notebook title.
@@ -467,7 +467,7 @@ class File(SQLModel, table=True):  # type: ignore
     hash: Optional[str] = Field(default=None, index=True)
     """Hash (md5)."""
     key: Optional[str] = Field(default=None, index=True)
-    """Storage key: relative path within storage location."""
+    """Storage key, the relative path within the storage location."""
     run: Optional[Run] = Relationship(back_populates="outputs")  # type: ignore
     """:class:`~lamindb.Run` that created the `file`."""
     run_id: Optional[str] = Field(foreign_key="core.run.id", index=True)
