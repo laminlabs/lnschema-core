@@ -1,17 +1,16 @@
-"""SQLModel children.
+"""SQLModel extensions.
 
 .. autosummary::
    :toctree: .
 
-   SQLModelModule
-   SQLModelPrefix
+   BaseORM
 """
 
 import importlib
 import re
 import typing
 from collections import namedtuple
-from typing import Any, Iterable, Optional, Sequence, Tuple, Union
+from typing import Any, Iterable, Mapping, Optional, Sequence, Tuple, Union
 
 import lndb
 import sqlmodel as sqm
@@ -54,8 +53,8 @@ sqm.SQLModel.__repr__ = __repr__
 sqm.SQLModel.__str__ = __repr__
 
 
-class SQLModelLamin(sqm.SQLModel):  # type: ignore
-    """SQLModel at Lamin."""
+class BaseORM(sqm.SQLModel):  # type: ignore
+    """SQLModel with lookup, data validation & schema modules."""
 
     def __init__(self, **user_kwargs):
         # pydantic does not enforce strict type checking for complex types, only their attributes
@@ -64,13 +63,10 @@ class SQLModelLamin(sqm.SQLModel):  # type: ignore
         validate_with_pydantic(self, user_kwargs)
 
     @classmethod
-    def df(cls):
+    def lookup(cls, field: Optional[str] = None):
+        """Lookup rows by field."""
         import lamindb as ln
 
-        return ln.select(cls).df()
-
-    @classmethod
-    def lookup(cls, field: Optional[str] = None):
         if field is None:
             # by default use the name field
             if "name" in cls.__fields__:
@@ -83,35 +79,27 @@ class SQLModelLamin(sqm.SQLModel):  # type: ignore
                 else:
                     # the first field
                     field = next(iter(cls.__fields__.keys()))
-        values = set(cls.df()[field].values)
+        df = ln.select(cls).df()
+        values = set(df[field].values)
         keys = _to_lookup_keys(values, padding=cls.__name__)
         return _namedtuple_from_dict(d=dict(zip(keys, values)), name=cls.__name__)
 
-
-class SQLModelSchemaModule(SQLModelLamin):
-    """SQLModel for schema module."""
-
-    def __init__(self, **user_kwargs):
-        super().__init__(**user_kwargs)
-
-    # this here is problematic for those tables that overwrite
-    # __table_args__; we currently need to treat them manually
+    # the ORMs that overwrite __table_args__ need to be treated manually
     @declared_attr
-    def __table_args__(cls) -> str:
+    def __table_args__(cls) -> Mapping:
         """Update table args with schema module."""
-        return dict(schema=f"{SCHEMA_NAME}")  # type: ignore
-
-
-class SQLModelSchemaModulePrefix(SQLModelLamin):
-    """SQLModel for schema module with prefixed table names."""
-
-    def __init__(self, **user_kwargs):
-        super().__init__(**user_kwargs)
+        if not is_sqlite():
+            return dict(schema=f"{SCHEMA_NAME}")  # type: ignore
+        else:
+            return {}
 
     @declared_attr
     def __tablename__(cls) -> str:  # type: ignore
         """Prefix table name with schema module."""
-        return f"{SCHEMA_NAME}.{cls.__name__.lower()}"
+        if is_sqlite():
+            return f"{SCHEMA_NAME}.{cls.__name__.lower()}"
+        else:
+            return f"{cls.__name__.lower()}"
 
 
 def is_sqlite():
@@ -125,11 +113,11 @@ def schema_sqlmodel(schema_name: str):
     if is_sqlite():
         prefix = f"{schema_name}."
         schema_arg = None
-        return SQLModelSchemaModulePrefix, prefix, schema_arg
+        return BaseORM, prefix, schema_arg
     else:
         prefix = ""
         schema_arg = schema_name
-        return SQLModelSchemaModule, prefix, schema_arg
+        return BaseORM, prefix, schema_arg
 
 
 def get_sqlite_prefix_schema_delim_from_alembic() -> Tuple[bool, str, Optional[str], str]:
