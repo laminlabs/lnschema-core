@@ -65,6 +65,8 @@ class BaseORM(sqm.SQLModel):  # type: ignore
     @classmethod
     def lookup(cls, field: Optional[str] = None):
         """Lookup rows by field."""
+        import lamindb as ln
+
         if field is None:
             # by default use the name field
             if "name" in cls.__fields__:
@@ -77,7 +79,8 @@ class BaseORM(sqm.SQLModel):  # type: ignore
                 else:
                     # the first field
                     field = next(iter(cls.__fields__.keys()))
-        values = set(cls.df()[field].values)
+        df = ln.select(cls).df()
+        values = set(df[field].values)
         keys = _to_lookup_keys(values, padding=cls.__name__)
         return _namedtuple_from_dict(d=dict(zip(keys, values)), name=cls.__name__)
 
