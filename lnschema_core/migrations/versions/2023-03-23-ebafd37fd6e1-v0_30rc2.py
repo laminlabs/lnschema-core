@@ -5,7 +5,7 @@ from alembic import op
 from sqlalchemy.engine.reflection import Inspector
 
 from lnschema_core.dev.sqlmodel import get_sqlite_prefix_schema_delim_from_alembic
-from lnschema_core.dev.type import TransformType
+from lnschema_core.types import TransformType
 
 revision = "ebafd37fd6e1"
 down_revision = "9640062eefee"
