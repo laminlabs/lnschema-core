@@ -9,7 +9,7 @@ from lndb._check_instance_setup import check_instance_setup as _check_instance_s
 _INSTANCE_SETUP = _check_instance_setup()
 
 if _INSTANCE_SETUP:
-    from . import dev, link
+    from . import dev, link, types
     from ._core import Features, File, Folder, Project, Run, Storage, Transform, User
 
     # backward compat

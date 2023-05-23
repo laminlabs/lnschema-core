@@ -4,7 +4,7 @@ import sqlmodel as sqm  # noqa
 from alembic import op
 
 from lnschema_core.dev.sqlmodel import get_sqlite_prefix_schema_delim_from_alembic
-from lnschema_core.dev.type import TransformType
+from lnschema_core.types import TransformType
 
 revision = "d161a14a12e3"
 down_revision = "6de59093e378"

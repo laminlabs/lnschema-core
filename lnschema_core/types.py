@@ -9,10 +9,4 @@
    SQLModelField
    TransformType
 """
-from .dev._type import (  # noqa
-    DataLike,
-    ListLike,
-    PathLike,
-    SQLModelField,
-    TransformType,
-)
+from ._types import DataLike, ListLike, PathLike, SQLModelField, TransformType  # noqa
