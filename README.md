@@ -2,5 +2,5 @@
 
 # lnschema-core: Data objects & data lineage (`yvzi`)
 
-- Stable user docs: [lamin.ai/docs/setup/](https://lamin.ai/docs/reference/)
+- Stable user docs: [lamin.ai/docs/reference/](https://lamin.ai/docs/reference/)
 - Latest developer docs: [netlify](https://lnschema-core-yvzi.netlify.app/docs/lnschema-core/)
