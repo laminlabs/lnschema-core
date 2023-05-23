@@ -4,25 +4,31 @@ from typing import Any, List, Optional, TypeVar, Union, overload  # noqa
 
 import anndata as ad
 import pandas as pd
-import sqlalchemy as sa
 from lamin_logger import logger
 from lndb.dev.upath import UPath
 from nbproject._is_run_from_ipython import is_run_from_ipython
-from pydantic.fields import PrivateAttr
-from sqlmodel import Field, ForeignKeyConstraint, Relationship
 
+from . import _USE_DJANGO
 from . import _name as schema_name
 from ._link import FileFeatures, FolderFile, ProjectFolder, RunIn  # noqa
 from ._timestamps import CreatedAt, UpdatedAt
 from ._users import CreatedBy
 from .dev import id as idg
-from .dev.sqlmodel import schema_sqlmodel
 from .types import DataLike, ListLike, PathLike, SQLModelField, TransformType
 
-SQLModel, prefix, schema_arg = schema_sqlmodel(schema_name)
+if _USE_DJANGO:
+    from django.db.models import Model as BaseORM
+else:
+    import sqlalchemy as sa
+    from pydantic.fields import PrivateAttr
+    from sqlmodel import Field, ForeignKeyConstraint, Relationship
+
+    from .dev.sqlmodel import schema_sqlmodel
+
+    BaseORM, prefix, schema_arg = schema_sqlmodel(schema_name)
 
 
-class User(SQLModel, table=True):  # type: ignore
+class User(BaseORM, table=True):  # type: ignore
     """User accounts.
 
     All data in this table is synched from the cloud user account to ensure a
@@ -40,7 +46,7 @@ class User(SQLModel, table=True):  # type: ignore
     updated_at: Optional[datetime] = UpdatedAt
 
 
-class Storage(SQLModel, table=True):  # type: ignore
+class Storage(BaseORM, table=True):  # type: ignore
     """Storage locations.
 
     A file or run-associated file can be stored in any desired S3,
@@ -61,7 +67,7 @@ class Storage(SQLModel, table=True):  # type: ignore
     created_by_id: Optional[str] = CreatedBy  # make non-optional over time
 
 
-class Project(SQLModel, table=True):  # type: ignore
+class Project(BaseORM, table=True):  # type: ignore
     """Projects."""
 
     id: str = Field(default_factory=idg.project, primary_key=True)
@@ -72,7 +78,7 @@ class Project(SQLModel, table=True):  # type: ignore
     updated_at: Optional[datetime] = UpdatedAt
 
 
-class Transform(SQLModel, table=True):  # type: ignore
+class Transform(BaseORM, table=True):  # type: ignore
     """Data transformations.
 
     Jupyter notebooks, pipelines, and apps.
@@ -115,7 +121,7 @@ class Transform(SQLModel, table=True):  # type: ignore
     updated_at: Optional[datetime] = UpdatedAt
 
 
-class Run(SQLModel, table=True):  # type: ignore
+class Run(BaseORM, table=True):  # type: ignore
     """Runs of data transforms.
 
     A `run` is any transform of a `file`.
@@ -227,7 +233,7 @@ class Run(SQLModel, table=True):  # type: ignore
             ln.context.run = self
 
 
-class Features(SQLModel, table=True):  # type: ignore
+class Features(BaseORM, table=True):  # type: ignore
     """Feature sets.
 
     A feature set is represented by the hash of the set of primary keys and the feature type.
@@ -336,7 +342,7 @@ class Features(SQLModel, table=True):  # type: ignore
         return features
 
 
-class Folder(SQLModel, table=True):  # type: ignore
+class Folder(BaseORM, table=True):  # type: ignore
     """See lamindb for docstring."""
 
     __table_args__ = (
@@ -437,7 +443,7 @@ class Folder(SQLModel, table=True):  # type: ignore
             self._cloud_filepath = privates["cloud_filepath"]
 
 
-class File(SQLModel, table=True):  # type: ignore
+class File(BaseORM, table=True):  # type: ignore
     """See lamindb for docstring."""
 
     __table_args__ = (
