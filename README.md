@@ -2,6 +2,5 @@
 
 # lnschema-core: Data objects & data lineage (`yvzi`)
 
-Core schema module for tracking data lineage.
-
-It is built with [SQLModel](https://sqlmodel.tiangolo.com/), a shallow wrapper that unifies [SQLAlchemy](https://www.sqlalchemy.org/) & [Pydantic](https://pydantic-docs.helpmanual.io/).
+- Stable user docs: [lamin.ai/docs/setup/](https://lamin.ai/docs/reference/)
+- Latest developer docs: [netlify](https://lnschema-core-yvzi.netlify.app/docs/lnschema-core/)
