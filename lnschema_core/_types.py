@@ -33,3 +33,7 @@ class TransformType(Enum):
 
     def __repr__(self):
         return self.name
+
+    @classmethod
+    def choices(cls):
+        return [(item.value, item.name) for item in cls]

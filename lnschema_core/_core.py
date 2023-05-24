@@ -31,21 +31,19 @@ class User(SQLModel, table=True):  # type: ignore
 
     id: str = Field(primary_key=True)
     email: str = Field(index=True, unique=True)
-    """Primary user email used for logging in."""
     handle: str = Field(nullable=False, index=True, unique=True)
-    """User handle."""
     name: Optional[str] = Field(index=True)
-    """Long display name."""
     created_at: datetime = CreatedAt
     updated_at: Optional[datetime] = UpdatedAt
 
 
 class Storage(SQLModel, table=True):  # type: ignore
-    """Storage locations.
+    """Storage locations, often object storage buckets.
 
     A file or run-associated file can be stored in any desired S3,
-    GCP, Azure or local storage location. This table tracks these locations
-    along with metadata.
+    GCP bucket or local storage location.
+
+    This table tracks these locations along with metadata.
     """
 
     id: str = Field(default_factory=idg.storage, primary_key=True)
@@ -54,7 +52,7 @@ class Storage(SQLModel, table=True):  # type: ignore
     type: Optional[str] = None
     """Local vs. s3 vs. gcp etc."""
     region: Optional[str] = None
-    """Cloud storage region if applicable."""
+    """Cloud storage region, if applicable."""
     created_at: datetime = CreatedAt
     updated_at: Optional[datetime] = UpdatedAt
     created_by: User = Relationship()

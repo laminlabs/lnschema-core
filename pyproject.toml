@@ -15,10 +15,10 @@ classifiers = [
 ]
 dependencies = [
     "nbproject",
+    "anndata",
     "sqlmodel>=0.0.8",
     "sqlalchemy>=1.4.41",
     "pydantic<2.0.0",
-    "anndata",
     "typeguard<3.0.0"
 ]
 
@@ -26,6 +26,9 @@ dependencies = [
 Home = "https://github.com/laminlabs/lnschema-core"
 
 [project.optional-dependencies]
+django = [
+    "django",
+]
 dev = [
     "pre-commit",
     "nox",
