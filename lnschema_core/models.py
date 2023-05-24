@@ -42,7 +42,7 @@ class Project(BaseORM):  # type: ignore
 
     class Meta:
         managed = True
-        db_table = "core.project"
+        db_table = "lnschema_core_project"
 
 
 class Transform(models.Model):  # type: ignore
@@ -58,7 +58,7 @@ class Transform(models.Model):  # type: ignore
 
     class Meta:
         managed = True
-        db_table = "core.transform"
+        db_table = "lnschema_core_transform"
         constraints = [models.UniqueConstraint(fields=["id", "version"], name="uq_transform_id_version")]
 
 
@@ -73,7 +73,7 @@ class Run(models.Model):  # type: ignore
 
     class Meta:
         managed = True
-        db_table = "core.run"
+        db_table = "lnschema_core_run"
 
 
 class Features(models.Model):  # type: ignore
@@ -84,7 +84,7 @@ class Features(models.Model):  # type: ignore
 
     class Meta:
         managed = True
-        db_table = "core.features"
+        db_table = "lnschema_core_features"
 
 
 class Folder(models.Model):  # type: ignore
@@ -119,5 +119,5 @@ class File(models.Model):  # type: ignore
 
     class Meta:
         managed = True
-        db_table = "core.file"
+        db_table = "lnschema_core_file"
         unique_together = (("storage", "key"),)

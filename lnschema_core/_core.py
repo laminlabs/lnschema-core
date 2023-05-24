@@ -11,15 +11,12 @@ from nbproject._is_run_from_ipython import is_run_from_ipython
 from pydantic.fields import PrivateAttr
 from sqlmodel import Field, ForeignKeyConstraint, Relationship
 
-from . import _name as schema_name
 from ._link import FileFeatures, FolderFile, ProjectFolder, RunIn  # noqa
 from ._timestamps import CreatedAt, UpdatedAt
 from ._users import CreatedBy
 from .dev import id as idg
-from .dev.sqlmodel import schema_sqlmodel
+from .dev.sqlmodel import BaseORM as SQLModel
 from .types import DataLike, ListLike, PathLike, SQLModelField, TransformType
-
-SQLModel, prefix, schema_arg = schema_sqlmodel(schema_name)
 
 
 class User(SQLModel, table=True):  # type: ignore
@@ -139,12 +136,9 @@ class Run(SQLModel, table=True):  # type: ignore
       `run` might have many `files` as inputs.
     """
 
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ["transform_id", "transform_version"],
-            ["core.transform.id", "core.transform.version"],
-        ),
-        {"schema": schema_arg},
+    __table_args__ = ForeignKeyConstraint(
+        ["transform_id", "transform_version"],
+        ["lnschema_core_transform.id", "lnschema_core_transform.version"],
     )
     id: Optional[str] = Field(default_factory=idg.run, primary_key=True)
     name: Optional[str] = Field(default=None, index=True)
@@ -337,15 +331,12 @@ class Features(SQLModel, table=True):  # type: ignore
 class Folder(SQLModel, table=True):  # type: ignore
     """See lamindb for docstring."""
 
-    __table_args__ = (
-        sa.UniqueConstraint("storage_id", "key", name="uq_folder_storage_key"),
-        {"schema": schema_arg},
-    )
+    __table_args__ = (sa.UniqueConstraint("storage_id", "key", name="uq_folder_storage_key"),)
 
     id: str = Field(default_factory=idg.folder, primary_key=True)
     name: str = Field(index=True)
     key: Optional[str] = Field(default=None, index=True)
-    storage_id: Optional[str] = Field(default=None, foreign_key="core.storage.id", index=True)
+    storage_id: Optional[str] = Field(default=None, foreign_key="lnschema_core_storage.id", index=True)
     """Storage root id."""
     files: List["File"] = Relationship(  # type: ignore  # noqa
         back_populates="folders",
@@ -442,10 +433,9 @@ class File(SQLModel, table=True):  # type: ignore
         sa.UniqueConstraint("storage_id", "key", name="uq_file_storage_key"),
         ForeignKeyConstraint(
             ["transform_id", "transform_version"],
-            ["core.transform.id", "core.transform.version"],
+            ["lnschema_core_transform.id", "lnschema_core_transform.version"],
             name="fk_file_transform_id_version_transform",
         ),
-        {"schema": schema_arg},
     )
 
     id: str = Field(default_factory=idg.file, primary_key=True)
@@ -468,7 +458,7 @@ class File(SQLModel, table=True):  # type: ignore
     """Storage key, the relative path within the storage location."""
     run: Optional[Run] = Relationship(back_populates="outputs")  # type: ignore
     """:class:`~lamindb.Run` that created the `file`."""
-    run_id: Optional[str] = Field(foreign_key="core.run.id", index=True)
+    run_id: Optional[str] = Field(foreign_key="lnschema_core_run.id", index=True)
     """Source run id."""
     transform: Transform = Relationship(sa_relationship_kwargs=dict(lazy="joined"))  # type: ignore
     """:class:`~lamindb.Transform` whose run created the `file` [pre-joined]."""
@@ -478,7 +468,7 @@ class File(SQLModel, table=True):  # type: ignore
     """Source transform version."""
     storage: Storage = Relationship(sa_relationship_kwargs=dict(lazy="joined"))  # type: ignore
     """:class:`~lamindb.Storage` location of `file` [pre-joined], see `.path()` for full path."""
-    storage_id: str = Field(foreign_key="core.storage.id", index=True)
+    storage_id: str = Field(foreign_key="lnschema_core_storage.id", index=True)
     """Storage root id."""
     features: List[Features] = Relationship(
         back_populates="files",

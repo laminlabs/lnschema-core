@@ -10,9 +10,8 @@ import importlib
 import re
 import typing
 from collections import namedtuple
-from typing import Any, Iterable, Mapping, Optional, Sequence, Tuple, Union
+from typing import Any, Iterable, Optional, Sequence, Tuple, Union
 
-import lndb
 import sqlmodel as sqm
 from pydantic import create_model
 from sqlalchemy.orm import declared_attr
@@ -20,6 +19,10 @@ from sqlalchemy.orm import relationship as sa_relationship
 from sqlalchemy.orm.relationships import RelationshipProperty
 from sqlalchemy.orm.session import object_session
 from typeguard import check_type
+
+from .. import __name__
+
+MODULE_NAME = __name__
 
 # add naming convention for alembic
 sqm.SQLModel.metadata.naming_convention = {
@@ -29,11 +32,6 @@ sqm.SQLModel.metadata.naming_convention = {
     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
     "pk": "pk_%(table_name)s",
 }
-
-
-# it's tricky to deal with class variables in SQLModel children
-# hence, we're using a global variable, here
-SCHEMA_NAME = None
 
 
 def __repr_args__(self) -> Sequence[Tuple[Optional[str], Any]]:
@@ -84,54 +82,10 @@ class BaseORM(sqm.SQLModel):  # type: ignore
         keys = _to_lookup_keys(values, padding=cls.__name__)
         return _namedtuple_from_dict(d=dict(zip(keys, values)), name=cls.__name__)
 
-    # the ORMs that overwrite __table_args__ need to be treated manually
-    @declared_attr
-    def __table_args__(cls) -> Mapping:
-        """Update table args with schema module."""
-        if not is_sqlite():
-            return dict(schema=f"{SCHEMA_NAME}")  # type: ignore
-        else:
-            return {}
-
     @declared_attr
     def __tablename__(cls) -> str:  # type: ignore
-        """Prefix table name with schema module."""
-        if is_sqlite():
-            return f"{SCHEMA_NAME}.{cls.__name__.lower()}"
-        else:
-            return f"{cls.__name__.lower()}"
-
-
-def is_sqlite():
-    return lndb.settings.instance.dialect == "sqlite"
-
-
-def schema_sqlmodel(schema_name: str):
-    global SCHEMA_NAME
-    SCHEMA_NAME = schema_name
-
-    if is_sqlite():
-        prefix = f"{schema_name}."
-        schema_arg = None
-        return BaseORM, prefix, schema_arg
-    else:
-        prefix = ""
-        schema_arg = schema_name
-        return BaseORM, prefix, schema_arg
-
-
-def get_sqlite_prefix_schema_delim_from_alembic() -> Tuple[bool, str, Optional[str], str]:
-    from alembic import op
-
-    bind = op.get_bind()
-    sqlite = bind.engine.name == "sqlite"
-
-    if sqlite:
-        prefix, schema, delim = f"{SCHEMA_NAME}.", None, "."
-    else:
-        prefix, schema, delim = "", SCHEMA_NAME, "_"
-
-    return sqlite, prefix, schema, delim
+        """Prefix table name with module name as in Django."""
+        return f"{MODULE_NAME}_{cls.__name__.lower()}"
 
 
 def add_relationship_keys(table: sqm.SQLModel):  # type: ignore
