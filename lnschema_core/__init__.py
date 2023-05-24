@@ -11,4 +11,15 @@ _USE_DJANGO: bool = False
 
 if _INSTANCE_SETUP:
     from . import dev, link, types
-    from ._core import Features, File, Folder, Project, Run, Storage, Transform, User
+
+    if not _USE_DJANGO:
+        from ._core import (
+            Features,
+            File,
+            Folder,
+            Project,
+            Run,
+            Storage,
+            Transform,
+            User,
+        )
