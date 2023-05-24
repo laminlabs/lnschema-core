@@ -136,9 +136,11 @@ class Run(SQLModel, table=True):  # type: ignore
       `run` might have many `files` as inputs.
     """
 
-    __table_args__ = ForeignKeyConstraint(
-        ["transform_id", "transform_version"],
-        ["lnschema_core_transform.id", "lnschema_core_transform.version"],
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["transform_id", "transform_version"],
+            ["lnschema_core_transform.id", "lnschema_core_transform.version"],
+        ),
     )
     id: Optional[str] = Field(default_factory=idg.run, primary_key=True)
     name: Optional[str] = Field(default=None, index=True)
