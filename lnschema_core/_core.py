@@ -12,14 +12,11 @@ from . import _USE_DJANGO as USE_DJANGO
 from . import _name as schema_name
 from ._link import FileFeatures, FolderFile, ProjectFolder, RunIn  # noqa
 from ._timestamps import CreatedAt, UpdatedAt
-from ._users import CreatedBy, current_user_id
+from ._users import CreatedBy
 from .dev import id as idg
 from .types import DataLike, ListLike, PathLike, SQLModelField, TransformType
 
-if USE_DJANGO:
-    from django.db import models
-    from django.db.models import Model as BaseORM
-else:
+if not USE_DJANGO:
     import sqlalchemy as sa
     from pydantic.fields import PrivateAttr
     from sqlmodel import Field, ForeignKeyConstraint, Relationship
@@ -27,9 +24,6 @@ else:
     from .dev.sqlmodel import schema_sqlmodel
 
     BaseORM, prefix, schema_arg = schema_sqlmodel(schema_name)
-
-
-if not USE_DJANGO:
 
     class User(BaseORM, table=True):  # type: ignore
         """User accounts.
@@ -44,22 +38,6 @@ if not USE_DJANGO:
         name: Optional[str] = Field(index=True)
         created_at: datetime = CreatedAt
         updated_at: Optional[datetime] = UpdatedAt
-
-else:
-
-    class User(BaseORM):  # type: ignore
-        id = models.CharField(primary_key=True)
-        email = models.CharField(unique=True)
-        handle = models.CharField(unique=True)
-        name = models.CharField(blank=True, null=True)
-        created_at = models.DateTimeField()
-        updated_at = models.DateTimeField(blank=True, null=True)
-
-        class Meta:
-            db_table = "core.user"
-
-
-if not USE_DJANGO:
 
     class Storage(BaseORM, table=True):  # type: ignore
         """Storage locations, often object storage buckets.
@@ -82,20 +60,6 @@ if not USE_DJANGO:
         created_by: User = Relationship()
         created_by_id: Optional[str] = CreatedBy  # make non-optional over time
 
-else:
-
-    class Storage(BaseORM):  # type: ignore
-        id = models.CharField(primary_key=True)
-        root = models.CharField()
-        type = models.CharField(blank=True, null=True)
-        region = models.CharField(blank=True, null=True)
-        created_at = models.DateTimeField(auto_now_add=True)
-        updated_at = models.DateTimeField(auto_add=True)
-        created_by = models.ForeignKey("User", models.DO_NOTHING, blank=True, null=True, default=current_user_id)
-
-        class Meta:
-            db_table = "core.storage"
-
 
 if not USE_DJANGO:
 
@@ -108,21 +72,6 @@ if not USE_DJANGO:
         created_by_id: str = CreatedBy
         created_at: datetime = CreatedAt
         updated_at: Optional[datetime] = UpdatedAt
-
-else:
-
-    class Project(BaseORM):  # type: ignore
-        id = models.CharField(primary_key=True)
-        name = models.CharField()
-        created_by = models.ForeignKey("User", models.DO_NOTHING, default=current_user_id)
-        created_at = models.DateTimeField(auto_now_add=True)
-        updated_at = models.DateTimeField(auto_add=True)
-
-        class Meta:
-            db_table = "core.project"
-
-
-if not USE_DJANGO:
 
     class Transform(BaseORM, table=True):  # type: ignore
         """Data transformations.
@@ -165,26 +114,6 @@ if not USE_DJANGO:
         created_by_id: str = CreatedBy
         created_at: datetime = CreatedAt
         updated_at: Optional[datetime] = UpdatedAt
-
-else:
-
-    class Transform(models.Model):  # type: ignore
-        id = models.CharField(primary_key=True)
-        version = models.CharField()
-        name = models.CharField()
-        type = models.CharField(choices=TransformType.choices(), db_index=True, default=(TransformType.notebook if is_run_from_ipython else TransformType.pipeline))
-        title = models.CharField(blank=True, null=True)
-        reference = models.CharField(blank=True, null=True)
-        created_by = models.ForeignKey("User", models.DO_NOTHING)
-        created_at = models.DateTimeField(auto_now_add=True)
-        updated_at = models.DateTimeField(auto_add=True)
-
-        class Meta:
-            db_table = "core.transform"
-            constraints = [models.UniqueConstraint(fields=["id", "version"], name="uq_transform_id_version")]
-
-
-if not USE_DJANGO:
 
     class Run(BaseORM, table=True):  # type: ignore
         """Runs of data transforms.
@@ -297,23 +226,6 @@ if not USE_DJANGO:
                     logger.success(f"Added: {self}")
                 ln.context.run = self
 
-else:
-
-    class Run(models.Model):  # type: ignore
-        id = models.CharField(primary_key=True)
-        name = models.CharField(blank=True, null=True)
-        external_id = models.CharField(blank=True, null=True)
-        transform = models.ForeignKey("Transform", models.DO_NOTHING)
-        transform_version = models.CharField()
-        created_by = models.ForeignKey("User", models.DO_NOTHING)
-        created_at = models.DateTimeField(auto_now_add=True)
-
-        class Meta:
-            db_table = "core.run"
-
-
-if not USE_DJANGO:
-
     class Features(BaseORM, table=True):  # type: ignore
         """Feature sets.
 
@@ -422,20 +334,6 @@ if not USE_DJANGO:
                 features = super().__new__(cls)
             return features
 
-else:
-
-    class Features(models.Model):  # type: ignore
-        id = models.CharField(primary_key=True)
-        type = models.CharField()
-        created_by = models.ForeignKey("User", models.DO_NOTHING, default=current_user_id)
-        created_at = models.DateTimeField(auto_now=True)
-
-        class Meta:
-            db_table = "core.features"
-
-
-if not USE_DJANGO:
-
     class Folder(BaseORM, table=True):  # type: ignore
         """See lamindb for docstring."""
 
@@ -535,25 +433,6 @@ if not USE_DJANGO:
             if path is not None:
                 self._local_filepath = privates["local_filepath"]
                 self._cloud_filepath = privates["cloud_filepath"]
-
-else:
-
-    class Folder(models.Model):  # type: ignore
-        id = models.CharField(primary_key=True)
-        name = models.CharField()
-        key = models.CharField(blank=True, null=True)
-        storage = models.ForeignKey("Storage", models.DO_NOTHING)
-        created_by = models.ForeignKey("User", models.DO_NOTHING, default=current_user_id)
-        created_at = models.DateTimeField()
-        updated_at = models.DateTimeField(blank=True, null=True)
-
-        class Meta:
-            managed = False
-            db_table = "folder"
-            unique_together = (("storage", "key"),)
-
-
-if not USE_DJANGO:
 
     class File(BaseORM, table=True):  # type: ignore
         """See lamindb for docstring."""
@@ -763,27 +642,6 @@ if not USE_DJANGO:
                 self._cloud_filepath = privates["cloud_filepath"]
                 self._memory_rep = privates["memory_rep"]
                 self._to_store = not privates["check_path_in_storage"]
-
-else:
-
-    class File(models.Model):  # type: ignore
-        id = models.CharField(primary_key=True)
-        size = models.BigIntegerField(blank=True, null=True)
-        name = models.CharField(blank=True, null=True)
-        suffix = models.CharField(blank=True, null=True)
-        hash = models.CharField(blank=True, null=True)
-        key = models.CharField(blank=True, null=True)
-        run = models.ForeignKey("Run", models.DO_NOTHING, blank=True, null=True)
-        transform = models.ForeignKey("Transform", models.DO_NOTHING, blank=True, null=True)
-        transform_version = models.CharField(blank=True, null=True)
-        storage = models.ForeignKey("Storage", models.DO_NOTHING)
-        created_at = models.DateTimeField(auto_now_add=True)
-        updated_at = models.DateTimeField(auto_add=True)
-        created_by = models.ForeignKey("User", models.DO_NOTHING, default=current_user_id)
-
-        class Meta:
-            db_table = "core.file"
-            unique_together = (("storage", "key"),)
 
 
 # add type annotations back asap when re-organizing the module
