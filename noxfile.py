@@ -21,7 +21,7 @@ def lint(session: nox.Session) -> None:
 def build(session):
     login_testuser1(session)
     setup_test_instances_from_main_branch(session)
-    session.install(".[dev,test,sqlmodel]")
+    session.install(".[dev,test]")
     response = requests.get("https://github.com/laminlabs/lamindb/tree/filename")
     if response.status_code < 400:
         session.install("git+https://github.com/laminlabs/lamindb@filename")
