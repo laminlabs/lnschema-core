@@ -7,7 +7,6 @@ from lndb.test import (
     migration_id_is_consistent,
     model_definitions_match_ddl,
 )
-
 from lnschema_core import _schema_id as schema_id
 
 package_name = get_package_name()

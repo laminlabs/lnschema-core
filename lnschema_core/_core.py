@@ -6,10 +6,11 @@ import anndata as ad
 import pandas as pd
 import sqlalchemy as sa
 from lamin_logger import logger
-from lndb.dev.upath import UPath
 from nbproject._is_run_from_ipython import is_run_from_ipython
 from pydantic.fields import PrivateAttr
 from sqlmodel import Field, ForeignKeyConstraint, Relationship
+
+from lndb.dev.upath import UPath
 
 from ._link import FileFeatures, FolderFile, ProjectFolder, RunInput  # noqa
 from ._timestamps import CreatedAt, UpdatedAt
