@@ -11,7 +11,7 @@ from nbproject._is_run_from_ipython import is_run_from_ipython
 from pydantic.fields import PrivateAttr
 from sqlmodel import Field, ForeignKeyConstraint, Relationship
 
-from ._link import FileFeatures, FolderFile, ProjectFolder, RunIn  # noqa
+from ._link import FileFeatures, FolderFile, ProjectFolder, RunInput  # noqa
 from ._timestamps import CreatedAt, UpdatedAt
 from ._users import CreatedBy
 from .dev import id as idg
@@ -152,7 +152,7 @@ class Run(SQLModel, table=True):  # type: ignore
     outputs: List["File"] = Relationship(back_populates="run")
     inputs: List["File"] = Relationship(
         back_populates="input_of",
-        sa_relationship_kwargs=dict(secondary=RunIn.__table__),
+        sa_relationship_kwargs=dict(secondary=RunInput.__table__),
     )
     created_by: User = Relationship()
     created_by_id: str = CreatedBy
@@ -484,7 +484,7 @@ class File(SQLModel, table=True):  # type: ignore
     """Folders that contain this file."""
     input_of: List[Run] = Relationship(  # type: ignore
         back_populates="inputs",
-        sa_relationship_kwargs=dict(secondary=RunIn.__table__),
+        sa_relationship_kwargs=dict(secondary=RunInput.__table__),
     )
     """Runs that use this file as input."""
     created_at: datetime = CreatedAt

@@ -3,7 +3,7 @@ from sqlmodel import Field
 from lnschema_core.dev.sqlmodel import BaseORM as SQLModel
 
 
-class RunIn(SQLModel, table=True):  # type: ignore
+class RunInput(SQLModel, table=True):  # type: ignore
     """Inputs of runs.
 
     This is a many-to-many link table for `run` and `file` storing the
