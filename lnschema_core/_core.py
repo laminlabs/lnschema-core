@@ -129,14 +129,14 @@ class Run(SQLModel, table=True):  # type: ignore
     It typically has inputs and outputs:
 
     - References to outputs are stored in the `file` table in the
-    `run_id` column as a foreign key the `run`
-    table. This is possible as every given `file` has a unique data run:
-    the `run` that produced the `file`. However, note that a given
-    `run` may output several `files`.
+      `run_id` column as a foreign key the `run`
+      table. This is possible as every given `file` has a unique data run:
+      the `run` that produced the `file`. However, note that a given
+      `run` may output several `files`.
     - References to inputs are stored in the `run_in` table, a
-    many-to-many link table between the `file` and `run` tables. Any
-    `file` might serve as an input for many `runs`. Similarly, any
-    `run` might have many `files` as inputs.
+      many-to-many link table between the `file` and `run` tables. Any
+      `file` might serve as an input for many `runs`. Similarly, any
+      `run` might have many `files` as inputs.
     """
 
     __table_args__ = (
