@@ -1,0 +1,3 @@
+[submodule "lndb"]
+	path = lndb
+	url = https://github.com/laminlabs/lndb
