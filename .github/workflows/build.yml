@@ -78,6 +78,7 @@ jobs:
         run: |
           nox -s lint --python ${{ matrix.python-version }}
       - name: Build
+        if: always()
         run: |
           nox -s build --python ${{ matrix.python-version }}
       - name: Codecov
