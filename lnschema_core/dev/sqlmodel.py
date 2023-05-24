@@ -88,6 +88,32 @@ class BaseORM(sqm.SQLModel):  # type: ignore
         return f"{MODULE_NAME}_{cls.__name__.lower()}"
 
 
+# backward compat for migrations ---
+SCHEMA_NAME = None
+
+
+def schema_sqlmodel(schema_name: str):
+    global SCHEMA_NAME
+    SCHEMA_NAME = schema_name
+
+
+def get_sqlite_prefix_schema_delim_from_alembic() -> Tuple[bool, str, Optional[str], str]:
+    from alembic import op
+
+    bind = op.get_bind()
+    sqlite = bind.engine.name == "sqlite"
+
+    if sqlite:
+        prefix, schema, delim = f"{SCHEMA_NAME}.", None, "."
+    else:
+        prefix, schema, delim = "", SCHEMA_NAME, "_"
+
+    return sqlite, prefix, schema, delim
+
+
+# end backward compat for migrations ---
+
+
 def add_relationship_keys(table: sqm.SQLModel):  # type: ignore
     """add all relationship keys to __sqlmodel_relationships__."""
     for i in getattr(table, "__mapper__").relationships:
