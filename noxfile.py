@@ -1,3 +1,5 @@
+import os
+
 import nox
 import requests  # type: ignore
 from laminci import move_built_docs_to_docs_slash_project_slug, upload_docs_artifact
@@ -21,6 +23,8 @@ def lint(session: nox.Session) -> None:
 def build(session):
     login_testuser1(session)
     setup_test_instances_from_main_branch(session)
+    if "GITHUB_EVENT_NAME" in os.environ and os.environ["GITHUB_EVENT_NAME"] != "push":
+        session.install("./lndb")
     session.install(".[dev,test]")
     response = requests.get("https://github.com/laminlabs/lamindb/tree/filename")
     if response.status_code < 400:

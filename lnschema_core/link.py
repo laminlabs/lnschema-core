@@ -3,10 +3,13 @@
 .. autosummary::
    :toctree: .
 
-   RunIn
+   RunInput
    FileFeatures
    ProjectFolder
    FolderFile
 
 """
-from ._link import FileFeatures, FolderFile, ProjectFolder, RunIn  # noqa
+from ._link import FileFeatures, FolderFile, ProjectFolder, RunInput  # noqa
+
+# backward compat
+RunIn = RunInput

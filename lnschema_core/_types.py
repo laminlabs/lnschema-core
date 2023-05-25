@@ -5,8 +5,9 @@ from typing import Callable, TypeVar
 import anndata as ad
 import numpy as np
 import pandas as pd
-from lndb.dev.upath import UPath
 from sqlalchemy.orm.attributes import InstrumentedAttribute
+
+from lndb.dev.upath import UPath
 
 PathLike = TypeVar("PathLike", str, Path, UPath)
 DataLike = TypeVar("DataLike", ad.AnnData, pd.DataFrame)

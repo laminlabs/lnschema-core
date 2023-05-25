@@ -9,14 +9,13 @@ from .types import TransformType
 class User(BaseORM):  # type: ignore
     id = models.CharField(max_length=64, primary_key=True)
     email = models.CharField(max_length=64, unique=True)
-    handle = models.CharField(max_length=64, unique=True)
-    name2 = models.CharField(max_length=64, blank=True, null=True)
+    handle2 = models.CharField(max_length=64, unique=True)
+    name = models.CharField(max_length=64, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         managed = True
-        db_table = '"core"."user"'
 
 
 class Storage(BaseORM):  # type: ignore
@@ -30,7 +29,6 @@ class Storage(BaseORM):  # type: ignore
 
     class Meta:
         managed = True
-        db_table = '"core"."storage"'
 
 
 class Project(BaseORM):  # type: ignore
@@ -42,7 +40,6 @@ class Project(BaseORM):  # type: ignore
 
     class Meta:
         managed = True
-        db_table = "core.project"
 
 
 class Transform(models.Model):  # type: ignore
@@ -58,7 +55,6 @@ class Transform(models.Model):  # type: ignore
 
     class Meta:
         managed = True
-        db_table = "core.transform"
         constraints = [models.UniqueConstraint(fields=["id", "version"], name="uq_transform_id_version")]
 
 
@@ -73,7 +69,6 @@ class Run(models.Model):  # type: ignore
 
     class Meta:
         managed = True
-        db_table = "core.run"
 
 
 class Features(models.Model):  # type: ignore
@@ -84,7 +79,6 @@ class Features(models.Model):  # type: ignore
 
     class Meta:
         managed = True
-        db_table = "core.features"
 
 
 class Folder(models.Model):  # type: ignore
@@ -98,7 +92,6 @@ class Folder(models.Model):  # type: ignore
 
     class Meta:
         managed = True
-        db_table = "folder"
         unique_together = (("storage", "key"),)
 
 
@@ -119,5 +112,4 @@ class File(models.Model):  # type: ignore
 
     class Meta:
         managed = True
-        db_table = "core.file"
         unique_together = (("storage", "key"),)
