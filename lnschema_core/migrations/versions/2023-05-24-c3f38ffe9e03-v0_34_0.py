@@ -48,7 +48,7 @@ def upgrade() -> None:
         op.rename_table(old_table_name="features", new_table_name="lnschema_core_features")
         op.rename_table(old_table_name="run_in", new_table_name="lnschema_core_runinput")
         op.rename_table(old_table_name="file_features", new_table_name="lnschema_core_filefeatures")
-        op.rename_table(old_table_name="core.project_folder", new_table_name="lnschema_core_projectfolder")
+        op.rename_table(old_table_name="project_folder", new_table_name="lnschema_core_projectfolder")
         op.rename_table(old_table_name="folder_file", new_table_name="lnschema_core_folderfile")
 
 
