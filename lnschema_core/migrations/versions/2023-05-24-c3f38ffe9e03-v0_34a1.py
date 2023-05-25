@@ -38,7 +38,7 @@ def upgrade() -> None:
         op.rename_table(old_table_name="file_features", new_table_name="lnschema_core_filefeatures", schema="core")
         op.rename_table(old_table_name="project_folder", new_table_name="lnschema_core_projectfolder", schema="core")
         op.rename_table(old_table_name="folder_file", new_table_name="lnschema_core_folderfile", schema="core")
-
+        # for whatever reason, this has to come after the rename
         op.execute("alter table core.lnschema_core_user set schema public")
         op.execute("alter table core.lnschema_core_project set schema public")
         op.execute("alter table core.lnschema_core_storage set schema public")
@@ -48,9 +48,9 @@ def upgrade() -> None:
         op.execute("alter table core.lnschema_core_folder set schema public")
         op.execute("alter table core.lnschema_core_features set schema public")
         op.execute("alter table core.lnschema_core_runinput set schema public")
-        op.execute("alter table core.lnschema_core_file_features set schema public")
-        op.execute("alter table core.lnschema_core_project_folder set schema public")
-        op.execute("alter table core.lnschema_core_folder_file set schema public")
+        op.execute("alter table core.lnschema_core_filefeatures set schema public")
+        op.execute("alter table core.lnschema_core_projectfolder set schema public")
+        op.execute("alter table core.lnschema_core_folderfile set schema public")
 
 
 def downgrade() -> None:
