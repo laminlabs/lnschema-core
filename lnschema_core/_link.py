@@ -1,6 +1,10 @@
 from sqlmodel import Field
 
-from lnschema_core.dev.sqlmodel import BaseORM as SQLModel
+from lnschema_core.dev.sqlmodel import get_orm
+
+from . import __name__ as module_name
+
+SQLModel = get_orm(module_name)
 
 
 class RunInput(SQLModel, table=True):  # type: ignore

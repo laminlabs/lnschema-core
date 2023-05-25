@@ -12,16 +12,20 @@ from sqlmodel import Field, ForeignKeyConstraint, Relationship
 
 from lndb.dev.upath import UPath
 
+from . import __name__ as module_name
 from . import _name as schema_name
 from ._link import FileFeatures, FolderFile, ProjectFolder, RunInput  # noqa
 from ._timestamps import CreatedAt, UpdatedAt
 from ._users import CreatedBy
 from .dev import id as idg
-from .dev.sqlmodel import BaseORM as SQLModel
-from .dev.sqlmodel import schema_sqlmodel
+from .dev.sqlmodel import get_orm, schema_sqlmodel
 from .types import DataLike, ListLike, PathLike, SQLModelField, TransformType
 
-schema_sqlmodel(schema_name)  # for backward compat
+# this is for backward compat
+schema_sqlmodel(schema_name)
+
+# this is the current way
+SQLModel = get_orm(module_name)
 
 
 class User(SQLModel, table=True):  # type: ignore

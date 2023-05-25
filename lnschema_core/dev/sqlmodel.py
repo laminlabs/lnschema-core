@@ -88,6 +88,13 @@ class BaseORM(sqm.SQLModel):  # type: ignore
         return f"{MODULE_NAME}_{cls.__name__.lower()}"
 
 
+def get_orm(module_name: str):
+    global MODULE_NAME
+    MODULE_NAME = module_name
+
+    return BaseORM
+
+
 # backward compat for migrations ---
 SCHEMA_NAME = None
 
