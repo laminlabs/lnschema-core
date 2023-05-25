@@ -96,6 +96,17 @@ def schema_sqlmodel(schema_name: str):
     global SCHEMA_NAME
     SCHEMA_NAME = schema_name
 
+    import lndb
+
+    if lndb.settings.instance.dialect == "sqlite":
+        prefix = f"{schema_name}."
+        schema_arg = None
+        return BaseORM, prefix, schema_arg
+    else:
+        prefix = ""
+        schema_arg = schema_name
+        return BaseORM, prefix, schema_arg
+
 
 def get_sqlite_prefix_schema_delim_from_alembic() -> Tuple[bool, str, Optional[str], str]:
     from alembic import op
