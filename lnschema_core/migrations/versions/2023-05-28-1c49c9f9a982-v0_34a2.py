@@ -64,7 +64,10 @@ def upgrade() -> None:
     op.drop_index(f"ix_core{delim}run_created_by_id", table_name="lnschema_core_run")
     op.drop_index(f"ix_core{delim}run_external_id", table_name="lnschema_core_run")
     op.drop_index(f"ix_core{delim}run_name", table_name="lnschema_core_run")
-    op.drop_index(f"ix_core{delim}run_transform_id", table_name="lnschema_core_run")
+    try:
+        op.drop_index(f"ix_core{delim}run_transform_id", table_name="lnschema_core_run")
+    except Exception:
+        pass
     op.drop_index(f"ix_core{delim}run_transform_version", table_name="lnschema_core_run")
     op.create_index(op.f("ix_lnschema_core_run_created_at"), "lnschema_core_run", ["created_at"], unique=False)
     op.create_index(op.f("ix_lnschema_core_run_created_by_id"), "lnschema_core_run", ["created_by_id"], unique=False)
@@ -72,10 +75,13 @@ def upgrade() -> None:
     op.create_index(op.f("ix_lnschema_core_run_name"), "lnschema_core_run", ["name"], unique=False)
     op.create_index(op.f("ix_lnschema_core_run_transform_id"), "lnschema_core_run", ["transform_id"], unique=False)
     op.create_index(op.f("ix_lnschema_core_run_transform_version"), "lnschema_core_run", ["transform_version"], unique=False)
-    op.drop_index(f"ix_core{delim}storage_created_at", table_name="lnschema_core_storage")
-    op.drop_index(f"ix_core{delim}storage_created_by_id", table_name="lnschema_core_storage")
-    op.drop_index(f"ix_core{delim}storage_root", table_name="lnschema_core_storage")
-    op.drop_index(f"ix_core{delim}storage_updated_at", table_name="lnschema_core_storage")
+    try:
+        op.drop_index(f"ix_core{delim}storage_created_at", table_name="lnschema_core_storage")
+        op.drop_index(f"ix_core{delim}storage_created_by_id", table_name="lnschema_core_storage")
+        op.drop_index(f"ix_core{delim}storage_root", table_name="lnschema_core_storage")
+        op.drop_index(f"ix_core{delim}storage_updated_at", table_name="lnschema_core_storage")
+    except Exception:
+        pass
     op.create_index(op.f("ix_lnschema_core_storage_created_at"), "lnschema_core_storage", ["created_at"], unique=False)
     op.create_index(op.f("ix_lnschema_core_storage_created_by_id"), "lnschema_core_storage", ["created_by_id"], unique=False)
     op.create_index(op.f("ix_lnschema_core_storage_root"), "lnschema_core_storage", ["root"], unique=False)
@@ -83,10 +89,13 @@ def upgrade() -> None:
     op.drop_index(f"ix_core{delim}transform_created_at", table_name="lnschema_core_transform")
     op.drop_index(f"ix_core{delim}transform_created_by_id", table_name="lnschema_core_transform")
     op.drop_index(f"ix_core{delim}transform_name", table_name="lnschema_core_transform")
-    op.drop_index(f"ix_core{delim}transform_reference", table_name="lnschema_core_transform")
-    op.drop_index(f"ix_core{delim}transform_title", table_name="lnschema_core_transform")
-    op.drop_index(f"ix_core{delim}transform_type", table_name="lnschema_core_transform")
-    op.drop_index(f"ix_core{delim}transform_updated_at", table_name="lnschema_core_transform")
+    try:
+        op.drop_index(f"ix_core{delim}transform_reference", table_name="lnschema_core_transform")
+        op.drop_index(f"ix_core{delim}transform_title", table_name="lnschema_core_transform")
+        op.drop_index(f"ix_core{delim}transform_type", table_name="lnschema_core_transform")
+        op.drop_index(f"ix_core{delim}transform_updated_at", table_name="lnschema_core_transform")
+    except Exception:
+        pass
     op.create_index(op.f("ix_lnschema_core_transform_created_at"), "lnschema_core_transform", ["created_at"], unique=False)
     op.create_index(op.f("ix_lnschema_core_transform_created_by_id"), "lnschema_core_transform", ["created_by_id"], unique=False)
     op.create_index(op.f("ix_lnschema_core_transform_name"), "lnschema_core_transform", ["name"], unique=False)
