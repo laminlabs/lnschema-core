@@ -1,4 +1,4 @@
-"""v0.34.0.
+"""v0.34a1.
 
 Reverts migration 0.15.0.
 """

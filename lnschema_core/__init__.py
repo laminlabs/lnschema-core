@@ -1,7 +1,7 @@
 """Data lineage (`yvzi`)."""
 _schema_id = "yvzi"
 _name = "core"
-_migration = "c3f38ffe9e03"
+_migration = "1c49c9f9a982"
 __version__ = "0.34a2"
 
 from lndb._check_instance_setup import check_instance_setup as _check_instance_setup
