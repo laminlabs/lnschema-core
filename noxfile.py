@@ -1,7 +1,7 @@
 import os
 
 import nox
-import requests  # type: ignore
+import requests  # type: ignore  # noqa
 from laminci import move_built_docs_to_docs_slash_project_slug, upload_docs_artifact
 from laminci.nox import (
     build_docs,
@@ -26,11 +26,11 @@ def build(session):
     if "GITHUB_EVENT_NAME" in os.environ and os.environ["GITHUB_EVENT_NAME"] != "push":
         session.install("./lndb")
     session.install(".[dev,test]")
-    response = requests.get("https://github.com/laminlabs/lamindb/tree/filename")
-    if response.status_code < 400:
-        session.install("git+https://github.com/laminlabs/lamindb@filename")
-    else:
-        session.install("git+https://github.com/laminlabs/lamindb")
+    # below useful for PRs
+    # response = requests.get("https://github.com/laminlabs/lamindb/tree/filename")
+    # if response.status_code < 400:
+    #     session.install("git+https://github.com/laminlabs/lamindb@filename")
+    session.install("git+https://github.com/laminlabs/lamindb")
     run_pytest(session)
     build_docs(session)
     upload_docs_artifact()
