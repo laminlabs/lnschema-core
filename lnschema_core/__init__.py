@@ -2,7 +2,7 @@
 _schema_id = "yvzi"
 _name = "core"
 _migration = "1c49c9f9a982"
-__version__ = "0.34a4"
+__version__ = "0.34a5"
 
 from lndb._check_instance_setup import check_instance_setup as _check_instance_setup
 
