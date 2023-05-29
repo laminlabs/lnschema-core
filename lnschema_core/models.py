@@ -6,6 +6,11 @@ from ._users import current_user_id
 from .types import TransformType
 
 
+class RunInput(models.Model):
+    run = models.ForeignKey("Run", on_delete=models.CASCADE)
+    file = models.ForeignKey("File", on_delete=models.CASCADE)
+
+
 class User(BaseORM):  # type: ignore
     id = models.CharField(max_length=64, primary_key=True)
     email = models.CharField(max_length=64, unique=True)
@@ -66,6 +71,7 @@ class Run(models.Model):  # type: ignore
     transform_version = models.CharField(max_length=64)
     created_by = models.ForeignKey("User", models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
+    inputs = models.ManyToManyField("File", through=RunInput, related_name="input_of")
 
     class Meta:
         managed = True
