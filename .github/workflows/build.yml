@@ -30,42 +30,35 @@ jobs:
           ssh-key: ${{ secrets.READ_LNDOCS }}
           path: lndocs
           ref: main
-      - name: Setup Python
-        uses: actions/setup-python@v4
+      - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
           cache: "pip"
           cache-dependency-path: ".github/workflows/build.yml" # See dependencies below
-      - name: Cache nox
-        uses: actions/cache@v3
-        with:
-          path: .nox
-          key: nox-${{ runner.os }}
-      - name: Cache pre-commit
+      - name: cache pre-commit
         uses: actions/cache@v3
         with:
           path: ~/.cache/pre-commit
           key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
-      - name: Cache postgres
+      - name: cache postgres
         id: cache-postgres
         uses: actions/cache@v3
         with:
           path: ~/postgres.tar
           key: cache-postgres-0
-      - name: Cache postgres miss
+      - name: cache postgres miss
         if: steps.cache-postgres.outputs.cache-hit != 'true'
         run: docker pull postgres:latest && docker image save postgres:latest --output ~/postgres.tar
-      - name: Cache postgres use
+      - name: cache postgres use
         if: steps.cache-postgres.outputs.cache-hit == 'true'
         run: docker image load --input ~/postgres.tar
-      - name: Install Python dependencies
+      - name: install Python deps
         run: |
           python -m pip install -U pip
-          pip install git+https://github.com/laminlabs/lamindb
-      - name: Install apt-get dependencies
+          pip install laminci
+      - name: install apt-get deps
         run: |
           sudo apt-get -y install graphviz
-          sudo apt-get install sqlite3-tools=3.37.2-2
           sudo apt-get install libpq-dev
       - name: Configure AWS
         uses: aws-actions/configure-aws-credentials@v1
@@ -73,14 +66,9 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-central-1
-      # - name: Lint
-      #   if: matrix.python-version == '3.9'
-      #   run: |
-      #     nox -s lint --python ${{ matrix.python-version }}
-      - name: Build
-        if: always()
-        run: |
-          nox -s build --python ${{ matrix.python-version }}
+      - run: nox -s lint
+      - run: nox -s install
+      - run: nox -s build
       - name: Codecov
         if: matrix.python-version == '3.9'
         uses: codecov/codecov-action@v2

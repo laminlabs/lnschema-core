@@ -1,37 +1,36 @@
-import os
+import sys
+from pathlib import Path
 
 import nox
-import requests  # type: ignore  # noqa
 from laminci import move_built_docs_to_docs_slash_project_slug, upload_docs_artifact
-from laminci.nox import (
-    build_docs,
-    login_testuser1,
-    run_pre_commit,
-    run_pytest,
-    setup_test_instances_from_main_branch,
-)
+from laminci.nox import build_docs, login_testuser1, run_pytest  # noqa
 
-nox.options.reuse_existing_virtualenvs = True
+nox.options.default_venv_backend = "none"
 
 
-@nox.session(python=["3.7", "3.8", "3.9", "3.10", "3.11"])
+@nox.session
 def lint(session: nox.Session) -> None:
-    run_pre_commit(session)
+    session.run(*"pip install pre-commit".split())
+    session.run("pre-commit", "install")
+    session.run("pre-commit", "run", "--all-files")
 
 
-@nox.session(python=["3.7", "3.8", "3.9", "3.10", "3.11"])
-def build(session):
+@nox.session
+def install(session: nox.Session) -> None:
+    session.run(*"pip install --no-deps .".split())
+    session.run(*"git clone https://github.com/laminlabs/lamindb --depth 1".split())
+    if sys.platform.startswith("linux"):  # remove version pin when running on CI
+        session.run(*"sed -i /lnschema_core/d ./lamindb/pyproject.toml".split())
+    session.run(*"pip install ./lamindb[aws,test]".split())
+
+
+@nox.session()
+def build(session: nox.Session) -> None:
     login_testuser1(session)
-    setup_test_instances_from_main_branch(session)
-    if "GITHUB_EVENT_NAME" in os.environ and os.environ["GITHUB_EVENT_NAME"] != "push":
-        session.install("./lndb")
-    session.install(".[dev,test]")
-    # below useful for PRs
-    # response = requests.get("https://github.com/laminlabs/lamindb/tree/filename")
-    # if response.status_code < 400:
-    #     session.install("git+https://github.com/laminlabs/lamindb@filename")
-    session.install("git+https://github.com/laminlabs/lamindb")
     run_pytest(session)
-    build_docs(session)
+    prefix = "." if Path("./lndocs").exists() else ".."
+    session.run(*f"pip install {prefix}/lndocs".split())
+    session.run(*"lamin init --storage ./docsbuild".split())
+    session.run("lndocs")
     upload_docs_artifact()
     move_built_docs_to_docs_slash_project_slug()
