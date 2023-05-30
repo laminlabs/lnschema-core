@@ -1,4 +1,5 @@
 import sys
+from pathlib import Path
 
 import nox
 from laminci import move_built_docs_to_docs_slash_project_slug, upload_docs_artifact
@@ -28,5 +29,9 @@ def build(session: nox.Session) -> None:
     login_testuser1(session)
     run_pytest(session)
     build_docs(session)
+    prefix = "." if Path("./lndocs").exists() else ".."
+    session.run(*f"pip install {prefix}/lndocs".split())
+    session.run(*"lamin init --storage ./docsbuild".split())
+    session.run("lndocs")
     upload_docs_artifact()
     move_built_docs_to_docs_slash_project_slug()
