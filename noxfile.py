@@ -20,7 +20,7 @@ def build(session):
     session.run(*"git clone https://github.com/laminlabs/lamindb --depth 1".split())
     if sys.platform.startswith("linux"):  # remove version pin when running on CI
         session.run(*"sed -i /lnschema_core/d ./lamindb/pyproject.toml".split())
-    session.run(*"pip install ./lamindb[aws]".split())
+    session.run(*"pip install ./lamindb[aws,test]".split())
     login_testuser1(session)
     run_pytest(session)
     build_docs(session)
