@@ -1,7 +1,6 @@
 import os
 
 import nox
-import requests  # type: ignore  # noqa
 from laminci import move_built_docs_to_docs_slash_project_slug, upload_docs_artifact
 from laminci.nox import build_docs, run_pytest
 
