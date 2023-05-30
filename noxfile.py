@@ -14,7 +14,7 @@ def lint(session: nox.Session) -> None:
     session.run("pre-commit", "run", "--all-files")
 
 
-@nox.session(python=["3.8", "3.9", "3.10", "3.11"])
+@nox.session()
 def build(session):
     session.run(*"pip install .[dev,test]".split())
     session.run(*"git clone https://github.com/laminlabs/lamindb --depth 1".split())
