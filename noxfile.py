@@ -1,4 +1,4 @@
-import os
+import sys
 
 import nox
 from laminci import move_built_docs_to_docs_slash_project_slug, upload_docs_artifact
@@ -18,7 +18,7 @@ def lint(session: nox.Session) -> None:
 def build(session):
     session.run(*"pip install .[dev,test]".split())
     session.run(*"git clone https://github.com/laminlabs/lamindb --depth 1".split())
-    if os.platform.startswith("linux"):  # remove version pin when running on CI
+    if sys.platform.startswith("linux"):  # remove version pin when running on CI
         session.run(*"sed -i '/lnschema_core/d' ./lamindb/pyproject.toml".split())
     session.run(*"pip install ./lamindb[aws]".split())
     run_pytest(session)
