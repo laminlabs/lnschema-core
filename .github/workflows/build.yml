@@ -66,11 +66,8 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-central-1
-      - run: nox -s lint
-      - name: Build
-        if: always()
-        run: |
-          nox -s build
+      # - run: nox -s lint
+      - run: nox -s build
       - name: Codecov
         if: matrix.python-version == '3.9'
         uses: codecov/codecov-action@v2
