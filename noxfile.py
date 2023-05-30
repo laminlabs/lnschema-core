@@ -18,7 +18,7 @@ def lint(session: nox.Session) -> None:
 def build(session):
     session.run(*"pip install .[dev,test]".split())
     session.run(*"git clone https://github.com/laminlabs/lamindb --depth 1".split())
-    if os.system().startswith("linux"):  # remove version pin when running on CI
+    if os.platform.startswith("linux"):  # remove version pin when running on CI
         session.run(*"sed -i '/lnschema_core/d' ./lamindb/pyproject.toml".split())
     session.run(*"pip install ./lamindb[aws]".split())
     run_pytest(session)
