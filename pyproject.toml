@@ -14,26 +14,20 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
 ]
 dependencies = [
-    "nbproject",
     "anndata",
     "sqlmodel>=0.0.8",
     "sqlalchemy>=1.4.41",
     "pydantic<2.0.0",
-    "typeguard<3.0.0"
+    "typeguard<3.0.0",
 ]
 
 [project.urls]
 Home = "https://github.com/laminlabs/lnschema-core"
 
 [project.optional-dependencies]
-django = [
-    "django",
-]
-dev = [
+test = [
     "pre-commit",
     "nox",
-]
-test = [
     "pytest>=6.0",
     "pytest-cov",
     "pytest_alembic",
