@@ -14,12 +14,19 @@ _INSTANCE_SETUP = _check_instance_setup()
 if _INSTANCE_SETUP:
     from . import dev, link, types
 
-    if _USE_DJANGO:
-        from lndb.dev._django import setup_django
-
-        setup_django(_lndb.settings.instance)
-    else:
+    if not _USE_DJANGO:
         from ._core import (  # type: ignore
+            Features,
+            File,
+            Folder,
+            Project,
+            Run,
+            Storage,
+            Transform,
+            User,
+        )
+    else:
+        from .models import (  # type: ignore
             Features,
             File,
             Folder,
