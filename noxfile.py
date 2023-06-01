@@ -16,7 +16,7 @@ def lint(session: nox.Session) -> None:
 @nox.session
 def install(session: nox.Session) -> None:
     session.run(*"pip install --no-deps .[django]".split())
-    session.run(*"git clone https://github.com/laminlabs/lamindb --depth 1".split())
+    session.run(*"git clone https://github.com/laminlabs/lamindb".split())
     response = requests.get("https://github.com/laminlabs/lamindb/tree/rename")
     if response.status_code < 400:
         session.run(*"git switch rename".split())
