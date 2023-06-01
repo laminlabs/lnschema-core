@@ -103,9 +103,9 @@ def schema_sqlmodel(schema_name: str):
     global SCHEMA_NAME
     SCHEMA_NAME = schema_name
 
-    import lndb
+    import lamindb_setup
 
-    if lndb.settings.instance.dialect == "sqlite":
+    if lamindb_setup.settings.instance.dialect == "sqlite":
         prefix = f"{schema_name}."
         schema_arg = None
         return BaseORM, prefix, schema_arg

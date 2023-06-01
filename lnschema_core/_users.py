@@ -2,13 +2,13 @@ from sqlmodel import Field
 
 
 def current_user_id() -> str:
-    from lndb import settings
+    from lamindb_setup import settings
 
     return settings.user.id
 
 
 def current_user_id_as_int() -> int:
-    from lndb import settings
+    from lamindb_setup import settings
 
     return settings.user.get_id_as_int()
 

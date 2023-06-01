@@ -1,8 +1,8 @@
 from pathlib import Path
 
-from lndb._migrate import generate_module_files  # noqa
-from lndb.test import model_definitions_match_ddl  # noqa
-from lndb.test import (  # noqa
+from lamindb_setup._migrate import generate_module_files  # noqa
+from lamindb_setup.test import model_definitions_match_ddl  # noqa
+from lamindb_setup.test import (  # noqa
     get_package_name,
     migrate_clones,
     migration_id_is_consistent,
