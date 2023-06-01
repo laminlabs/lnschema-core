@@ -6,7 +6,7 @@ import anndata as ad
 import pandas as pd
 import sqlalchemy as sa
 from lamin_logger import logger
-from lndb.dev.upath import UPath
+from lamindb_setup.dev.upath import UPath
 from nbproject._is_run_from_ipython import is_run_from_ipython
 from pydantic.fields import PrivateAttr
 from sqlmodel import Field, ForeignKeyConstraint, Relationship
@@ -653,9 +653,8 @@ def storage_key_from_file(file: File):
 
 # add type annotations back asap when re-organizing the module
 def filepath_from_file_or_folder(file_or_folder: Union[File, Folder]):
-    from lndb.dev import StorageSettings
-
-    from lndb import settings
+    from lamindb_setup import settings
+    from lamindb_setup.dev import StorageSettings
 
     # using __name__ for type check to avoid need of
     # dynamically importing the type

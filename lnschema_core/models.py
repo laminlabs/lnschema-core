@@ -427,9 +427,8 @@ def storage_key_from_file(file: File):
 
 # add type annotations back asap when re-organizing the module
 def filepath_from_file_or_folder(file_or_folder: Union[File, Folder]):
-    from lndb.dev import StorageSettings
-
-    from lndb import settings
+    from lamindb_setup import settings
+    from lamindb_setup.dev import StorageSettings
 
     # using __name__ for type check to avoid need of
     # dynamically importing the type
