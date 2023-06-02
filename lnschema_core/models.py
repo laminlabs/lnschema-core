@@ -67,6 +67,7 @@ class RunInput(BaseORM):
 
 
 class User(BaseORM):
+    id = models.CharField(max_length=8, primary_key=True)
     email = models.CharField(max_length=64, unique=True)
     handle = models.CharField(max_length=64, unique=True)
     name = models.CharField(max_length=64, blank=True, null=True)
@@ -78,6 +79,7 @@ class User(BaseORM):
 
 
 class Storage(BaseORM):
+    id = models.CharField(max_length=8, default=idg.storage, primary_key=True)
     root = models.CharField(max_length=255)
     type = models.CharField(max_length=63, blank=True, null=True)
     region = models.CharField(max_length=63, blank=True, null=True)
@@ -90,6 +92,7 @@ class Storage(BaseORM):
 
 
 class Project(BaseORM):
+    id = models.CharField(max_length=8, default=idg.project, primary_key=True)
     name = models.CharField(max_length=64)
     folders = models.ManyToManyField("Folder")
     files = models.ManyToManyField("File")
@@ -102,6 +105,7 @@ class Project(BaseORM):
 
 
 class Transform(BaseORM):
+    id = models.CharField(max_length=12, default=idg.transform, primary_key=True)
     name = models.CharField(max_length=63)
     version = models.CharField(max_length=63)
     type = models.CharField(max_length=63, choices=TransformType.choices(), db_index=True, default=(TransformType.notebook if is_run_from_ipython else TransformType.pipeline))
@@ -117,6 +121,7 @@ class Transform(BaseORM):
 
 
 class Run(BaseORM):
+    id = models.CharField(max_length=12, default=idg.run, primary_key=True)
     name = models.CharField(max_length=255, blank=True, null=True)
     external_id = models.CharField(max_length=255, blank=True, null=True)
     transform = models.ForeignKey(Transform, models.DO_NOTHING)
