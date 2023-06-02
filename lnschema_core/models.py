@@ -1,17 +1,64 @@
 from pathlib import Path, PurePosixPath
 from typing import Any, List, Optional, Union
 
+import pandas as pd
 from django.db import models
-from django.db.models import Model as BaseORM
 from lamin_logger import logger
 from nbproject._is_run_from_ipython import is_run_from_ipython
 from upath import UPath
 
 from ._users import current_user_id_as_int
+from .dev import id as idg
 from .types import DataLike, ListLike, PathLike, TransformType
 
 
-class RunInput(models.Model):
+class NoResultFound(Exception):
+    pass
+
+
+class MultipleResultsFound(Exception):
+    pass
+
+
+class LaminQuerySet(models.QuerySet):
+    def df(self):
+        return pd.DataFrame(self.values())
+
+    def list(self):
+        return list(self)
+
+    def first(self):
+        if len(self) == 0:
+            return None
+        return self[0]
+
+    def one(self):
+        if len(self) == 0:
+            raise NoResultFound
+        elif len(self) > 1:
+            raise MultipleResultsFound
+        else:
+            return self[0]
+
+    def one_or_none(self):
+        if len(self) == 0:
+            return None
+        elif len(self) == 1:
+            return self[0]
+        else:
+            raise MultipleResultsFound
+
+
+class BaseORM(models.Model):
+    def __repr__(self) -> str:
+        fields = ", ".join([f"{k.name}={getattr(self, k.name)}" for k in self._meta.fields])
+        return f"{self.__name__}({fields})"
+
+    class Meta:
+        abstract = True
+
+
+class RunInput(BaseORM):
     run = models.ForeignKey("Run", on_delete=models.CASCADE)
     file = models.ForeignKey("File", on_delete=models.CASCADE)
 
@@ -54,7 +101,7 @@ class Project(BaseORM):
         managed = True
 
 
-class Transform(models.Model):
+class Transform(BaseORM):
     name = models.CharField(max_length=63)
     version = models.CharField(max_length=63)
     type = models.CharField(max_length=63, choices=TransformType.choices(), db_index=True, default=(TransformType.notebook if is_run_from_ipython else TransformType.pipeline))
@@ -69,7 +116,7 @@ class Transform(models.Model):
         unique_together = (("name", "version"),)
 
 
-class Run(models.Model):
+class Run(BaseORM):
     name = models.CharField(max_length=255, blank=True, null=True)
     external_id = models.CharField(max_length=255, blank=True, null=True)
     transform = models.ForeignKey(Transform, models.DO_NOTHING)
@@ -141,7 +188,7 @@ class Run(models.Model):
             ln.context.run = self
 
 
-class Features(models.Model):
+class Features(BaseORM):
     id = models.CharField(max_length=63, primary_key=True)
     type = models.CharField(max_length=63)
     created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id_as_int)
@@ -197,7 +244,7 @@ class Features(models.Model):
         return features
 
 
-class Folder(models.Model):
+class Folder(BaseORM):
     name = models.CharField(max_length=255)
     key = models.CharField(max_length=255, blank=True, null=True)
     storage = models.ForeignKey(Storage, models.DO_NOTHING)
@@ -264,7 +311,8 @@ class Folder(models.Model):
             self._cloud_filepath = privates["cloud_filepath"]
 
 
-class File(models.Model):
+class File(BaseORM):
+    id = models.CharField(max_length=20, primary_key=True)
     name = models.CharField(max_length=255, blank=True, null=True)
     suffix = models.CharField(max_length=63, blank=True, null=True)
     size = models.BigIntegerField(blank=True, null=True)
@@ -346,8 +394,9 @@ class File(models.Model):
     def __name__(cls) -> str:
         return "File"
 
-    def __init__(  # type: ignore
-        self,
+    @classmethod
+    def create(  # type: ignore
+        cls,
         data: Union[PathLike, DataLike] = None,
         *,
         key: Optional[str] = None,
@@ -385,6 +434,7 @@ class File(models.Model):
             run=run,
             format=format,
         )
+        kwargs["id"] = idg.file()
         if features is not None:
             kwargs["features"] = features
         log_hint(
@@ -409,12 +459,13 @@ class File(models.Model):
                 assert kwargs["run"].transform is not None
                 kwargs["transform"] = kwargs["run"].transform
 
-        super().__init__(**kwargs)
+        file = cls(**kwargs)
         if data is not None:
-            self._local_filepath = privates["local_filepath"]
-            self._cloud_filepath = privates["cloud_filepath"]
-            self._memory_rep = privates["memory_rep"]
-            self._to_store = not privates["check_path_in_storage"]
+            file._local_filepath = privates["local_filepath"]
+            file._cloud_filepath = privates["cloud_filepath"]
+            file._memory_rep = privates["memory_rep"]
+            file._to_store = not privates["check_path_in_storage"]
+        return file
 
 
 # add type annotations back asap when re-organizing the module

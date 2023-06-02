@@ -30,8 +30,10 @@ if _INSTANCE_SETUP:
             Transform,
             User,
         )
+        from .dev.sqlmodel import BaseORM
     else:
         from .models import (  # type: ignore
+            BaseORM,
             Features,
             File,
             Folder,
