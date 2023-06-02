@@ -26,12 +26,15 @@ def lookup(cls: Any, field: Optional[str] = None):
     else:
         df = ln.select(cls).df()
         values = set(df[field].values)
-    values.remove(None)
-    keys = _to_lookup_keys(values, padding=cls.__name__)
-    return _namedtuple_from_dict(d=dict(zip(keys, values)), name=cls.__name__)
+    for value in [None, ""]:
+        if value in values:
+            values.remove(value)
+    keys = to_lookup_keys(values, padding=cls.__name__)
+    nt = namedtuple_from_dict(d=dict(zip(keys, values)), name=cls.__name__)
+    return nt
 
 
-def _to_lookup_keys(x: Iterable[str], padding: str = "LOOKUP") -> list:
+def to_lookup_keys(x: Iterable[str], padding: str = "LOOKUP") -> list:
     """Convert a list of strings to tab-completion allowed formats."""
     lookup = [re.sub("[^0-9a-zA-Z]+", "_", str(i)) for i in x]
     for i, value in enumerate(lookup):
@@ -40,7 +43,7 @@ def _to_lookup_keys(x: Iterable[str], padding: str = "LOOKUP") -> list:
     return lookup
 
 
-def _namedtuple_from_dict(d: dict, name: str = "entity") -> tuple:
+def namedtuple_from_dict(d: dict, name: str = "entity") -> tuple:
     """Create a namedtuple from a dict to allow autocompletion."""
     nt = namedtuple(name, d.keys())  # type:ignore
     return nt(**d)
