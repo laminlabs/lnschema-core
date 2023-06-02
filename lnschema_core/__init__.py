@@ -31,6 +31,7 @@ if _INSTANCE_SETUP:
             User,
         )
         from .dev.sqlmodel import BaseORM
+        from .link import RunInput
     else:
         from .models import (  # type: ignore
             BaseORM,
@@ -39,6 +40,7 @@ if _INSTANCE_SETUP:
             Folder,
             Project,
             Run,
+            RunInput,
             Storage,
             Transform,
             User,

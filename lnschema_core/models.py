@@ -52,7 +52,7 @@ class LaminQuerySet(models.QuerySet):
 class BaseORM(models.Model):
     def __repr__(self) -> str:
         fields = ", ".join([f"{k.name}={getattr(self, k.name)}" for k in self._meta.fields])
-        return f"{self.__name__}({fields})"
+        return f"{self.__class__.__name__}({fields})"
 
     class Meta:
         abstract = True
@@ -245,13 +245,14 @@ class Features(BaseORM):
 
 
 class Folder(BaseORM):
+    id = models.CharField(max_length=20, primary_key=True)
     name = models.CharField(max_length=255)
     key = models.CharField(max_length=255, blank=True, null=True)
     storage = models.ForeignKey(Storage, models.DO_NOTHING)
     files = models.ManyToManyField("File")
     created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id_as_int)
-    created_at = models.DateTimeField()
-    updated_at = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         managed = True
@@ -281,12 +282,12 @@ class Folder(BaseORM):
             length_limit=length_limit,
         )
 
-    def __init__(  # type: ignore
-        self,
+    @classmethod
+    def create(  # type: ignore
+        cls,
         path: Optional[Union[Path, UPath, str]] = None,
         *,
         # continue with fields
-        id: Optional[str] = None,
         name: Optional[str] = None,
         key: Optional[str] = None,
         storage_id: Optional[str] = None,
@@ -300,15 +301,18 @@ class Folder(BaseORM):
                 name=name,
                 key=key,
             )
-            if id is not None:
-                kwargs["id"] = id
         else:
             kwargs = {k: v for k, v in locals().items() if v and k != "self"}
+        kwargs["id"] = idg.folder()
 
-        super().__init__(**kwargs)
+        files = kwargs.pop("files")
+
+        folder = cls(**kwargs)
         if path is not None:
-            self._local_filepath = privates["local_filepath"]
-            self._cloud_filepath = privates["cloud_filepath"]
+            folder._local_filepath = privates["local_filepath"]
+            folder._cloud_filepath = privates["cloud_filepath"]
+            folder._files = files
+        return folder
 
 
 class File(BaseORM):
