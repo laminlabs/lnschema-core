@@ -7,7 +7,7 @@ from lamin_logger import logger
 from nbproject._is_run_from_ipython import is_run_from_ipython
 from upath import UPath
 
-from ._users import current_user_id_as_int
+from ._users import current_user_id
 from .dev import id as idg
 from .types import DataLike, ListLike, PathLike, TransformType
 
@@ -54,6 +54,9 @@ class BaseORM(models.Model):
         fields = ", ".join([f"{k.name}={getattr(self, k.name)}" for k in self._meta.fields])
         return f"{self.__class__.__name__}({fields})"
 
+    def __str__(self) -> str:
+        return self.__repr__()
+
     class Meta:
         abstract = True
 
@@ -85,7 +88,7 @@ class Storage(BaseORM):
     region = models.CharField(max_length=63, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(User, models.DO_NOTHING, blank=True, null=True, default=current_user_id_as_int)
+    created_by = models.ForeignKey(User, models.DO_NOTHING, blank=True, null=True, default=current_user_id)
 
     class Meta:
         managed = True
@@ -96,7 +99,7 @@ class Project(BaseORM):
     name = models.CharField(max_length=64)
     folders = models.ManyToManyField("Folder")
     files = models.ManyToManyField("File")
-    created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id_as_int)
+    created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -105,13 +108,13 @@ class Project(BaseORM):
 
 
 class Transform(BaseORM):
-    id = models.CharField(max_length=12, default=idg.transform, primary_key=True)
-    name = models.CharField(max_length=63)
-    version = models.CharField(max_length=63)
+    name = models.CharField(max_length=127)
+    hash = models.CharField(max_length=12, default=idg.transform)
+    version = models.CharField(max_length=10, default="0")
     type = models.CharField(max_length=63, choices=TransformType.choices(), db_index=True, default=(TransformType.notebook if is_run_from_ipython else TransformType.pipeline))
     title = models.CharField(max_length=63, blank=True, null=True)
     reference = models.CharField(max_length=63, blank=True, null=True)
-    created_by = models.ForeignKey(User, models.DO_NOTHING)
+    created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -127,14 +130,15 @@ class Run(BaseORM):
     transform = models.ForeignKey(Transform, models.DO_NOTHING)
     inputs = models.ManyToManyField("File", through=RunInput, related_name="input_of")
     # outputs on File
-    created_by = models.ForeignKey(User, models.DO_NOTHING)
+    created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         managed = True
 
-    def __init__(  # type: ignore
-        self,
+    @classmethod
+    def create(  # type: ignore
+        cls,
         *,
         id: Optional[str] = None,
         name: Optional[str] = None,
@@ -161,15 +165,7 @@ class Run(BaseORM):
 
         run = None
         if load_latest:
-            run = (
-                ln.select(
-                    ln.Run,
-                    transform_id=transform.id,
-                    transform_version=transform.version,
-                )
-                .order_by(ln.Run.created_at.desc())
-                .first()
-            )
+            run = ln.select(ln.Run, transform=transform).order_by("-created_at").first()
             if run is not None:
                 logger.info(f"Loaded: {run}")
         elif id is not None:
@@ -178,25 +174,30 @@ class Run(BaseORM):
                 raise NotImplementedError("You can currently only pass existing ids")
 
         if run is None:
-            kwargs.update(dict(transform_id=transform.id, transform_version=transform.version))
-            super().__init__(**kwargs)
-            self._ln_identity_key = None
+            kwargs["transform_id"] = transform.id
+            if "load_latest" in kwargs:
+                del kwargs["load_latest"]
+            del kwargs["cls"]
+            run = cls(**kwargs)
+            run._ln_identity_key = None
         else:
-            super().__init__(**run.dict())
-            self._ln_identity_key = run.id  # simulate query result
+            run = cls(**run.dict())
+            run._ln_identity_key = run.id  # simulate query result
 
         if global_context:
             if run is None:
-                added_self = ln.add(self)
-                self._ln_identity_key = added_self.id
-                logger.success(f"Added: {self}")
-            ln.context.run = self
+                added_self = ln.add(run)
+                run._ln_identity_key = added_self.id  # type: ignore
+                logger.success(f"Saved: {run}")
+            ln.context.run = run
+
+        return run
 
 
 class Features(BaseORM):
     id = models.CharField(max_length=63, primary_key=True)
     type = models.CharField(max_length=63)
-    created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id_as_int)
+    created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id)
     created_at = models.DateTimeField(auto_now=True)
     files = models.ManyToManyField("File")
 
@@ -255,7 +256,7 @@ class Folder(BaseORM):
     key = models.CharField(max_length=255, blank=True, null=True)
     storage = models.ForeignKey(Storage, models.DO_NOTHING)
     files = models.ManyToManyField("File")
-    created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id_as_int)
+    created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -335,7 +336,7 @@ class File(BaseORM):
     # input_of from Run.inputs
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id_as_int)
+    created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id)
 
     class Meta:
         managed = True
@@ -459,8 +460,6 @@ class File(BaseORM):
         if kwargs["run"] is not None:
             if kwargs["run"].transform_id is not None:
                 kwargs["transform_id"] = kwargs["run"].transform_id
-                assert kwargs["run"].transform_version is not None
-                kwargs["transform_version"] = kwargs["run"].transform_version
             else:
                 # accessing the relationship should always be possible if
                 # the above if clause was false as then, we should have a fresh
@@ -475,6 +474,13 @@ class File(BaseORM):
             file._memory_rep = privates["memory_rep"]
             file._to_store = not privates["check_path_in_storage"]
         return file
+
+    def save(self, *args, **kwargs):
+        if self.transform is not None:
+            self.transform.save()
+        if self.run is not None:
+            self.run.save()
+        super().save(*args, **kwargs)
 
 
 # add type annotations back asap when re-organizing the module
