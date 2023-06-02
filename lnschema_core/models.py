@@ -1,5 +1,5 @@
 from pathlib import Path, PurePosixPath
-from typing import Any, List, Optional, Union
+from typing import Any, List, NamedTuple, Optional, Union
 
 import pandas as pd
 from django.db import models
@@ -7,6 +7,7 @@ from lamin_logger import logger
 from nbproject._is_run_from_ipython import is_run_from_ipython
 from upath import UPath
 
+from ._lookup import lookup as _lookup
 from ._users import current_user_id
 from .dev import id as idg
 from .types import DataLike, ListLike, PathLike, TransformType
@@ -53,6 +54,10 @@ class BaseORM(models.Model):
     def __repr__(self) -> str:
         fields = ", ".join([f"{k.name}={getattr(self, k.name)}" for k in self._meta.fields])
         return f"{self.__class__.__name__}({fields})"
+
+    @classmethod
+    def lookup(cls, field: Optional[str] = None) -> NamedTuple:
+        return _lookup(cls, field)
 
     def __str__(self) -> str:
         return self.__repr__()

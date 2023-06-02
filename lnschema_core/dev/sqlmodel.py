@@ -9,7 +9,7 @@
 import importlib
 import re
 import typing
-from typing import Any, Optional, Sequence, Tuple, Union
+from typing import Any, NamedTuple, Optional, Sequence, Tuple, Union
 
 import sqlmodel as sqm
 from pydantic import create_model
@@ -61,7 +61,7 @@ class BaseORM(sqm.SQLModel):  # type: ignore
         validate_with_pydantic(self, user_kwargs)
 
     @classmethod
-    def lookup(cls, field: Optional[str] = None):
+    def lookup(cls, field: Optional[str] = None) -> NamedTuple:
         return _lookup(cls, field)
 
     @declared_attr
