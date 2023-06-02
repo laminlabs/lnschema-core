@@ -9,8 +9,7 @@
 import importlib
 import re
 import typing
-from collections import namedtuple
-from typing import Any, Iterable, Optional, Sequence, Tuple, Union
+from typing import Any, NamedTuple, Optional, Sequence, Tuple, Union
 
 import sqlmodel as sqm
 from pydantic import create_model
@@ -21,6 +20,7 @@ from sqlalchemy.orm.session import object_session
 from typeguard import check_type
 
 from .. import __name__
+from .._lookup import lookup as _lookup
 
 MODULE_NAME = __name__
 
@@ -61,26 +61,8 @@ class BaseORM(sqm.SQLModel):  # type: ignore
         validate_with_pydantic(self, user_kwargs)
 
     @classmethod
-    def lookup(cls, field: Optional[str] = None):
-        """Lookup rows by field."""
-        import lamindb as ln
-
-        if field is None:
-            # by default use the name field
-            if "name" in cls.__fields__:
-                field = "name"
-            else:
-                non_ids = [i for i in cls.__fields__.keys() if "id" not in i]
-                if len(non_ids) > 0:
-                    # the first field isn't named with id
-                    field = non_ids[0]
-                else:
-                    # the first field
-                    field = next(iter(cls.__fields__.keys()))
-        df = ln.select(cls).df()
-        values = set(df[field].values)
-        keys = _to_lookup_keys(values, padding=cls.__name__)
-        return _namedtuple_from_dict(d=dict(zip(keys, values)), name=cls.__name__)
+    def lookup(cls, field: Optional[str] = None) -> NamedTuple:
+        return _lookup(cls, field)
 
     @declared_attr
     def __tablename__(cls) -> str:  # type: ignore
@@ -373,18 +355,3 @@ def _resolve_forward_ref(ann, module):
 #         return sqlmodel_class
 
 #     return wrapper
-
-
-def _to_lookup_keys(x: Iterable[str], padding: str = "LOOKUP") -> list:
-    """Convert a list of strings to tab-completion allowed formats."""
-    lookup = [re.sub("[^0-9a-zA-Z]+", "_", str(i)) for i in x]
-    for i, value in enumerate(lookup):
-        if value == "" or (not value[0].isalpha()):
-            lookup[i] = f"{padding}_{value}"
-    return lookup
-
-
-def _namedtuple_from_dict(d: dict, name: str = "entity") -> tuple:
-    """Create a namedtuple from a dict to allow autocompletion."""
-    nt = namedtuple(name, d.keys())  # type:ignore
-    return nt(**d)
