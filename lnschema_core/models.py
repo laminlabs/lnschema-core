@@ -297,9 +297,12 @@ class Folder(BaseORM):
             super().__init__(*args, **kwargs)
             return None
         else:  # user-facing calling signature
-            if len(args) != 1:
-                raise ValueError("Only one non-keyword arg allowed")
-            path: Optional[Union[Path, UPath, str]] = args[0]
+            if len(args) != 1 and "files" not in kwargs:
+                raise ValueError("Either provide path as arg or provide files as kwarg!")
+            if len(args) == 1:
+                path: Optional[Union[Path, UPath, str]] = args[0]
+            else:
+                path = None
             name: Optional[str] = kwargs.pop("name") if "name" in kwargs else None
             key: Optional[str] = kwargs.pop("key") if "key" in kwargs else None
             files: Optional[str] = kwargs.pop("files") if "files" in kwargs else None
@@ -308,11 +311,15 @@ class Folder(BaseORM):
 
         from lamindb._folder import get_folder_kwargs_from_data
 
-        kwargs, privates = get_folder_kwargs_from_data(
-            path=path,
-            name=name,
-            key=key,
-        )
+        if path is not None:
+            kwargs, privates = get_folder_kwargs_from_data(
+                path=path,
+                name=name,
+                key=key,
+            )
+            files = kwargs.pop("files")
+        else:
+            kwargs = dict(name=name)
         kwargs["id"] = idg.folder()
         super().__init__(**kwargs)
         if path is not None:
