@@ -141,9 +141,8 @@ class Run(BaseORM):
     class Meta:
         managed = True
 
-    @classmethod
-    def create(  # type: ignore
-        cls,
+    def __init__(  # type: ignore
+        self,
         *,
         id: Optional[str] = None,
         name: Optional[str] = None,
@@ -183,20 +182,18 @@ class Run(BaseORM):
             if "load_latest" in kwargs:
                 del kwargs["load_latest"]
             del kwargs["cls"]
-            run = cls(**kwargs)
-            run._ln_identity_key = None
+            super.__init__(**kwargs)
+            self._ln_identity_key = None  # noqa
         else:
-            run = cls(**run.dict())
-            run._ln_identity_key = run.id  # simulate query result
+            super.__init__(**run.dict())
+            self._ln_identity_key = run.id  # simulate query result
 
         if global_context:
             if run is None:
-                added_self = ln.add(run)
-                run._ln_identity_key = added_self.id  # type: ignore
-                logger.success(f"Saved: {run}")
-            ln.context.run = run
-
-        return run
+                added_self = ln.add(self)
+                self._ln_identity_key = added_self.id  # type: ignore
+                logger.success(f"Saved: {self}")
+            ln.context.run = self
 
 
 class Features(BaseORM):
@@ -293,9 +290,8 @@ class Folder(BaseORM):
             length_limit=length_limit,
         )
 
-    @classmethod
-    def create(  # type: ignore
-        cls,
+    def __init__(  # type: ignore
+        self,
         path: Optional[Union[Path, UPath, str]] = None,
         *,
         # continue with fields
@@ -318,12 +314,11 @@ class Folder(BaseORM):
 
         files = kwargs.pop("files")
 
-        folder = cls(**kwargs)
+        super().__init__(**kwargs)
         if path is not None:
-            folder._local_filepath = privates["local_filepath"]
-            folder._cloud_filepath = privates["cloud_filepath"]
-            folder._files = files
-        return folder
+            self._local_filepath = privates["local_filepath"]
+            self._cloud_filepath = privates["cloud_filepath"]
+            self._files = files
 
 
 class File(BaseORM):
@@ -409,9 +404,8 @@ class File(BaseORM):
     def __name__(cls) -> str:
         return "File"
 
-    @classmethod
-    def create(  # type: ignore
-        cls,
+    def __init__(  # type: ignore
+        self,
         data: Union[PathLike, DataLike] = None,
         *,
         key: Optional[str] = None,
@@ -421,6 +415,15 @@ class File(BaseORM):
         features: List[Features] = None,
         input_of: List[Run] = None,
     ):
+        # this foresee django internal use, but doesn't seem needed right now
+        # if isinstance(data, str):
+        #     _kwargs = locals()
+        #     _kwargs.update(kwargs)
+        #     _kwargs["id"] = _kwargs.pop("data")
+        #     _kwargs.pop("self")
+        #     super().__init__(**_kwargs)
+        #     return None
+
         if features is None:
             features = []
         if input_of is None:
@@ -472,13 +475,12 @@ class File(BaseORM):
                 assert kwargs["run"].transform is not None
                 kwargs["transform"] = kwargs["run"].transform
 
-        file = cls(**kwargs)
+        super().__init__(**kwargs)
         if data is not None:
-            file._local_filepath = privates["local_filepath"]
-            file._cloud_filepath = privates["cloud_filepath"]
-            file._memory_rep = privates["memory_rep"]
-            file._to_store = not privates["check_path_in_storage"]
-        return file
+            self._local_filepath = privates["local_filepath"]
+            self._cloud_filepath = privates["cloud_filepath"]
+            self._memory_rep = privates["memory_rep"]
+            self._to_store = not privates["check_path_in_storage"]
 
     def save(self, *args, **kwargs):
         if self.transform is not None:
