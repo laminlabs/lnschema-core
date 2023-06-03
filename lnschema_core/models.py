@@ -143,18 +143,19 @@ class Run(BaseORM):
 
     def __init__(  # type: ignore
         self,
-        *,
-        id: Optional[str] = None,
-        name: Optional[str] = None,
-        load_latest: bool = False,
-        external_id: Optional[str] = None,
-        transform: Optional[Transform] = None,
-        inputs: List["File"] = None,
-        outputs: List["File"] = None,
+        *args,
+        **kwargs,
     ):
-        kwargs = {k: v for k, v in locals().items()}
-        for k in ["self", "__class__", "inputs", "outputs"]:
-            kwargs.pop(k)
+        if len(args) > 1 and isinstance(args[0], str) and len(args[0]) == 20:  # initialize with all fields from db as args
+            super().__init__(*args, **kwargs)
+            return None
+        else:  # user-facing calling signature
+            if len(args) != 1:
+                raise ValueError("Only one non-keyword arg allowed")
+
+            id: Optional[str] = kwargs["id"] if "id" in kwargs else None
+            load_latest: bool = kwargs["load_latest"] if "load_latest" in kwargs else False
+            transform: Optional[Transform] = kwargs["id"] if "id" in kwargs else None
 
         import lamindb as ln
 
@@ -291,30 +292,28 @@ class Folder(BaseORM):
             length_limit=length_limit,
         )
 
-    def __init__(  # type: ignore
-        self,
-        path: Optional[Union[Path, UPath, str]] = None,
-        *,
-        # continue with fields
-        name: Optional[str] = None,
-        key: Optional[str] = None,
-        storage_id: Optional[str] = None,
-        files: List["File"] = [],
-    ):
-        if path is not None:
-            from lamindb._folder import get_folder_kwargs_from_data
+    def __init__(self, *args, **kwargs):  # type: ignore
+        if len(args) > 1 and isinstance(args[0], str) and len(args[0]) == 20:  # initialize with all fields from db as args
+            super().__init__(*args, **kwargs)
+            return None
+        else:  # user-facing calling signature
+            if len(args) != 1:
+                raise ValueError("Only one non-keyword arg allowed")
+            path: Optional[Union[Path, UPath, str]] = args[0]
+            name: Optional[str] = kwargs.pop("name") if "name" in kwargs else None
+            key: Optional[str] = kwargs.pop("key") if "key" in kwargs else None
+            files: Optional[str] = kwargs.pop("files") if "files" in kwargs else None
+            if len(kwargs) != 0:
+                raise ValueError(f"This kwargs are not permitted: {kwargs}")
 
-            kwargs, privates = get_folder_kwargs_from_data(
-                path=path,
-                name=name,
-                key=key,
-            )
-        else:
-            kwargs = {k: v for k, v in locals().items() if v and k != "self"}
+        from lamindb._folder import get_folder_kwargs_from_data
+
+        kwargs, privates = get_folder_kwargs_from_data(
+            path=path,
+            name=name,
+            key=key,
+        )
         kwargs["id"] = idg.folder()
-
-        files = kwargs.pop("files")
-
         super().__init__(**kwargs)
         if path is not None:
             self._local_filepath = privates["local_filepath"]
@@ -323,7 +322,7 @@ class Folder(BaseORM):
 
 
 class File(BaseORM):
-    id = models.CharField(max_length=20, primary_key=True)
+    id: str = models.CharField(max_length=20, primary_key=True)
     name = models.CharField(max_length=255, blank=True, null=True)
     suffix = models.CharField(max_length=63, blank=True, null=True)
     size = models.BigIntegerField(blank=True, null=True)
@@ -331,7 +330,7 @@ class File(BaseORM):
     key = models.CharField(max_length=255, blank=True, null=True)
     run = models.ForeignKey(Run, models.DO_NOTHING, blank=True, null=True, related_name="outputs")
     transform = models.ForeignKey(Transform, models.DO_NOTHING, blank=True, null=True)
-    storage = models.ForeignKey(Storage, models.DO_NOTHING)
+    storage: "Storage" = models.ForeignKey(Storage, models.DO_NOTHING)
     # folders from Folders.files
     # features from Features.files
     # input_of from Run.inputs
@@ -407,30 +406,20 @@ class File(BaseORM):
 
     def __init__(  # type: ignore
         self,
-        data: Union[PathLike, DataLike] = None,
-        *,
-        key: Optional[str] = None,
-        name: Optional[str] = None,
-        run: Optional[Run] = None,
-        format: Optional[str] = None,
-        features: List[Features] = None,
-        input_of: List[Run] = None,
+        *args,
+        **kwargs,
     ):
-        # this foresee django internal use, but doesn't seem needed right now
-        # if isinstance(data, str):
-        #     _kwargs = locals()
-        #     _kwargs.update(kwargs)
-        #     _kwargs["id"] = _kwargs.pop("data")
-        #     _kwargs.pop("self")
-        #     super().__init__(**_kwargs)
-        #     return None
-
-        if features is None:
-            features = []
-        if input_of is None:
-            input_of = []
-        if not isinstance(features, List):
-            features = [features]
+        if len(args) > 1 and isinstance(args[0], str) and len(args[0]) == 20:  # initialize with all fields from db as args
+            super().__init__(*args, **kwargs)
+            return None
+        else:  # user facing calling signature
+            if len(args) != 1:
+                raise ValueError("Only one non-keyword arg allowed")
+            data: Union[PathLike, DataLike] = args[0]
+            key: Optional[str] = kwargs["key"] if "key" in kwargs else None
+            name: Optional[str] = kwargs["name"] if "name" in kwargs else None
+            run: Optional[Run] = kwargs["run"] if "run" in kwargs else None
+            format = kwargs["format"] if "format" in kwargs else None
 
         def log_hint(*, check_path_in_storage: bool, key: str, id: str, suffix: str) -> None:
             hint = ""
@@ -454,8 +443,6 @@ class File(BaseORM):
             format=format,
         )
         kwargs["id"] = idg.file()
-        if features is not None:
-            kwargs["features"] = features
         log_hint(
             check_path_in_storage=privates["check_path_in_storage"],
             key=kwargs["key"],
