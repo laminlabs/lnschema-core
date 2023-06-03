@@ -364,9 +364,12 @@ class File(BaseORM):
             super().__init__(*args, **kwargs)
             return None
         else:  # user facing calling signature
-            if len(args) != 1:
+            if len(args) > 1:
                 raise ValueError("Only one non-keyword arg allowed")
-            data: Union[PathLike, DataLike] = args[0]
+            if len(args) == 0:
+                data: Union[PathLike, DataLike] = kwargs["data"]
+            else:
+                data: Union[PathLike, DataLike] = args[0]
             key: Optional[str] = kwargs["key"] if "key" in kwargs else None
             name: Optional[str] = kwargs["name"] if "name" in kwargs else None
             run: Optional[Run] = kwargs["run"] if "run" in kwargs else None
