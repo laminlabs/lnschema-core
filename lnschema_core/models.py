@@ -181,7 +181,6 @@ class Run(BaseORM):
             kwargs["transform_id"] = transform.id
             if "load_latest" in kwargs:
                 del kwargs["load_latest"]
-            del kwargs["cls"]
             super.__init__(**kwargs)
             self._ln_identity_key = None  # noqa
         else:
