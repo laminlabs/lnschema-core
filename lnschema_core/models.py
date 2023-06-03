@@ -152,7 +152,9 @@ class Run(BaseORM):
         inputs: List["File"] = None,
         outputs: List["File"] = None,
     ):
-        kwargs = {k: v for k, v in locals().items() if v and k != "self"}
+        kwargs = {k: v for k, v in locals().items()}
+        for k in ["self", "__class__", "inputs", "outputs"]:
+            kwargs.pop(k)
 
         import lamindb as ln
 
@@ -181,10 +183,10 @@ class Run(BaseORM):
             kwargs["transform_id"] = transform.id
             if "load_latest" in kwargs:
                 del kwargs["load_latest"]
-            super.__init__(**kwargs)
+            super().__init__(**kwargs)
             self._ln_identity_key = None  # noqa
         else:
-            super.__init__(**run.dict())
+            super().__init__(**run.dict())
             self._ln_identity_key = run.id  # simulate query result
 
         if global_context:
