@@ -1,16 +1,18 @@
+import builtins
 from pathlib import Path, PurePosixPath
 from typing import Any, List, NamedTuple, Optional, Union
 
 import pandas as pd
 from django.db import models
 from lamin_logger import logger
-from nbproject._is_run_from_ipython import is_run_from_ipython
 from upath import UPath
 
 from ._lookup import lookup as _lookup
 from ._users import current_user_id
 from .dev import id as idg
 from .types import DataLike, ListLike, PathLike, TransformType
+
+is_run_from_ipython = getattr(builtins, "__IPYTHON__", False)
 
 
 class NoResultFound(Exception):
