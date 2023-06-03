@@ -150,12 +150,12 @@ class Run(BaseORM):
             super().__init__(*args, **kwargs)
             return None
         else:  # user-facing calling signature
-            if len(args) != 1:
-                raise ValueError("Only one non-keyword arg allowed")
+            if len(args) != 0:
+                raise ValueError("Only keyword args allowed")
 
             id: Optional[str] = kwargs["id"] if "id" in kwargs else None
             load_latest: bool = kwargs["load_latest"] if "load_latest" in kwargs else False
-            transform: Optional[Transform] = kwargs["id"] if "id" in kwargs else None
+            transform: Optional[Transform] = kwargs["transform"] if "transform" in kwargs else None
 
         import lamindb as ln
 
