@@ -141,62 +141,6 @@ class Run(BaseORM):
     class Meta:
         managed = True
 
-    def __init__(  # type: ignore
-        self,
-        *args,
-        **kwargs,
-    ):
-        if len(args) > 1 and isinstance(args[0], str) and len(args[0]) == 20:  # initialize with all fields from db as args
-            super().__init__(*args, **kwargs)
-            return None
-        else:  # user-facing calling signature
-            if len(args) != 0:
-                raise ValueError("Only keyword args allowed")
-
-            id: Optional[str] = kwargs["id"] if "id" in kwargs else None
-            load_latest: bool = kwargs["load_latest"] if "load_latest" in kwargs else False
-            transform: Optional[Transform] = kwargs["transform"] if "transform" in kwargs else None
-
-        import lamindb as ln
-
-        global_context = False
-        if transform is None:
-            if ln.context.transform is not None:
-                global_context = True
-                transform = ln.context.transform
-            else:
-                raise ValueError("Either call `ln.Run(transform=transform)` or `ln.track(transform=...)`.")
-
-        if not isinstance(transform, Transform):
-            raise TypeError("transform needs to be of type Transform")
-
-        run = None
-        if load_latest:
-            run = ln.select(ln.Run, transform=transform).order_by("-created_at").first()
-            if run is not None:
-                logger.info(f"Loaded: {run}")
-        elif id is not None:
-            run = ln.select(ln.Run, id=id).one_or_none()
-            if run is None:
-                raise NotImplementedError("You can currently only pass existing ids")
-
-        if run is None:
-            kwargs["transform_id"] = transform.id
-            if "load_latest" in kwargs:
-                del kwargs["load_latest"]
-            super().__init__(**kwargs)
-            self._ln_identity_key = None  # noqa
-        else:
-            super().__init__(**run.dict())
-            self._ln_identity_key = run.id  # simulate query result
-
-        if global_context:
-            if run is None:
-                added_self = ln.add(self)
-                self._ln_identity_key = added_self.id  # type: ignore
-                logger.success(f"Saved: {self}")
-            ln.context.run = self
-
 
 class Features(BaseORM):
     id = models.CharField(max_length=63, primary_key=True)
