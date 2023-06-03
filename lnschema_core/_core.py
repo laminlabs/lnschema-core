@@ -1,3 +1,4 @@
+import builtins
 from datetime import datetime as datetime
 from pathlib import Path, PurePosixPath
 from typing import Any, List, Optional, TypeVar, Union, overload  # noqa
@@ -7,7 +8,6 @@ import pandas as pd
 import sqlalchemy as sa
 from lamin_logger import logger
 from lamindb_setup.dev.upath import UPath
-from nbproject._is_run_from_ipython import is_run_from_ipython
 from pydantic.fields import PrivateAttr
 from sqlmodel import Field, ForeignKeyConstraint, Relationship
 
@@ -19,6 +19,8 @@ from ._users import CreatedBy
 from .dev import id as idg
 from .dev.sqlmodel import get_orm, schema_sqlmodel
 from .types import DataLike, ListLike, PathLike, SQLModelField, TransformType
+
+is_run_from_ipython = getattr(builtins, "__IPYTHON__", False)
 
 # this is for backward compat
 schema_sqlmodel(schema_name)
