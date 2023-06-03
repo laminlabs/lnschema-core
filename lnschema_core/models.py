@@ -143,63 +143,6 @@ class Run(BaseORM):
     class Meta:
         managed = True
 
-    @classmethod
-    def create(  # type: ignore
-        cls,
-        *,
-        id: Optional[str] = None,
-        name: Optional[str] = None,
-        load_latest: bool = False,
-        external_id: Optional[str] = None,
-        transform: Optional[Transform] = None,
-        inputs: List["File"] = None,
-        outputs: List["File"] = None,
-    ):
-        kwargs = {k: v for k, v in locals().items() if v and k != "self"}
-
-        import lamindb as ln
-
-        global_context = False
-        if transform is None:
-            if ln.context.transform is not None:
-                global_context = True
-                transform = ln.context.transform
-            else:
-                raise ValueError("Either call `ln.Run(transform=transform)` or `ln.track(transform=...)`.")
-
-        if not isinstance(transform, Transform):
-            raise TypeError("transform needs to be of type Transform")
-
-        run = None
-        if load_latest:
-            run = ln.select(ln.Run, transform=transform).order_by("-created_at").first()
-            if run is not None:
-                logger.info(f"Loaded: {run}")
-        elif id is not None:
-            run = ln.select(ln.Run, id=id).one_or_none()
-            if run is None:
-                raise NotImplementedError("You can currently only pass existing ids")
-
-        if run is None:
-            kwargs["transform_id"] = transform.id
-            if "load_latest" in kwargs:
-                del kwargs["load_latest"]
-            del kwargs["cls"]
-            run = cls(**kwargs)
-            run._ln_identity_key = None
-        else:
-            run = cls(**run.dict())
-            run._ln_identity_key = run.id  # simulate query result
-
-        if global_context:
-            if run is None:
-                added_self = ln.add(run)
-                run._ln_identity_key = added_self.id  # type: ignore
-                logger.success(f"Saved: {run}")
-            ln.context.run = run
-
-        return run
-
 
 class Features(BaseORM):
     id = models.CharField(max_length=63, primary_key=True)
@@ -295,41 +238,44 @@ class Folder(BaseORM):
             length_limit=length_limit,
         )
 
-    @classmethod
-    def create(  # type: ignore
-        cls,
-        path: Optional[Union[Path, UPath, str]] = None,
-        *,
-        # continue with fields
-        name: Optional[str] = None,
-        key: Optional[str] = None,
-        storage_id: Optional[str] = None,
-        files: List["File"] = [],
-    ):
-        if path is not None:
-            from lamindb._folder import get_folder_kwargs_from_data
+    def __init__(self, *args, **kwargs):  # type: ignore
+        if len(args) > 1 and isinstance(args[0], str) and len(args[0]) == 20:  # initialize with all fields from db as args
+            super().__init__(*args, **kwargs)
+            return None
+        else:  # user-facing calling signature
+            if len(args) != 1 and "files" not in kwargs:
+                raise ValueError("Either provide path as arg or provide files as kwarg!")
+            if len(args) == 1:
+                path: Optional[Union[Path, UPath, str]] = args[0]
+            else:
+                path = None
+            name: Optional[str] = kwargs.pop("name") if "name" in kwargs else None
+            key: Optional[str] = kwargs.pop("key") if "key" in kwargs else None
+            files: Optional[str] = kwargs.pop("files") if "files" in kwargs else None
+            if len(kwargs) != 0:
+                raise ValueError(f"This kwargs are not permitted: {kwargs}")
 
+        from lamindb._folder import get_folder_kwargs_from_data
+
+        if path is not None:
             kwargs, privates = get_folder_kwargs_from_data(
                 path=path,
                 name=name,
                 key=key,
             )
+            files = kwargs.pop("files")
         else:
-            kwargs = {k: v for k, v in locals().items() if v and k != "self"}
+            kwargs = dict(name=name)
         kwargs["id"] = idg.folder()
-
-        files = kwargs.pop("files")
-
-        folder = cls(**kwargs)
+        super().__init__(**kwargs)
         if path is not None:
-            folder._local_filepath = privates["local_filepath"]
-            folder._cloud_filepath = privates["cloud_filepath"]
-            folder._files = files
-        return folder
+            self._local_filepath = privates["local_filepath"]
+            self._cloud_filepath = privates["cloud_filepath"]
+            self._files = files
 
 
 class File(BaseORM):
-    id = models.CharField(max_length=20, primary_key=True)
+    id: str = models.CharField(max_length=20, primary_key=True)
     name = models.CharField(max_length=255, blank=True, null=True)
     suffix = models.CharField(max_length=63, blank=True, null=True)
     size = models.BigIntegerField(blank=True, null=True)
@@ -337,7 +283,7 @@ class File(BaseORM):
     key = models.CharField(max_length=255, blank=True, null=True)
     run = models.ForeignKey(Run, models.DO_NOTHING, blank=True, null=True, related_name="outputs")
     transform = models.ForeignKey(Transform, models.DO_NOTHING, blank=True, null=True)
-    storage = models.ForeignKey(Storage, models.DO_NOTHING)
+    storage: "Storage" = models.ForeignKey(Storage, models.DO_NOTHING)
     # folders from Folders.files
     # features from Features.files
     # input_of from Run.inputs
@@ -411,24 +357,25 @@ class File(BaseORM):
     def __name__(cls) -> str:
         return "File"
 
-    @classmethod
-    def create(  # type: ignore
-        cls,
-        data: Union[PathLike, DataLike] = None,
-        *,
-        key: Optional[str] = None,
-        name: Optional[str] = None,
-        run: Optional[Run] = None,
-        format: Optional[str] = None,
-        features: List[Features] = None,
-        input_of: List[Run] = None,
+    def __init__(  # type: ignore
+        self,
+        *args,
+        **kwargs,
     ):
-        if features is None:
-            features = []
-        if input_of is None:
-            input_of = []
-        if not isinstance(features, List):
-            features = [features]
+        if len(args) > 1 and isinstance(args[0], str) and len(args[0]) == 20:  # initialize with all fields from db as args
+            super().__init__(*args, **kwargs)
+            return None
+        else:  # user facing calling signature
+            if len(args) > 1:
+                raise ValueError("Only one non-keyword arg allowed")
+            if len(args) == 0:
+                data: Union[PathLike, DataLike] = kwargs["data"]
+            else:
+                data: Union[PathLike, DataLike] = args[0]
+            key: Optional[str] = kwargs["key"] if "key" in kwargs else None
+            name: Optional[str] = kwargs["name"] if "name" in kwargs else None
+            run: Optional[Run] = kwargs["run"] if "run" in kwargs else None
+            format = kwargs["format"] if "format" in kwargs else None
 
         def log_hint(*, check_path_in_storage: bool, key: str, id: str, suffix: str) -> None:
             hint = ""
@@ -452,8 +399,6 @@ class File(BaseORM):
             format=format,
         )
         kwargs["id"] = idg.file()
-        if features is not None:
-            kwargs["features"] = features
         log_hint(
             check_path_in_storage=privates["check_path_in_storage"],
             key=kwargs["key"],
@@ -474,13 +419,12 @@ class File(BaseORM):
                 assert kwargs["run"].transform is not None
                 kwargs["transform"] = kwargs["run"].transform
 
-        file = cls(**kwargs)
+        super().__init__(**kwargs)
         if data is not None:
-            file._local_filepath = privates["local_filepath"]
-            file._cloud_filepath = privates["cloud_filepath"]
-            file._memory_rep = privates["memory_rep"]
-            file._to_store = not privates["check_path_in_storage"]
-        return file
+            self._local_filepath = privates["local_filepath"]
+            self._cloud_filepath = privates["cloud_filepath"]
+            self._memory_rep = privates["memory_rep"]
+            self._to_store = not privates["check_path_in_storage"]
 
     def save(self, *args, **kwargs):
         if self.transform is not None:

@@ -171,65 +171,6 @@ class Run(SQLModel, table=True):  # type: ignore
     _ln_identity_key: Optional[str] = PrivateAttr(default=None)
     # simulate query result
 
-    def __init__(  # type: ignore
-        self,
-        *,
-        id: Optional[str] = None,
-        name: Optional[str] = None,
-        load_latest: bool = False,
-        external_id: Optional[str] = None,
-        transform: Optional[Transform] = None,
-        inputs: List["File"] = None,
-        outputs: List["File"] = None,
-    ):
-        kwargs = {k: v for k, v in locals().items() if v and k != "self"}
-
-        import lamindb as ln
-
-        global_context = False
-        if transform is None:
-            if ln.context.transform is not None:
-                global_context = True
-                transform = ln.context.transform
-            else:
-                raise ValueError("Either call `ln.Run(transform=transform)` or `ln.track(transform=...)`.")
-
-        if not isinstance(transform, Transform):
-            raise TypeError("transform needs to be of type Transform")
-
-        run = None
-        if load_latest:
-            run = (
-                ln.select(
-                    ln.Run,
-                    transform_id=transform.id,
-                    transform_version=transform.version,
-                )
-                .order_by(ln.Run.created_at.desc())
-                .first()
-            )
-            if run is not None:
-                logger.info(f"Loaded: {run}")
-        elif id is not None:
-            run = ln.select(ln.Run, id=id).one_or_none()
-            if run is None:
-                raise NotImplementedError("You can currently only pass existing ids")
-
-        if run is None:
-            kwargs.update(dict(transform_id=transform.id, transform_version=transform.version))
-            super().__init__(**kwargs)
-            self._ln_identity_key = None
-        else:
-            super().__init__(**run.dict())
-            self._ln_identity_key = run.id  # simulate query result
-
-        if global_context:
-            if run is None:
-                added_self = ln.add(self)
-                self._ln_identity_key = added_self.id
-                logger.success(f"Added: {self}")
-            ln.context.run = self
-
 
 class Features(SQLModel, table=True):  # type: ignore
     """Feature sets.
