@@ -1,17 +1,12 @@
 from enum import Enum
 from pathlib import Path
-from typing import Callable, TypeVar
+from typing import Any, TypeVar
 
-import anndata as ad
-import numpy as np
-import pandas as pd
-from lamindb_setup.dev.upath import UPath
-from sqlalchemy.orm.attributes import InstrumentedAttribute
+from upath import UPath
 
 PathLike = TypeVar("PathLike", str, Path, UPath)
-DataLike = TypeVar("DataLike", ad.AnnData, pd.DataFrame)
-ListLike = TypeVar("ListLike", pd.Series, list, np.array)
-SQLModelField = TypeVar("SQLModelField", Callable, InstrumentedAttribute)
+# statically typing the following is hard because these are all heavy dependencies, even DataFrame is heavy & slow to import
+DataLike = Any
 
 
 class Usage(str, Enum):

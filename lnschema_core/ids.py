@@ -1,3 +1,32 @@
+"""IDs.
+
+See: https://github.com/laminlabs/lamin-notes/blob/main/docs/2022/ids.ipynb
+
+Base generators:
+
+.. autosummary::
+   :toctree: .
+
+   base26
+   base62
+   base64
+
+Entity-related generators:
+
+.. autosummary::
+   :toctree: .
+
+   schema
+   user
+   instance
+   storage
+   file
+   folder
+   run
+   transform
+   project
+   secret
+"""
 # Some IDs got updated on 2023-02-14 to be multiples of 4
 # for matching byte representation, should we ever go there.
 import secrets
