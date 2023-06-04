@@ -1,6 +1,6 @@
 import builtins
 from pathlib import Path, PurePosixPath
-from typing import Any, Iterable, List, NamedTuple, Optional, Union
+from typing import Iterable, List, NamedTuple, Optional, Union
 
 import pandas as pd
 from django.db import models
@@ -250,9 +250,6 @@ class Features(BaseORM):
     Args:
         data: [Path, str, pd.DataFrame, ad.AnnData] - DataFrame or AnnData to parse.
         reference: Any = None - Reference for mapping features.
-        id: str = None - Primary key.
-        type: Any = None - Type of reference.
-        files: List[File] - Files to link against.
     """
 
     id = models.CharField(max_length=63, primary_key=True)
@@ -264,49 +261,20 @@ class Features(BaseORM):
     class Meta:
         managed = True
 
-    def __init__(  # type: ignore
-        self,
-        iterable: Iterable = None,
-        field: models.CharField = None,
-        *,
-        id: str = None,
-        type: Any = None,
-        # continue with fields
-        files: List["File"] = [],
-        **map_kwargs,
-    ):
-        kwargs = locals()
-
-        # needed for erroring when passing pd.index
-        if kwargs["data"] is not None:
-            kwargs.pop("data")
-        if kwargs["iterable"] is not None:
-            kwargs.pop("iterable")
-
-        kwargs = {k: v for k, v in kwargs.items() if v and k != "self"}
-        super().__init__(**kwargs)
-
-    def __new__(
+    def from_iterable(
         cls,
-        iterable: Iterable = None,
-        field: models.CharField = None,
-        *,
-        id: str = None,
-        type: Any = None,
-        # continue with fields
-        files: List["File"] = [],
-        **map_kwargs,
+        iterable: Iterable,
+        field: models.CharField,
+        species: str = None,
     ):
-        if iterable is not None:
-            from lamindb._file import get_features_from_data
+        """Parse iterable & return featureset & records."""
+        from lamindb._features import parse_features_from_iterable
 
-            features = get_features_from_data(
-                iterable=iterable,
-                field=field,
-                **map_kwargs,
-            )
-        else:
-            features = super().__new__(cls)
+        features = parse_features_from_iterable(
+            iterable=iterable,
+            field=field,
+            species=species,
+        )
         return features
 
 
