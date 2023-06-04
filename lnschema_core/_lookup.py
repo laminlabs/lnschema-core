@@ -2,13 +2,9 @@ import re
 from collections import namedtuple
 from typing import Any, Iterable, Optional
 
-from lamindb_setup import _USE_DJANGO
-
 
 def lookup(cls: Any, field: Optional[str] = None):
     """Lookup rows by field."""
-    import lamindb as ln
-
     if field is None:
         # by default use the name field
         if "name" in cls.__fields__:
@@ -21,11 +17,7 @@ def lookup(cls: Any, field: Optional[str] = None):
             else:
                 # the first field
                 field = next(iter(cls.__fields__.keys()))
-    if _USE_DJANGO:
-        values = set(cls.objects.values_list(field, flat=True))
-    else:
-        df = ln.select(cls).df()
-        values = set(df[field].values)
+    values = set(cls.objects.values_list(field, flat=True))
     for value in [None, ""]:
         if value in values:
             values.remove(value)
