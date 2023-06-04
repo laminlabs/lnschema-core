@@ -1,6 +1,6 @@
 import builtins
 from pathlib import Path, PurePosixPath
-from typing import Any, List, NamedTuple, Optional, Union
+from typing import Any, Iterable, List, NamedTuple, Optional, Union
 
 import pandas as pd
 from django.db import models
@@ -10,7 +10,7 @@ from upath import UPath
 from . import ids
 from ._lookup import lookup as _lookup
 from ._users import current_user_id
-from .types import DataLike, ListLike, PathLike, TransformType
+from .types import DataLike, PathLike, TransformType
 
 is_run_from_ipython = getattr(builtins, "__IPYTHON__", False)
 
@@ -265,7 +265,7 @@ class Features(BaseORM):
 
     def __init__(  # type: ignore
         self,
-        iterable: ListLike = None,
+        iterable: Iterable = None,
         field: models.CharField = None,
         *,
         id: str = None,
@@ -287,7 +287,7 @@ class Features(BaseORM):
 
     def __new__(
         cls,
-        iterable: ListLike = None,
+        iterable: Iterable = None,
         field: models.CharField = None,
         *,
         id: str = None,
