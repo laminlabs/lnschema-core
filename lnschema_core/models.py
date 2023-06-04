@@ -33,7 +33,8 @@ class LaminQuerySet(models.QuerySet):
     """
 
     def df(self):
-        df = pd.DataFrame(self.values())
+        columns = [field.name for field in self.model._meta.fields]
+        df = pd.DataFrame(self.values(), columns=columns)
         if "id" in df.columns:
             df = df.set_index("id")
         return df
