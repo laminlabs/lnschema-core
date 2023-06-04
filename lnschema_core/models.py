@@ -24,10 +24,21 @@ class MultipleResultsFound(Exception):
 
 
 class LaminQuerySet(models.QuerySet):
-    def df(self):
-        return pd.DataFrame(self.values())
+    """Extension of Django QuerySet.
 
-    def list(self):
+    This brings some of the SQLAlchemy/SQLModel/SQL-inspired calls.
+
+    As LaminDB was based on SQLAlchemy/SQLModel in the beginning, and might
+    support it again in the future, these calls will be supported longtime.
+    """
+
+    def df(self):
+        df = pd.DataFrame(self.values())
+        if "id" in df.columns:
+            df = df.set_index("id")
+        return df
+
+    def list(self) -> List:
         return list(self)
 
     def first(self):
