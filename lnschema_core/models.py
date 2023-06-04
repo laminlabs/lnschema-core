@@ -7,9 +7,9 @@ from django.db import models
 from lamin_logger import logger
 from upath import UPath
 
+from . import ids
 from ._lookup import lookup as _lookup
 from ._users import current_user_id
-from .dev import id as idg
 from .types import DataLike, ListLike, PathLike, TransformType
 
 is_run_from_ipython = getattr(builtins, "__IPYTHON__", False)
@@ -77,6 +77,12 @@ class RunInput(BaseORM):
 
 
 class User(BaseORM):
+    """User accounts.
+
+    All data in this table is synched from the cloud user account to ensure a
+    globally unique user identity.
+    """
+
     id = models.CharField(max_length=8, primary_key=True)
     email = models.CharField(max_length=64, unique=True)
     handle = models.CharField(max_length=64, unique=True)
@@ -89,10 +95,21 @@ class User(BaseORM):
 
 
 class Storage(BaseORM):
-    id = models.CharField(max_length=8, default=idg.storage, primary_key=True)
+    """Storage locations, often object storage buckets.
+
+    A file or run-associated file can be stored in any desired S3,
+    GCP bucket or local storage location.
+
+    This table tracks these locations along with metadata.
+    """
+
+    id = models.CharField(max_length=8, default=ids.storage, primary_key=True)
     root = models.CharField(max_length=255)
+    """Path to the root of the storage location: an s3 path, a local path, etc."""
     type = models.CharField(max_length=63, blank=True, null=True)
+    """Local vs. s3 vs. gcp etc."""
     region = models.CharField(max_length=63, blank=True, null=True)
+    """Cloud storage region, if applicable."""
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(User, models.DO_NOTHING, blank=True, null=True, default=current_user_id)
@@ -102,7 +119,9 @@ class Storage(BaseORM):
 
 
 class Project(BaseORM):
-    id = models.CharField(max_length=8, default=idg.project, primary_key=True)
+    """Projects."""
+
+    id = models.CharField(max_length=8, default=ids.project, primary_key=True)
     name = models.CharField(max_length=64)
     folders = models.ManyToManyField("Folder")
     files = models.ManyToManyField("File")
@@ -115,12 +134,39 @@ class Project(BaseORM):
 
 
 class Transform(BaseORM):
-    name = models.CharField(max_length=127)
-    hash = models.CharField(max_length=12, default=idg.transform)
+    """Data transformations.
+
+    Jupyter notebooks, pipelines, and apps.
+
+    A pipeline is typically versioned software that can perform a data
+    transformation/processing workflow. This can be anything from typical
+    workflow tools (Nextflow, Snakemake, Prefect, Apache Airflow, etc.) to
+    simple (versioned) scripts.
+
+    Data can also be ingested & transformed through an app.
+    """
+
+    name = models.CharField(max_length=255)
+    """A name for the transform, a pipeline name, or a file name of a notebook or script.
+    """
+    hash = models.CharField(max_length=12, default=ids.transform)
     version = models.CharField(max_length=10, default="0")
+    """Version identifier, defaults to `"0"`.
+
+    Use this to label different versions of the same transform.
+
+    Consider using `semantic versioning <https://semver.org>`__
+    with `Python versioning <https://peps.python.org/pep-0440/>`__.
+    """
     type = models.CharField(max_length=63, choices=TransformType.choices(), db_index=True, default=(TransformType.notebook if is_run_from_ipython else TransformType.pipeline))
-    title = models.CharField(max_length=63, blank=True, null=True)
-    reference = models.CharField(max_length=63, blank=True, null=True)
+    """Transform type. Defaults to `notebook` if run from IPython, otherwise to `pipeline`.
+    """
+    title = models.TextField(blank=True, null=True)
+    """An additional title, like a notebook title.
+    """
+    reference = models.CharField(max_length=255, blank=True, null=True)
+    """Reference for the transform, e.g., a URL.
+    """
     created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -131,7 +177,32 @@ class Transform(BaseORM):
 
 
 class Run(BaseORM):
-    id = models.CharField(max_length=12, default=idg.run, primary_key=True)
+    """Runs of data transforms.
+
+    A `run` is any transform of a `file`.
+
+    Args:
+        id: Optional[str] = None
+        name: Optional[str] = None
+        load_latest: bool = False - Load latest run for given notebook or pipeline.
+        transform: Optional[Transform] = None
+        inputs: List[File] = None
+        outputs: List[File] = None
+
+    It typically has inputs and outputs:
+
+    - References to outputs are stored in the `file` table in the
+      `run_id` column as a foreign key the `run`
+      table. This is possible as every given `file` has a unique data run:
+      the `run` that produced the `file`. However, note that a given
+      `run` may output several `files`.
+    - References to inputs are stored in the `run_in` table, a
+      many-to-many link table between the `file` and `run` tables. Any
+      `file` might serve as an input for many `runs`. Similarly, any
+      `run` might have many `files` as inputs.
+    """
+
+    id = models.CharField(max_length=12, default=ids.run, primary_key=True)
     name = models.CharField(max_length=255, blank=True, null=True)
     external_id = models.CharField(max_length=255, blank=True, null=True)
     transform = models.ForeignKey(Transform, models.DO_NOTHING)
@@ -145,6 +216,33 @@ class Run(BaseORM):
 
 
 class Features(BaseORM):
+    """Feature sets.
+
+    A feature set is represented by the hash of the set of primary keys and the feature type.
+
+    The current supported feature types are lnschema_bionty.Gene,
+    lnschema_bionty.Protein & lnschema_bionty.CellMarker.
+
+    Guides:
+
+    - :doc:`/guide/scrna`
+    - :doc:`guide/flow`
+
+    Examples:
+
+    >>> import lnschema_bionty as bt
+    >>> reference = bt.Gene(species="mouse")
+    >>> features = ln.Features(adata, reference=reference)
+    >>> file = ln.File(adata, name="Mouse Lymph Node scRNA-seq", features=features)
+
+    Args:
+        data: [Path, str, pd.DataFrame, ad.AnnData] - DataFrame or AnnData to parse.
+        reference: Any = None - Reference for mapping features.
+        id: str = None - Primary key.
+        type: Any = None - Type of reference.
+        files: List[File] - Files to link against.
+    """
+
     id = models.CharField(max_length=63, primary_key=True)
     type = models.CharField(max_length=63)
     created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id)
@@ -266,7 +364,7 @@ class Folder(BaseORM):
             files = kwargs.pop("files")
         else:
             kwargs = dict(name=name)
-        kwargs["id"] = idg.folder()
+        kwargs["id"] = ids.folder()
         super().__init__(**kwargs)
         if path is not None:
             self._local_filepath = privates["local_filepath"]
@@ -278,12 +376,26 @@ class File(BaseORM):
     id: str = models.CharField(max_length=20, primary_key=True)
     name = models.CharField(max_length=255, blank=True, null=True)
     suffix = models.CharField(max_length=63, blank=True, null=True)
+    """Suffix to construct the storage key. Defaults to `None`.
+
+    This is a file extension if the `file` is stored in a file format.
+    It's `None` if the storage format doesn't have a canonical extension.
+    """
     size = models.BigIntegerField(blank=True, null=True)
+    """Size in bytes.
+
+    Examples: 1KB is 1e3 bytes, 1MB is 1e6, 1GB is 1e9, 1TB is 1e12 etc.
+    """
     hash = models.CharField(max_length=63, blank=True, null=True)
+    """Hash (md5)."""
     key = models.CharField(max_length=255, blank=True, null=True)
+    """Storage key, the relative path within the storage location."""
     run = models.ForeignKey(Run, models.DO_NOTHING, blank=True, null=True, related_name="outputs")
+    """:class:`~lamindb.Run` that created the `file`."""
     transform = models.ForeignKey(Transform, models.DO_NOTHING, blank=True, null=True)
+    """:class:`~lamindb.Transform` whose run created the `file`."""
     storage: "Storage" = models.ForeignKey(Storage, models.DO_NOTHING)
+    """:class:`~lamindb.Storage` location of `file`, see `.path()` for full path."""
     # folders from Folders.files
     # features from Features.files
     # input_of from Run.inputs
@@ -398,7 +510,7 @@ class File(BaseORM):
             run=run,
             format=format,
         )
-        kwargs["id"] = idg.file()
+        kwargs["id"] = ids.file()
         log_hint(
             check_path_in_storage=privates["check_path_in_storage"],
             key=kwargs["key"],
