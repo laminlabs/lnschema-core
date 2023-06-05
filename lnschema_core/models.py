@@ -68,7 +68,7 @@ class LaminQuerySet(models.QuerySet):
 # todo, make a CreatedUpdated Mixin, but need to figure out docs
 class BaseORM(models.Model):
     def __repr__(self) -> str:
-        fields = ", ".join([f"{k.name}={getattr(self, k.name)}" for k in self._meta.fields])
+        fields = ", ".join([f"{k.name}={getattr(self, k.name)}" for k in self._meta.fields if hasattr(self, k.name)])
         return f"{self.__class__.__name__}({fields})"
 
     @classmethod
@@ -372,9 +372,9 @@ class Folder(BaseORM):
     """A universal random id, valid across DB instances."""
     name = models.CharField(max_length=255, db_index=True)
     """Name or title of the folder."""
-    key = models.CharField(max_length=255, null=True, default=None)
+    key = models.CharField(max_length=255, null=True, default=None, db_index=True)
     """Storage key of the folder."""
-    storage = models.ForeignKey(Storage, models.DO_NOTHING, related_name="folders")
+    storage = models.ForeignKey(Storage, models.DO_NOTHING, related_name="folders", null=True)
     """Storage location of the folder."""
     files = models.ManyToManyField("File", related_name="folders")
     """Files in folder."""
@@ -452,9 +452,9 @@ class Folder(BaseORM):
 class File(BaseORM):
     id = models.CharField(max_length=20, primary_key=True)
     """A universal random id, valid across DB instances."""
-    name = models.CharField(max_length=255, db_index=True)
+    name = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """A universal random id, valid across DB instances."""
-    suffix = models.CharField(max_length=30, db_index=True)
+    suffix = models.CharField(max_length=30, db_index=True, null=True, default=None)
     """File suffix.
 
     This is a file extension if the `file` is stored in a file format.
@@ -465,13 +465,13 @@ class File(BaseORM):
 
     Examples: 1KB is 1e3 bytes, 1MB is 1e6, 1GB is 1e9, 1TB is 1e12 etc.
     """
-    hash = models.CharField(max_length=86, db_index=True)
+    hash = models.CharField(max_length=86, db_index=True, null=True, default=None)
     """Hash of file content. 86 base64 chars allow to store 64 bytes, 512 bits."""
-    key = models.CharField(max_length=255, db_index=True)
+    key = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """Storage key, the relative path within the storage location."""
-    run = models.ForeignKey(Run, models.DO_NOTHING, related_name="outputs")
+    run = models.ForeignKey(Run, models.DO_NOTHING, related_name="outputs", null=True)
     """:class:`~lamindb.Run` that created the `file`."""
-    transform = models.ForeignKey(Transform, models.DO_NOTHING, related_name="files")
+    transform = models.ForeignKey(Transform, models.DO_NOTHING, related_name="files", null=True)
     """:class:`~lamindb.Transform` whose run created the `file`."""
     storage: "Storage" = models.ForeignKey(Storage, models.DO_NOTHING, related_name="files")
     """:class:`~lamindb.Storage` location of `file`, see `.path()` for full path."""
