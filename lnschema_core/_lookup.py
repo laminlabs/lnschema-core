@@ -7,18 +7,19 @@ from django.db import models
 
 def lookup(orm: models.Model, field: Optional[str] = None):
     """Lookup rows by field."""
+    model_field_names = [i.name for i in orm._meta.fields]
     if field is None:
         # by default use the name field
-        if "name" in orm.__fields__:
+        if "name" in model_field_names:
             field = "name"
         else:
-            non_ids = [i for i in orm.__fields__.keys() if "id" not in i]
+            non_ids = [i for i in model_field_names if "id" not in i]
             if len(non_ids) > 0:
                 # the first field isn't named with id
                 field = non_ids[0]
             else:
                 # the first field
-                field = next(iter(orm.__fields__.keys()))
+                field = model_field_names[0]
     values = set(orm.objects.values_list(field, flat=True))
     for value in [None, ""]:
         if value in values:
