@@ -282,8 +282,8 @@ class Run(BaseORM):
     # outputs on File
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
-    updated_at = models.DateTimeField(auto_now=True, db_index=True)
-    """Time of last update to record."""
+    run_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    """Time of run execution."""
     created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id, related_name="created_runs")
     """Creator of record, a :class:`~lamindb.User`."""
 
