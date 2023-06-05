@@ -350,21 +350,20 @@ class Featureset(BaseORM):
     def __init__(self, *args, **kwargs):  # type: ignore
         relationships: Dict = {}
         if "genes" in kwargs:
-            relationships.update({"genes": kwargs.pop("genes")})
+            relationships["genes"] = kwargs.pop("genes")
         if "proteins" in kwargs:
-            relationships.update({"proteins": kwargs.pop("proteins")})
+            relationships["proteins"] = kwargs.pop("proteins")
         if "cell_markers" in kwargs:
-            relationships.update({"cell_markers": kwargs.pop("cell_markers")})
-        self._related_features_records = relationships
+            relationships["cell_markers"] = kwargs.pop("cell_markers")
+        self._relationships = relationships
 
         super().__init__(*args, **kwargs)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        if len(self._related_features_records) > 0:
-            for key, records in self._related_features_records.items():
-                [r.save() for r in records]
-                getattr(self, key).add(*records)
+        for key, records in self._relationships.items():
+            [r.save() for r in records]
+            getattr(self, key).set(records)
 
 
 class Folder(BaseORM):
