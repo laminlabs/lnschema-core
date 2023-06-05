@@ -95,7 +95,7 @@ class User(BaseORM):
     """User accounts.
 
     All data in this table is synched from the cloud user account to ensure a
-    globally unique user identity.
+    universal user identity, valid across DB instances, email & handle changes.
     """
 
     id = models.CharField(max_length=8, primary_key=True)
@@ -116,12 +116,11 @@ class User(BaseORM):
 
 
 class Storage(BaseORM):
-    """Storage locations, typically cloud buckets.
+    """Storage locations, typically cloud storage buckets.
 
-    A file or run-associated file can be stored in any desired S3,
-    GCP bucket or local storage location.
+    A file can be stored in S3 and GCP buckets or local storage locations.
 
-    This table tracks these locations along with metadata.
+    This ORM tracks these locations along with metadata.
     """
 
     id = models.CharField(max_length=8, default=ids.storage, db_index=True, primary_key=True)
@@ -192,10 +191,10 @@ class Transform(BaseORM):
     id = models.CharField(max_length=14, db_index=True, primary_key=True)
     """Universal id, composed of stem_id and version suffix."""
     name = models.CharField(max_length=255, db_index=True, null=True, default=None)
-    """A name/title for the transform, a pipeline name, notebook title, etc..
+    """Transform name or title, a pipeline name, notebook title, etc..
     """
     short_name = models.CharField(max_length=30, db_index=True, null=True, default=None)
-    """A short name, if desired.
+    """A short name.
     """
     stem_id = models.CharField(max_length=12, default=ids.transform, db_index=True)
     """Stem of id, identifying transform up to version."""
@@ -259,16 +258,15 @@ class Transform(BaseORM):
 class Run(BaseORM):
     """Runs of data transformations.
 
-    It typically has inputs and outputs:
+    Typically, a run has inputs and outputs:
 
-    - References to outputs are stored in the `file` table in the
-      `run` field. This is possible as every given `file` has a unique data run:
-      the `run` that produced the `file`. Any given
-      `run` may output several `files`, which you can access via: `run.outputs`.
-    - References to inputs are stored in the `RunInput` ORM, a
-      many-to-many link ORM between `File` and `Run`. Any
-      `file` might serve as an input for many `runs`: `file.input_of`. Similarly, any
-      `run` might have many `files` as inputs: `run.inputs`.
+    - References to outputs are stored in the `File` ORM in the `run` field.
+      This is possible as every given file has a unique run that created it. Any
+      given `Run` can output multiple `files`: `run.outputs`.
+    - References to inputs are stored in the `RunInput` ORM, a many-to-many link
+      ORM between `File` and `Run`. Any `file` might serve as an input for
+      multiple `runs`: `file.input_of`. Similarly, any `run` might have many
+      `files` as inputs: `run.inputs`.
     """
 
     id = models.CharField(max_length=20, default=ids.run, primary_key=True)
