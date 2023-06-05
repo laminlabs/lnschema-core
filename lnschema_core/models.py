@@ -126,7 +126,7 @@ class Storage(BaseORM):
     id = models.CharField(max_length=8, default=ids.storage, db_index=True, primary_key=True)
     """Universal id, valid across DB instances."""
     root = models.CharField(max_length=255, db_index=True)
-    """Path to the root of the storage location: an s3 path, a local path, etc."""
+    """Path to the root of the storage location (an s3 path, a local path, etc.)."""
     type = models.CharField(max_length=63, db_index=True)
     """Local vs. s3 vs. gcp etc."""
     region = models.CharField(max_length=63, db_index=True, null=True)
@@ -141,7 +141,7 @@ class Storage(BaseORM):
         default=current_user_id,
         related_name="created_storages",
     )
-    """Creator of record."""
+    """Creator of record, a :class:`~lamindb.User`."""
 
     class Meta:
         managed = True
@@ -170,7 +170,7 @@ class Project(BaseORM):
         default=current_user_id,
         related_name="created_projects",
     )
-    """Creator of record."""
+    """Creator of record, a :class:`~lamindb.User`."""
 
     class Meta:
         managed = True
@@ -229,7 +229,7 @@ class Transform(BaseORM):
         default=current_user_id,
         related_name="created_transforms",
     )
-    """Creator of record."""
+    """Creator of record, a :class:`~lamindb.User`."""
 
     class Meta:
         managed = True
@@ -278,7 +278,7 @@ class Run(BaseORM):
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
     created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id, related_name="created_runs")
-    """Creator of record."""
+    """Creator of record, a :class:`~lamindb.User`."""
 
     class Meta:
         managed = True
@@ -325,7 +325,7 @@ class Featureset(BaseORM):
         default=current_user_id,
         related_name="created_featuresets",
     )
-    """Creator of record."""
+    """Creator of record, a :class:`~lamindb.User`."""
 
     class Meta:
         managed = True
@@ -370,19 +370,19 @@ class Folder(BaseORM):
     id = models.CharField(max_length=20, default=ids.folder, primary_key=True)
     """A universal random id, valid across DB instances."""
     name = models.CharField(max_length=255, db_index=True)
-    """Name or title of the folder."""
+    """Name or title of folder."""
     key = models.CharField(max_length=255, null=True, default=None, db_index=True)
-    """Storage key of the folder."""
+    """Storage key of folder."""
     storage = models.ForeignKey(Storage, models.DO_NOTHING, related_name="folders", null=True)
-    """Storage location of the folder."""
+    """:class:`~lamindb.Storage` location of folder, see `.path()` for full path."""
     files = models.ManyToManyField("File", related_name="folders")
-    """Files in folder."""
+    """:class:`~lamindb.File` records in folder."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
     created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id, related_name="created_folders")
-    """Creator of record."""
+    """Creator of record, a :class:`~lamindb.User`."""
 
     class Meta:
         managed = True
@@ -482,7 +482,7 @@ class File(BaseORM):
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
     created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id, related_name="created_files")
-    """Creator of record."""
+    """Creator of record, a :class:`~lamindb.User`."""
 
     class Meta:
         managed = True
