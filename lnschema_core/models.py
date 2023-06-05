@@ -227,7 +227,7 @@ class Run(BaseORM):
         managed = True
 
 
-class Features(BaseORM):
+class Featureset(BaseORM):
     """Feature sets.
 
     A feature set is represented by the hash of the set of primary keys and the feature type.
