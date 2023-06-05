@@ -238,29 +238,18 @@ class Transform(BaseORM):
 
 
 class Run(BaseORM):
-    """Runs of data transforms.
-
-    A `run` is any transform of a `file`.
-
-    Args:
-        id: Optional[str] = None
-        name: Optional[str] = None
-        load_latest: bool = False - Load latest run for given notebook or pipeline.
-        transform: Optional[Transform] = None
-        inputs: List[File] = None
-        outputs: List[File] = None
+    """Runs of data transformations.
 
     It typically has inputs and outputs:
 
     - References to outputs are stored in the `file` table in the
-      `run_id` column as a foreign key the `run`
-      table. This is possible as every given `file` has a unique data run:
-      the `run` that produced the `file`. However, note that a given
-      `run` may output several `files`.
-    - References to inputs are stored in the `run_in` table, a
-      many-to-many link table between the `file` and `run` tables. Any
-      `file` might serve as an input for many `runs`. Similarly, any
-      `run` might have many `files` as inputs.
+      `run` field. This is possible as every given `file` has a unique data run:
+      the `run` that produced the `file`. Any given
+      `run` may output several `files`, which you can access via: `run.outputs`.
+    - References to inputs are stored in the `RunInput` ORM, a
+      many-to-many link ORM between `File` and `Run`. Any
+      `file` might serve as an input for many `runs`: `file.input_of`. Similarly, any
+      `run` might have many `files` as inputs: `run.inputs`.
     """
 
     id = models.CharField(max_length=20, default=ids.run, primary_key=True)
@@ -290,8 +279,8 @@ class Featureset(BaseORM):
 
     A feature set is represented by the hash of the set of primary keys and the feature type.
 
-    The current supported feature types are lnschema_bionty.Gene,
-    lnschema_bionty.Protein & lnschema_bionty.CellMarker.
+    The current supported feature types are `lnschema_bionty.Gene`,
+    `lnschema_bionty.Protein`, and `lnschema_bionty.CellMarker`.
 
     Guides:
 
@@ -302,12 +291,12 @@ class Featureset(BaseORM):
 
     >>> import lnschema_bionty as bt
     >>> reference = bt.Gene(species="mouse")
-    >>> features = ln.Features(adata, reference=reference)
-    >>> file = ln.File(adata, name="Mouse Lymph Node scRNA-seq", features=features)
+    >>> features = ln.Features.from_iterable(adata.var["ensemble_id"], Gene.ensembl_gene_id)
+    >>> features.save()
+    >>> file = ln.File(adata, name="Mouse Lymph Node scRNA-seq")
+    >>> file.save()
+    >>> file.featuresets.add(featureset)
 
-    Args:
-        data: [Path, str, pd.DataFrame, ad.AnnData] - DataFrame or AnnData to parse.
-        reference: Any = None - Reference for mapping features.
     """
 
     id = models.CharField(max_length=64, primary_key=True)
