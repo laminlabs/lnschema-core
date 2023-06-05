@@ -129,7 +129,7 @@ class Storage(BaseORM):
     """Path to the root of the storage location: an s3 path, a local path, etc."""
     type = models.CharField(max_length=63, db_index=True)
     """Local vs. s3 vs. gcp etc."""
-    region = models.CharField(max_length=63, db_index=True)
+    region = models.CharField(max_length=63, db_index=True, null=True)
     """Cloud storage region, if applicable."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
@@ -363,7 +363,8 @@ class Featureset(BaseORM):
         super().save(*args, **kwargs)
         if len(self._related_features_records) > 0:
             for key, records in self._related_features_records.items():
-                getattr(self, key).add(*[r.save() for r in records])
+                [r.save() for r in records]
+                getattr(self, key).add(*records)
 
 
 class Folder(BaseORM):
