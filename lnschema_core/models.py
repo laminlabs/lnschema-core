@@ -96,18 +96,24 @@ class User(BaseORM):
     """
 
     id = models.CharField(max_length=8, primary_key=True)
-    email = models.CharField(max_length=64, unique=True)
-    handle = models.CharField(max_length=64, unique=True)
-    name = models.CharField(max_length=64, blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    """Universal id, valid across DB instances."""
+    handle = models.CharField(max_length=30, unique=True, db_index=True)
+    """Universal handle, valid across DB instances."""
+    email = models.CharField(max_length=255, unique=True, db_index=True)
+    """Latest email address."""
+    name = models.CharField(max_length=255, db_index=True)
+    """Name."""
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    """Time of creation of record."""
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    """Time of last update to record."""
 
     class Meta:
         managed = True
 
 
 class Storage(BaseORM):
-    """Storage locations, often object storage buckets.
+    """Storage locations, typically cloud buckets.
 
     A file or run-associated file can be stored in any desired S3,
     GCP bucket or local storage location.
@@ -115,16 +121,20 @@ class Storage(BaseORM):
     This table tracks these locations along with metadata.
     """
 
-    id = models.CharField(max_length=8, default=ids.storage, primary_key=True)
-    root = models.CharField(max_length=255)
+    id = models.CharField(max_length=8, default=ids.storage, db_index=True, primary_key=True)
+    """Universal id, valid across DB instances."""
+    root = models.CharField(max_length=255, db_index=True)
     """Path to the root of the storage location: an s3 path, a local path, etc."""
-    type = models.CharField(max_length=63, blank=True, null=True)
+    type = models.CharField(max_length=63, db_index=True)
     """Local vs. s3 vs. gcp etc."""
-    region = models.CharField(max_length=63, blank=True, null=True)
+    region = models.CharField(max_length=63, db_index=True)
     """Cloud storage region, if applicable."""
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(User, models.DO_NOTHING, blank=True, null=True, default=current_user_id)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    """Time of creation of record."""
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    """Time of last update to record."""
+    created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id)
+    """Creator of record."""
 
     class Meta:
         managed = True
@@ -134,12 +144,18 @@ class Project(BaseORM):
     """Projects."""
 
     id = models.CharField(max_length=8, default=ids.project, primary_key=True)
-    name = models.CharField(max_length=64)
+    """Universal id, valid across DB instances."""
+    name = models.CharField(max_length=255, db_index=True)
+    """Project name or title."""
     folders = models.ManyToManyField("Folder")
+    """Project folders."""
     files = models.ManyToManyField("File")
     created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    """Creator of record."""
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    """Time of creation of record."""
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    """Time of last update to record."""
 
     class Meta:
         managed = True
@@ -180,8 +196,11 @@ class Transform(BaseORM):
     """Reference for the transform, e.g., a URL.
     """
     created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    """Creator of record."""
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    """Time of creation of record."""
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    """Time of last update to record."""
 
     class Meta:
         managed = True
@@ -221,7 +240,9 @@ class Run(BaseORM):
     inputs = models.ManyToManyField("File", through=RunInput, related_name="input_of")
     # outputs on File
     created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id)
-    created_at = models.DateTimeField(auto_now_add=True)
+    """Creator of record."""
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    """Time of creation of record."""
 
     class Meta:
         managed = True
@@ -255,6 +276,7 @@ class Featureset(BaseORM):
     id = models.CharField(max_length=63, primary_key=True)
     type = models.CharField(max_length=63)
     created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id)
+    """Creator of record."""
     created_at = models.DateTimeField(auto_now=True)
     files = models.ManyToManyField("File")
 
@@ -285,8 +307,11 @@ class Folder(BaseORM):
     storage = models.ForeignKey(Storage, models.DO_NOTHING)
     files = models.ManyToManyField("File")
     created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    """Creator of record."""
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    """Time of creation of record."""
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    """Time of last update to record."""
 
     class Meta:
         managed = True
@@ -379,9 +404,12 @@ class File(BaseORM):
     # folders from Folders.files
     # features from Features.files
     # input_of from Run.inputs
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    """Time of creation of record."""
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    """Time of last update to record."""
     created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id)
+    """Creator of record."""
 
     class Meta:
         managed = True
