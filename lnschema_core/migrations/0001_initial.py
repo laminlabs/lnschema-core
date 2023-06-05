@@ -195,7 +195,7 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to="lnschema_core.transform"),
         ),
         migrations.CreateModel(
-            name="Features",
+            name="Featureset",
             fields=[
                 ("id", models.CharField(max_length=63, primary_key=True, serialize=False)),
                 ("type", models.CharField(max_length=63)),
