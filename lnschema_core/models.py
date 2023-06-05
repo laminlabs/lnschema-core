@@ -170,7 +170,12 @@ class Transform(BaseORM):
     Consider using `semantic versioning <https://semver.org>`__
     with `Python versioning <https://peps.python.org/pep-0440/>`__.
     """
-    type = models.CharField(max_length=63, choices=TransformType.choices(), db_index=True, default=(TransformType.notebook if is_run_from_ipython else TransformType.pipeline))
+    type = models.CharField(
+        max_length=63,
+        choices=TransformType.choices(),
+        db_index=True,
+        default=(TransformType.notebook if is_run_from_ipython else TransformType.pipeline),
+    )
     """Transform type. Defaults to `notebook` if run from IPython, otherwise to `pipeline`.
     """
     title = models.TextField(blank=True, null=True)
@@ -261,6 +266,7 @@ class Features(BaseORM):
     class Meta:
         managed = True
 
+    @classmethod
     def from_iterable(
         cls,
         iterable: Iterable,
