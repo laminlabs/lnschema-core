@@ -25,6 +25,7 @@ class TransformType(Enum):
     pipeline = "pipeline"
     notebook = "notebook"
     app = "app"
+    api = "api"
 
     def __repr__(self):
         return self.name

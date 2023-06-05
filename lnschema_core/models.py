@@ -13,6 +13,7 @@ from ._users import current_user_id
 from .types import DataLike, PathLike, TransformType
 
 is_run_from_ipython = getattr(builtins, "__IPYTHON__", False)
+TRANSFORM_TYPE_DEFAULT = TransformType.notebook if is_run_from_ipython else TransformType.pipeline
 
 
 class NoResultFound(Exception):
@@ -64,6 +65,7 @@ class LaminQuerySet(models.QuerySet):
             raise MultipleResultsFound
 
 
+# todo, make a CreatedUpdated Mixin, but need to figure out docs
 class BaseORM(models.Model):
     def __repr__(self) -> str:
         fields = ", ".join([f"{k.name}={getattr(self, k.name)}" for k in self._meta.fields])
@@ -96,18 +98,24 @@ class User(BaseORM):
     """
 
     id = models.CharField(max_length=8, primary_key=True)
-    email = models.CharField(max_length=64, unique=True)
-    handle = models.CharField(max_length=64, unique=True)
-    name = models.CharField(max_length=64, blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    """Universal id, valid across DB instances."""
+    handle = models.CharField(max_length=30, unique=True, db_index=True)
+    """Universal handle, valid across DB instances."""
+    email = models.CharField(max_length=255, unique=True, db_index=True)
+    """Latest email address."""
+    name = models.CharField(max_length=255, db_index=True)
+    """Name."""
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    """Time of creation of record."""
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    """Time of last update to record."""
 
     class Meta:
         managed = True
 
 
 class Storage(BaseORM):
-    """Storage locations, often object storage buckets.
+    """Storage locations, typically cloud buckets.
 
     A file or run-associated file can be stored in any desired S3,
     GCP bucket or local storage location.
@@ -115,16 +123,20 @@ class Storage(BaseORM):
     This table tracks these locations along with metadata.
     """
 
-    id = models.CharField(max_length=8, default=ids.storage, primary_key=True)
-    root = models.CharField(max_length=255)
+    id = models.CharField(max_length=8, default=ids.storage, db_index=True, primary_key=True)
+    """Universal id, valid across DB instances."""
+    root = models.CharField(max_length=255, db_index=True)
     """Path to the root of the storage location: an s3 path, a local path, etc."""
-    type = models.CharField(max_length=63, blank=True, null=True)
+    type = models.CharField(max_length=63, db_index=True)
     """Local vs. s3 vs. gcp etc."""
-    region = models.CharField(max_length=63, blank=True, null=True)
+    region = models.CharField(max_length=63, db_index=True)
     """Cloud storage region, if applicable."""
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(User, models.DO_NOTHING, blank=True, null=True, default=current_user_id)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    """Time of creation of record."""
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    """Time of last update to record."""
+    created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id, related_name="created_storages")
+    """Creator of record."""
 
     class Meta:
         managed = True
@@ -134,12 +146,21 @@ class Project(BaseORM):
     """Projects."""
 
     id = models.CharField(max_length=8, default=ids.project, primary_key=True)
-    name = models.CharField(max_length=64)
-    folders = models.ManyToManyField("Folder")
-    files = models.ManyToManyField("File")
-    created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    """Universal id, valid across DB instances."""
+    name = models.CharField(max_length=255, db_index=True, unique=True)
+    """Project name or title."""
+    external_id = models.CharField(max_length=255, db_index=True)
+    """External id (such as from a project management tool)."""
+    folders = models.ManyToManyField("Folder", related_name="projects")
+    """Project folders."""
+    files = models.ManyToManyField("File", related_name="projects")
+    """Project files."""
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    """Time of creation of record."""
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    """Time of last update to record."""
+    created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id, related_name="created_projects")
+    """Creator of record."""
 
     class Meta:
         managed = True
@@ -148,21 +169,21 @@ class Project(BaseORM):
 class Transform(BaseORM):
     """Data transformations.
 
-    Jupyter notebooks, pipelines, and apps.
+    Pipelines, workflows, notebooks, app-based transforms.
 
-    A pipeline is typically versioned software that can perform a data
-    transformation/processing workflow. This can be anything from typical
-    workflow tools (Nextflow, Snakemake, Prefect, Apache Airflow, etc.) to
-    simple (versioned) scripts.
+    A pipeline is versioned software that transforms data.
+    This can be anything from typical workflow tools (Nextflow, Snakemake,
+    Prefect, Apache Airflow, etc.) to simple (versioned) scripts.
 
-    Data can also be ingested & transformed through an app.
+    Creating a file is a transform, too.
     """
 
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, db_index=True)
     """A name for the transform, a pipeline name, or a file name of a notebook or script.
     """
-    hash = models.CharField(max_length=12, default=ids.transform)
-    version = models.CharField(max_length=10, default="0")
+    uid = models.CharField(max_length=12, default=ids.transform, db_index=True)
+    """Universal id, valid across DB instances."""
+    version = models.CharField(max_length=10, default="0", db_index=True)
     """Version identifier, defaults to `"0"`.
 
     Use this to label different versions of the same transform.
@@ -170,22 +191,29 @@ class Transform(BaseORM):
     Consider using `semantic versioning <https://semver.org>`__
     with `Python versioning <https://peps.python.org/pep-0440/>`__.
     """
-    type = models.CharField(max_length=63, choices=TransformType.choices(), db_index=True, default=(TransformType.notebook if is_run_from_ipython else TransformType.pipeline))
-    """Transform type. Defaults to `notebook` if run from IPython, otherwise to `pipeline`.
+    type = models.CharField(max_length=20, choices=TransformType.choices(), db_index=True, default=TRANSFORM_TYPE_DEFAULT)
+    """Transform type.
+
+    Defaults to `notebook` if run from IPython, from a script to `pipeline`.
+
+    If run from the app, it defaults to `app`.
     """
-    title = models.TextField(blank=True, null=True)
+    title = models.TextField(db_index=True)
     """An additional title, like a notebook title.
     """
-    reference = models.CharField(max_length=255, blank=True, null=True)
+    reference = models.CharField(max_length=255, db_index=True)
     """Reference for the transform, e.g., a URL.
     """
-    created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    """Time of creation of record."""
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    """Time of last update to record."""
+    created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id, related_name="created_transforms")
+    """Creator of record."""
 
     class Meta:
         managed = True
-        unique_together = (("name", "version"),)
+        unique_together = (("uid", "version"),)
 
 
 class Run(BaseORM):
@@ -214,14 +242,23 @@ class Run(BaseORM):
       `run` might have many `files` as inputs.
     """
 
-    id = models.CharField(max_length=12, default=ids.run, primary_key=True)
-    name = models.CharField(max_length=255, blank=True, null=True)
-    external_id = models.CharField(max_length=255, blank=True, null=True)
-    transform = models.ForeignKey(Transform, models.DO_NOTHING)
+    id = models.CharField(max_length=20, default=ids.run, primary_key=True)
+    """Universal id, valid across DB instances."""
+    name = models.CharField(max_length=255, db_index=True)
+    """Name or title of run."""
+    external_id = models.CharField(max_length=255, db_index=True)
+    """External id (such as from a workflow tool)."""
+    transform = models.ForeignKey(Transform, models.DO_NOTHING, related_name="runs")
+    """The transform :class:`~lamindb.Transform` that is being run."""
     inputs = models.ManyToManyField("File", through=RunInput, related_name="input_of")
+    """The input files for the run."""
     # outputs on File
-    created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    """Time of creation of record."""
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    """Time of last update to record."""
+    created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id, related_name="created_runs")
+    """Creator of record."""
 
     class Meta:
         managed = True
@@ -237,8 +274,8 @@ class Featureset(BaseORM):
 
     Guides:
 
-    - :doc:`/guide/scrna`
-    - :doc:`guide/flow`
+    - :doc:`/biology/scrna`
+    - :doc:`/biology/flow`
 
     Examples:
 
@@ -252,11 +289,18 @@ class Featureset(BaseORM):
         reference: Any = None - Reference for mapping features.
     """
 
-    id = models.CharField(max_length=63, primary_key=True)
-    type = models.CharField(max_length=63)
-    created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id)
-    created_at = models.DateTimeField(auto_now=True)
+    id = models.CharField(max_length=64, primary_key=True)
+    """A universal id, valid across DB instances: a hash of the linked set of features."""
+    type = models.CharField(max_length=64)
+    """A feature entity type."""
     files = models.ManyToManyField("File")
+    """Files linked to the featureset."""
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    """Time of creation of record."""
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    """Time of last update to record."""
+    created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id, related_name="created_featuresets")
+    """Creator of record."""
 
     class Meta:
         managed = True
@@ -279,14 +323,22 @@ class Featureset(BaseORM):
 
 
 class Folder(BaseORM):
-    id = models.CharField(max_length=20, primary_key=True)
-    name = models.CharField(max_length=255)
-    key = models.CharField(max_length=255, blank=True, null=True)
-    storage = models.ForeignKey(Storage, models.DO_NOTHING)
-    files = models.ManyToManyField("File")
-    created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    id = models.CharField(max_length=20, default=ids.folder, primary_key=True)
+    """A universal random id, valid across DB instances."""
+    name = models.CharField(max_length=255, db_index=True)
+    """Name or title of the folder."""
+    key = models.CharField(max_length=255, null=True, default=None)
+    """Storage key of the folder."""
+    storage = models.ForeignKey(Storage, models.DO_NOTHING, related_name="folders")
+    """Storage location of the folder."""
+    files = models.ManyToManyField("File", related_name="folders")
+    """Files in folder."""
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    """Time of creation of record."""
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    """Time of last update to record."""
+    created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id, related_name="created_folders")
+    """Creator of record."""
 
     class Meta:
         managed = True
@@ -353,35 +405,40 @@ class Folder(BaseORM):
 
 
 class File(BaseORM):
-    id: str = models.CharField(max_length=20, primary_key=True)
-    name = models.CharField(max_length=255, blank=True, null=True)
-    suffix = models.CharField(max_length=63, blank=True, null=True)
-    """Suffix to construct the storage key. Defaults to `None`.
+    id = models.CharField(max_length=20, primary_key=True)
+    """A universal random id, valid across DB instances."""
+    name = models.CharField(max_length=255, db_index=True)
+    """A universal random id, valid across DB instances."""
+    suffix = models.CharField(max_length=30, db_index=True)
+    """File suffix.
 
     This is a file extension if the `file` is stored in a file format.
     It's `None` if the storage format doesn't have a canonical extension.
     """
-    size = models.BigIntegerField(blank=True, null=True)
+    size = models.BigIntegerField(null=True, db_index=True)
     """Size in bytes.
 
     Examples: 1KB is 1e3 bytes, 1MB is 1e6, 1GB is 1e9, 1TB is 1e12 etc.
     """
-    hash = models.CharField(max_length=63, blank=True, null=True)
-    """Hash (md5)."""
-    key = models.CharField(max_length=255, blank=True, null=True)
+    hash = models.CharField(max_length=86, db_index=True)
+    """Hash of file content. 86 base64 chars allow to store 64 bytes, 512 bits."""
+    key = models.CharField(max_length=255, db_index=True)
     """Storage key, the relative path within the storage location."""
-    run = models.ForeignKey(Run, models.DO_NOTHING, blank=True, null=True, related_name="outputs")
+    run = models.ForeignKey(Run, models.DO_NOTHING, related_name="outputs")
     """:class:`~lamindb.Run` that created the `file`."""
-    transform = models.ForeignKey(Transform, models.DO_NOTHING, blank=True, null=True)
+    transform = models.ForeignKey(Transform, models.DO_NOTHING, related_name="files")
     """:class:`~lamindb.Transform` whose run created the `file`."""
-    storage: "Storage" = models.ForeignKey(Storage, models.DO_NOTHING)
+    storage: "Storage" = models.ForeignKey(Storage, models.DO_NOTHING, related_name="files")
     """:class:`~lamindb.Storage` location of `file`, see `.path()` for full path."""
     # folders from Folders.files
     # features from Features.files
     # input_of from Run.inputs
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    """Time of creation of record."""
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    """Time of last update to record."""
+    created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id, related_name="created_files")
+    """Creator of record."""
 
     class Meta:
         managed = True
@@ -398,7 +455,7 @@ class File(BaseORM):
         run: Optional[Run] = None,
         format: Optional[str] = None,
     ) -> None:
-        """Replace data object."""
+        """Replace file content."""
         from lamindb._file import get_file_kwargs_from_data
 
         if isinstance(data, (Path, str)):
