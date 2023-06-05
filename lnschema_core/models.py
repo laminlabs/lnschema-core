@@ -1,6 +1,6 @@
 import builtins
 from pathlib import Path, PurePosixPath
-from typing import Iterable, List, NamedTuple, Optional, Union
+from typing import Dict, Iterable, List, NamedTuple, Optional, Union
 
 import pandas as pd
 from django.db import models
@@ -135,7 +135,12 @@ class Storage(BaseORM):
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
-    created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id, related_name="created_storages")
+    created_by = models.ForeignKey(
+        User,
+        models.DO_NOTHING,
+        default=current_user_id,
+        related_name="created_storages",
+    )
     """Creator of record."""
 
     class Meta:
@@ -159,7 +164,12 @@ class Project(BaseORM):
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
-    created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id, related_name="created_projects")
+    created_by = models.ForeignKey(
+        User,
+        models.DO_NOTHING,
+        default=current_user_id,
+        related_name="created_projects",
+    )
     """Creator of record."""
 
     class Meta:
@@ -191,7 +201,12 @@ class Transform(BaseORM):
     Consider using `semantic versioning <https://semver.org>`__
     with `Python versioning <https://peps.python.org/pep-0440/>`__.
     """
-    type = models.CharField(max_length=20, choices=TransformType.choices(), db_index=True, default=TRANSFORM_TYPE_DEFAULT)
+    type = models.CharField(
+        max_length=20,
+        choices=TransformType.choices(),
+        db_index=True,
+        default=TRANSFORM_TYPE_DEFAULT,
+    )
     """Transform type.
 
     Defaults to `notebook` if run from IPython, from a script to `pipeline`.
@@ -208,7 +223,12 @@ class Transform(BaseORM):
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
-    created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id, related_name="created_transforms")
+    created_by = models.ForeignKey(
+        User,
+        models.DO_NOTHING,
+        default=current_user_id,
+        related_name="created_transforms",
+    )
     """Creator of record."""
 
     class Meta:
@@ -293,18 +313,24 @@ class Featureset(BaseORM):
     """A universal id, valid across DB instances: a hash of the linked set of features."""
     type = models.CharField(max_length=64)
     """A feature entity type."""
-    files = models.ManyToManyField("File")
+    files = models.ManyToManyField("File", related_name="featuresets")
     """Files linked to the featureset."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
-    created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id, related_name="created_featuresets")
+    created_by = models.ForeignKey(
+        User,
+        models.DO_NOTHING,
+        default=current_user_id,
+        related_name="created_featuresets",
+    )
     """Creator of record."""
 
     class Meta:
         managed = True
 
+    @classmethod
     def from_iterable(
         cls,
         iterable: Iterable,
@@ -320,6 +346,24 @@ class Featureset(BaseORM):
             species=species,
         )
         return features
+
+    def __init__(self, *args, **kwargs):  # type: ignore
+        relationships: Dict = {}
+        if "genes" in kwargs:
+            relationships.update({"genes": kwargs.pop("genes")})
+        if "proteins" in kwargs:
+            relationships.update({"proteins": kwargs.pop("proteins")})
+        if "cell_markers" in kwargs:
+            relationships.update({"cell_markers": kwargs.pop("cell_markers")})
+        self._related_features_records = relationships
+
+        super().__init__(*args, **kwargs)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if len(self._related_features_records) > 0:
+            for key, records in self._related_features_records.items():
+                getattr(self, key).add(*[r.save() for r in records])
 
 
 class Folder(BaseORM):
