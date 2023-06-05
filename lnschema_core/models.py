@@ -188,12 +188,15 @@ class Transform(BaseORM):
     Creating a file is a transform, too.
     """
 
-    name = models.CharField(max_length=255, db_index=True)
+    name = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """A name for the transform, a pipeline name, or a file name of a notebook or script.
+    """
+    title = models.TextField(db_index=True, null=True, default=None)
+    """An additional title, like a notebook title.
     """
     uid = models.CharField(max_length=12, default=ids.transform, db_index=True)
     """Universal id, valid across DB instances."""
-    version = models.CharField(max_length=10, default="0", db_index=True)
+    version = models.CharField(max_length=10, default=None, db_index=True, null=True)
     """Version identifier, defaults to `"0"`.
 
     Use this to label different versions of the same transform.
@@ -213,10 +216,7 @@ class Transform(BaseORM):
 
     If run from the app, it defaults to `app`.
     """
-    title = models.TextField(db_index=True)
-    """An additional title, like a notebook title.
-    """
-    reference = models.CharField(max_length=255, db_index=True)
+    reference = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """Reference for the transform, e.g., a URL.
     """
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
