@@ -34,7 +34,8 @@ class LaminQuerySet(models.QuerySet):
     """
 
     def df(self):
-        columns = [field.name for field in self.model._meta.fields]
+        columns = [field.name for field in self.model._meta.fields if not isinstance(field, models.ForeignKey)]
+        columns += [f"{field.name}_id" for field in self.model._meta.fields if isinstance(field, models.ForeignKey)]
         df = pd.DataFrame(self.values(), columns=columns)
         if "id" in df.columns:
             df = df.set_index("id")
