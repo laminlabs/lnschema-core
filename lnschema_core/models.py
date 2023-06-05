@@ -189,18 +189,20 @@ class Transform(BaseORM):
     Creating a file is a transform, too.
     """
 
+    id = models.CharField(max_length=14, db_index=True, primary_key=True)
+    """Universal id, composed of stem_id and version suffix."""
     name = models.CharField(max_length=255, db_index=True, null=True, default=None)
-    """A name for the transform, a pipeline name, or a file name of a notebook or script.
+    """A name/title for the transform, a pipeline name, notebook title, etc..
     """
-    title = models.TextField(db_index=True, null=True, default=None)
-    """An additional title, like a notebook title.
+    short_name = models.CharField(max_length=30, db_index=True, null=True, default=None)
+    """A short name, if desired.
     """
-    uid = models.CharField(max_length=12, default=ids.transform, db_index=True)
-    """Universal id, valid across DB instances."""
-    version = models.CharField(max_length=10, default=None, db_index=True, null=True)
-    """Version identifier, defaults to `"0"`.
+    stem_id = models.CharField(max_length=12, default=ids.transform, db_index=True)
+    """Stem of id, identifying transform up to version."""
+    version = models.CharField(max_length=10, default="0", db_index=True)
+    """Version, defaults to `"0"`.
 
-    Use this to label different versions of the same transform.
+    Use this to label different versions of the same pipeline, notebook, etc.
 
     Consider using `semantic versioning <https://semver.org>`__
     with `Python versioning <https://peps.python.org/pep-0440/>`__.
@@ -213,7 +215,7 @@ class Transform(BaseORM):
     )
     """Transform type.
 
-    Defaults to `notebook` if run from IPython, from a script to `pipeline`.
+    Defaults to `notebook` if run from ipython and to `pipeline` if run from python.
 
     If run from the app, it defaults to `app`.
     """
@@ -234,7 +236,24 @@ class Transform(BaseORM):
 
     class Meta:
         managed = True
-        unique_together = (("uid", "version"),)
+        unique_together = (("stem_id", "version"),)
+
+    def __init__(self, *args, **kwargs):
+        if len(args) > 0:  # initialize with all fields from db as args
+            super().__init__(*args, **kwargs)
+            return None
+        else:  # user-facing calling signature
+            # set default ids
+            if "id" not in kwargs and "stem_id" not in kwargs:
+                kwargs["id"] = ids.base62(n_char=14)
+                kwargs["stem_id"] = kwargs["id"][:12]
+            elif "stem_id" in kwargs:
+                assert isinstance(kwargs["stem_id"], str) and len(kwargs["stem_id"]) == 12
+                kwargs["id"] = kwargs["stem_id"] + ids.base62(n_char=2)
+            elif "id" in kwargs:
+                assert isinstance(kwargs["id"], str) and len(kwargs["id"]) == 14
+                kwargs["stem_id"] = kwargs["id"][:12]
+            super().__init__(**kwargs)
 
 
 class Run(BaseORM):
