@@ -76,6 +76,12 @@ class BaseORM(models.Model):
     def lookup(cls, field: Optional[str] = None) -> NamedTuple:
         return _lookup(cls, field)
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        from lamindb_setup import settings
+
+        settings.instance._upload_cloud_sqlite_file()
+
     def __str__(self) -> str:
         return self.__repr__()
 
