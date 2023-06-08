@@ -317,7 +317,7 @@ class Featureset(BaseORM):
     """
 
     id = models.CharField(max_length=64, primary_key=True)
-    """A universal id, valid across DB instances: a hash of the linked set of features."""
+    """A universal id, valid across DB instances, a hash of the linked set of features."""
     type = models.CharField(max_length=64)
     """A feature entity type."""
     files = models.ManyToManyField("File", related_name="featuresets")
