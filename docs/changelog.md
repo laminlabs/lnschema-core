@@ -3,18 +3,16 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-🚸 Add select method to `BaseORM` | [189](https://github.com/laminlabs/lnschema-core/pull/189) | [falexwolf](https://github.com/falexwolf) | 2023-06-08 | 0.35a8
+🚸 Add select method to `BaseORM` | [189](https://github.com/laminlabs/lnschema-core/pull/189) | [falexwolf](https://github.com/falexwolf) | 2023-06-08 | 0.35.0
 🎨 Auto fetch related names for Featureset | [188](https://github.com/laminlabs/lnschema-core/pull/188) | [sunnyosun](https://github.com/sunnyosun) | 2023-06-08 |
 🏗️ Re-architect transform id | [186](https://github.com/laminlabs/lnschema-core/pull/186) | [falexwolf](https://github.com/falexwolf) | 2023-06-06 | 0.35a7
 🎨 Adapted featureset | [185](https://github.com/laminlabs/lnschema-core/pull/185) | [sunnyosun](https://github.com/sunnyosun) | 2023-06-05 | 0.35a6
 ♻️ Polish schema | [184](https://github.com/laminlabs/lnschema-core/pull/184) | [falexwolf](https://github.com/falexwolf) | 2023-06-05 |
 🚸 Improve QuerySet | [182](https://github.com/laminlabs/lnschema-core/pull/182) | [falexwolf](https://github.com/falexwolf) | 2023-06-05 |
-:fire: Delete SQLAlchemy related content | [181](https://github.com/laminlabs/lnschema-core/pull/181) | [falexwolf](https://github.com/falexwolf) | 2023-06-04 |
-:fire: Remove unncessary files | [180](https://github.com/laminlabs/lnschema-core/pull/180) | [falexwolf](https://github.com/falexwolf) | 2023-06-04 | 0.35a4
+🔥 Delete SQLAlchemy related content | [181](https://github.com/laminlabs/lnschema-core/pull/181) | [falexwolf](https://github.com/falexwolf) | 2023-06-04 |
 ♻️ Absorb `DjangoORM.create()` in `DjangoORM.__init__()` | [178](https://github.com/laminlabs/lnschema-core/pull/178) | [falexwolf](https://github.com/falexwolf) | 2023-06-03 |
-➖ Remove nbproject from code | [179](https://github.com/laminlabs/lnschema-core/pull/179) | [Koncopd](https://github.com/Koncopd) | 2023-06-03 |
 🏗️ Enable Django backend | [177](https://github.com/laminlabs/lnschema-core/pull/177) | [falexwolf](https://github.com/falexwolf) | 2023-06-02 | 0.35a3
-🚚 Rename lndb to lamindb-setup | [176](https://github.com/laminlabs/lnschema-core/pull/176) | [falexwolf](https://github.com/falexwolf) | 2023-06-01 | 0.35a2
+🚚 Rename `lndb` to `lamindb-setup` | [176](https://github.com/laminlabs/lnschema-core/pull/176) | [falexwolf](https://github.com/falexwolf) | 2023-06-01 | 0.35a2
 🏗️ Add Django backend | [175](https://github.com/laminlabs/lnschema-core/pull/175) | [falexwolf](https://github.com/falexwolf) | 2023-05-31 | 0.35a1
 👷 Refactor CI | [174](https://github.com/laminlabs/lnschema-core/pull/174) | [falexwolf](https://github.com/falexwolf) | 2023-05-30 |
 🏗️ Remove SQL-level schema modules | [172](https://github.com/laminlabs/lnschema-core/pull/172) | [falexwolf](https://github.com/falexwolf) | 2023-05-25 | 0.34.0
