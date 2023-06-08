@@ -19,6 +19,12 @@ TRANSFORM_TYPE_DEFAULT = TransformType.notebook if is_run_from_ipython else Tran
 
 # todo, make a CreatedUpdated Mixin, but need to figure out docs
 class BaseORM(models.Model):
+    """Base data model.
+
+    Is essentially equal to the Django Model base class, but adds the following
+    methods.
+    """
+
     def __repr__(self) -> str:
         fields = ", ".join([f"{k.name}={getattr(self, k.name)}" for k in self._meta.fields if hasattr(self, k.name)])
         return f"{self.__class__.__name__}({fields})"
