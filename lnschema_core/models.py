@@ -1,69 +1,20 @@
 import builtins
 from pathlib import Path, PurePosixPath
-from typing import Dict, Iterable, List, NamedTuple, Optional, Union
+from typing import Dict, Iterable, NamedTuple, Optional, Union
 
-import pandas as pd
 from django.db import models
+from django.db.models import Manager
 from lamin_logger import logger
 from upath import UPath
 
 from . import ids
 from ._lookup import lookup as _lookup
+from ._queryset import QuerySet
 from ._users import current_user_id
 from .types import DataLike, PathLike, TransformType
 
 is_run_from_ipython = getattr(builtins, "__IPYTHON__", False)
 TRANSFORM_TYPE_DEFAULT = TransformType.notebook if is_run_from_ipython else TransformType.pipeline
-
-
-class NoResultFound(Exception):
-    pass
-
-
-class MultipleResultsFound(Exception):
-    pass
-
-
-class LaminQuerySet(models.QuerySet):
-    """Extension of Django QuerySet.
-
-    This brings some of the SQLAlchemy/SQLModel/SQL-inspired calls.
-
-    As LaminDB was based on SQLAlchemy/SQLModel in the beginning, and might
-    support it again in the future, these calls will be supported longtime.
-    """
-
-    def df(self):
-        columns = [field.name for field in self.model._meta.fields if not isinstance(field, models.ForeignKey)]
-        columns += [f"{field.name}_id" for field in self.model._meta.fields if isinstance(field, models.ForeignKey)]
-        df = pd.DataFrame(self.values(), columns=columns)
-        if "id" in df.columns:
-            df = df.set_index("id")
-        return df
-
-    def list(self) -> List:
-        return list(self)
-
-    def first(self):
-        if len(self) == 0:
-            return None
-        return self[0]
-
-    def one(self):
-        if len(self) == 0:
-            raise NoResultFound
-        elif len(self) > 1:
-            raise MultipleResultsFound
-        else:
-            return self[0]
-
-    def one_or_none(self):
-        if len(self) == 0:
-            return None
-        elif len(self) == 1:
-            return self[0]
-        else:
-            raise MultipleResultsFound
 
 
 # todo, make a CreatedUpdated Mixin, but need to figure out docs
@@ -72,12 +23,20 @@ class BaseORM(models.Model):
         fields = ", ".join([f"{k.name}={getattr(self, k.name)}" for k in self._meta.fields if hasattr(self, k.name)])
         return f"{self.__class__.__name__}({fields})"
 
-    @classmethod
-    def lookup(cls, field: Optional[str] = None) -> NamedTuple:
-        return _lookup(cls, field)
-
     def __str__(self) -> str:
         return self.__repr__()
+
+    @classmethod
+    def lookup(cls, field: Optional[str] = None) -> NamedTuple:
+        """Lookup object for auto-completing field values."""
+        return _lookup(cls, field)
+
+    @classmethod
+    def select(cls, **expressions) -> Union[QuerySet, Manager]:
+        """Query the ORM."""
+        from lamindb._select import select
+
+        return select(cls, **expressions)
 
     class Meta:
         abstract = True
