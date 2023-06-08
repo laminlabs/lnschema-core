@@ -355,13 +355,12 @@ class Featureset(BaseORM):
         return features
 
     def __init__(self, *args, **kwargs):  # type: ignore
+        related_names = [i.related_name for i in self.__class__._meta.related_objects]
+
         relationships: Dict = {}
-        if "genes" in kwargs:
-            relationships["genes"] = kwargs.pop("genes")
-        if "proteins" in kwargs:
-            relationships["proteins"] = kwargs.pop("proteins")
-        if "cell_markers" in kwargs:
-            relationships["cell_markers"] = kwargs.pop("cell_markers")
+        for related_name in related_names:
+            if related_name in kwargs:
+                relationships[related_name] = kwargs.pop(related_name)
         self._relationships = relationships
 
         super().__init__(*args, **kwargs)
