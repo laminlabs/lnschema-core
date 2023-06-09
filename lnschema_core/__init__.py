@@ -3,7 +3,7 @@ _schema_id = "yvzi"
 _name = "core"
 __version__ = "0.35.1"
 
-import lamindb_setup as _lamindb_setup
+# can directly import from lamindb_setup going forward
 from lamindb_setup._check_instance_setup import (
     check_instance_setup as _check_instance_setup,
 )
