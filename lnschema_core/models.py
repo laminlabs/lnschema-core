@@ -10,8 +10,8 @@ from upath import UPath
 from . import ids
 from ._lookup import lookup as _lookup
 from ._queryset import QuerySet
-from ._users import current_user_id
 from .types import DataLike, PathLike, TransformType
+from .users import current_user_id
 
 is_run_from_ipython = getattr(builtins, "__IPYTHON__", False)
 TRANSFORM_TYPE_DEFAULT = TransformType.notebook if is_run_from_ipython else TransformType.pipeline

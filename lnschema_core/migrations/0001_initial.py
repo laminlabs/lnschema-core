@@ -95,7 +95,7 @@ class Migration(migrations.Migration):
                 (
                     "created_by",
                     models.ForeignKey(
-                        default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.DO_NOTHING, related_name="created_transforms", to="lnschema_core.user"
+                        default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.PROTECT, related_name="created_transforms", to="lnschema_core.user"
                     ),
                 ),
             ],
@@ -116,7 +116,7 @@ class Migration(migrations.Migration):
                 (
                     "created_by",
                     models.ForeignKey(
-                        default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.DO_NOTHING, related_name="created_storages", to="lnschema_core.user"
+                        default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.PROTECT, related_name="created_storages", to="lnschema_core.user"
                     ),
                 ),
             ],
@@ -139,7 +139,7 @@ class Migration(migrations.Migration):
             model_name="run",
             name="created_by",
             field=models.ForeignKey(
-                default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.DO_NOTHING, related_name="created_runs", to="lnschema_core.user"
+                default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.PROTECT, related_name="created_runs", to="lnschema_core.user"
             ),
         ),
         migrations.AddField(
@@ -150,7 +150,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="run",
             name="transform",
-            field=models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name="runs", to="lnschema_core.transform"),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name="runs", to="lnschema_core.transform"),
         ),
         migrations.CreateModel(
             name="Project",
@@ -163,7 +163,7 @@ class Migration(migrations.Migration):
                 (
                     "created_by",
                     models.ForeignKey(
-                        default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.DO_NOTHING, related_name="created_projects", to="lnschema_core.user"
+                        default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.PROTECT, related_name="created_projects", to="lnschema_core.user"
                     ),
                 ),
                 ("files", models.ManyToManyField(related_name="projects", to="lnschema_core.file")),
@@ -177,7 +177,7 @@ class Migration(migrations.Migration):
             model_name="folder",
             name="created_by",
             field=models.ForeignKey(
-                default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.DO_NOTHING, related_name="created_folders", to="lnschema_core.user"
+                default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.PROTECT, related_name="created_folders", to="lnschema_core.user"
             ),
         ),
         migrations.AddField(
@@ -188,29 +188,29 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="folder",
             name="storage",
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name="folders", to="lnschema_core.storage"),
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, related_name="folders", to="lnschema_core.storage"),
         ),
         migrations.AddField(
             model_name="file",
             name="created_by",
             field=models.ForeignKey(
-                default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.DO_NOTHING, related_name="created_files", to="lnschema_core.user"
+                default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.PROTECT, related_name="created_files", to="lnschema_core.user"
             ),
         ),
         migrations.AddField(
             model_name="file",
             name="run",
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name="outputs", to="lnschema_core.run"),
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, related_name="outputs", to="lnschema_core.run"),
         ),
         migrations.AddField(
             model_name="file",
             name="storage",
-            field=models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name="files", to="lnschema_core.storage"),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name="files", to="lnschema_core.storage"),
         ),
         migrations.AddField(
             model_name="file",
             name="transform",
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name="files", to="lnschema_core.transform"),
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, related_name="files", to="lnschema_core.transform"),
         ),
         migrations.CreateModel(
             name="Featureset",
@@ -223,7 +223,7 @@ class Migration(migrations.Migration):
                     "created_by",
                     models.ForeignKey(
                         default=lnschema_core.users.current_user_id,
-                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        on_delete=django.db.models.deletion.PROTECT,
                         related_name="created_featuresets",
                         to="lnschema_core.user",
                     ),
