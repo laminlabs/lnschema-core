@@ -526,7 +526,7 @@ class File(BaseORM):
             if key_path.name != new_name:
                 self._clear_storagekey = self.key
                 self.key = str(key_path.with_name(new_name))
-                logger.warning(f"Replacing the file will also replace the key from '{key_path}' to '{self.key}', and delete '{key_path}' upon `ln.add`")
+                logger.warning(f"Replacing the file will replace key '{key_path}' with '{self.key}' and delete '{key_path}' upon `save()`")
         else:
             self.key = kwargs["key"]
             old_storage = f"{self.id}{self.suffix}"
@@ -572,7 +572,7 @@ class File(BaseORM):
             if check_path_in_storage:
                 hint += "file in storage ✓"
             else:
-                hint += "file will be copied to storage upon `ln.add()`"
+                hint += "file will be copied to storage upon `save()`"
             if key is None:
                 hint += f" using storage key = {id}{suffix}"
             else:
