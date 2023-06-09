@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-🔥 Remove unnecessary files | [192](https://github.com/laminlabs/lnschema-core/pull/192) | [falexwolf](https://github.com/falexwolf) | 2023-06-09 |
+🔥 Remove unnecessary files | [192](https://github.com/laminlabs/lnschema-core/pull/192) | [falexwolf](https://github.com/falexwolf) | 2023-06-09 | 0.35.2
 👷 Simplify CI & remove docs | [191](https://github.com/laminlabs/lnschema-core/pull/191) | [falexwolf](https://github.com/falexwolf) | 2023-06-09 |
 🚸 Check for required fields | [190](https://github.com/laminlabs/lnschema-core/pull/190) | [falexwolf](https://github.com/falexwolf) | 2023-06-09 | 0.35.1
 🚸 Add select method to `BaseORM` | [189](https://github.com/laminlabs/lnschema-core/pull/189) | [falexwolf](https://github.com/falexwolf) | 2023-06-08 | 0.35.0
