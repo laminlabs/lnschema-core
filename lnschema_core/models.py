@@ -26,11 +26,22 @@ class BaseORM(models.Model):
     """
 
     def __repr__(self) -> str:
-        fields = ", ".join([f"{k.name}={getattr(self, k.name)}" for k in self._meta.fields if hasattr(self, k.name)])
-        return f"{self.__class__.__name__}({fields})"
+        fields = [field.name for field in self._meta.fields if not isinstance(field, models.ForeignKey)]
+        fields += [f"{field.name}_id" for field in self._meta.fields if isinstance(field, models.ForeignKey)]
+        fields_str = ", ".join([f"{k}={getattr(self, k)}" for k in fields if hasattr(self, k)])
+        return f"{self.__class__.__name__}({fields_str})"
 
     def __str__(self) -> str:
         return self.__repr__()
+
+    def __init__(self, *args, **kwargs):
+        required_fields = {k.name for k in self._meta.fields if not k.null and k.default is None}
+        required_fields_not_passed = {k: None for k in required_fields if k not in kwargs}
+        kwargs.update(required_fields_not_passed)
+        missing_fields = [k for k, v in kwargs.items() if v is None and k in required_fields]
+        if missing_fields:
+            raise TypeError(f"{missing_fields} are required.")
+        super().__init__(*args, **kwargs)
 
     @classmethod
     def lookup(cls, field: Optional[str] = None) -> NamedTuple:
@@ -63,11 +74,11 @@ class User(BaseORM):
     universal user identity, valid across DB instances, email & handle changes.
     """
 
-    id = models.CharField(max_length=8, primary_key=True)
+    id = models.CharField(max_length=8, primary_key=True, default=None)
     """Universal id, valid across DB instances."""
-    handle = models.CharField(max_length=30, unique=True, db_index=True)
+    handle = models.CharField(max_length=30, unique=True, db_index=True, default=None)
     """Universal handle, valid across DB instances."""
-    email = models.CharField(max_length=255, unique=True, db_index=True)
+    email = models.CharField(max_length=255, unique=True, db_index=True, default=None)
     """Latest email address."""
     name = models.CharField(max_length=255, db_index=True)
     """Name."""
