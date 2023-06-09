@@ -3,7 +3,7 @@ from pathlib import Path, PurePosixPath
 from typing import Dict, Iterable, NamedTuple, Optional, Union
 
 from django.db import models
-from django.db.models import Manager
+from django.db.models import PROTECT, Manager
 from lamin_logger import logger
 from upath import UPath
 
@@ -126,7 +126,7 @@ class Storage(BaseORM):
     """Time of last update to record."""
     created_by = models.ForeignKey(
         User,
-        models.DO_NOTHING,
+        PROTECT,
         default=current_user_id,
         related_name="created_storages",
     )
@@ -155,7 +155,7 @@ class Project(BaseORM):
     """Time of last update to record."""
     created_by = models.ForeignKey(
         User,
-        models.DO_NOTHING,
+        PROTECT,
         default=current_user_id,
         related_name="created_projects",
     )
@@ -216,7 +216,7 @@ class Transform(BaseORM):
     """Time of last update to record."""
     created_by = models.ForeignKey(
         User,
-        models.DO_NOTHING,
+        PROTECT,
         default=current_user_id,
         related_name="created_transforms",
     )
@@ -264,7 +264,7 @@ class Run(BaseORM):
     """Name or title of run."""
     external_id = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """External id (such as from a workflow tool)."""
-    transform = models.ForeignKey(Transform, models.DO_NOTHING, related_name="runs")
+    transform = models.ForeignKey(Transform, PROTECT, related_name="runs")
     """The transform :class:`~lamindb.Transform` that is being run."""
     inputs = models.ManyToManyField("File", through="RunInput", related_name="input_of")
     """The input files for the run."""
@@ -273,7 +273,7 @@ class Run(BaseORM):
     """Time of creation of record."""
     run_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of run execution."""
-    created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id, related_name="created_runs")
+    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_runs")
     """Creator of record, a :class:`~lamindb.User`."""
 
     class Meta:
@@ -317,7 +317,7 @@ class Featureset(BaseORM):
     """Time of last update to record."""
     created_by = models.ForeignKey(
         User,
-        models.DO_NOTHING,
+        PROTECT,
         default=current_user_id,
         related_name="created_featuresets",
     )
@@ -369,7 +369,7 @@ class Folder(BaseORM):
     # below is one of the few cases with null=True, default=None
     key = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """Storage key of folder."""
-    storage = models.ForeignKey(Storage, models.DO_NOTHING, related_name="folders", null=True)
+    storage = models.ForeignKey(Storage, PROTECT, related_name="folders", null=True)
     """:class:`~lamindb.Storage` location of folder, see `.path()` for full path."""
     files = models.ManyToManyField("File", related_name="folders")
     """:class:`~lamindb.File` records in folder."""
@@ -377,7 +377,7 @@ class Folder(BaseORM):
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
-    created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id, related_name="created_folders")
+    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_folders")
     """Creator of record, a :class:`~lamindb.User`."""
 
     class Meta:
@@ -465,11 +465,11 @@ class File(BaseORM):
     # below is one of the few cases with null=True, default=None
     key = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """Storage key, the relative path within the storage location."""
-    run = models.ForeignKey(Run, models.DO_NOTHING, related_name="outputs", null=True)
+    run = models.ForeignKey(Run, PROTECT, related_name="outputs", null=True)
     """:class:`~lamindb.Run` that created the `file`."""
-    transform = models.ForeignKey(Transform, models.DO_NOTHING, related_name="files", null=True)
+    transform = models.ForeignKey(Transform, PROTECT, related_name="files", null=True)
     """:class:`~lamindb.Transform` whose run created the `file`."""
-    storage: "Storage" = models.ForeignKey(Storage, models.DO_NOTHING, related_name="files")
+    storage: "Storage" = models.ForeignKey(Storage, PROTECT, related_name="files")
     """:class:`~lamindb.Storage` location of `file`, see `.path()` for full path."""
     # folders from Folders.files
     # features from Features.files
@@ -478,7 +478,7 @@ class File(BaseORM):
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
-    created_by = models.ForeignKey(User, models.DO_NOTHING, default=current_user_id, related_name="created_files")
+    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_files")
     """Creator of record, a :class:`~lamindb.User`."""
 
     class Meta:
