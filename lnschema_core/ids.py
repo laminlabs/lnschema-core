@@ -50,6 +50,14 @@ def base62(n_char: int) -> str:
     return id
 
 
+class Base62:
+    def __init__(self, n_char: int):
+        self.n_char = n_char
+
+    def __call__(self):
+        return base62(self.n_char)
+
+
 def base26(n_char: int):
     """ASCII lowercase."""
     alphabet = string.ascii_lowercase
