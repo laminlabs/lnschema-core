@@ -17,6 +17,15 @@ is_run_from_ipython = getattr(builtins, "__IPYTHON__", False)
 TRANSFORM_TYPE_DEFAULT = TransformType.notebook if is_run_from_ipython else TransformType.pipeline
 
 
+def validate_required_fields(orm, kwargs):
+    required_fields = {k.name for k in orm._meta.fields if not k.null and k.default is None}
+    required_fields_not_passed = {k: None for k in required_fields if k not in kwargs}
+    kwargs.update(required_fields_not_passed)
+    missing_fields = [k for k, v in kwargs.items() if v is None and k in required_fields]
+    if missing_fields:
+        raise TypeError(f"{missing_fields} are required.")
+
+
 # todo, make a CreatedUpdated Mixin, but need to figure out docs
 class BaseORM(models.Model):
     """Base data model.
@@ -26,11 +35,18 @@ class BaseORM(models.Model):
     """
 
     def __repr__(self) -> str:
-        fields = ", ".join([f"{k.name}={getattr(self, k.name)}" for k in self._meta.fields if hasattr(self, k.name)])
-        return f"{self.__class__.__name__}({fields})"
+        fields = [field.name for field in self._meta.fields if not isinstance(field, models.ForeignKey)]
+        fields += [f"{field.name}_id" for field in self._meta.fields if isinstance(field, models.ForeignKey)]
+        fields_str = ", ".join([f"{k}={getattr(self, k)}" for k in fields if hasattr(self, k)])
+        return f"{self.__class__.__name__}({fields_str})"
 
     def __str__(self) -> str:
         return self.__repr__()
+
+    def __init__(self, *args, **kwargs):
+        if not args:  # object is loaded from DB
+            validate_required_fields(self, kwargs)
+        super().__init__(*args, **kwargs)
 
     @classmethod
     def lookup(cls, field: Optional[str] = None) -> NamedTuple:
@@ -48,12 +64,20 @@ class BaseORM(models.Model):
         abstract = True
 
 
-class RunInput(BaseORM):
-    run = models.ForeignKey("Run", on_delete=models.CASCADE)
-    file = models.ForeignKey("File", on_delete=models.CASCADE)
-
-    class Meta:
-        managed = True
+# A note on required fields at the ORM level
+#
+# As Django does most of its validation on the Form-level, it doesn't offer functionality
+# for validating the integrity of an ORM object upon instantation (similar to pydantic)
+#
+# For required fields, we define them as commonly done on the SQL level together
+# with a validator in BaseORM (validate_required_fields)
+#
+# This goes against the Django convention, but goes with the SQLModel convention
+# (Optional fields can be null on the SQL level, non-optional fields cannot)
+#
+# Due to Django's convention where CharField has pre-configured (null=False, default=""), marking
+# a required field necessitates passing `default=None`. Without the validator it would trigger
+# an error at the SQL-level, with it, it triggers it at instantiation
 
 
 class User(BaseORM):
@@ -63,11 +87,11 @@ class User(BaseORM):
     universal user identity, valid across DB instances, email & handle changes.
     """
 
-    id = models.CharField(max_length=8, primary_key=True)
+    id = models.CharField(max_length=8, primary_key=True, default=None)
     """Universal id, valid across DB instances."""
-    handle = models.CharField(max_length=30, unique=True, db_index=True)
+    handle = models.CharField(max_length=30, unique=True, db_index=True, default=None)
     """Universal handle, valid across DB instances."""
-    email = models.CharField(max_length=255, unique=True, db_index=True)
+    email = models.CharField(max_length=255, unique=True, db_index=True, default=None)
     """Latest email address."""
     name = models.CharField(max_length=255, db_index=True)
     """Name."""
@@ -90,11 +114,11 @@ class Storage(BaseORM):
 
     id = models.CharField(max_length=8, default=ids.storage, db_index=True, primary_key=True)
     """Universal id, valid across DB instances."""
-    root = models.CharField(max_length=255, db_index=True)
+    root = models.CharField(max_length=255, db_index=True, default=None)
     """Path to the root of the storage location (an s3 path, a local path, etc.)."""
-    type = models.CharField(max_length=63, db_index=True)
+    type = models.CharField(max_length=30, db_index=True)
     """Local vs. s3 vs. gcp etc."""
-    region = models.CharField(max_length=63, db_index=True, null=True)
+    region = models.CharField(max_length=63, db_index=True, null=True, default=None)
     """Cloud storage region, if applicable."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
@@ -117,9 +141,9 @@ class Project(BaseORM):
 
     id = models.CharField(max_length=8, default=ids.project, primary_key=True)
     """Universal id, valid across DB instances."""
-    name = models.CharField(max_length=255, db_index=True, unique=True)
+    name = models.CharField(max_length=255, db_index=True, unique=True, default=None)
     """Project name or title."""
-    external_id = models.CharField(max_length=255, db_index=True)
+    external_id = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """External id (such as from a project management tool)."""
     folders = models.ManyToManyField("Folder", related_name="projects")
     """Project folders."""
@@ -153,7 +177,7 @@ class Transform(BaseORM):
     Creating a file is a transform, too.
     """
 
-    id = models.CharField(max_length=14, db_index=True, primary_key=True)
+    id = models.CharField(max_length=14, db_index=True, primary_key=True, default=None)
     """Universal id, composed of stem_id and version suffix."""
     name = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """Transform name or title, a pipeline name, notebook title, etc..
@@ -236,13 +260,13 @@ class Run(BaseORM):
 
     id = models.CharField(max_length=20, default=ids.run, primary_key=True)
     """Universal id, valid across DB instances."""
-    name = models.CharField(max_length=255, db_index=True)
+    name = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """Name or title of run."""
-    external_id = models.CharField(max_length=255, db_index=True)
+    external_id = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """External id (such as from a workflow tool)."""
     transform = models.ForeignKey(Transform, models.DO_NOTHING, related_name="runs")
     """The transform :class:`~lamindb.Transform` that is being run."""
-    inputs = models.ManyToManyField("File", through=RunInput, related_name="input_of")
+    inputs = models.ManyToManyField("File", through="RunInput", related_name="input_of")
     """The input files for the run."""
     # outputs on File
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -281,7 +305,7 @@ class Featureset(BaseORM):
 
     """
 
-    id = models.CharField(max_length=64, primary_key=True)
+    id = models.CharField(max_length=64, primary_key=True, default=None)
     """A universal id, valid across DB instances, a hash of the linked set of features."""
     type = models.CharField(max_length=64)
     """A feature entity type."""
@@ -340,9 +364,10 @@ class Featureset(BaseORM):
 class Folder(BaseORM):
     id = models.CharField(max_length=20, default=ids.folder, primary_key=True)
     """A universal random id, valid across DB instances."""
-    name = models.CharField(max_length=255, db_index=True)
+    name = models.CharField(max_length=255, db_index=True, default=None)
     """Name or title of folder."""
-    key = models.CharField(max_length=255, null=True, default=None, db_index=True)
+    # below is one of the few cases with null=True, default=None
+    key = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """Storage key of folder."""
     storage = models.ForeignKey(Storage, models.DO_NOTHING, related_name="folders", null=True)
     """:class:`~lamindb.Storage` location of folder, see `.path()` for full path."""
@@ -437,6 +462,7 @@ class File(BaseORM):
     """
     hash = models.CharField(max_length=86, db_index=True, null=True, default=None)
     """Hash of file content. 86 base64 chars allow to store 64 bytes, 512 bits."""
+    # below is one of the few cases with null=True, default=None
     key = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """Storage key, the relative path within the storage location."""
     run = models.ForeignKey(Run, models.DO_NOTHING, related_name="outputs", null=True)
@@ -597,6 +623,14 @@ class File(BaseORM):
         if self.run is not None:
             self.run.save()
         super().save(*args, **kwargs)
+
+
+class RunInput(BaseORM):
+    run = models.ForeignKey("Run", on_delete=models.CASCADE)
+    file = models.ForeignKey("File", on_delete=models.CASCADE)
+
+    class Meta:
+        managed = True
 
 
 # add type annotations back asap when re-organizing the module
