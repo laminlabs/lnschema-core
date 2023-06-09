@@ -143,7 +143,7 @@ class Project(BaseORM):
     """Universal id, valid across DB instances."""
     name = models.CharField(max_length=255, db_index=True, unique=True, default=None)
     """Project name or title."""
-    external_id = models.CharField(max_length=255, db_index=True)
+    external_id = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """External id (such as from a project management tool)."""
     folders = models.ManyToManyField("Folder", related_name="projects")
     """Project folders."""
@@ -177,12 +177,12 @@ class Transform(BaseORM):
     Creating a file is a transform, too.
     """
 
-    id = models.CharField(max_length=14, db_index=True, primary_key=True)
+    id = models.CharField(max_length=14, db_index=True, primary_key=True, default=None)
     """Universal id, composed of stem_id and version suffix."""
-    name = models.CharField(max_length=255, db_index=True)
+    name = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """Transform name or title, a pipeline name, notebook title, etc..
     """
-    short_name = models.CharField(max_length=30, db_index=True)
+    short_name = models.CharField(max_length=30, db_index=True, null=True, default=None)
     """A short name.
     """
     stem_id = models.CharField(max_length=12, default=ids.transform, db_index=True)
@@ -207,7 +207,7 @@ class Transform(BaseORM):
 
     If run from the app, it defaults to `app`.
     """
-    reference = models.CharField(max_length=255, db_index=True)
+    reference = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """Reference for the transform, e.g., a URL.
     """
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -260,9 +260,9 @@ class Run(BaseORM):
 
     id = models.CharField(max_length=20, default=ids.run, primary_key=True)
     """Universal id, valid across DB instances."""
-    name = models.CharField(max_length=255, db_index=True)
+    name = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """Name or title of run."""
-    external_id = models.CharField(max_length=255, db_index=True)
+    external_id = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """External id (such as from a workflow tool)."""
     transform = models.ForeignKey(Transform, models.DO_NOTHING, related_name="runs")
     """The transform :class:`~lamindb.Transform` that is being run."""
@@ -305,7 +305,7 @@ class Featureset(BaseORM):
 
     """
 
-    id = models.CharField(max_length=64, primary_key=True)
+    id = models.CharField(max_length=64, primary_key=True, default=None)
     """A universal id, valid across DB instances, a hash of the linked set of features."""
     type = models.CharField(max_length=64)
     """A feature entity type."""
@@ -364,10 +364,10 @@ class Featureset(BaseORM):
 class Folder(BaseORM):
     id = models.CharField(max_length=20, default=ids.folder, primary_key=True)
     """A universal random id, valid across DB instances."""
-    name = models.CharField(max_length=255, db_index=True)
+    name = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """Name or title of folder."""
     # below is one of the few cases with null=True, default=None
-    key = models.CharField(max_length=255, null=True, default=None, db_index=True)
+    key = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """Storage key of folder."""
     storage = models.ForeignKey(Storage, models.DO_NOTHING, related_name="folders", null=True)
     """:class:`~lamindb.Storage` location of folder, see `.path()` for full path."""
@@ -447,9 +447,9 @@ class Folder(BaseORM):
 class File(BaseORM):
     id = models.CharField(max_length=20, primary_key=True)
     """A universal random id, valid across DB instances."""
-    name = models.CharField(max_length=255, db_index=True)
+    name = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """A universal random id, valid across DB instances."""
-    suffix = models.CharField(max_length=30, db_index=True)
+    suffix = models.CharField(max_length=30, db_index=True, null=True, default=None)
     """File suffix.
 
     This is a file extension if the `file` is stored in a file format.
@@ -460,7 +460,7 @@ class File(BaseORM):
 
     Examples: 1KB is 1e3 bytes, 1MB is 1e6, 1GB is 1e9, 1TB is 1e12 etc.
     """
-    hash = models.CharField(max_length=86, db_index=True)
+    hash = models.CharField(max_length=86, db_index=True, null=True, default=None)
     """Hash of file content. 86 base64 chars allow to store 64 bytes, 512 bits."""
     # below is one of the few cases with null=True, default=None
     key = models.CharField(max_length=255, db_index=True, null=True, default=None)
