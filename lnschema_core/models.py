@@ -44,7 +44,8 @@ class BaseORM(models.Model):
         return self.__repr__()
 
     def __init__(self, *args, **kwargs):
-        validate_required_fields(self, kwargs)
+        if not args:  # object is loaded from DB
+            validate_required_fields(self, kwargs)
         super().__init__(*args, **kwargs)
 
     @classmethod
