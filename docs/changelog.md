@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+👷 Simplify CI & remove docs | [191](https://github.com/laminlabs/lnschema-core/pull/191) | [falexwolf](https://github.com/falexwolf) | 2023-06-09 |
 🚸 Check for required fields | [190](https://github.com/laminlabs/lnschema-core/pull/190) | [falexwolf](https://github.com/falexwolf) | 2023-06-09 | 0.35.1
 🚸 Add select method to `BaseORM` | [189](https://github.com/laminlabs/lnschema-core/pull/189) | [falexwolf](https://github.com/falexwolf) | 2023-06-08 | 0.35.0
 🎨 Auto fetch related names for Featureset | [188](https://github.com/laminlabs/lnschema-core/pull/188) | [sunnyosun](https://github.com/sunnyosun) | 2023-06-08 |
