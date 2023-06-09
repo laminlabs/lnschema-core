@@ -5,9 +5,9 @@ from typing import List
 import django.db.models.deletion
 from django.db import migrations, models
 
-import lnschema_core._users
 import lnschema_core.ids
 import lnschema_core.types
+import lnschema_core.users
 
 
 class Migration(migrations.Migration):
@@ -95,7 +95,7 @@ class Migration(migrations.Migration):
                 (
                     "created_by",
                     models.ForeignKey(
-                        default=lnschema_core._users.current_user_id, on_delete=django.db.models.deletion.DO_NOTHING, related_name="created_transforms", to="lnschema_core.user"
+                        default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.DO_NOTHING, related_name="created_transforms", to="lnschema_core.user"
                     ),
                 ),
             ],
@@ -116,7 +116,7 @@ class Migration(migrations.Migration):
                 (
                     "created_by",
                     models.ForeignKey(
-                        default=lnschema_core._users.current_user_id, on_delete=django.db.models.deletion.DO_NOTHING, related_name="created_storages", to="lnschema_core.user"
+                        default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.DO_NOTHING, related_name="created_storages", to="lnschema_core.user"
                     ),
                 ),
             ],
@@ -139,7 +139,7 @@ class Migration(migrations.Migration):
             model_name="run",
             name="created_by",
             field=models.ForeignKey(
-                default=lnschema_core._users.current_user_id, on_delete=django.db.models.deletion.DO_NOTHING, related_name="created_runs", to="lnschema_core.user"
+                default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.DO_NOTHING, related_name="created_runs", to="lnschema_core.user"
             ),
         ),
         migrations.AddField(
@@ -163,7 +163,7 @@ class Migration(migrations.Migration):
                 (
                     "created_by",
                     models.ForeignKey(
-                        default=lnschema_core._users.current_user_id, on_delete=django.db.models.deletion.DO_NOTHING, related_name="created_projects", to="lnschema_core.user"
+                        default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.DO_NOTHING, related_name="created_projects", to="lnschema_core.user"
                     ),
                 ),
                 ("files", models.ManyToManyField(related_name="projects", to="lnschema_core.file")),
@@ -177,7 +177,7 @@ class Migration(migrations.Migration):
             model_name="folder",
             name="created_by",
             field=models.ForeignKey(
-                default=lnschema_core._users.current_user_id, on_delete=django.db.models.deletion.DO_NOTHING, related_name="created_folders", to="lnschema_core.user"
+                default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.DO_NOTHING, related_name="created_folders", to="lnschema_core.user"
             ),
         ),
         migrations.AddField(
@@ -194,7 +194,7 @@ class Migration(migrations.Migration):
             model_name="file",
             name="created_by",
             field=models.ForeignKey(
-                default=lnschema_core._users.current_user_id, on_delete=django.db.models.deletion.DO_NOTHING, related_name="created_files", to="lnschema_core.user"
+                default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.DO_NOTHING, related_name="created_files", to="lnschema_core.user"
             ),
         ),
         migrations.AddField(
@@ -222,7 +222,7 @@ class Migration(migrations.Migration):
                 (
                     "created_by",
                     models.ForeignKey(
-                        default=lnschema_core._users.current_user_id,
+                        default=lnschema_core.users.current_user_id,
                         on_delete=django.db.models.deletion.DO_NOTHING,
                         related_name="created_featuresets",
                         to="lnschema_core.user",
