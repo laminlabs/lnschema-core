@@ -364,7 +364,7 @@ class Featureset(BaseORM):
 class Folder(BaseORM):
     id = models.CharField(max_length=20, default=ids.folder, primary_key=True)
     """A universal random id, valid across DB instances."""
-    name = models.CharField(max_length=255, db_index=True, null=True, default=None)
+    name = models.CharField(max_length=255, db_index=True, default=None)
     """Name or title of folder."""
     # below is one of the few cases with null=True, default=None
     key = models.CharField(max_length=255, db_index=True, null=True, default=None)

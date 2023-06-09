@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
             name="Folder",
             fields=[
                 ("id", models.CharField(default=lnschema_core.ids.folder, max_length=20, primary_key=True, serialize=False)),
-                ("name", models.CharField(db_index=True, default=None, max_length=255, null=True)),
+                ("name", models.CharField(db_index=True, default=None, max_length=255)),
                 ("key", models.CharField(db_index=True, default=None, max_length=255, null=True)),
                 ("created_at", models.DateTimeField(auto_now_add=True, db_index=True)),
                 ("updated_at", models.DateTimeField(auto_now=True, db_index=True)),
