@@ -1,6 +1,5 @@
 [![pypi](https://img.shields.io/pypi/v/lnschema_core?color=%2334D058&label=pypi%20package)](https://pypi.org/project/lnschema_core)
 
-# lnschema-core: Data objects & data lineage (`yvzi`)
+# `lnschema_core`: Data objects & data lineage
 
-- Stable user docs: [lamin.ai/docs/reference/](https://lamin.ai/docs/reference/)
-- Latest developer docs: [netlify](https://lnschema-core-yvzi.netlify.app/docs/lnschema-core/)
+`lnschema_core` is documented & tested within `lamindb`: [github.com/laminlabs/lamindb](https://github.com/laminlabs/lamindb).
