@@ -5,9 +5,9 @@ from typing import List
 import django.db.models.deletion
 from django.db import migrations, models
 
-import lnschema_core._types
 import lnschema_core._users
 import lnschema_core.ids
+import lnschema_core.types
 
 
 class Migration(migrations.Migration):
@@ -85,7 +85,7 @@ class Migration(migrations.Migration):
                     models.CharField(
                         choices=[("pipeline", "pipeline"), ("notebook", "notebook"), ("app", "app"), ("api", "api")],
                         db_index=True,
-                        default=lnschema_core._types.TransformType["pipeline"],
+                        default=lnschema_core.types.TransformType["pipeline"],
                         max_length=20,
                     ),
                 ),
