@@ -423,7 +423,7 @@ class Folder(BaseORM):
             key: Optional[str] = kwargs.pop("key") if "key" in kwargs else None
             files: Optional[str] = kwargs.pop("files") if "files" in kwargs else None
             if len(kwargs) != 0:
-                raise ValueError(f"This kwargs are not permitted: {kwargs}")
+                raise ValueError(f"These kwargs are not permitted: {kwargs}")
 
         from lamindb._folder import get_folder_kwargs_from_data
 
@@ -442,6 +442,16 @@ class Folder(BaseORM):
             self._local_filepath = privates["local_filepath"]
             self._cloud_filepath = privates["cloud_filepath"]
             self._files = files
+
+    def save(self, *args, **kwargs) -> None:
+        """Save the folder."""
+        # only has attr _files if freshly initialized
+        if hasattr(self, "_files"):
+            for file in self._files:
+                file.save()
+        super().save(*args, **kwargs)
+        if hasattr(self, "_files"):
+            self.files.set(self._files)
 
 
 class File(BaseORM):
