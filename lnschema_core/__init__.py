@@ -14,7 +14,7 @@ if _INSTANCE_SETUP:
     from . import ids, types
     from .models import (  # type: ignore
         BaseORM,
-        Featureset,
+        FeatureSet,
         File,
         Folder,
         Project,
@@ -25,4 +25,4 @@ if _INSTANCE_SETUP:
         User,
     )
 
-    Features = Featureset  # backward compat
+    Features = FeatureSet  # backward compat
