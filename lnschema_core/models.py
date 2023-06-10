@@ -627,6 +627,9 @@ class File(BaseORM):
             self._to_store = not privates["check_path_in_storage"]
 
     def save(self, *args, **kwargs) -> None:
+        self._save_kip_store(*args, **kwargs)
+
+    def _save_kip_store(self, *args, **kwargs) -> None:
         """Save the file to database & storage."""
         if self.transform is not None:
             self.transform.save()
