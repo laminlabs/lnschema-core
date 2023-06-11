@@ -1,10 +1,12 @@
 import builtins
+import inspect
+import traceback
 from pathlib import Path, PurePosixPath
 from typing import Dict, Iterable, NamedTuple, Optional, Union
 
 from django.db import models
 from django.db.models import PROTECT, Manager
-from lamin_logger import logger
+from lamin_logger import colors, logger
 from upath import UPath
 
 from . import ids
@@ -15,6 +17,20 @@ from .users import current_user_id
 
 is_run_from_ipython = getattr(builtins, "__IPYTHON__", False)
 TRANSFORM_TYPE_DEFAULT = TransformType.notebook if is_run_from_ipython else TransformType.pipeline
+
+
+def executor_name(module: bool = True) -> Union[str, None]:
+    stack = inspect.stack()
+    if len(stack) < 3:
+        return None
+    executor = stack[2]
+    if module:
+        module_name = getattr(inspect.getmodule(executor.frame), "__name__", None)
+        if module_name is not None:
+            module_name = module_name.partition(".")[0]
+        return module_name
+    else:
+        return executor.function
 
 
 def validate_required_fields(orm, kwargs):
@@ -645,6 +661,21 @@ class File(BaseORM):
         if self.run is not None:
             self.run.save()
         super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs) -> None:
+        exec_module = executor_name()
+        print(exec_module)
+        if exec_module != "lamindb":
+            from lamindb.dev.storage import delete_storage
+
+            storage_key = storage_key_from_file(self)
+            try:
+                delete_storage(storage_key)
+                logger.success(f"Deleted {colors.yellow(f'object {storage_key}')} from storage.")
+            except Exception:
+                traceback.print_exc()
+
+        super().delete(*args, **kwargs)
 
 
 class RunInput(BaseORM):
