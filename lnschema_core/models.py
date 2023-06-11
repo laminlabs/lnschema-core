@@ -664,7 +664,6 @@ class File(BaseORM):
 
     def delete(self, *args, **kwargs) -> None:
         exec_module = executor_name()
-        print(exec_module)
         if exec_module != "lamindb":
             from lamindb.dev.storage import delete_storage
 
