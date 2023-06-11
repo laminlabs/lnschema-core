@@ -651,12 +651,14 @@ class File(BaseORM):
         from lamindb.dev.storage import delete_storage
 
         storage_key = storage_key_from_file(self)
+
+        self._delete_skip_storage(*args, **kwargs)
+
         try:
             delete_storage(storage_key)
             logger.success(f"Deleted {colors.yellow(f'object {storage_key}')} from storage.")
         except Exception:
             traceback.print_exc()
-        self._delete_skip_storage(*args, **kwargs)
 
     def _delete_skip_storage(self, *args, **kwargs) -> None:
         super().delete(*args, **kwargs)
