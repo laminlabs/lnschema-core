@@ -664,7 +664,7 @@ class File(BaseORM):
 
     def delete(self, *args, **kwargs) -> None:
         exec_module = executor_name()
-        if exec_module != "lamindb":
+        if exec_module not in ("lamindb", "lnschema_core"):
             from lamindb.dev.storage import delete_storage
 
             storage_key = storage_key_from_file(self)
