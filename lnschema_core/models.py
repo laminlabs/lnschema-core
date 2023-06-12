@@ -101,9 +101,6 @@ class User(BaseORM):
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
 
-    class Meta:
-        managed = True
-
 
 class Storage(BaseORM):
     """Storage locations, typically cloud storage buckets.
@@ -128,9 +125,6 @@ class Storage(BaseORM):
     created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_storages")
     """Creator of record, a :class:`~lamindb.User`."""
 
-    class Meta:
-        managed = True
-
 
 class Project(BaseORM):
     """Projects."""
@@ -151,9 +145,6 @@ class Project(BaseORM):
     """Time of last update to record."""
     created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_projects")
     """Creator of record, a :class:`~lamindb.User`."""
-
-    class Meta:
-        managed = True
 
 
 class Transform(BaseORM):
@@ -204,7 +195,6 @@ class Transform(BaseORM):
     """Creator of record, a :class:`~lamindb.User`."""
 
     class Meta:
-        managed = True
         unique_together = (("stem_id", "version"),)
 
     def __init__(self, *args, **kwargs):
@@ -257,9 +247,6 @@ class Run(BaseORM):
     created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_runs")
     """Creator of record, a :class:`~lamindb.User`."""
 
-    class Meta:
-        managed = True
-
 
 class FeatureSet(BaseORM):
     """Feature sets.
@@ -298,9 +285,6 @@ class FeatureSet(BaseORM):
     """Time of last update to record."""
     created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_featuresets")
     """Creator of record, a :class:`~lamindb.User`."""
-
-    class Meta:
-        managed = True
 
     @classmethod
     def from_iterable(
@@ -357,7 +341,6 @@ class Folder(BaseORM):
     """Creator of record, a :class:`~lamindb.User`."""
 
     class Meta:
-        managed = True
         unique_together = (("storage", "key"),)
 
     @property
@@ -440,7 +423,6 @@ class File(BaseORM):
     """Creator of record, a :class:`~lamindb.User`."""
 
     class Meta:
-        managed = True
         unique_together = (("storage", "key"),)
 
     def path(self) -> Union[Path, UPath]:
@@ -529,5 +511,4 @@ class RunInput(BaseORM):
     file = models.ForeignKey("File", on_delete=models.CASCADE)
 
     class Meta:
-        managed = True
         unique_together = ("run", "file")
