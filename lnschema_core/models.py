@@ -149,12 +149,7 @@ class Project(BaseORM):
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
-    created_by = models.ForeignKey(
-        User,
-        PROTECT,
-        default=current_user_id,
-        related_name="created_projects",
-    )
+    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_projects")
     """Creator of record, a :class:`~lamindb.User`."""
 
     class Meta:
@@ -191,12 +186,7 @@ class Transform(BaseORM):
     Consider using `semantic versioning <https://semver.org>`__
     with `Python versioning <https://peps.python.org/pep-0440/>`__.
     """
-    type = models.CharField(
-        max_length=20,
-        choices=TransformType.choices(),
-        db_index=True,
-        default=TRANSFORM_TYPE_DEFAULT,
-    )
+    type = models.CharField(max_length=20, choices=TransformType.choices(), db_index=True, default=TRANSFORM_TYPE_DEFAULT)
     """Transform type.
 
     Defaults to `notebook` if run from ipython and to `pipeline` if run from python.
@@ -210,12 +200,7 @@ class Transform(BaseORM):
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
-    created_by = models.ForeignKey(
-        User,
-        PROTECT,
-        default=current_user_id,
-        related_name="created_transforms",
-    )
+    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_transforms")
     """Creator of record, a :class:`~lamindb.User`."""
 
     class Meta:
@@ -311,12 +296,7 @@ class FeatureSet(BaseORM):
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
-    created_by = models.ForeignKey(
-        User,
-        PROTECT,
-        default=current_user_id,
-        related_name="created_featuresets",
-    )
+    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_featuresets")
     """Creator of record, a :class:`~lamindb.User`."""
 
     class Meta:
