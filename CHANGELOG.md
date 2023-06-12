@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+✨ Delete storage in File.delete | [196](https://github.com/laminlabs/lnschema-core/pull/196) | [Koncopd](https://github.com/Koncopd) | 2023-06-12 |
 🚚 Rename Featureset to FeatureSet | [194](https://github.com/laminlabs/lnschema-core/pull/194) | [sunnyosun](https://github.com/sunnyosun) | 2023-06-10 | 0.35.4
 ♻️ Move save logic here | [193](https://github.com/laminlabs/lnschema-core/pull/193) | [falexwolf](https://github.com/falexwolf) | 2023-06-10 | 0.35.3
 🔥 Remove unnecessary files | [192](https://github.com/laminlabs/lnschema-core/pull/192) | [falexwolf](https://github.com/falexwolf) | 2023-06-09 | 0.35.2
