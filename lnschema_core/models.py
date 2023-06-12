@@ -381,7 +381,6 @@ class Folder(BaseORM):
 
         return tree(
             self,
-            dir_path=self.path(),
             level=level,
             limit_to_directories=limit_to_directories,
             length_limit=length_limit,
