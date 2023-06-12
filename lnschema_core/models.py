@@ -558,10 +558,6 @@ class File(BaseORM):
         self._memory_rep = privates["memory_rep"]
         self._to_store = not privates["check_path_in_storage"]  # no need to upload if new file is already in storage
 
-    @property
-    def __name__(cls) -> str:
-        return "File"
-
     def __init__(  # type: ignore
         self,
         *args,
