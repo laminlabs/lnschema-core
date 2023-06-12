@@ -567,14 +567,9 @@ class File(BaseORM):
         *args,
         **kwargs,
     ):
-        if len(args) > 1:  # Django-internal call (from_db())
-            super().__init__(*args, **kwargs)
-            return None
-        else:  # user facing calling signature
-            from lamindb._file import init_file
+        from lamindb._file import init_file
 
-            kwargs = init_file(self, *args, **kwargs)
-            super().__init__(**kwargs)
+        init_file(self, *args, **kwargs)
 
     def save(self, *args, **kwargs) -> None:
         """Save the file to database & storage."""
