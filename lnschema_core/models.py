@@ -8,9 +8,9 @@ from django.db.models import PROTECT, Manager
 from lamin_logger import colors, logger
 from upath import UPath
 
-from . import ids
 from ._lookup import lookup as _lookup
 from ._queryset import QuerySet
+from .ids import Base62, base62
 from .types import DataLike, PathLike, TransformType
 from .users import current_user_id
 
@@ -113,7 +113,7 @@ class Storage(BaseORM):
     This ORM tracks these locations along with metadata.
     """
 
-    id = models.CharField(max_length=8, default=ids.storage, db_index=True, primary_key=True)
+    id = models.CharField(max_length=8, default=Base62(8), db_index=True, primary_key=True)
     """Universal id, valid across DB instances."""
     root = models.CharField(max_length=255, db_index=True, default=None)
     """Path to the root of the storage location (an s3 path, a local path, etc.)."""
@@ -125,12 +125,7 @@ class Storage(BaseORM):
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
-    created_by = models.ForeignKey(
-        User,
-        PROTECT,
-        default=current_user_id,
-        related_name="created_storages",
-    )
+    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_storages")
     """Creator of record, a :class:`~lamindb.User`."""
 
     class Meta:
@@ -140,7 +135,7 @@ class Storage(BaseORM):
 class Project(BaseORM):
     """Projects."""
 
-    id = models.CharField(max_length=8, default=ids.project, primary_key=True)
+    id = models.CharField(max_length=8, default=Base62(8), primary_key=True)
     """Universal id, valid across DB instances."""
     name = models.CharField(max_length=255, db_index=True, unique=True, default=None)
     """Project name or title."""
@@ -186,7 +181,7 @@ class Transform(BaseORM):
     short_name = models.CharField(max_length=30, db_index=True, null=True, default=None)
     """A short name.
     """
-    stem_id = models.CharField(max_length=12, default=ids.transform, db_index=True)
+    stem_id = models.CharField(max_length=12, default=Base62(12), db_index=True)
     """Stem of id, identifying transform up to version."""
     version = models.CharField(max_length=10, default="0", db_index=True)
     """Version, defaults to `"0"`.
@@ -234,11 +229,11 @@ class Transform(BaseORM):
         else:  # user-facing calling signature
             # set default ids
             if "id" not in kwargs and "stem_id" not in kwargs:
-                kwargs["id"] = ids.base62(n_char=14)
+                kwargs["id"] = base62(14)
                 kwargs["stem_id"] = kwargs["id"][:12]
             elif "stem_id" in kwargs:
                 assert isinstance(kwargs["stem_id"], str) and len(kwargs["stem_id"]) == 12
-                kwargs["id"] = kwargs["stem_id"] + ids.base62(n_char=2)
+                kwargs["id"] = kwargs["stem_id"] + base62(2)
             elif "id" in kwargs:
                 assert isinstance(kwargs["id"], str) and len(kwargs["id"]) == 14
                 kwargs["stem_id"] = kwargs["id"][:12]
@@ -259,7 +254,7 @@ class Run(BaseORM):
       `files` as inputs: `run.inputs`.
     """
 
-    id = models.CharField(max_length=20, default=ids.run, primary_key=True)
+    id = models.CharField(max_length=20, default=Base62(20), primary_key=True)
     """Universal id, valid across DB instances."""
     name = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """Name or title of run."""
@@ -363,7 +358,7 @@ class FeatureSet(BaseORM):
 
 
 class Folder(BaseORM):
-    id = models.CharField(max_length=20, default=ids.folder, primary_key=True)
+    id = models.CharField(max_length=20, primary_key=True)
     """A universal random id, valid across DB instances."""
     name = models.CharField(max_length=255, db_index=True, default=None)
     """Name or title of folder."""
@@ -439,7 +434,7 @@ class Folder(BaseORM):
             files = kwargs.pop("files")
         else:
             kwargs = dict(name=name)
-        kwargs["id"] = ids.folder()
+        kwargs["id"] = base62(20)
         super().__init__(**kwargs)
         if path is not None:
             self._local_filepath = privates["local_filepath"]
@@ -459,7 +454,7 @@ class Folder(BaseORM):
 
 class File(BaseORM):
     id = models.CharField(max_length=20, primary_key=True)
-    """A universal random id, valid across DB instances."""
+    """A universal random id (20-char base62), valid across DB instances."""
     name = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """A universal random id, valid across DB instances."""
     suffix = models.CharField(max_length=30, db_index=True, null=True, default=None)
