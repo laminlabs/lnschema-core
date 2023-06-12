@@ -10,7 +10,7 @@ from upath import UPath
 
 from ._lookup import lookup as _lookup
 from ._queryset import QuerySet
-from .ids import Base62, base62
+from .ids import base62, base62_8, base62_12, base62_20
 from .types import DataLike, PathLike, TransformType
 from .users import current_user_id
 
@@ -113,7 +113,7 @@ class Storage(BaseORM):
     This ORM tracks these locations along with metadata.
     """
 
-    id = models.CharField(max_length=8, default=Base62(8), db_index=True, primary_key=True)
+    id = models.CharField(max_length=8, default=base62_8, db_index=True, primary_key=True)
     """Universal id, valid across DB instances."""
     root = models.CharField(max_length=255, db_index=True, default=None)
     """Path to the root of the storage location (an s3 path, a local path, etc.)."""
@@ -135,7 +135,7 @@ class Storage(BaseORM):
 class Project(BaseORM):
     """Projects."""
 
-    id = models.CharField(max_length=8, default=Base62(8), primary_key=True)
+    id = models.CharField(max_length=8, default=base62_8, primary_key=True)
     """Universal id, valid across DB instances."""
     name = models.CharField(max_length=255, db_index=True, unique=True, default=None)
     """Project name or title."""
@@ -176,7 +176,7 @@ class Transform(BaseORM):
     short_name = models.CharField(max_length=30, db_index=True, null=True, default=None)
     """A short name.
     """
-    stem_id = models.CharField(max_length=12, default=Base62(12), db_index=True)
+    stem_id = models.CharField(max_length=12, default=base62_12, db_index=True)
     """Stem of id, identifying transform up to version."""
     version = models.CharField(max_length=10, default="0", db_index=True)
     """Version, defaults to `"0"`.
@@ -239,7 +239,7 @@ class Run(BaseORM):
       `files` as inputs: `run.inputs`.
     """
 
-    id = models.CharField(max_length=20, default=Base62(20), primary_key=True)
+    id = models.CharField(max_length=20, default=base62_20, primary_key=True)
     """Universal id, valid across DB instances."""
     name = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """Name or title of run."""
@@ -414,7 +414,7 @@ class Folder(BaseORM):
             files = kwargs.pop("files")
         else:
             kwargs = dict(name=name)
-        kwargs["id"] = base62(20)
+        kwargs["id"] = base62_20
         super().__init__(**kwargs)
         if path is not None:
             self._local_filepath = privates["local_filepath"]
@@ -560,3 +560,4 @@ class RunInput(BaseORM):
 
     class Meta:
         managed = True
+        unique_together = ("run", "file")

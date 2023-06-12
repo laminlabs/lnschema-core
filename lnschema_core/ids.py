@@ -43,6 +43,8 @@ def base62(n_char: int) -> str:
     return id
 
 
+# this cannot be serialized by Django,
+# hence, see below
 class Base62:
     def __init__(self, n_char: int):
         self.n_char = n_char
@@ -56,3 +58,23 @@ def base26(n_char: int):
     alphabet = string.ascii_lowercase
     id = "".join(secrets.choice(alphabet) for i in range(n_char))
     return id
+
+
+def base62_8() -> str:
+    return base62(8)
+
+
+def base62_12() -> str:
+    return base62(12)
+
+
+def base62_16() -> str:
+    return base62(16)
+
+
+def base62_20() -> str:
+    return base62(20)
+
+
+def base62_24() -> str:
+    return base62(24)
