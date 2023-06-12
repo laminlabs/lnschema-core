@@ -571,66 +571,10 @@ class File(BaseORM):
             super().__init__(*args, **kwargs)
             return None
         else:  # user facing calling signature
-            if len(args) > 1:
-                raise ValueError("Only one non-keyword arg allowed")
-            if len(args) == 0:
-                data: Union[PathLike, DataLike] = kwargs["data"]
-            else:
-                data: Union[PathLike, DataLike] = args[0]
-            key: Optional[str] = kwargs["key"] if "key" in kwargs else None
-            name: Optional[str] = kwargs["name"] if "name" in kwargs else None
-            run: Optional[Run] = kwargs["run"] if "run" in kwargs else None
-            format = kwargs["format"] if "format" in kwargs else None
+            from lamindb._file import init_file
 
-        def log_hint(*, check_path_in_storage: bool, key: str, id: str, suffix: str) -> None:
-            hint = ""
-            if check_path_in_storage:
-                hint += "file in storage ✓"
-            else:
-                hint += "file will be copied to storage upon `save()`"
-            if key is None:
-                hint += f" using storage key = {id}{suffix}"
-            else:
-                hint += f" using storage key = {key}"
-            logger.hint(hint)
-
-        from lamindb._file import get_file_kwargs_from_data
-
-        kwargs, privates = get_file_kwargs_from_data(
-            data=data,
-            name=name,
-            key=key,
-            run=run,
-            format=format,
-        )
-        kwargs["id"] = ids.file()
-        log_hint(
-            check_path_in_storage=privates["check_path_in_storage"],
-            key=kwargs["key"],
-            id=kwargs["id"],
-            suffix=kwargs["suffix"],
-        )
-
-        # transform cannot be directly passed, just via run
-        # it's directly stored in the file table to avoid another join
-        # mediate by the run table
-        if kwargs["run"] is not None:
-            if kwargs["run"].transform_id is not None:
-                kwargs["transform_id"] = kwargs["run"].transform_id
-            else:
-                # accessing the relationship should always be possible if
-                # the above if clause was false as then, we should have a fresh
-                # Transform object that is not queried from the DB
-                assert kwargs["run"].transform is not None
-                kwargs["transform"] = kwargs["run"].transform
-
-        if data is not None:
-            self._local_filepath = privates["local_filepath"]
-            self._cloud_filepath = privates["cloud_filepath"]
-            self._memory_rep = privates["memory_rep"]
-            self._to_store = not privates["check_path_in_storage"]
-
-        super().__init__(**kwargs)
+            kwargs = init_file(self, *args, **kwargs)
+            super().__init__(**kwargs)
 
     def save(self, *args, **kwargs) -> None:
         """Save the file to database & storage."""
