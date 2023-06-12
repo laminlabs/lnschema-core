@@ -8,9 +8,9 @@ from django.db.models import PROTECT, Manager
 from lamin_logger import colors, logger
 from upath import UPath
 
-from . import ids
 from ._lookup import lookup as _lookup
 from ._queryset import QuerySet
+from .ids import base62, base62_8, base62_12, base62_20
 from .types import DataLike, PathLike, TransformType
 from .users import current_user_id
 
@@ -113,7 +113,7 @@ class Storage(BaseORM):
     This ORM tracks these locations along with metadata.
     """
 
-    id = models.CharField(max_length=8, default=ids.storage, db_index=True, primary_key=True)
+    id = models.CharField(max_length=8, default=base62_8, db_index=True, primary_key=True)
     """Universal id, valid across DB instances."""
     root = models.CharField(max_length=255, db_index=True, default=None)
     """Path to the root of the storage location (an s3 path, a local path, etc.)."""
@@ -125,12 +125,7 @@ class Storage(BaseORM):
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
-    created_by = models.ForeignKey(
-        User,
-        PROTECT,
-        default=current_user_id,
-        related_name="created_storages",
-    )
+    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_storages")
     """Creator of record, a :class:`~lamindb.User`."""
 
     class Meta:
@@ -140,7 +135,7 @@ class Storage(BaseORM):
 class Project(BaseORM):
     """Projects."""
 
-    id = models.CharField(max_length=8, default=ids.project, primary_key=True)
+    id = models.CharField(max_length=8, default=base62_8, primary_key=True)
     """Universal id, valid across DB instances."""
     name = models.CharField(max_length=255, db_index=True, unique=True, default=None)
     """Project name or title."""
@@ -154,12 +149,7 @@ class Project(BaseORM):
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
-    created_by = models.ForeignKey(
-        User,
-        PROTECT,
-        default=current_user_id,
-        related_name="created_projects",
-    )
+    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_projects")
     """Creator of record, a :class:`~lamindb.User`."""
 
     class Meta:
@@ -186,7 +176,7 @@ class Transform(BaseORM):
     short_name = models.CharField(max_length=30, db_index=True, null=True, default=None)
     """A short name.
     """
-    stem_id = models.CharField(max_length=12, default=ids.transform, db_index=True)
+    stem_id = models.CharField(max_length=12, default=base62_12, db_index=True)
     """Stem of id, identifying transform up to version."""
     version = models.CharField(max_length=10, default="0", db_index=True)
     """Version, defaults to `"0"`.
@@ -196,12 +186,7 @@ class Transform(BaseORM):
     Consider using `semantic versioning <https://semver.org>`__
     with `Python versioning <https://peps.python.org/pep-0440/>`__.
     """
-    type = models.CharField(
-        max_length=20,
-        choices=TransformType.choices(),
-        db_index=True,
-        default=TRANSFORM_TYPE_DEFAULT,
-    )
+    type = models.CharField(max_length=20, choices=TransformType.choices(), db_index=True, default=TRANSFORM_TYPE_DEFAULT)
     """Transform type.
 
     Defaults to `notebook` if run from ipython and to `pipeline` if run from python.
@@ -215,12 +200,7 @@ class Transform(BaseORM):
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
-    created_by = models.ForeignKey(
-        User,
-        PROTECT,
-        default=current_user_id,
-        related_name="created_transforms",
-    )
+    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_transforms")
     """Creator of record, a :class:`~lamindb.User`."""
 
     class Meta:
@@ -234,11 +214,11 @@ class Transform(BaseORM):
         else:  # user-facing calling signature
             # set default ids
             if "id" not in kwargs and "stem_id" not in kwargs:
-                kwargs["id"] = ids.base62(n_char=14)
+                kwargs["id"] = base62(14)
                 kwargs["stem_id"] = kwargs["id"][:12]
             elif "stem_id" in kwargs:
                 assert isinstance(kwargs["stem_id"], str) and len(kwargs["stem_id"]) == 12
-                kwargs["id"] = kwargs["stem_id"] + ids.base62(n_char=2)
+                kwargs["id"] = kwargs["stem_id"] + base62(2)
             elif "id" in kwargs:
                 assert isinstance(kwargs["id"], str) and len(kwargs["id"]) == 14
                 kwargs["stem_id"] = kwargs["id"][:12]
@@ -259,7 +239,7 @@ class Run(BaseORM):
       `files` as inputs: `run.inputs`.
     """
 
-    id = models.CharField(max_length=20, default=ids.run, primary_key=True)
+    id = models.CharField(max_length=20, default=base62_20, primary_key=True)
     """Universal id, valid across DB instances."""
     name = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """Name or title of run."""
@@ -316,12 +296,7 @@ class FeatureSet(BaseORM):
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
-    created_by = models.ForeignKey(
-        User,
-        PROTECT,
-        default=current_user_id,
-        related_name="created_featuresets",
-    )
+    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_featuresets")
     """Creator of record, a :class:`~lamindb.User`."""
 
     class Meta:
@@ -363,7 +338,7 @@ class FeatureSet(BaseORM):
 
 
 class Folder(BaseORM):
-    id = models.CharField(max_length=20, default=ids.folder, primary_key=True)
+    id = models.CharField(max_length=20, primary_key=True)
     """A universal random id, valid across DB instances."""
     name = models.CharField(max_length=255, db_index=True, default=None)
     """Name or title of folder."""
@@ -405,46 +380,16 @@ class Folder(BaseORM):
         from lamindb._folder import tree
 
         return tree(
-            dir_path=self.path(),
+            self,
             level=level,
             limit_to_directories=limit_to_directories,
             length_limit=length_limit,
         )
 
-    def __init__(self, *args, **kwargs):  # type: ignore
-        if len(args) > 1 and isinstance(args[0], str) and len(args[0]) == 20:  # initialize with all fields from db as args
-            super().__init__(*args, **kwargs)
-            return None
-        else:  # user-facing calling signature
-            if len(args) != 1 and "files" not in kwargs:
-                raise ValueError("Either provide path as arg or provide files as kwarg!")
-            if len(args) == 1:
-                path: Optional[Union[Path, UPath, str]] = args[0]
-            else:
-                path = None
-            name: Optional[str] = kwargs.pop("name") if "name" in kwargs else None
-            key: Optional[str] = kwargs.pop("key") if "key" in kwargs else None
-            files: Optional[str] = kwargs.pop("files") if "files" in kwargs else None
-            if len(kwargs) != 0:
-                raise ValueError(f"These kwargs are not permitted: {kwargs}")
+    def __init__(self, *args, **kwargs):
+        from lamindb._folder import init_folder
 
-        from lamindb._folder import get_folder_kwargs_from_data
-
-        if path is not None:
-            kwargs, privates = get_folder_kwargs_from_data(
-                path=path,
-                name=name,
-                key=key,
-            )
-            files = kwargs.pop("files")
-        else:
-            kwargs = dict(name=name)
-        kwargs["id"] = ids.folder()
-        super().__init__(**kwargs)
-        if path is not None:
-            self._local_filepath = privates["local_filepath"]
-            self._cloud_filepath = privates["cloud_filepath"]
-            self._files = files
+        init_folder(self, *args, **kwargs)
 
     def save(self, *args, **kwargs) -> None:
         """Save the folder."""
@@ -459,7 +404,7 @@ class Folder(BaseORM):
 
 class File(BaseORM):
     id = models.CharField(max_length=20, primary_key=True)
-    """A universal random id, valid across DB instances."""
+    """A universal random id (20-char base62), valid across DB instances."""
     name = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """A universal random id, valid across DB instances."""
     suffix = models.CharField(max_length=30, db_index=True, null=True, default=None)
@@ -585,3 +530,4 @@ class RunInput(BaseORM):
 
     class Meta:
         managed = True
+        unique_together = ("run", "file")
