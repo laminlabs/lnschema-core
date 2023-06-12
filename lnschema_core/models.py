@@ -1,6 +1,6 @@
 import builtins
 import traceback
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 from typing import Dict, Iterable, NamedTuple, Optional, Union
 
 from django.db import models
@@ -512,51 +512,9 @@ class File(BaseORM):
         format: Optional[str] = None,
     ) -> None:
         """Replace file content."""
-        from lamindb._file import get_file_kwargs_from_data
+        from lamindb._file import replace_file
 
-        if isinstance(data, (Path, str)):
-            name_to_pass = None
-        else:
-            name_to_pass = self.name
-
-        kwargs, privates = get_file_kwargs_from_data(
-            data=data,
-            name=name_to_pass,
-            run=run,
-            format=format,
-        )
-
-        if kwargs["name"] != self.name:
-            logger.warning(f"Your new filename '{kwargs['name']}' does not match the previous filename '{self.name}': to update the name, set file.name = '{kwargs['name']}'")
-
-        if self.key is not None:
-            key_path = PurePosixPath(self.key)
-            if isinstance(data, (Path, str)):
-                new_name = kwargs["name"]  # use the name from the data filepath
-            else:
-                # do not change the key stem to file.name
-                new_name = key_path.stem  # use the stem of the key for in-memory data
-            if PurePosixPath(new_name).suffixes == []:
-                new_name = f"{new_name}{kwargs['suffix']}"
-            if key_path.name != new_name:
-                self._clear_storagekey = self.key
-                self.key = str(key_path.with_name(new_name))
-                logger.warning(f"Replacing the file will replace key '{key_path}' with '{self.key}' and delete '{key_path}' upon `save()`")
-        else:
-            self.key = kwargs["key"]
-            old_storage = f"{self.id}{self.suffix}"
-            new_storage = self.key if self.key is not None else f"{self.id}{kwargs['suffix']}"
-            if old_storage != new_storage:
-                self._clear_storagekey = old_storage
-
-        self.suffix = kwargs["suffix"]
-        self.size = kwargs["size"]
-        self.hash = kwargs["hash"]
-        self.run = kwargs["run"]
-        self._local_filepath = privates["local_filepath"]
-        self._cloud_filepath = privates["cloud_filepath"]
-        self._memory_rep = privates["memory_rep"]
-        self._to_store = not privates["check_path_in_storage"]  # no need to upload if new file is already in storage
+        replace_file(self, data, run, format)
 
     def __init__(  # type: ignore
         self,
