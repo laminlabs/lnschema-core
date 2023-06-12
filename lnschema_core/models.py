@@ -414,7 +414,7 @@ class Folder(BaseORM):
             files = kwargs.pop("files")
         else:
             kwargs = dict(name=name)
-        kwargs["id"] = base62_20
+        kwargs["id"] = base62_20()
         super().__init__(**kwargs)
         if path is not None:
             self._local_filepath = privates["local_filepath"]
