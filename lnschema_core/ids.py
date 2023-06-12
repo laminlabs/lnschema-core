@@ -60,6 +60,10 @@ def base26(n_char: int):
     return id
 
 
+def base62_4() -> str:
+    return base62(4)
+
+
 def base62_8() -> str:
     return base62(8)
 
