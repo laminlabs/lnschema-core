@@ -1,7 +1,7 @@
 import builtins
 import traceback
 from pathlib import Path
-from typing import Dict, Iterable, NamedTuple, Optional, Union
+from typing import Dict, Iterable, NamedTuple, Optional, Union, overload  # noqa
 
 from django.db import models
 from django.db.models import PROTECT, Manager
@@ -515,6 +515,22 @@ class File(BaseORM):
         from lamindb._file import replace_file
 
         replace_file(self, data, run, format)
+
+    @overload
+    def __init__(
+        data: Union[PathLike, DataLike],
+        key: Optional[str] = None,
+        name: Optional[str] = None,
+        run: Optional[Run] = None,
+    ):
+        ...
+
+    @overload
+    def __init__(
+        *args,
+        **kwargs,
+    ):
+        ...
 
     def __init__(  # type: ignore
         self,
