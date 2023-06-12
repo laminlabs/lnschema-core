@@ -9,6 +9,8 @@ import lnschema_core.ids
 import lnschema_core.types
 import lnschema_core.users
 
+MANAGED = True
+
 
 class Migration(migrations.Migration):
     initial = True
@@ -29,7 +31,7 @@ class Migration(migrations.Migration):
                 ("updated_at", models.DateTimeField(auto_now=True, db_index=True)),
             ],
             options={
-                "managed": True,
+                "managed": MANAGED,
             },
         ),
         migrations.CreateModel(
@@ -42,7 +44,7 @@ class Migration(migrations.Migration):
                 ("updated_at", models.DateTimeField(auto_now=True, db_index=True)),
             ],
             options={
-                "managed": True,
+                "managed": MANAGED,
             },
         ),
         migrations.CreateModel(
@@ -55,7 +57,7 @@ class Migration(migrations.Migration):
                 ("run_at", models.DateTimeField(auto_now_add=True, db_index=True)),
             ],
             options={
-                "managed": True,
+                "managed": MANAGED,
             },
         ),
         migrations.CreateModel(
@@ -69,7 +71,7 @@ class Migration(migrations.Migration):
                 ("updated_at", models.DateTimeField(auto_now=True, db_index=True)),
             ],
             options={
-                "managed": True,
+                "managed": MANAGED,
             },
         ),
         migrations.CreateModel(
@@ -100,7 +102,7 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={
-                "managed": True,
+                "managed": MANAGED,
                 "unique_together": {("stem_id", "version")},
             },
         ),
@@ -121,7 +123,7 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={
-                "managed": True,
+                "managed": MANAGED,
             },
         ),
         migrations.CreateModel(
@@ -132,7 +134,7 @@ class Migration(migrations.Migration):
                 ("run", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="lnschema_core.run")),
             ],
             options={
-                "managed": True,
+                "managed": MANAGED,
                 "unique_together": {("run", "file")},
             },
         ),
@@ -158,7 +160,7 @@ class Migration(migrations.Migration):
             fields=[
                 ("id", models.CharField(default=lnschema_core.ids.base62_8, max_length=8, primary_key=True, serialize=False)),
                 ("name", models.CharField(db_index=True, default=None, max_length=255, unique=True)),
-                ("external_id", models.CharField(db_index=True, default=None, max_length=255, null=True)),
+                ("external_id", models.CharField(db_index=True, default=None, max_length=40, null=True)),
                 ("created_at", models.DateTimeField(auto_now_add=True, db_index=True)),
                 ("updated_at", models.DateTimeField(auto_now=True, db_index=True)),
                 (
@@ -171,7 +173,7 @@ class Migration(migrations.Migration):
                 ("folders", models.ManyToManyField(related_name="projects", to="lnschema_core.folder")),
             ],
             options={
-                "managed": True,
+                "managed": MANAGED,
             },
         ),
         migrations.AddField(
@@ -229,7 +231,7 @@ class Migration(migrations.Migration):
                 ("files", models.ManyToManyField(related_name="featuresets", to="lnschema_core.file")),
             ],
             options={
-                "managed": True,
+                "managed": MANAGED,
             },
         ),
         migrations.AlterUniqueTogether(
@@ -239,5 +241,46 @@ class Migration(migrations.Migration):
         migrations.AlterUniqueTogether(
             name="file",
             unique_together={("storage", "key")},
+        ),
+    ]
+
+
+if not MANAGED:
+    Migration.operations += [
+        migrations.AlterModelOptions(
+            name="featureset",
+            options={"managed": True},
+        ),
+        migrations.AlterModelOptions(
+            name="file",
+            options={"managed": True},
+        ),
+        migrations.AlterModelOptions(
+            name="folder",
+            options={"managed": True},
+        ),
+        migrations.AlterModelOptions(
+            name="project",
+            options={"managed": True},
+        ),
+        migrations.AlterModelOptions(
+            name="run",
+            options={"managed": True},
+        ),
+        migrations.AlterModelOptions(
+            name="runinput",
+            options={"managed": True},
+        ),
+        migrations.AlterModelOptions(
+            name="storage",
+            options={"managed": True},
+        ),
+        migrations.AlterModelOptions(
+            name="transform",
+            options={"managed": True},
+        ),
+        migrations.AlterModelOptions(
+            name="user",
+            options={"managed": True},
         ),
     ]
