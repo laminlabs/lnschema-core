@@ -567,7 +567,7 @@ class File(BaseORM):
         *args,
         **kwargs,
     ):
-        if len(args) > 1 and isinstance(args[0], str) and len(args[0]) == 20:  # initialize with all fields from db as args
+        if len(args) > 1:  # Django-internal call (from_db())
             super().__init__(*args, **kwargs)
             return None
         else:  # user facing calling signature
@@ -624,12 +624,13 @@ class File(BaseORM):
                 assert kwargs["run"].transform is not None
                 kwargs["transform"] = kwargs["run"].transform
 
-        super().__init__(**kwargs)
         if data is not None:
             self._local_filepath = privates["local_filepath"]
             self._cloud_filepath = privates["cloud_filepath"]
             self._memory_rep = privates["memory_rep"]
             self._to_store = not privates["check_path_in_storage"]
+
+        super().__init__(**kwargs)
 
     def save(self, *args, **kwargs) -> None:
         """Save the file to database & storage."""
