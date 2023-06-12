@@ -139,7 +139,7 @@ class Project(BaseORM):
     """Universal id, valid across DB instances."""
     name = models.CharField(max_length=255, db_index=True, unique=True, default=None)
     """Project name or title."""
-    external_id = models.CharField(max_length=255, db_index=True, null=True, default=None)
+    external_id = models.CharField(max_length=40, db_index=True, null=True, default=None)
     """External id (such as from a project management tool)."""
     folders = models.ManyToManyField("Folder", related_name="projects")
     """Project folders."""
