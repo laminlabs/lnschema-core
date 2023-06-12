@@ -380,46 +380,17 @@ class Folder(BaseORM):
         from lamindb._folder import tree
 
         return tree(
+            self,
             dir_path=self.path(),
             level=level,
             limit_to_directories=limit_to_directories,
             length_limit=length_limit,
         )
 
-    def __init__(self, *args, **kwargs):  # type: ignore
-        if len(args) > 1 and isinstance(args[0], str) and len(args[0]) == 20:  # initialize with all fields from db as args
-            super().__init__(*args, **kwargs)
-            return None
-        else:  # user-facing calling signature
-            if len(args) != 1 and "files" not in kwargs:
-                raise ValueError("Either provide path as arg or provide files as kwarg!")
-            if len(args) == 1:
-                path: Optional[Union[Path, UPath, str]] = args[0]
-            else:
-                path = None
-            name: Optional[str] = kwargs.pop("name") if "name" in kwargs else None
-            key: Optional[str] = kwargs.pop("key") if "key" in kwargs else None
-            files: Optional[str] = kwargs.pop("files") if "files" in kwargs else None
-            if len(kwargs) != 0:
-                raise ValueError(f"These kwargs are not permitted: {kwargs}")
+    def __init__(self, *args, **kwargs):
+        from lamindb._folder import init_folder
 
-        from lamindb._folder import get_folder_kwargs_from_data
-
-        if path is not None:
-            kwargs, privates = get_folder_kwargs_from_data(
-                path=path,
-                name=name,
-                key=key,
-            )
-            files = kwargs.pop("files")
-        else:
-            kwargs = dict(name=name)
-        kwargs["id"] = base62_20()
-        super().__init__(**kwargs)
-        if path is not None:
-            self._local_filepath = privates["local_filepath"]
-            self._cloud_filepath = privates["cloud_filepath"]
-            self._files = files
+        init_folder(self, *args, **kwargs)
 
     def save(self, *args, **kwargs) -> None:
         """Save the folder."""
