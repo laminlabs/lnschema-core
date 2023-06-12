@@ -1,7 +1,7 @@
 import builtins
 import traceback
-from pathlib import Path, PurePosixPath
-from typing import Dict, Iterable, NamedTuple, Optional, Union
+from pathlib import Path
+from typing import Dict, Iterable, NamedTuple, Optional, Union, overload  # noqa
 
 from django.db import models
 from django.db.models import PROTECT, Manager
@@ -391,6 +391,8 @@ class Folder(BaseORM):
 
     def path(self) -> Union[Path, UPath]:
         """Path on storage."""
+        from lamindb._file_access import filepath_from_file_or_folder
+
         return filepath_from_file_or_folder(self)
 
     def tree(
@@ -498,6 +500,8 @@ class File(BaseORM):
 
     def path(self) -> Union[Path, UPath]:
         """Path on storage."""
+        from lamindb._file_access import filepath_from_file_or_folder
+
         return filepath_from_file_or_folder(self)
 
     # likely needs an arg `key`
@@ -508,124 +512,34 @@ class File(BaseORM):
         format: Optional[str] = None,
     ) -> None:
         """Replace file content."""
-        from lamindb._file import get_file_kwargs_from_data
+        from lamindb._file import replace_file
 
-        if isinstance(data, (Path, str)):
-            name_to_pass = None
-        else:
-            name_to_pass = self.name
+        replace_file(self, data, run, format)
 
-        kwargs, privates = get_file_kwargs_from_data(
-            data=data,
-            name=name_to_pass,
-            run=run,
-            format=format,
-        )
+    @overload
+    def __init__(
+        data: Union[PathLike, DataLike],
+        key: Optional[str] = None,
+        name: Optional[str] = None,
+        run: Optional[Run] = None,
+    ):
+        ...
 
-        if kwargs["name"] != self.name:
-            logger.warning(f"Your new filename '{kwargs['name']}' does not match the previous filename '{self.name}': to update the name, set file.name = '{kwargs['name']}'")
-
-        if self.key is not None:
-            key_path = PurePosixPath(self.key)
-            if isinstance(data, (Path, str)):
-                new_name = kwargs["name"]  # use the name from the data filepath
-            else:
-                # do not change the key stem to file.name
-                new_name = key_path.stem  # use the stem of the key for in-memory data
-            if PurePosixPath(new_name).suffixes == []:
-                new_name = f"{new_name}{kwargs['suffix']}"
-            if key_path.name != new_name:
-                self._clear_storagekey = self.key
-                self.key = str(key_path.with_name(new_name))
-                logger.warning(f"Replacing the file will replace key '{key_path}' with '{self.key}' and delete '{key_path}' upon `save()`")
-        else:
-            self.key = kwargs["key"]
-            old_storage = f"{self.id}{self.suffix}"
-            new_storage = self.key if self.key is not None else f"{self.id}{kwargs['suffix']}"
-            if old_storage != new_storage:
-                self._clear_storagekey = old_storage
-
-        self.suffix = kwargs["suffix"]
-        self.size = kwargs["size"]
-        self.hash = kwargs["hash"]
-        self.run = kwargs["run"]
-        self._local_filepath = privates["local_filepath"]
-        self._cloud_filepath = privates["cloud_filepath"]
-        self._memory_rep = privates["memory_rep"]
-        self._to_store = not privates["check_path_in_storage"]  # no need to upload if new file is already in storage
-
-    @property
-    def __name__(cls) -> str:
-        return "File"
+    @overload
+    def __init__(
+        *args,
+        **kwargs,
+    ):
+        ...
 
     def __init__(  # type: ignore
         self,
         *args,
         **kwargs,
     ):
-        if len(args) > 1 and isinstance(args[0], str) and len(args[0]) == 20:  # initialize with all fields from db as args
-            super().__init__(*args, **kwargs)
-            return None
-        else:  # user facing calling signature
-            if len(args) > 1:
-                raise ValueError("Only one non-keyword arg allowed")
-            if len(args) == 0:
-                data: Union[PathLike, DataLike] = kwargs["data"]
-            else:
-                data: Union[PathLike, DataLike] = args[0]
-            key: Optional[str] = kwargs["key"] if "key" in kwargs else None
-            name: Optional[str] = kwargs["name"] if "name" in kwargs else None
-            run: Optional[Run] = kwargs["run"] if "run" in kwargs else None
-            format = kwargs["format"] if "format" in kwargs else None
+        from lamindb._file import init_file
 
-        def log_hint(*, check_path_in_storage: bool, key: str, id: str, suffix: str) -> None:
-            hint = ""
-            if check_path_in_storage:
-                hint += "file in storage ✓"
-            else:
-                hint += "file will be copied to storage upon `save()`"
-            if key is None:
-                hint += f" using storage key = {id}{suffix}"
-            else:
-                hint += f" using storage key = {key}"
-            logger.hint(hint)
-
-        from lamindb._file import get_file_kwargs_from_data
-
-        kwargs, privates = get_file_kwargs_from_data(
-            data=data,
-            name=name,
-            key=key,
-            run=run,
-            format=format,
-        )
-        kwargs["id"] = ids.file()
-        log_hint(
-            check_path_in_storage=privates["check_path_in_storage"],
-            key=kwargs["key"],
-            id=kwargs["id"],
-            suffix=kwargs["suffix"],
-        )
-
-        # transform cannot be directly passed, just via run
-        # it's directly stored in the file table to avoid another join
-        # mediate by the run table
-        if kwargs["run"] is not None:
-            if kwargs["run"].transform_id is not None:
-                kwargs["transform_id"] = kwargs["run"].transform_id
-            else:
-                # accessing the relationship should always be possible if
-                # the above if clause was false as then, we should have a fresh
-                # Transform object that is not queried from the DB
-                assert kwargs["run"].transform is not None
-                kwargs["transform"] = kwargs["run"].transform
-
-        super().__init__(**kwargs)
-        if data is not None:
-            self._local_filepath = privates["local_filepath"]
-            self._cloud_filepath = privates["cloud_filepath"]
-            self._memory_rep = privates["memory_rep"]
-            self._to_store = not privates["check_path_in_storage"]
+        init_file(self, *args, **kwargs)
 
     def save(self, *args, **kwargs) -> None:
         """Save the file to database & storage."""
@@ -648,6 +562,7 @@ class File(BaseORM):
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs) -> None:
+        from lamindb._file_access import storage_key_from_file
         from lamindb.dev.storage import delete_storage
 
         storage_key = storage_key_from_file(self)
@@ -670,42 +585,3 @@ class RunInput(BaseORM):
 
     class Meta:
         managed = True
-
-
-# add type annotations back asap when re-organizing the module
-def storage_key_from_file(file: File):
-    if file.key is None:
-        return f"{file.id}{file.suffix}"
-    else:
-        return file.key
-
-
-# add type annotations back asap when re-organizing the module
-def filepath_from_file_or_folder(file_or_folder: Union[File, Folder]):
-    from lamindb_setup import settings
-    from lamindb_setup.dev import StorageSettings
-
-    # using __name__ for type check to avoid need of
-    # dynamically importing the type
-    if file_or_folder.__name__ == "File":
-        storage_key = storage_key_from_file(file_or_folder)
-    else:
-        storage_key = file_or_folder.key
-        if storage_key is None:
-            raise ValueError("Only real folders have a path!")
-    if file_or_folder.storage_id == settings.storage.id:
-        path = settings.storage.key_to_filepath(storage_key)
-    else:
-        logger.warning(
-            "file.path() is slow for files outside the currently configured storage"
-            " location\nconsider joining for the set of files you're interested in:"
-            " ln.select(ln.File, ln.Storage)the path is storage.root / file.key if"
-            " file.key is not None\notherwise storage.root / (file.id + file.suffix)"
-        )
-        import lamindb as ln
-
-        storage = ln.select(ln.Storage, id=file_or_folder.storage_id).one()
-        # find a better way than passing None to instance_settings in the future!
-        storage_settings = StorageSettings(storage.root, instance_settings=None)
-        path = storage_settings.key_to_filepath(storage_key)
-    return path
