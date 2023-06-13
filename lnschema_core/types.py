@@ -15,12 +15,17 @@ class ChoicesMixin:
     def choices(cls):
         return [(item.value, item.name) for item in cls]
 
+    # needs to mix with Enum
+    def __repr__(self):
+        return self.value
+
+    # needs to mix with Enum
+    def __str__(self):
+        return self.value
+
 
 class TransformType(ChoicesMixin, Enum):
     pipeline = "pipeline"
     notebook = "notebook"
     app = "app"
     api = "api"
-
-    def __repr__(self):
-        return self.name
