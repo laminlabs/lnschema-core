@@ -148,7 +148,7 @@ class Project(BaseORM):
 
 
 class Transform(BaseORM):
-    """Data transformations.
+    """File transformations.
 
     Pipelines, workflows, notebooks, app-based transforms.
 
@@ -216,7 +216,7 @@ class Transform(BaseORM):
 
 
 class Run(BaseORM):
-    """Runs of data transformations.
+    """Runs of transforms.
 
     Typically, a run has inputs and outputs:
 
