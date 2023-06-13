@@ -445,6 +445,7 @@ class File(BaseORM):
 
     @overload
     def __init__(
+        self,
         data: Union[PathLike, DataLike],
         key: Optional[str] = None,
         name: Optional[str] = None,
@@ -454,7 +455,7 @@ class File(BaseORM):
 
     @overload
     def __init__(
-        *args,
+        self,
         **kwargs,
     ):
         ...
