@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🔥 Remove unnecessary file | [203](https://github.com/laminlabs/lnschema-core/pull/203) | [falexwolf](https://github.com/falexwolf) | 2023-06-14 |
 ✅ Add migrations check | [202](https://github.com/laminlabs/lnschema-core/pull/202) | [falexwolf](https://github.com/falexwolf) | 2023-06-14 |
 ♻️ Alter SA migration strategy | [200](https://github.com/laminlabs/lnschema-core/pull/200) | [falexwolf](https://github.com/falexwolf) | 2023-06-12 | 0.36.7
 🍱 Add migration process for legacy SA instances | [199](https://github.com/laminlabs/lnschema-core/pull/199) | [falexwolf](https://github.com/falexwolf) | 2023-06-12 | 0.35.5
