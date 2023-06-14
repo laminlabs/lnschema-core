@@ -14,14 +14,14 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
 ]
 dependencies = [
-    "lamindb_setup",
 ]
 
 [project.urls]
 Home = "https://github.com/laminlabs/lnschema-core"
 
 [project.optional-dependencies]
-test = [
+dev = [
+    "lamindb_setup @ git+https://github.com/laminlabs/lamindb-setup",
     "pre-commit",
     "nox",
     "laminci",
