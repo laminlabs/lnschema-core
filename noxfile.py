@@ -13,4 +13,4 @@ def lint(session: nox.Session) -> None:
 def test(session: nox.Session) -> None:
     session.run(*"pip install -e .[dev]".split())
     login_testuser1(session)
-    run_pytest(session)
+    run_pytest(session, coverage=False)
