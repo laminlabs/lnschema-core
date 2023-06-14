@@ -1,5 +1,5 @@
 import nox
-from laminci.nox import run_pre_commit, run_pytest  # noqa
+from laminci.nox import login_testuser1, run_pre_commit, run_pytest  # noqa
 
 nox.options.default_venv_backend = "none"
 
@@ -11,4 +11,6 @@ def lint(session: nox.Session) -> None:
 
 @nox.session
 def test(session: nox.Session) -> None:
+    login_testuser1(session)
+    session.run(*"pip install -e .[dev]".split())
     run_pytest(session)
