@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚚 Make `User.name` nullable | [204](https://github.com/laminlabs/lnschema-core/pull/204) | [falexwolf](https://github.com/falexwolf) | 2023-06-15 |
 🔥 Remove unnecessary file | [203](https://github.com/laminlabs/lnschema-core/pull/203) | [falexwolf](https://github.com/falexwolf) | 2023-06-14 |
 ✅ Add migrations check | [202](https://github.com/laminlabs/lnschema-core/pull/202) | [falexwolf](https://github.com/falexwolf) | 2023-06-14 |
 ♻️ Alter SA migration strategy | [200](https://github.com/laminlabs/lnschema-core/pull/200) | [falexwolf](https://github.com/falexwolf) | 2023-06-12 | 0.36.7
