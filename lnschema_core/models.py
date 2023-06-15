@@ -94,7 +94,7 @@ class User(BaseORM):
     """Universal handle, valid across DB instances."""
     email = models.CharField(max_length=255, unique=True, db_index=True, default=None)
     """Latest email address."""
-    name = models.CharField(max_length=255, db_index=True)
+    name = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """Name."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
