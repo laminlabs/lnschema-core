@@ -9,7 +9,7 @@ from upath import UPath
 from ._lookup import lookup as _lookup
 from ._queryset import QuerySet
 from .ids import base62, base62_8, base62_12, base62_20
-from .types import DataLike, PathLike, TransformType
+from .types import TransformType
 from .users import current_user_id
 
 is_run_from_ipython = getattr(builtins, "__IPYTHON__", False)
@@ -422,50 +422,6 @@ class File(BaseORM):
 
     class Meta:
         unique_together = (("storage", "key"),)
-
-    def path(self) -> Union[Path, UPath]:
-        """Path on storage."""
-        from lamindb._file_access import filepath_from_file_or_folder
-
-        return filepath_from_file_or_folder(self)
-
-    # likely needs an arg `key`
-    def replace(
-        self,
-        data: Union[PathLike, DataLike],
-        run: Optional[Run] = None,
-        format: Optional[str] = None,
-    ) -> None:
-        """Replace file content."""
-        from lamindb._file import replace_file
-
-        replace_file(self, data, run, format)
-
-    @overload
-    def __init__(
-        self,
-        data: Union[PathLike, DataLike],
-        key: Optional[str] = None,
-        name: Optional[str] = None,
-        run: Optional[Run] = None,
-    ):
-        ...
-
-    @overload
-    def __init__(
-        self,
-        **kwargs,
-    ):
-        ...
-
-    def __init__(  # type: ignore
-        self,
-        *args,
-        **kwargs,
-    ):
-        from lamindb._file import init_file
-
-        init_file(self, *args, **kwargs)
 
 
 class RunInput(BaseORM):
