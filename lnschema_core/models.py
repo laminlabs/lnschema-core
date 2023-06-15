@@ -1,10 +1,8 @@
 import builtins
-from pathlib import Path
 from typing import Dict, Iterable, NamedTuple, Optional, Union, overload  # noqa
 
 from django.db import models
 from django.db.models import PROTECT, Manager
-from upath import UPath
 
 from ._lookup import lookup as _lookup
 from ._queryset import QuerySet
@@ -340,47 +338,6 @@ class Folder(BaseORM):
 
     class Meta:
         unique_together = (("storage", "key"),)
-
-    @property
-    def __name__(cls) -> str:
-        return "Folder"
-
-    def path(self) -> Union[Path, UPath]:
-        """Path on storage."""
-        from lamindb._file_access import filepath_from_file_or_folder
-
-        return filepath_from_file_or_folder(self)
-
-    def tree(
-        self,
-        level: int = -1,
-        limit_to_directories: bool = False,
-        length_limit: int = 1000,
-    ) -> None:
-        """Print a visual tree structure."""
-        from lamindb._folder import tree
-
-        return tree(
-            self,
-            level=level,
-            limit_to_directories=limit_to_directories,
-            length_limit=length_limit,
-        )
-
-    def __init__(self, *args, **kwargs):
-        from lamindb._folder import init_folder
-
-        init_folder(self, *args, **kwargs)
-
-    def save(self, *args, **kwargs) -> None:
-        """Save the folder."""
-        # only has attr _files if freshly initialized
-        if hasattr(self, "_files"):
-            for file in self._files:
-                file.save()
-        super().save(*args, **kwargs)
-        if hasattr(self, "_files"):
-            self.files.set(self._files)
 
 
 class File(BaseORM):
