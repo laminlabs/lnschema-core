@@ -1,11 +1,9 @@
 import builtins
-import traceback
 from pathlib import Path
 from typing import Dict, Iterable, NamedTuple, Optional, Union, overload  # noqa
 
 from django.db import models
 from django.db.models import PROTECT, Manager
-from lamin_logger import colors, logger
 from upath import UPath
 
 from ._lookup import lookup as _lookup
@@ -488,23 +486,6 @@ class File(BaseORM):
         if self.run is not None:
             self.run.save()
         super().save(*args, **kwargs)
-
-    def delete(self, *args, **kwargs) -> None:
-        from lamindb._file_access import storage_key_from_file
-        from lamindb.dev.storage import delete_storage
-
-        storage_key = storage_key_from_file(self)
-
-        self._delete_skip_storage(*args, **kwargs)
-
-        try:
-            delete_storage(storage_key)
-            logger.success(f"Deleted {colors.yellow(f'object {storage_key}')} from storage.")
-        except Exception:
-            traceback.print_exc()
-
-    def _delete_skip_storage(self, *args, **kwargs) -> None:
-        super().delete(*args, **kwargs)
 
 
 class RunInput(BaseORM):
