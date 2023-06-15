@@ -1,17 +1,13 @@
 import builtins
-import traceback
-from pathlib import Path
 from typing import Dict, Iterable, NamedTuple, Optional, Union, overload  # noqa
 
 from django.db import models
 from django.db.models import PROTECT, Manager
-from lamin_logger import colors, logger
-from upath import UPath
 
 from ._lookup import lookup as _lookup
 from ._queryset import QuerySet
-from .ids import base62, base62_8, base62_12, base62_20
-from .types import DataLike, PathLike, TransformType
+from .ids import base62_8, base62_12, base62_20
+from .types import TransformType
 from .users import current_user_id
 
 is_run_from_ipython = getattr(builtins, "__IPYTHON__", False)
@@ -79,6 +75,10 @@ class BaseORM(models.Model):
 # Due to Django's convention where CharField has pre-configured (null=False, default=""), marking
 # a required field necessitates passing `default=None`. Without the validator it would trigger
 # an error at the SQL-level, with it, it triggers it at instantiation
+
+# A note on class and instance methods of core ORM
+#
+# All of these are defined and tested within lamindb, in files starting with _{orm_name}.py
 
 
 class User(BaseORM):
@@ -197,23 +197,6 @@ class Transform(BaseORM):
     class Meta:
         unique_together = (("stem_id", "version"),)
 
-    def __init__(self, *args, **kwargs):
-        if len(args) > 0:  # initialize with all fields from db as args
-            super().__init__(*args, **kwargs)
-            return None
-        else:  # user-facing calling signature
-            # set default ids
-            if "id" not in kwargs and "stem_id" not in kwargs:
-                kwargs["id"] = base62(14)
-                kwargs["stem_id"] = kwargs["id"][:12]
-            elif "stem_id" in kwargs:
-                assert isinstance(kwargs["stem_id"], str) and len(kwargs["stem_id"]) == 12
-                kwargs["id"] = kwargs["stem_id"] + base62(2)
-            elif "id" in kwargs:
-                assert isinstance(kwargs["id"], str) and len(kwargs["id"]) == 14
-                kwargs["stem_id"] = kwargs["id"][:12]
-            super().__init__(**kwargs)
-
 
 class Run(BaseORM):
     """Runs of transforms.
@@ -286,40 +269,6 @@ class FeatureSet(BaseORM):
     created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_featuresets")
     """Creator of record, a :class:`~lamindb.User`."""
 
-    @classmethod
-    def from_iterable(
-        cls,
-        iterable: Iterable,
-        field: models.CharField,
-        species: str = None,
-    ):
-        """Parse iterable & return featureset & records."""
-        from lamindb._features import parse_features_from_iterable
-
-        features = parse_features_from_iterable(
-            iterable=iterable,
-            field=field,
-            species=species,
-        )
-        return features
-
-    def __init__(self, *args, **kwargs):  # type: ignore
-        related_names = [i.related_name for i in self.__class__._meta.related_objects]
-
-        relationships: Dict = {}
-        for related_name in related_names:
-            if related_name in kwargs:
-                relationships[related_name] = kwargs.pop(related_name)
-        self._relationships = relationships
-
-        super().__init__(*args, **kwargs)
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        for key, records in self._relationships.items():
-            [r.save() for r in records]
-            getattr(self, key).set(records)
-
 
 class Folder(BaseORM):
     id = models.CharField(max_length=20, primary_key=True)
@@ -342,47 +291,6 @@ class Folder(BaseORM):
 
     class Meta:
         unique_together = (("storage", "key"),)
-
-    @property
-    def __name__(cls) -> str:
-        return "Folder"
-
-    def path(self) -> Union[Path, UPath]:
-        """Path on storage."""
-        from lamindb._file_access import filepath_from_file_or_folder
-
-        return filepath_from_file_or_folder(self)
-
-    def tree(
-        self,
-        level: int = -1,
-        limit_to_directories: bool = False,
-        length_limit: int = 1000,
-    ) -> None:
-        """Print a visual tree structure."""
-        from lamindb._folder import tree
-
-        return tree(
-            self,
-            level=level,
-            limit_to_directories=limit_to_directories,
-            length_limit=length_limit,
-        )
-
-    def __init__(self, *args, **kwargs):
-        from lamindb._folder import init_folder
-
-        init_folder(self, *args, **kwargs)
-
-    def save(self, *args, **kwargs) -> None:
-        """Save the folder."""
-        # only has attr _files if freshly initialized
-        if hasattr(self, "_files"):
-            for file in self._files:
-                file.save()
-        super().save(*args, **kwargs)
-        if hasattr(self, "_files"):
-            self.files.set(self._files)
 
 
 class File(BaseORM):
@@ -424,87 +332,6 @@ class File(BaseORM):
 
     class Meta:
         unique_together = (("storage", "key"),)
-
-    def path(self) -> Union[Path, UPath]:
-        """Path on storage."""
-        from lamindb._file_access import filepath_from_file_or_folder
-
-        return filepath_from_file_or_folder(self)
-
-    # likely needs an arg `key`
-    def replace(
-        self,
-        data: Union[PathLike, DataLike],
-        run: Optional[Run] = None,
-        format: Optional[str] = None,
-    ) -> None:
-        """Replace file content."""
-        from lamindb._file import replace_file
-
-        replace_file(self, data, run, format)
-
-    @overload
-    def __init__(
-        self,
-        data: Union[PathLike, DataLike],
-        key: Optional[str] = None,
-        name: Optional[str] = None,
-        run: Optional[Run] = None,
-    ):
-        ...
-
-    @overload
-    def __init__(
-        self,
-        **kwargs,
-    ):
-        ...
-
-    def __init__(  # type: ignore
-        self,
-        *args,
-        **kwargs,
-    ):
-        from lamindb._file import init_file
-
-        init_file(self, *args, **kwargs)
-
-    def save(self, *args, **kwargs) -> None:
-        """Save the file to database & storage."""
-        self._save_skip_storage(*args, **kwargs)
-        from lamindb._save import check_and_attempt_clearing, check_and_attempt_upload
-
-        exception = check_and_attempt_upload(self)
-        if exception is not None:
-            self._delete_skip_storage()
-            raise RuntimeError(exception)
-        exception = check_and_attempt_clearing(self)
-        if exception is not None:
-            raise RuntimeError(exception)
-
-    def _save_skip_storage(self, *args, **kwargs) -> None:
-        if self.transform is not None:
-            self.transform.save()
-        if self.run is not None:
-            self.run.save()
-        super().save(*args, **kwargs)
-
-    def delete(self, *args, **kwargs) -> None:
-        from lamindb._file_access import storage_key_from_file
-        from lamindb.dev.storage import delete_storage
-
-        storage_key = storage_key_from_file(self)
-
-        self._delete_skip_storage(*args, **kwargs)
-
-        try:
-            delete_storage(storage_key)
-            logger.success(f"Deleted {colors.yellow(f'object {storage_key}')} from storage.")
-        except Exception:
-            traceback.print_exc()
-
-    def _delete_skip_storage(self, *args, **kwargs) -> None:
-        super().delete(*args, **kwargs)
 
 
 class RunInput(BaseORM):
