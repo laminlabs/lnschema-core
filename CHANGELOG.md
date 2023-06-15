@@ -3,11 +3,11 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-🚚 Move methods to lamindb | [205](https://github.com/laminlabs/lnschema-core/pull/205) | [falexwolf](https://github.com/falexwolf) | 2023-06-15 |
+🚚 Move methods to lamindb | [205](https://github.com/laminlabs/lnschema-core/pull/205) | [falexwolf](https://github.com/falexwolf) | 2023-06-15 | 0.35.8
 🚚 Make `User.name` nullable | [204](https://github.com/laminlabs/lnschema-core/pull/204) | [falexwolf](https://github.com/falexwolf) | 2023-06-15 |
 🔥 Remove unnecessary file | [203](https://github.com/laminlabs/lnschema-core/pull/203) | [falexwolf](https://github.com/falexwolf) | 2023-06-14 |
 ✅ Add migrations check | [202](https://github.com/laminlabs/lnschema-core/pull/202) | [falexwolf](https://github.com/falexwolf) | 2023-06-14 |
-♻️ Alter SA migration strategy | [200](https://github.com/laminlabs/lnschema-core/pull/200) | [falexwolf](https://github.com/falexwolf) | 2023-06-12 | 0.36.7
+♻️ Alter SA migration strategy | [200](https://github.com/laminlabs/lnschema-core/pull/200) | [falexwolf](https://github.com/falexwolf) | 2023-06-12 | 0.35.7
 🍱 Add migration process for legacy SA instances | [199](https://github.com/laminlabs/lnschema-core/pull/199) | [falexwolf](https://github.com/falexwolf) | 2023-06-12 | 0.35.5
 ♻️ Less customized IDs | [198](https://github.com/laminlabs/lnschema-core/pull/198) | [falexwolf](https://github.com/falexwolf) | 2023-06-12 |
 ♻️ Move logic to lamindb | [197](https://github.com/laminlabs/lnschema-core/pull/197) | [falexwolf](https://github.com/falexwolf) | 2023-06-12 |
