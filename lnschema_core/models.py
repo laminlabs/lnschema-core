@@ -76,6 +76,10 @@ class BaseORM(models.Model):
 # a required field necessitates passing `default=None`. Without the validator it would trigger
 # an error at the SQL-level, with it, it triggers it at instantiation
 
+# A note on class and instance methods of core ORM
+#
+# All of these are defined and tested within lamindb, in files starting with _{orm_name}.py
+
 
 class User(BaseORM):
     """User accounts.
