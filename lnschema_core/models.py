@@ -467,26 +467,6 @@ class File(BaseORM):
 
         init_file(self, *args, **kwargs)
 
-    def save(self, *args, **kwargs) -> None:
-        """Save the file to database & storage."""
-        self._save_skip_storage(*args, **kwargs)
-        from lamindb._save import check_and_attempt_clearing, check_and_attempt_upload
-
-        exception = check_and_attempt_upload(self)
-        if exception is not None:
-            self._delete_skip_storage()
-            raise RuntimeError(exception)
-        exception = check_and_attempt_clearing(self)
-        if exception is not None:
-            raise RuntimeError(exception)
-
-    def _save_skip_storage(self, *args, **kwargs) -> None:
-        if self.transform is not None:
-            self.transform.save()
-        if self.run is not None:
-            self.run.save()
-        super().save(*args, **kwargs)
-
 
 class RunInput(BaseORM):
     run = models.ForeignKey("Run", on_delete=models.CASCADE)
