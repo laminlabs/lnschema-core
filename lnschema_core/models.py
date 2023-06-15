@@ -282,40 +282,6 @@ class FeatureSet(BaseORM):
     created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_featuresets")
     """Creator of record, a :class:`~lamindb.User`."""
 
-    @classmethod
-    def from_iterable(
-        cls,
-        iterable: Iterable,
-        field: models.CharField,
-        species: str = None,
-    ):
-        """Parse iterable & return featureset & records."""
-        from lamindb._features import parse_features_from_iterable
-
-        features = parse_features_from_iterable(
-            iterable=iterable,
-            field=field,
-            species=species,
-        )
-        return features
-
-    def __init__(self, *args, **kwargs):  # type: ignore
-        related_names = [i.related_name for i in self.__class__._meta.related_objects]
-
-        relationships: Dict = {}
-        for related_name in related_names:
-            if related_name in kwargs:
-                relationships[related_name] = kwargs.pop(related_name)
-        self._relationships = relationships
-
-        super().__init__(*args, **kwargs)
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        for key, records in self._relationships.items():
-            [r.save() for r in records]
-            getattr(self, key).set(records)
-
 
 class Folder(BaseORM):
     id = models.CharField(max_length=20, primary_key=True)
