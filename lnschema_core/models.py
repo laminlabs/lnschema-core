@@ -91,11 +91,11 @@ class User(BaseORM):
     id = models.CharField(max_length=8, primary_key=True, default=None)
     """Universal id, valid across DB instances."""
     handle = models.CharField(max_length=30, unique=True, db_index=True, default=None)
-    """Universal handle, valid across DB instances."""
+    """Universal handle, valid across DB instances (required)."""
     email = models.CharField(max_length=255, unique=True, db_index=True, default=None)
-    """Latest email address."""
+    """Email address (required)."""
     name = models.CharField(max_length=255, db_index=True, null=True, default=None)
-    """Name."""
+    """Name (optional)."""  # has to match hub specification, where it's also optional
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
@@ -113,7 +113,7 @@ class Storage(BaseORM):
     id = models.CharField(max_length=8, default=base62_8, db_index=True, primary_key=True)
     """Universal id, valid across DB instances."""
     root = models.CharField(max_length=255, db_index=True, default=None)
-    """Path to the root of the storage location (an s3 path, a local path, etc.)."""
+    """Root path of storage, an s3 path, a local path, etc. (required)."""
     type = models.CharField(max_length=30, db_index=True)
     """Local vs. s3 vs. gcp etc."""
     region = models.CharField(max_length=63, db_index=True, null=True, default=None)
