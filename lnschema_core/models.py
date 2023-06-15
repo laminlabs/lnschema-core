@@ -4,7 +4,6 @@ from typing import Dict, Iterable, NamedTuple, Optional, Union, overload  # noqa
 from django.db import models
 from django.db.models import PROTECT, Manager
 
-from ._lookup import lookup as _lookup
 from ._queryset import QuerySet
 from .ids import base62_8, base62_12, base62_20
 from .types import TransformType
@@ -44,11 +43,6 @@ class BaseORM(models.Model):
         if not args:  # object is loaded from DB
             validate_required_fields(self, kwargs)
         super().__init__(*args, **kwargs)
-
-    @classmethod
-    def lookup(cls, field: Optional[str] = None) -> NamedTuple:
-        """Lookup object for auto-completing field values."""
-        return _lookup(cls, field)
 
     @classmethod
     def select(cls, **expressions) -> Union[QuerySet, Manager]:
@@ -177,7 +171,12 @@ class Transform(BaseORM):
     Consider using `semantic versioning <https://semver.org>`__
     with `Python versioning <https://peps.python.org/pep-0440/>`__.
     """
-    type = models.CharField(max_length=20, choices=TransformType.choices(), db_index=True, default=TRANSFORM_TYPE_DEFAULT)
+    type = models.CharField(
+        max_length=20,
+        choices=TransformType.choices(),
+        db_index=True,
+        default=TRANSFORM_TYPE_DEFAULT,
+    )
     """Transform type.
 
     Defaults to `notebook` if run from ipython and to `pipeline` if run from python.
