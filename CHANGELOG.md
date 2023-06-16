@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-🔥 Removed lookup | [206](https://github.com/laminlabs/lnschema-core/pull/206) | [sunnyosun](https://github.com/sunnyosun) | 2023-06-15 |
+🔥 Removed lookup | [206](https://github.com/laminlabs/lnschema-core/pull/206) | [sunnyosun](https://github.com/sunnyosun) | 2023-06-15 | 0.35.9
 🚚 Move methods to lamindb | [205](https://github.com/laminlabs/lnschema-core/pull/205) | [falexwolf](https://github.com/falexwolf) | 2023-06-15 | 0.35.8
 🚚 Make `User.name` nullable | [204](https://github.com/laminlabs/lnschema-core/pull/204) | [falexwolf](https://github.com/falexwolf) | 2023-06-15 |
 🔥 Remove unnecessary file | [203](https://github.com/laminlabs/lnschema-core/pull/203) | [falexwolf](https://github.com/falexwolf) | 2023-06-14 |
