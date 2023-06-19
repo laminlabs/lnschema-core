@@ -126,7 +126,7 @@ class Project(BaseORM):
 
 
 class Transform(BaseORM):
-    """Transformations of artifacts (:class:`~lamindb.File`).
+    """Transformations of files (:class:`~lamindb.File`).
 
     Pipelines, workflows, notebooks, app-based transformations.
 
@@ -213,7 +213,7 @@ class Run(BaseORM):
 
 
 class FeatureSet(BaseORM):
-    """Feature sets of data artifacts (`~lamindb.File`).
+    """Feature sets of data artifacts (:class:`~lamindb.File`).
 
     A feature set is represented by the hash of the id set for the feature type.
 
