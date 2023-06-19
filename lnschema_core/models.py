@@ -62,7 +62,7 @@ class BaseORM(models.Model):
 
 
 class User(BaseORM):
-    """User accounts.
+    """Users.
 
     All data in this table is synched from the cloud user account to ensure a
     universal user identity, valid across DB instances, email & handle changes.
@@ -83,11 +83,9 @@ class User(BaseORM):
 
 
 class Storage(BaseORM):
-    """Storage locations, typically cloud storage buckets.
+    """Storage locations.
 
-    A file can be stored in S3 and GCP buckets or local storage locations.
-
-    This ORM tracks these locations along with metadata.
+    Either S3 or GCP buckets or local storage locations.
     """
 
     id = models.CharField(max_length=8, default=base62_8, db_index=True, primary_key=True)
@@ -128,15 +126,13 @@ class Project(BaseORM):
 
 
 class Transform(BaseORM):
-    """File transformations.
+    """Transformations of artifacts (:class:`~lamindb.File`).
 
-    Pipelines, workflows, notebooks, app-based transforms.
+    Pipelines, workflows, notebooks, app-based transformations.
 
     A pipeline is versioned software that transforms data.
     This can be anything from typical workflow tools (Nextflow, Snakemake,
     Prefect, Apache Airflow, etc.) to simple (versioned) scripts.
-
-    Creating a file is a transform, too.
     """
 
     id = models.CharField(max_length=14, db_index=True, primary_key=True, default=None)
@@ -184,11 +180,11 @@ class Transform(BaseORM):
 
 
 class Run(BaseORM):
-    """Runs of transforms.
+    """Runs of transformations (:class:`~lamindb.Transform`).
 
     Typically, a run has inputs and outputs:
 
-    - References to outputs are stored in the `File` ORM in the `run` field.
+    - References to outputs are stored in :class:`~lamindb.File` in the `run` field.
       This is possible as every given file has a unique run that created it. Any
       given `Run` can output multiple `files`: `run.outputs`.
     - References to inputs are stored in the `RunInput` ORM, a many-to-many link
@@ -217,9 +213,9 @@ class Run(BaseORM):
 
 
 class FeatureSet(BaseORM):
-    """Feature sets.
+    """Feature sets of data artifacts (`~lamindb.File`).
 
-    A feature set is represented by the hash of the set of primary keys and the feature type.
+    A feature set is represented by the hash of the id set for the feature type.
 
     The current supported feature types are `lnschema_bionty.Gene`,
     `lnschema_bionty.Protein`, and `lnschema_bionty.CellMarker`.
