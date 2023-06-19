@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚚 Move BaseORM.__init__ to lamindb | [208](https://github.com/laminlabs/lnschema-core/pull/208) | [falexwolf](https://github.com/falexwolf) | 2023-06-19 |
 🚚 Expand field length `short_name` in transform | [207](https://github.com/laminlabs/lnschema-core/pull/207) | [falexwolf](https://github.com/falexwolf) | 2023-06-19 |
 🔥 Removed lookup | [206](https://github.com/laminlabs/lnschema-core/pull/206) | [sunnyosun](https://github.com/sunnyosun) | 2023-06-15 | 0.35.9
 🚚 Move methods to lamindb | [205](https://github.com/laminlabs/lnschema-core/pull/205) | [falexwolf](https://github.com/falexwolf) | 2023-06-15 | 0.35.8
