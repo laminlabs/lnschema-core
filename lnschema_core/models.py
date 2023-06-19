@@ -13,15 +13,6 @@ is_run_from_ipython = getattr(builtins, "__IPYTHON__", False)
 TRANSFORM_TYPE_DEFAULT = TransformType.notebook if is_run_from_ipython else TransformType.pipeline
 
 
-def validate_required_fields(orm, kwargs):
-    required_fields = {k.name for k in orm._meta.fields if not k.null and k.default is None}
-    required_fields_not_passed = {k: None for k in required_fields if k not in kwargs}
-    kwargs.update(required_fields_not_passed)
-    missing_fields = [k for k, v in kwargs.items() if v is None and k in required_fields]
-    if missing_fields:
-        raise TypeError(f"{missing_fields} are required.")
-
-
 # todo, make a CreatedUpdated Mixin, but need to figure out docs
 class BaseORM(models.Model):
     """Base data model.
@@ -38,11 +29,6 @@ class BaseORM(models.Model):
 
     def __str__(self) -> str:
         return self.__repr__()
-
-    def __init__(self, *args, **kwargs):
-        if not args:  # object is loaded from DB
-            validate_required_fields(self, kwargs)
-        super().__init__(*args, **kwargs)
 
     @classmethod
     def select(cls, **expressions) -> Union[QuerySet, Manager]:
@@ -296,7 +282,9 @@ class File(BaseORM):
     id = models.CharField(max_length=20, primary_key=True)
     """A universal random id (20-char base62), valid across DB instances."""
     name = models.CharField(max_length=255, db_index=True, null=True, default=None)
-    """A universal random id, valid across DB instances."""
+    """A name or title for the file, mostly useful if no key is provided."""
+    key = models.CharField(max_length=255, db_index=True, null=True, default=None)
+    """Storage key, the relative path within the storage location."""
     suffix = models.CharField(max_length=30, db_index=True, null=True, default=None)
     """File suffix.
 
@@ -310,9 +298,6 @@ class File(BaseORM):
     """
     hash = models.CharField(max_length=86, db_index=True, null=True, default=None)
     """Hash of file content. 86 base64 chars allow to store 64 bytes, 512 bits."""
-    # below is one of the few cases with null=True, default=None
-    key = models.CharField(max_length=255, db_index=True, null=True, default=None)
-    """Storage key, the relative path within the storage location."""
     run = models.ForeignKey(Run, PROTECT, related_name="outputs", null=True)
     """:class:`~lamindb.Run` that created the `file`."""
     transform = models.ForeignKey(Transform, PROTECT, related_name="files", null=True)
