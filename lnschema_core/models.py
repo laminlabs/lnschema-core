@@ -110,7 +110,7 @@ class Storage(BaseORM):
     """Root path of storage, an s3 path, a local path, etc. (required)."""
     type = models.CharField(max_length=30, db_index=True)
     """Local vs. s3 vs. gcp etc."""
-    region = models.CharField(max_length=63, db_index=True, null=True, default=None)
+    region = models.CharField(max_length=64, db_index=True, null=True, default=None)
     """Cloud storage region, if applicable."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
@@ -158,7 +158,7 @@ class Transform(BaseORM):
     name = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """Transform name or title, a pipeline name, notebook title, etc..
     """
-    short_name = models.CharField(max_length=30, db_index=True, null=True, default=None)
+    short_name = models.CharField(max_length=128, db_index=True, null=True, default=None)
     """A short name.
     """
     stem_id = models.CharField(max_length=12, default=base62_12, db_index=True)
