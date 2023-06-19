@@ -282,7 +282,9 @@ class File(BaseORM):
     id = models.CharField(max_length=20, primary_key=True)
     """A universal random id (20-char base62), valid across DB instances."""
     name = models.CharField(max_length=255, db_index=True, null=True, default=None)
-    """A universal random id, valid across DB instances."""
+    """A name or title for the file, mostly useful if no key is provided."""
+    key = models.CharField(max_length=255, db_index=True, null=True, default=None)
+    """Storage key, the relative path within the storage location."""
     suffix = models.CharField(max_length=30, db_index=True, null=True, default=None)
     """File suffix.
 
@@ -296,9 +298,6 @@ class File(BaseORM):
     """
     hash = models.CharField(max_length=86, db_index=True, null=True, default=None)
     """Hash of file content. 86 base64 chars allow to store 64 bytes, 512 bits."""
-    # below is one of the few cases with null=True, default=None
-    key = models.CharField(max_length=255, db_index=True, null=True, default=None)
-    """Storage key, the relative path within the storage location."""
     run = models.ForeignKey(Run, PROTECT, related_name="outputs", null=True)
     """:class:`~lamindb.Run` that created the `file`."""
     transform = models.ForeignKey(Transform, PROTECT, related_name="files", null=True)
