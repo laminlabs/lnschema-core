@@ -251,27 +251,19 @@ class FeatureSet(BaseORM):
     """Creator of record, a :class:`~lamindb.User`."""
 
 
-class Folder(BaseORM):
+class Tag(BaseORM):
     id = models.CharField(max_length=20, primary_key=True)
     """A universal random id, valid across DB instances."""
     name = models.CharField(max_length=255, db_index=True, default=None)
     """Name or title of folder."""
-    # below is one of the few cases with null=True, default=None
-    key = models.CharField(max_length=255, db_index=True, null=True, default=None)
-    """Storage key of folder."""
-    storage = models.ForeignKey(Storage, PROTECT, related_name="folders", null=True)
-    """:class:`~lamindb.Storage` location of folder, see `.path()` for full path."""
-    files = models.ManyToManyField("File", related_name="folders")
+    files = models.ManyToManyField("File", related_name="tags")
     """:class:`~lamindb.File` records in folder."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
-    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_folders")
+    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_tags")
     """Creator of record, a :class:`~lamindb.User`."""
-
-    class Meta:
-        unique_together = (("storage", "key"),)
 
 
 class File(BaseORM):
