@@ -104,6 +104,23 @@ class Storage(BaseORM):
     """Creator of record, a :class:`~lamindb.User`."""
 
 
+class Tag(BaseORM):
+    """Tags."""
+
+    id = models.CharField(max_length=20, default=base62_8, primary_key=True)
+    """A universal random id, valid across DB instances."""
+    name = models.CharField(max_length=255, db_index=True, unique=True, default=None)
+    """Name or title of tag."""
+    files = models.ManyToManyField("File", related_name="tags")
+    """:class:`~lamindb.File` records in tag."""
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    """Time of creation of record."""
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    """Time of last update to record."""
+    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_tags")
+    """Creator of record, a :class:`~lamindb.User`."""
+
+
 class Project(BaseORM):
     """Projects."""
 
@@ -248,21 +265,6 @@ class FeatureSet(BaseORM):
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
     created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_featuresets")
-    """Creator of record, a :class:`~lamindb.User`."""
-
-
-class Tag(BaseORM):
-    id = models.CharField(max_length=20, default=base62_8, primary_key=True)
-    """A universal random id, valid across DB instances."""
-    name = models.CharField(max_length=255, db_index=True, unique=True, default=None, null=False)
-    """Name or title of tag."""
-    files = models.ManyToManyField("File", related_name="tags")
-    """:class:`~lamindb.File` records in tag."""
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    """Time of creation of record."""
-    updated_at = models.DateTimeField(auto_now=True, db_index=True)
-    """Time of last update to record."""
-    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_tags")
     """Creator of record, a :class:`~lamindb.User`."""
 
 
