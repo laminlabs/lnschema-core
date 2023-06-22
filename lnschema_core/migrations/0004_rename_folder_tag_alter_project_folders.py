@@ -16,6 +16,10 @@ class Migration(migrations.Migration):
             old_name="Folder",
             new_name="Tag",
         ),
+        migrations.AlterUniqueTogether(
+            name="tag",
+            unique_together=set(),
+        ),
         migrations.RemoveField(
             model_name="tag",
             name="key",
@@ -23,10 +27,6 @@ class Migration(migrations.Migration):
         migrations.RemoveField(
             model_name="tag",
             name="storage",
-        ),
-        migrations.AlterUniqueTogether(
-            name="tag",
-            unique_together=set(),
         ),
         migrations.AlterField(
             model_name="tag",
