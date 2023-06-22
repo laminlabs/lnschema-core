@@ -16,10 +16,13 @@ class Migration(migrations.Migration):
             old_name="Folder",
             new_name="Tag",
         ),
-        migrations.AlterField(
-            model_name="project",
-            name="folders",
-            field=models.ManyToManyField(related_name="projects", to="folder"),
+        migrations.RemoveField(
+            model_name="tag",
+            name="key",
+        ),
+        migrations.RemoveField(
+            model_name="tag",
+            name="storage",
         ),
         migrations.AlterUniqueTogether(
             name="tag",
@@ -38,11 +41,12 @@ class Migration(migrations.Migration):
             field=models.ManyToManyField(related_name="tags", to="lnschema_core.file"),
         ),
         migrations.RemoveField(
-            model_name="tag",
-            name="key",
+            model_name="project",
+            name="folders",
         ),
-        migrations.RemoveField(
-            model_name="tag",
-            name="storage",
+        migrations.AddField(
+            model_name="project",
+            name="tags",
+            field=models.ManyToManyField(related_name="projects", to="lnschema_core.tag"),
         ),
     ]
