@@ -16,11 +16,11 @@ if _INSTANCE_SETUP:
         BaseORM,
         FeatureSet,
         File,
-        Folder,
         Project,
         Run,
         RunInput,
         Storage,
+        Tag,
         Transform,
         User,
     )
