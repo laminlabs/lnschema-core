@@ -252,9 +252,9 @@ class FeatureSet(BaseORM):
 
 
 class Tag(BaseORM):
-    id = models.CharField(max_length=20, primary_key=True)
+    id = models.CharField(max_length=20, default=base62_8, primary_key=True)
     """A universal random id, valid across DB instances."""
-    name = models.CharField(max_length=255, db_index=True, default=None)
+    name = models.CharField(max_length=255, db_index=True, unique=True, default=None, null=False)
     """Name or title of tag."""
     files = models.ManyToManyField("File", related_name="tags")
     """:class:`~lamindb.File` records in tag."""
