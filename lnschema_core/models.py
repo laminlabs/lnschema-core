@@ -107,7 +107,7 @@ class Storage(BaseORM):
 class Tag(BaseORM):
     """Tags."""
 
-    id = models.CharField(max_length=20, default=base62_8, primary_key=True)
+    id = models.CharField(max_length=8, default=base62_8, primary_key=True)
     """A universal random id, valid across DB instances."""
     name = models.CharField(max_length=255, db_index=True, unique=True, default=None)
     """Name or title of tag."""

@@ -49,4 +49,14 @@ class Migration(migrations.Migration):
             name="tags",
             field=models.ManyToManyField(related_name="projects", to="lnschema_core.tag"),
         ),
+        migrations.AlterField(
+            model_name="tag",
+            name="id",
+            field=models.CharField(default=lnschema_core.ids.base62_8, max_length=8, primary_key=True, serialize=False),
+        ),
+        migrations.AlterField(
+            model_name="tag",
+            name="name",
+            field=models.CharField(db_index=True, default=None, max_length=255, unique=True),
+        ),
     ]
