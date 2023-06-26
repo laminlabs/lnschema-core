@@ -18,7 +18,6 @@ if _INSTANCE_SETUP:
         File,
         Project,
         Run,
-        RunInput,
         Storage,
         Tag,
         Transform,
