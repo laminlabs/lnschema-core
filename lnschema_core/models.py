@@ -204,10 +204,9 @@ class Run(BaseORM):
     - References to outputs are stored in :class:`~lamindb.File` in the `run` field.
       This is possible as every given file has a unique run that created it. Any
       given `Run` can output multiple `files`: `run.outputs`.
-    - References to inputs are stored in the `RunInput` ORM, a many-to-many link
-      ORM between `File` and `Run`. Any `file` might serve as an input for
-      multiple `runs`: `file.input_of`. Similarly, any `run` might have many
-      `files` as inputs: `run.inputs`.
+    - References to inputs are stored in the :class:`~lamindb.File` in the
+      `input_of` field. Any `file` might serve as an input for multiple `runs`.
+      Similarly, any `run` might have many `files` as inputs: `run.inputs`.
     """
 
     id = models.CharField(max_length=20, default=base62_20, primary_key=True)
@@ -218,7 +217,7 @@ class Run(BaseORM):
     """External id (such as from a workflow tool)."""
     transform = models.ForeignKey(Transform, PROTECT, related_name="runs")
     """The transform :class:`~lamindb.Transform` that is being run."""
-    inputs = models.ManyToManyField("File", through="RunInput", related_name="input_of")
+    inputs = models.ManyToManyField("File", related_name="input_of")
     """The input files for the run."""
     # outputs on File
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -306,11 +305,3 @@ class File(BaseORM):
 
     class Meta:
         unique_together = (("storage", "key"),)
-
-
-class RunInput(BaseORM):
-    run = models.ForeignKey("Run", on_delete=models.CASCADE)
-    file = models.ForeignKey("File", on_delete=models.CASCADE)
-
-    class Meta:
-        unique_together = ("run", "file")
