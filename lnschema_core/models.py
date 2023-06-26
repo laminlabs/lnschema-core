@@ -1,5 +1,6 @@
 import builtins
-from typing import Dict, Iterable, NamedTuple, Optional, Union, overload  # noqa
+from datetime import datetime
+from typing import Any, Dict, Iterable, NamedTuple, Optional, Union, overload  # noqa
 
 from django.db import models
 from django.db.models import PROTECT, Manager
@@ -13,6 +14,13 @@ is_run_from_ipython = getattr(builtins, "__IPYTHON__", False)
 TRANSFORM_TYPE_DEFAULT = TransformType.notebook if is_run_from_ipython else TransformType.pipeline
 
 
+def format_datetime(dt: Union[datetime, Any]) -> str:
+    if not isinstance(dt, datetime):
+        return dt
+    else:
+        return dt.strftime("%Y-%m-%d %H:%M:%S")
+
+
 # todo, make a CreatedUpdated Mixin, but need to figure out docs
 class BaseORM(models.Model):
     """Base data model.
@@ -22,10 +30,13 @@ class BaseORM(models.Model):
     """
 
     def __repr__(self) -> str:
-        fields = [field.name for field in self._meta.fields if not isinstance(field, models.ForeignKey)]
-        fields += [f"{field.name}_id" for field in self._meta.fields if isinstance(field, models.ForeignKey)]
-        fields_str = ", ".join([f"{k}={getattr(self, k)}" for k in fields if hasattr(self, k)])
-        return f"{self.__class__.__name__}({fields_str})"
+        field_names = [field.name for field in self._meta.fields if not isinstance(field, (models.ForeignKey, models.DateTimeField))]
+        # skip created_at
+        field_names += [field.name for field in self._meta.fields if isinstance(field, models.DateTimeField) and field.name != "created_at"]
+        field_names += [f"{field.name}_id" for field in self._meta.fields if isinstance(field, models.ForeignKey)]
+        fields_str = {k: format_datetime(getattr(self, k)) for k in field_names if hasattr(self, k)}
+        fields_joined_str = ", ".join([f"{k}={fields_str[k]}" for k in fields_str])
+        return f"{self.__class__.__name__}({fields_joined_str})"
 
     def __str__(self) -> str:
         return self.__repr__()
