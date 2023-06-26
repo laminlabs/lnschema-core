@@ -9,7 +9,11 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterField(
+        migrations.RemoveField(
+            model_name="run",
+            name="inputs",
+        ),
+        migrations.AddField(
             model_name="run",
             name="inputs",
             field=models.ManyToManyField(related_name="input_of", to="lnschema_core.file"),
