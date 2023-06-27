@@ -244,28 +244,24 @@ class Dataset(BaseORM):
 
     Datasets are measurements of features (aka observations of variables).
 
-    A feature can be a "high-level" feature, i.e., a feature that has
-    semantic meaning and can be modeled as :class:`~lamindb.Feature` or any other ORM.
+    1. A feature can be a “high-level” feature, i.e., it has meaning, can label
+       a column in a DataFrame, and can be modeled as a Feature or another ORM.
+       Examples: gene id, protein id, phenotype name, temperature,
+       concentration, treatment label, treatment id, etc.
+    2. In other cases, a feature might be a “low-level” feature without semantic
+       meaning. Examples: pixels, single letters in sequences, etc.
 
-    Examples: gene id, protein id, phenotype name, temperature, concentration,
-    treatment label, etc.
+    LaminDB typically stores datasets as files (`.files`), either as
 
-    In other cases, a feature might be a "low-level" feature without semantic meaning,
-    and without the necessity to model.
+    1. serialized `DataFrame` or `AnnData` objects (for high-level features)
+    2. a set of files of any type (for low-level features, e.g., a folder of
+       images or fastqs)
 
-    Examples: pixels, single letters in sequences, etc.
+    In simple cases, a single serialized DataFrame or AnnData object (`.file`)
+    is enough.
 
-    Values for measurements can be stored in several ways:
-
-    LaminDB typically stores datasets as files (`.files`)
-
-    - serialized `DataFrame` or `AnnData` objects for high-level features
-    - a set of files of any type for low-level features (e.g., a folder of images)
-
-    In simple cases, a single serialized DataFrame or AnnData object (`.file`) is enough.
-
-    One might also store a dataset in a SQL table or view in a data warehousing
-    platform, but this is not yet supported by LaminDB.
+    One might also store a dataset in a SQL table or view, but this is not yet
+    supported by LaminDB.
     """
 
     id = models.CharField(max_length=20, default=base62_20, primary_key=True)
@@ -274,6 +270,8 @@ class Dataset(BaseORM):
     """Name or title of dataset (required)."""
     description = models.TextField(null=True, default=None)
     """A description."""
+    feature_sets = models.ManyToManyField("FeatureSet", related_name="datasets")
+    """The feature sets measured in this dataset."""
     file = models.ForeignKey("File", on_delete=PROTECT, null=True, unique=True, related_name="datasets")
     """Storage of dataset as a one file."""
     files = models.ManyToManyField("File", related_name="datasets")
@@ -305,6 +303,8 @@ class Feature(BaseORM):
     """A way of grouping features of same type."""
     description = models.TextField(null=True, default=None)
     """A description."""
+    feature_sets = models.ManyToManyField("FeatureSet", related_name="features")
+    """Feature sets linked to this gene."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
@@ -330,7 +330,7 @@ class FeatureSet(BaseORM):
 
     >>> import lnschema_bionty as bt
     >>> reference = bt.Gene(species="mouse")
-    >>> feature_set = ln.FeatureSet.from_iterable(adata.var["ensemble_id"], Gene.ensembl_gene_id)
+    >>> feature_set = ln.FeatureSet.from_values(adata.var["ensemble_id"], Gene.ensembl_gene_id)
     >>> feature_set.save()
     >>> file = ln.File(adata, name="Mouse Lymph Node scRNA-seq")
     >>> file.save()
