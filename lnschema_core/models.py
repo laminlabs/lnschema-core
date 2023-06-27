@@ -239,8 +239,35 @@ class Run(BaseORM):
     """Creator of record, a :class:`~lamindb.User`."""
 
 
+class Feature(BaseORM):
+    """Features: column names of DataFrames.
+
+    Note that you can use Bionty ORMs to manage common features like genes,
+    pathways, proteins & cell markers.
+
+    Similarly, you can define custom ORMs to manage features like gene sets, nodes, etc.
+
+    This ORM is a way of getting started without using Bionty or a custom schema.
+    """
+
+    id = models.CharField(max_length=12, default=base62_12, primary_key=True)
+    """Universal id, valid across DB instances."""
+    name = models.CharField(max_length=255, db_index=True, default=None)
+    """Name of feature (required)."""
+    type = models.CharField(max_length=96, null=True, default=None)
+    """A way of grouping features of same type."""
+    description = models.TextField(null=True, default=None)
+    """A description."""
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    """Time of creation of record."""
+    run_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    """Time of run execution."""
+    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_runs")
+    """Creator of record, a :class:`~lamindb.User`."""
+
+
 class FeatureSet(BaseORM):
-    """Feature sets of data artifacts (:class:`~lamindb.File`).
+    """Feature sets: sets of features.
 
     A feature set is represented by the hash of the id set for the feature type.
 
@@ -256,8 +283,8 @@ class FeatureSet(BaseORM):
 
     >>> import lnschema_bionty as bt
     >>> reference = bt.Gene(species="mouse")
-    >>> features = ln.Features.from_iterable(adata.var["ensemble_id"], Gene.ensembl_gene_id)
-    >>> features.save()
+    >>> feature_set = ln.FeatureSet.from_iterable(adata.var["ensemble_id"], Gene.ensembl_gene_id)
+    >>> feature_set.save()
     >>> file = ln.File(adata, name="Mouse Lymph Node scRNA-seq")
     >>> file.save()
     >>> file.featuresets.add(featureset)
