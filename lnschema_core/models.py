@@ -239,6 +239,53 @@ class Run(BaseORM):
     """Creator of record, a :class:`~lamindb.User`."""
 
 
+class Dataset(BaseORM):
+    """Datasets: measurements of features.
+
+    Datasets are measurements of features (aka observations of variables).
+
+    A feature can be a "high-level" feature, i.e., a feature that has
+    semantic meaning and can be modeled as :class:`~lamindb.Feature` or any other ORM.
+
+    Examples: gene id, protein id, phenotype name, temperature, concentration,
+    treatment label, etc.
+
+    In other cases, a feature might be a "low-level" feature without semantic meaning,
+    and without the necessity to model.
+
+    Examples: pixels, single letters in sequences, etc.
+
+    Values for measurements can be stored in several ways:
+
+    LaminDB typically stores datasets as files (`.files`)
+
+    - serialized `DataFrame` or `AnnData` objects for high-level features
+    - a set of files of any type for low-level features (e.g., a folder of images)
+
+    In simple cases, a single serialized DataFrame or AnnData object (`.file`) is enough.
+
+    One might also store a dataset in a SQL table or view in a data warehousing
+    platform, but this is not yet supported by LaminDB.
+    """
+
+    id = models.CharField(max_length=20, default=base62_20, primary_key=True)
+    """Universal id, valid across DB instances."""
+    name = models.CharField(max_length=255, db_index=True, default=None)
+    """Name or title of dataset (required)."""
+    description = models.TextField(null=True, default=None)
+    """A description."""
+    file = models.ForeignKey("File", on_delete=PROTECT, null=True, unique=True, related_name="datasets")
+    """Storage of dataset as a one file."""
+    files = models.ManyToManyField("File", related_name="datasets")
+    """Storage of dataset as multiple file."""
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    """Time of creation of record."""
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    """Time of run execution."""
+    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_datasets")
+    """Creator of record, a :class:`~lamindb.User`."""
+
+
 class Feature(BaseORM):
     """Features: column names of DataFrames.
 
@@ -253,16 +300,16 @@ class Feature(BaseORM):
     id = models.CharField(max_length=12, default=base62_12, primary_key=True)
     """Universal id, valid across DB instances."""
     name = models.CharField(max_length=255, db_index=True, default=None)
-    """Name of feature (required)."""
+    """Name or title of feature (required)."""
     type = models.CharField(max_length=96, null=True, default=None)
     """A way of grouping features of same type."""
     description = models.TextField(null=True, default=None)
     """A description."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
-    run_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of run execution."""
-    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_runs")
+    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_features")
     """Creator of record, a :class:`~lamindb.User`."""
 
 
