@@ -14,6 +14,8 @@ if _INSTANCE_SETUP:
     from . import ids, types
     from .models import (  # type: ignore
         BaseORM,
+        Dataset,
+        Feature,
         FeatureSet,
         File,
         Project,
