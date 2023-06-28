@@ -56,4 +56,9 @@ class Migration(migrations.Migration):
                 "abstract": False,
             },
         ),
+        migrations.AlterField(
+            model_name="featureset",
+            name="files",
+            field=models.ManyToManyField(related_name="feature_sets", to="lnschema_core.file"),
+        ),
     ]

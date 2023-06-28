@@ -342,8 +342,8 @@ class FeatureSet(BaseORM):
     """A universal id, valid across DB instances, a hash of the linked set of features."""
     type = models.CharField(max_length=64)
     """A feature entity type."""
-    files = models.ManyToManyField("File", related_name="featuresets")
-    """Files linked to the featureset."""
+    files = models.ManyToManyField("File", related_name="feature_sets")
+    """Files linked to the feature set."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
