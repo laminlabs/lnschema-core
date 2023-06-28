@@ -270,6 +270,8 @@ class Dataset(BaseORM):
     """Name or title of dataset (required)."""
     description = models.TextField(null=True, default=None)
     """A description."""
+    hash = models.CharField(max_length=86, db_index=True, null=True, default=None)
+    """Hash of dataset content. 86 base64 chars allow to store 64 bytes, 512 bits."""
     feature_sets = models.ManyToManyField("FeatureSet", related_name="datasets")
     """The feature sets measured in this dataset."""
     file = models.ForeignKey("File", on_delete=PROTECT, null=True, unique=True, related_name="datasets")
