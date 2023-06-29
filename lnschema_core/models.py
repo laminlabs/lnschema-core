@@ -1,4 +1,5 @@
 import builtins
+from pathlib import Path
 from typing import (  # noqa
     TYPE_CHECKING,
     Any,
@@ -14,6 +15,7 @@ from typing import (  # noqa
 
 from django.db import models
 from django.db.models import PROTECT, CharField, Manager, TextField
+from upath import UPath
 
 from lnschema_core.types import (
     AnnDataAccessor,
@@ -697,4 +699,42 @@ class File(ORM):
         length_limit: int = 1000,
     ):
         """Given a prefix, print a visual tree structure of files."""
+        pass
+
+    def path(self) -> Union[Path, UPath]:
+        """Path in storage."""
+
+    def load(self, is_run_input: Optional[bool] = None, stream: bool = False) -> DataLike:
+        """Stage and load to memory.
+
+        Returns in-memory representation if possible, e.g., an `AnnData` object
+        for an `h5ad` file.
+        """
+        pass
+
+    def stage(self, is_run_input: Optional[bool] = None) -> Path:
+        """Update cache from cloud storage if outdated.
+
+        Returns a path to a locally cached on-disk object (say, a
+        `.jpg` file).
+        """
+        pass
+
+    def delete(file, storage: Optional[bool] = None) -> None:
+        """Delete file, optionall from storage.
+
+        Args:
+            storage: `Optional[bool] = None` Indicate whether you want to delete the
+            file in storage.
+
+        Example:
+
+        For any `File` object `file`, call:
+
+        >>> file.delete(storage=True)  # storage=True auto-confirms deletion in storage
+        """
+        pass
+
+    def save(file, *args, **kwargs) -> None:
+        """Save the file to database & storage."""
         pass
