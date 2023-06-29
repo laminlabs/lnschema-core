@@ -2,6 +2,7 @@ from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, TypeVar
 
+from django.db.models import CharField, TextField
 from upath import UPath
 
 if TYPE_CHECKING:
@@ -13,6 +14,7 @@ PathLike = TypeVar("PathLike", str, Path, UPath)
 # dependencies, even DataFrame is heavy & slow to import
 DataLike = Any
 ListLike = TypeVar("ListLike", "pd.Series", list, "np.array")
+StrField = TypeVar("StrField", str, CharField, TextField)
 
 
 class ChoicesMixin:
