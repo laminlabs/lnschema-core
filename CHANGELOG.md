@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+✨ Add `Dataset` & `Feature` ORMs | [212](https://github.com/laminlabs/lnschema-core/pull/212) | [falexwolf](https://github.com/falexwolf) | 2023-06-29 |
 💄 Denoise display of timestamps | [211](https://github.com/laminlabs/lnschema-core/pull/211) | [falexwolf](https://github.com/falexwolf) | 2023-06-26 |
 🎨 Auto-manage `RunInput` relationship | [210](https://github.com/laminlabs/lnschema-core/pull/210) | [falexwolf](https://github.com/falexwolf) | 2023-06-26 | 0.36.1
 🚚 Repurpose `Folder` to `Tag` | [209](https://github.com/laminlabs/lnschema-core/pull/209) | [falexwolf](https://github.com/falexwolf) | 2023-06-22 | 0.36.0
