@@ -1,14 +1,26 @@
 import builtins
 from datetime import datetime
-from typing import Any, Dict, Iterable, NamedTuple, Optional, Union, overload  # noqa
+from typing import (  # noqa
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    Iterable,
+    NamedTuple,
+    Optional,
+    Union,
+    overload,
+)
 
 from django.db import models
-from django.db.models import PROTECT, Manager
+from django.db.models import PROTECT, CharField, Manager, TextField
 
 from ._queryset import QuerySet
 from .ids import base62_8, base62_12, base62_20
 from .types import TransformType
 from .users import current_user_id
+
+if TYPE_CHECKING:
+    import pandas as pd
 
 is_run_from_ipython = getattr(builtins, "__IPYTHON__", False)
 TRANSFORM_TYPE_DEFAULT = TransformType.notebook if is_run_from_ipython else TransformType.pipeline
@@ -43,10 +55,48 @@ class BaseORM(models.Model):
 
     @classmethod
     def select(cls, **expressions) -> Union[QuerySet, Manager]:
-        """Query the ORM."""
+        """Query records.
+
+        Guide: :doc:`/guide/select`.
+
+        Args:
+            ORM: An ORM class.
+            expressions: Fields and values passed as Django query expressions.
+
+        Returns:
+            A `QuerySet` or Django `Manager`.
+        """
         from lamindb._select import select
 
         return select(cls, **expressions)
+
+    @classmethod
+    def search(
+        cls,
+        string: str,
+        *,
+        field: Optional[Union[str, CharField, TextField]] = None,
+        top_hit: bool = False,
+        case_sensitive: bool = True,
+        synonyms_field: Optional[Union[str, TextField, CharField]] = "synonyms",
+        synonyms_sep: str = "|",
+    ) -> Union["pd.DataFrame", "BaseORM"]:
+        """Search the table.
+
+        Args:
+            string: `str` The input string to match against the field ontology values.
+            field: `Optional[Union[str, CharField, TextField]] = None` The field
+                against which the input string is matching.
+            top_hit: `bool = False` If `True`, return only the top hit or hits (in
+                case of equal scores).
+            case_sensitive: `bool = False` Whether the match is case sensitive.
+            synonyms_field: `bool = True` Also search synonyms. If `None`, is ignored.
+
+        Returns:
+            A sorted `DataFrame` of search results with a score in column
+            `__ratio__`. If `top_hit` is `True`, the best match.
+        """
+        pass
 
     class Meta:
         abstract = True
@@ -355,6 +405,8 @@ class FeatureSet(BaseORM):
 
 
 class File(BaseORM):
+    """Test."""
+
     id = models.CharField(max_length=20, primary_key=True)
     """A universal random id (20-char base62), valid across DB instances."""
     name = models.CharField(max_length=255, db_index=True, null=True, default=None)
