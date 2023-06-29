@@ -12,6 +12,9 @@ from typing import (  # noqa
 
 from django.db import models
 from django.db.models import PROTECT, CharField, Manager, TextField
+from django.db.models.query_utils import DeferredAttribute as Field
+
+from lnschema_core.types import ListLike
 
 from ._queryset import QuerySet
 from .ids import base62_8, base62_12, base62_20
@@ -25,13 +28,46 @@ is_run_from_ipython = getattr(builtins, "__IPYTHON__", False)
 TRANSFORM_TYPE_DEFAULT = TransformType.notebook if is_run_from_ipython else TransformType.pipeline
 
 
-# todo, make a CreatedUpdated Mixin, but need to figure out docs
 class ORM(models.Model):
-    """Base data model.
+    """LaminDB's base ORM.
 
-    Is essentially equal to the Django Model base class, but adds the following
-    methods.
+    Is based on `django.db.models.Model`.
     """
+
+    @classmethod
+    def from_values(cls, values: ListLike, field: Union[Field, str], **kwargs):
+        """Parse values for an identifier (a name, an id, etc.) and create records.
+
+        This method helps avoid problems around duplication of entries,
+        violation of idempotency, and performance when creating records in bulk.
+
+        Guide: :doc:`/biology/registries`.
+
+        Args:
+            values: `ListLike` A list of values for an identifier, e.g.
+                `["name1", "name2"]`.
+            field: `Field` If `iterable` is `ListLike`, an `ORM` field to look
+                up, e.g. `lb.CellMarker.name`.
+            **kwargs: Can contain `species`. Either `"human"`, `"mouse"`, or any other
+                `name` of `Bionty.Species`. If `None`, will use default species in
+                bionty for each entity.
+
+        Returns:
+            A list of records.
+
+        For every `value` in an iterable of identifiers and a given `ORM.field`,
+        this function performs:
+
+        1. It checks whether the value already exists in the database
+        (`ORM.select(field=value)`). If so, it adds the queried record to
+        the returned list and skips step 2. Otherwise, proceed with 2.
+        2. If the `ORM` is from `lnschema_bionty`, it checks whether there is an
+        exact match in the underlying ontology (`Bionty.inspect(value, field)`).
+        If so, it creates a record from Bionty and adds it to the returned list.
+        Otherwise, it creates a record that populates a single field using `value`
+        and adds the record to the returned list.
+        """
+        pass
 
     @classmethod
     def select(cls, **expressions) -> Union[QuerySet, Manager]:
