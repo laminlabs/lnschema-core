@@ -1,7 +1,5 @@
 """IDs.
 
-See: https://github.com/laminlabs/lamin-notes/blob/main/docs/2022/ids.ipynb
-
 Base generators:
 
 .. autosummary::
@@ -9,48 +7,60 @@ Base generators:
 
    base26
    base62
-   Base62
    base64
 
-For example, 8 base62 characters:
+8 base62 characters:
 
 ======= ===========
-n_rows  p_collision
+n       p_collision
 ======= ===========
 100k    2e-05
 1M      2e-03
 ======= ===========
 
-20 base62 characters (62**20=7e+35) roughly matches UUID (2*122=5e+36).
+12 base62 characters:
+
+======= ===========
+n       p_collision
+======= ===========
+100M    2e-06
+1B      2e-04
+======= ===========
+
+20 base62 characters (62**20=7e+35) roughly matches UUID (2*122=5e+36):
+
+======= ===========
+n       p_collision
+======= ===========
+3e15    1e-6
+======= ===========
+
 """
-# Some IDs got updated on 2023-02-14 to be multiples of 4
-# for matching byte representation, should we ever go there.
 import secrets
 import string
 
 
 def base64(n_char: int) -> str:
-    """Like nanoid."""
+    """Random Base64 string."""
     alphabet = string.digits + string.ascii_letters.swapcase() + "_" + "-"
     id = "".join(secrets.choice(alphabet) for i in range(n_char))
     return id
 
 
 def base62(n_char: int) -> str:
-    """Like nanoid without hyphen and underscore."""
+    """Random Base62 string."""
     alphabet = string.digits + string.ascii_letters.swapcase()
     id = "".join(secrets.choice(alphabet) for i in range(n_char))
     return id
 
 
-# this cannot be serialized by Django,
-# hence, see below
-class Base62:
-    def __init__(self, n_char: int):
-        self.n_char = n_char
+# the following cannot be serialized by Django
+# class Base62:
+#     def __init__(self, n_char: int):
+#         self.n_char = n_char
 
-    def __call__(self):
-        return base62(self.n_char)
+#     def __call__(self):
+#         return base62(self.n_char)
 
 
 def base26(n_char: int):
