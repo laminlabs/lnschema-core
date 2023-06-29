@@ -15,7 +15,14 @@ from typing import (  # noqa
 from django.db import models
 from django.db.models import PROTECT, CharField, Manager, TextField
 
-from lnschema_core.types import DataLike, ListLike, PathLike, StrField
+from lnschema_core.types import (
+    AnnDataAccessor,
+    BackedAccessor,
+    DataLike,
+    ListLike,
+    PathLike,
+    StrField,
+)
 
 from ._queryset import QuerySet
 from .ids import base62_8, base62_12, base62_20
@@ -674,4 +681,8 @@ class File(ORM):
 
         However, it will update the suffix if the file type changes.
         """
+        pass
+
+    def backed(self, is_run_input: Optional[bool] = None) -> Union["AnnDataAccessor", "BackedAccessor"]:
+        """Return a cloud-backed data object to stream."""
         pass
