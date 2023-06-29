@@ -13,7 +13,7 @@ _INSTANCE_SETUP = _check_instance_setup()
 if _INSTANCE_SETUP:
     from . import ids, types
     from .models import (  # type: ignore
-        BaseORM,
+        ORM,
         Dataset,
         Feature,
         FeatureSet,

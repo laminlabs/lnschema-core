@@ -1,52 +1,227 @@
 import builtins
-from datetime import datetime
-from typing import Any, Dict, Iterable, NamedTuple, Optional, Union, overload  # noqa
+from typing import (  # noqa
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    Iterable,
+    List,
+    Literal,
+    NamedTuple,
+    Optional,
+    Union,
+    overload,
+)
 
 from django.db import models
-from django.db.models import PROTECT, Manager
+from django.db.models import PROTECT, CharField, Manager, TextField
+
+from lnschema_core.types import ListLike, StrField
 
 from ._queryset import QuerySet
 from .ids import base62_8, base62_12, base62_20
 from .types import TransformType
 from .users import current_user_id
 
+if TYPE_CHECKING:
+    import pandas as pd
+
 is_run_from_ipython = getattr(builtins, "__IPYTHON__", False)
 TRANSFORM_TYPE_DEFAULT = TransformType.notebook if is_run_from_ipython else TransformType.pipeline
 
 
-def format_datetime(dt: Union[datetime, Any]) -> str:
-    if not isinstance(dt, datetime):
-        return dt
-    else:
-        return dt.strftime("%Y-%m-%d %H:%M:%S")
+class ORM(models.Model):
+    """LaminDB's base ORM.
 
-
-# todo, make a CreatedUpdated Mixin, but need to figure out docs
-class BaseORM(models.Model):
-    """Base data model.
-
-    Is essentially equal to the Django Model base class, but adds the following
-    methods.
+    Is based on `django.db.models.Model`.
     """
 
-    def __repr__(self) -> str:
-        field_names = [field.name for field in self._meta.fields if not isinstance(field, (models.ForeignKey, models.DateTimeField))]
-        # skip created_at
-        field_names += [field.name for field in self._meta.fields if isinstance(field, models.DateTimeField) and field.name != "created_at"]
-        field_names += [f"{field.name}_id" for field in self._meta.fields if isinstance(field, models.ForeignKey)]
-        fields_str = {k: format_datetime(getattr(self, k)) for k in field_names if hasattr(self, k)}
-        fields_joined_str = ", ".join([f"{k}={fields_str[k]}" for k in fields_str])
-        return f"{self.__class__.__name__}({fields_joined_str})"
+    def add_synonym(self, synonym: Union[str, ListLike], force: bool = False):
+        """Add synonyms to a record."""
+        pass
 
-    def __str__(self) -> str:
-        return self.__repr__()
+    def remove_synonym(self, synonym: Union[str, ListLike]):
+        """Remove synonyms from a record."""
+        pass
+
+    @classmethod
+    def from_values(cls, identifiers: ListLike, field: StrField, **kwargs):
+        """Parse values for an identifier (a name, an id, etc.) and create records.
+
+        This method helps avoid problems around duplication of entries,
+        violation of idempotency, and performance when creating records in bulk.
+
+        Guide: :doc:`/biology/registries`.
+
+        Args:
+            identifiers: `ListLike` A list of values for an identifier, e.g.
+                `["name1", "name2"]`.
+            field: `StrField` If `iterable` is `ListLike`, an `ORM` field to look
+                up, e.g. `lb.CellMarker.name`.
+            **kwargs: Can contain `species`. Either `"human"`, `"mouse"`, or any other
+                `name` of `Bionty.Species`. If `None`, will use default species in
+                bionty for each entity.
+
+        Returns:
+            A list of records.
+
+        For every `value` in an iterable of identifiers and a given `ORM.field`,
+        this function performs:
+
+        1. It checks whether the value already exists in the database
+        (`ORM.select(field=value)`). If so, it adds the queried record to
+        the returned list and skips step 2. Otherwise, proceed with 2.
+        2. If the `ORM` is from `lnschema_bionty`, it checks whether there is an
+        exact match in the underlying ontology (`Bionty.inspect(value, field)`).
+        If so, it creates a record from Bionty and adds it to the returned list.
+        Otherwise, it creates a record that populates a single field using `value`
+        and adds the record to the returned list.
+        """
+        pass
+
+    @classmethod
+    def inspect(
+        cls,
+        identifiers: ListLike,
+        field: StrField,
+        *,
+        case_sensitive: bool = False,
+        inspect_synonyms: bool = True,
+        return_df: bool = False,
+        logging: bool = True,
+        **kwargs,
+    ) -> Union["pd.DataFrame", Dict[str, List[str]]]:
+        """Inspect if a list of identifiers are mappable to existing values of a field.
+
+        Args:
+            identifiers: `ListLike` Identifiers that will be checked against the
+                field.
+            field: `StrField` The field of identifiers.
+                    Examples are 'ontology_id' to map against the source ID
+                    or 'name' to map against the ontologies field names.
+            case_sensitive: Whether the identifier inspection is case sensitive.
+            inspect_synonyms: Whether to inspect synonyms.
+            return_df: Whether to return a Pandas DataFrame.
+
+        Returns:
+            - A Dictionary of "mapped" and "unmapped" identifiers
+            - If `return_df`: A DataFrame indexed by identifiers with a boolean `__mapped__`
+                column that indicates compliance with the identifiers.
+
+        Examples:
+            >>> import lnschema_bionty as lb
+            >>> gene_symbols = ["A1CF", "A1BG", "FANCD1", "FANCD20"]
+            >>> lb.Gene.inspect(gene_symbols, field=lb.Gene.symbol)
+        """
+        pass
+
+    @classmethod
+    def lookup(cls, field: Optional[StrField] = None) -> NamedTuple:
+        """Return an auto-complete object for a field.
+
+        Args:
+            field: `Optional[StrField] = None` The field to
+                look up the values for. Defaults to first string field.
+
+        Returns:
+            A `NamedTuple` of lookup information of the field values with a
+            dictionary converter.
+
+        Examples:
+            >>> import lnschema_bionty as lb
+            >>> lookup = lb.Gene.lookup()
+            >>> lookup.adgb_dt
+            >>> lookup_dict = lookup.dict()
+            >>> lookup['ADGB-DT']
+        """
+        pass
+
+    @classmethod
+    def map_synonyms(
+        cls,
+        synonyms: Iterable,
+        *,
+        return_mapper: bool = False,
+        case_sensitive: bool = False,
+        keep: Literal["first", "last", False] = "first",
+        synonyms_field: str = "synonyms",
+        synonyms_sep: str = "|",
+        field: Optional[str] = None,
+        **kwargs,
+    ) -> Union[List[str], Dict[str, str]]:
+        """Maps input synonyms to standardized names.
+
+        Args:
+            synonyms: `Iterable` Synonyms that will be standardized.
+            return_mapper: `bool = False` If `True`, returns `{input_synonym1:
+                standardized_name1}`.
+            case_sensitive: `bool = False` Whether the mapping is case sensitive.
+            species: `Optional[str]` Map only against this species related entries.
+            keep: `Literal["first", "last", False] = "first"` When a synonym maps to
+                multiple names, determines which duplicates to mark as
+                `pd.DataFrame.duplicated`
+
+                    - "first": returns the first mapped standardized name
+                    - "last": returns the last mapped standardized name
+                    - `False`: returns all mapped standardized name
+            synonyms_field: `str = "synonyms"` A field containing the concatenated synonyms.
+            synonyms_sep: `str = "|"` Which separator is used to separate synonyms.
+            field: `Optional[str]` The field representing the standardized names.
+
+        Returns:
+            If `return_mapper` is `False`: a list of standardized names. Otherwise,
+            a dictionary of mapped values with mappable synonyms as keys and
+            standardized names as values.
+
+        Examples:
+            >>> import lnschema_bionty as lb
+            >>> gene_synonyms = ["A1CF", "A1BG", "FANCD1", "FANCD20"]
+            >>> standardized_names = lb.Gene.map_synonyms(gene_synonyms, species="human")
+        """
 
     @classmethod
     def select(cls, **expressions) -> Union[QuerySet, Manager]:
-        """Query the ORM."""
+        """Query records.
+
+        Guide: :doc:`/guide/select`.
+
+        Args:
+            ORM: An ORM class.
+            expressions: Fields and values passed as Django query expressions.
+
+        Returns:
+            A `QuerySet` or Django `Manager`.
+        """
         from lamindb._select import select
 
         return select(cls, **expressions)
+
+    @classmethod
+    def search(
+        cls,
+        string: str,
+        *,
+        field: Optional[StrField] = None,
+        top_hit: bool = False,
+        case_sensitive: bool = True,
+        synonyms_field: Optional[Union[str, TextField, CharField]] = "synonyms",
+        synonyms_sep: str = "|",
+    ) -> Union["pd.DataFrame", "ORM"]:
+        """Search the table.
+
+        Args:
+            string: `str` The input string to match against the field ontology values.
+            field: `Optional[StrField] = None` The field
+                against which the input string is matching.
+            top_hit: `bool = False` If `True`, return only the top hit or hits (in
+                case of equal scores).
+            case_sensitive: `bool = False` Whether the match is case sensitive.
+            synonyms_field: `bool = True` Also search synonyms. If `None`, is ignored.
+
+        Returns:
+            A sorted `DataFrame` of search results with a score in column
+            `__ratio__`. If `top_hit` is `True`, the best match.
+        """
+        pass
 
     class Meta:
         abstract = True
@@ -58,7 +233,7 @@ class BaseORM(models.Model):
 # for validating the integrity of an ORM object upon instantation (similar to pydantic)
 #
 # For required fields, we define them as commonly done on the SQL level together
-# with a validator in BaseORM (validate_required_fields)
+# with a validator in ORM (validate_required_fields)
 #
 # This goes against the Django convention, but goes with the SQLModel convention
 # (Optional fields can be null on the SQL level, non-optional fields cannot)
@@ -72,7 +247,7 @@ class BaseORM(models.Model):
 # All of these are defined and tested within lamindb, in files starting with _{orm_name}.py
 
 
-class User(BaseORM):
+class User(ORM):
     """Users.
 
     All data in this table is synched from the cloud user account to ensure a
@@ -93,7 +268,7 @@ class User(BaseORM):
     """Time of last update to record."""
 
 
-class Storage(BaseORM):
+class Storage(ORM):
     """Storage locations.
 
     Either S3 or GCP buckets or local storage locations.
@@ -115,7 +290,7 @@ class Storage(BaseORM):
     """Creator of record, a :class:`~lamindb.User`."""
 
 
-class Tag(BaseORM):
+class Tag(ORM):
     """Tags."""
 
     id = models.CharField(max_length=8, default=base62_8, primary_key=True)
@@ -132,7 +307,7 @@ class Tag(BaseORM):
     """Creator of record, a :class:`~lamindb.User`."""
 
 
-class Project(BaseORM):
+class Project(ORM):
     """Projects."""
 
     id = models.CharField(max_length=8, default=base62_8, primary_key=True)
@@ -153,7 +328,7 @@ class Project(BaseORM):
     """Creator of record, a :class:`~lamindb.User`."""
 
 
-class Transform(BaseORM):
+class Transform(ORM):
     """Transformations of files (:class:`~lamindb.File`).
 
     Pipelines, workflows, notebooks, app-based transformations.
@@ -207,7 +382,7 @@ class Transform(BaseORM):
         unique_together = (("stem_id", "version"),)
 
 
-class Run(BaseORM):
+class Run(ORM):
     """Runs of transformations (:class:`~lamindb.Transform`).
 
     Typically, a run has inputs and outputs:
@@ -239,7 +414,7 @@ class Run(BaseORM):
     """Creator of record, a :class:`~lamindb.User`."""
 
 
-class Dataset(BaseORM):
+class Dataset(ORM):
     """Datasets: measurements of features.
 
     Datasets are measurements of features (aka observations of variables).
@@ -286,7 +461,7 @@ class Dataset(BaseORM):
     """Creator of record, a :class:`~lamindb.User`."""
 
 
-class Feature(BaseORM):
+class Feature(ORM):
     """Features: column names of DataFrames.
 
     Note that you can use Bionty ORMs to manage common features like genes,
@@ -315,7 +490,7 @@ class Feature(BaseORM):
     """Creator of record, a :class:`~lamindb.User`."""
 
 
-class FeatureSet(BaseORM):
+class FeatureSet(ORM):
     """Feature sets: sets of features.
 
     A feature set is represented by the hash of the id set for the feature type.
@@ -354,7 +529,9 @@ class FeatureSet(BaseORM):
     """Creator of record, a :class:`~lamindb.User`."""
 
 
-class File(BaseORM):
+class File(ORM):
+    """Test."""
+
     id = models.CharField(max_length=20, primary_key=True)
     """A universal random id (20-char base62), valid across DB instances."""
     name = models.CharField(max_length=255, db_index=True, null=True, default=None)
