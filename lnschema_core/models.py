@@ -35,6 +35,14 @@ class ORM(models.Model):
     Is based on `django.db.models.Model`.
     """
 
+    def add_synonym(self, synonym: Union[str, ListLike], force: bool = False):
+        """Add synonyms to a record."""
+        pass
+
+    def remove_synonym(self, synonym: Union[str, ListLike]):
+        """Remove synonyms from a record."""
+        pass
+
     @classmethod
     def from_values(cls, identifiers: ListLike, field: StrField, **kwargs):
         """Parse values for an identifier (a name, an id, etc.) and create records.
