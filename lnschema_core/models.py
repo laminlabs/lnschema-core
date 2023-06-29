@@ -686,3 +686,15 @@ class File(ORM):
     def backed(self, is_run_input: Optional[bool] = None) -> Union["AnnDataAccessor", "BackedAccessor"]:
         """Return a cloud-backed data object to stream."""
         pass
+
+    @classmethod
+    def tree(
+        cls,
+        prefix: Optional[str] = None,
+        *,
+        level: int = -1,
+        limit_to_directories: bool = False,
+        length_limit: int = 1000,
+    ):
+        """Given a prefix, print a visual tree structure of files."""
+        pass
