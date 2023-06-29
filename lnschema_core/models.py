@@ -637,7 +637,9 @@ class File(ORM):
     ):
         pass
 
+    @classmethod
     def from_dir(
+        cls,
         path: PathLike,
         *,
         run: Optional[Run] = None,
