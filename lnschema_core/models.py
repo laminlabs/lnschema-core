@@ -614,7 +614,7 @@ class File(ORM):
 
     @overload
     def __init__(
-        file,
+        self,
         data: Union[PathLike, DataLike],
         key: Optional[str] = None,
         run: Optional[Run] = None,
@@ -625,13 +625,13 @@ class File(ORM):
 
     @overload
     def __init__(
-        file,
+        self,
         **kwargs,
     ):
         ...
 
     def __init__(
-        file,
+        self,
         *args,
         **kwargs,
     ):
@@ -644,4 +644,34 @@ class File(ORM):
         *,
         run: Optional[Run] = None,
     ) -> List["File"]:
+        pass
+
+    def replace(
+        self,
+        data: Union[PathLike, DataLike],
+        run: Optional[Run] = None,
+        format: Optional[str] = None,
+    ) -> None:
+        """Replace file content.
+
+        Args:
+            data: `Union[PathLike, DataLike]` A file path or an in-memory data
+                object (`DataFrame`, `AnnData`).
+            run: `Optional[Run] = None` The run that created the file, gets
+                auto-linked if `ln.track()` was called.
+
+        Examples:
+
+        Say we made a change to the content of a file (e.g., edited the image
+        `paradisi05_laminopathic_nuclei.jpg`).
+
+        This is how we replace the old file in storage with the new file:
+
+        >>> file.replace("paradisi05_laminopathic_nuclei.jpg")
+        >>> file.save()
+
+        Note that this neither changes the storage key nor the filename.
+
+        However, it will update the suffix if the file type changes.
+        """
         pass
