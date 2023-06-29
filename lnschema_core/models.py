@@ -26,7 +26,7 @@ TRANSFORM_TYPE_DEFAULT = TransformType.notebook if is_run_from_ipython else Tran
 
 
 # todo, make a CreatedUpdated Mixin, but need to figure out docs
-class BaseORM(models.Model):
+class ORM(models.Model):
     """Base data model.
 
     Is essentially equal to the Django Model base class, but adds the following
@@ -60,7 +60,7 @@ class BaseORM(models.Model):
         case_sensitive: bool = True,
         synonyms_field: Optional[Union[str, TextField, CharField]] = "synonyms",
         synonyms_sep: str = "|",
-    ) -> Union["pd.DataFrame", "BaseORM"]:
+    ) -> Union["pd.DataFrame", "ORM"]:
         """Search the table.
 
         Args:
@@ -88,7 +88,7 @@ class BaseORM(models.Model):
 # for validating the integrity of an ORM object upon instantation (similar to pydantic)
 #
 # For required fields, we define them as commonly done on the SQL level together
-# with a validator in BaseORM (validate_required_fields)
+# with a validator in ORM (validate_required_fields)
 #
 # This goes against the Django convention, but goes with the SQLModel convention
 # (Optional fields can be null on the SQL level, non-optional fields cannot)
@@ -102,7 +102,7 @@ class BaseORM(models.Model):
 # All of these are defined and tested within lamindb, in files starting with _{orm_name}.py
 
 
-class User(BaseORM):
+class User(ORM):
     """Users.
 
     All data in this table is synched from the cloud user account to ensure a
@@ -123,7 +123,7 @@ class User(BaseORM):
     """Time of last update to record."""
 
 
-class Storage(BaseORM):
+class Storage(ORM):
     """Storage locations.
 
     Either S3 or GCP buckets or local storage locations.
@@ -145,7 +145,7 @@ class Storage(BaseORM):
     """Creator of record, a :class:`~lamindb.User`."""
 
 
-class Tag(BaseORM):
+class Tag(ORM):
     """Tags."""
 
     id = models.CharField(max_length=8, default=base62_8, primary_key=True)
@@ -162,7 +162,7 @@ class Tag(BaseORM):
     """Creator of record, a :class:`~lamindb.User`."""
 
 
-class Project(BaseORM):
+class Project(ORM):
     """Projects."""
 
     id = models.CharField(max_length=8, default=base62_8, primary_key=True)
@@ -183,7 +183,7 @@ class Project(BaseORM):
     """Creator of record, a :class:`~lamindb.User`."""
 
 
-class Transform(BaseORM):
+class Transform(ORM):
     """Transformations of files (:class:`~lamindb.File`).
 
     Pipelines, workflows, notebooks, app-based transformations.
@@ -237,7 +237,7 @@ class Transform(BaseORM):
         unique_together = (("stem_id", "version"),)
 
 
-class Run(BaseORM):
+class Run(ORM):
     """Runs of transformations (:class:`~lamindb.Transform`).
 
     Typically, a run has inputs and outputs:
@@ -269,7 +269,7 @@ class Run(BaseORM):
     """Creator of record, a :class:`~lamindb.User`."""
 
 
-class Dataset(BaseORM):
+class Dataset(ORM):
     """Datasets: measurements of features.
 
     Datasets are measurements of features (aka observations of variables).
@@ -316,7 +316,7 @@ class Dataset(BaseORM):
     """Creator of record, a :class:`~lamindb.User`."""
 
 
-class Feature(BaseORM):
+class Feature(ORM):
     """Features: column names of DataFrames.
 
     Note that you can use Bionty ORMs to manage common features like genes,
@@ -345,7 +345,7 @@ class Feature(BaseORM):
     """Creator of record, a :class:`~lamindb.User`."""
 
 
-class FeatureSet(BaseORM):
+class FeatureSet(ORM):
     """Feature sets: sets of features.
 
     A feature set is represented by the hash of the id set for the feature type.
@@ -384,7 +384,7 @@ class FeatureSet(BaseORM):
     """Creator of record, a :class:`~lamindb.User`."""
 
 
-class File(BaseORM):
+class File(ORM):
     """Test."""
 
     id = models.CharField(max_length=20, primary_key=True)
