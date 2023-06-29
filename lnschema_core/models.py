@@ -70,6 +70,27 @@ class ORM(models.Model):
         pass
 
     @classmethod
+    def lookup(cls, field: Optional[Union[str, CharField, TextField]] = None) -> NamedTuple:
+        """Return an auto-complete object for a field.
+
+        Args:
+            field: `Optional[Union[str, CharField, TextField]] = None` The field to
+                look up the values for. Defaults to first string field.
+
+        Returns:
+            A `NamedTuple` of lookup information of the field values with a
+            dictionary converter.
+
+        Examples:
+            >>> import lnschema_bionty as lb
+            >>> lookup = lb.Gene.lookup()
+            >>> lookup.adgb_dt
+            >>> lookup_dict = lookup.dict()
+            >>> lookup['ADGB-DT']
+        """
+        pass
+
+    @classmethod
     def select(cls, **expressions) -> Union[QuerySet, Manager]:
         """Query records.
 
