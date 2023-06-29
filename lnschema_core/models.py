@@ -636,3 +636,10 @@ class File(ORM):
         **kwargs,
     ):
         pass
+
+    def from_dir(
+        path: PathLike,
+        *,
+        run: Optional[Run] = None,
+    ) -> List["File"]:
+        pass
