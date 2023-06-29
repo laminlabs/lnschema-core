@@ -720,7 +720,7 @@ class File(ORM):
         """
         pass
 
-    def delete(file, storage: Optional[bool] = None) -> None:
+    def delete(self, storage: Optional[bool] = None) -> None:
         """Delete file, optionall from storage.
 
         Args:
@@ -735,6 +735,6 @@ class File(ORM):
         """
         pass
 
-    def save(file, *args, **kwargs) -> None:
+    def save(self, *args, **kwargs) -> None:
         """Save the file to database & storage."""
         pass
