@@ -15,7 +15,7 @@ from typing import (  # noqa
 from django.db import models
 from django.db.models import PROTECT, CharField, Manager, TextField
 
-from lnschema_core.types import ListLike, StrField
+from lnschema_core.types import DataLike, ListLike, PathLike, StrField
 
 from ._queryset import QuerySet
 from .ids import base62_8, base62_12, base62_20
@@ -530,7 +530,49 @@ class FeatureSet(ORM):
 
 
 class File(ORM):
-    """Test."""
+    """Files.
+
+    Args:
+        data: `Union[PathLike, DataLike]` A file path or an in-memory data
+            object (`DataFrame`, `AnnData`) to serialize. Can be a cloud path, e.g.,
+            `"s3://my-bucket/my_samples/my_file.fcs"`.
+        key: `Optional[str] = None` A storage key: a relative filepath within the
+            current default storage, e.g., `"my_samples/my_file.fcs"`.
+        name: `Optional[str] = None` A description.
+        run: `Optional[Run] = None` The run that created the file, gets auto-linked
+            if `ln.track()` was called.
+        feature_sets: `Optional[List[FeatureSet]] = None` A list of `FeatureSet`
+            records describing the features measured in the file.
+
+    Track where files come from by passing the generating :class:`~lamindb.Run`.
+
+    Often, files store jointly measured observations of features: track them
+    with :class:`~lamindb.FeatureSet`.
+
+    If files have corresponding representations in storage and memory, LaminDB
+    makes some configurable default choices (e.g., serialize a `DataFrame` as a
+    `.parquet` file).
+
+    .. admonition:: Examples for storage-memory correspondence
+
+    Listed are typical `suffix` values & in memory data objects.
+
+    - Table: `.csv`, `.tsv`, `.parquet`, `.ipc`
+        ⟷ `pd.DataFrame`, `polars.DataFrame`
+    - Annotated matrix: `.h5ad`, `.h5mu`, `.zrad` ⟷ `AnnData`, `MuData`
+    - Image: `.jpg`, `.png` ⟷ `np.ndarray`, ...
+    - Array: zarr directory, TileDB store ⟷ zarr loader, TileDB loader
+    - Fastq: `.fastq` ⟷ /
+    - VCF: `.vcf` ⟷ /
+    - QC: `.html` ⟷ /
+
+    .. note::
+
+        In some cases (`.zarr`), a `File` is present as many small objects in what
+        appears to be a "folder" in storage. Hence, we often refer to files as data
+        artifacts.
+
+    """
 
     id = models.CharField(max_length=20, primary_key=True)
     """A universal random id (20-char base62), valid across DB instances."""
@@ -569,3 +611,28 @@ class File(ORM):
 
     class Meta:
         unique_together = (("storage", "key"),)
+
+    @overload
+    def __init__(
+        file,
+        data: Union[PathLike, DataLike],
+        key: Optional[str] = None,
+        run: Optional[Run] = None,
+        name: Optional[str] = None,
+        feature_sets: Optional[List[FeatureSet]] = None,
+    ):
+        ...
+
+    @overload
+    def __init__(
+        file,
+        **kwargs,
+    ):
+        ...
+
+    def __init__(
+        file,
+        *args,
+        **kwargs,
+    ):
+        pass
