@@ -1,4 +1,5 @@
 import builtins
+from datetime import datetime
 from pathlib import Path
 from typing import (  # noqa
     TYPE_CHECKING,
@@ -34,8 +35,8 @@ from .users import current_user_id
 if TYPE_CHECKING:
     import pandas as pd
 
-is_run_from_ipython = getattr(builtins, "__IPYTHON__", False)
-TRANSFORM_TYPE_DEFAULT = TransformType.notebook if is_run_from_ipython else TransformType.pipeline
+IPYTHON = getattr(builtins, "__IPYTHON__", False)
+TRANSFORM_TYPE_DEFAULT = TransformType.notebook if IPYTHON else TransformType.pipeline
 
 
 class ORM(models.Model):
@@ -43,9 +44,8 @@ class ORM(models.Model):
 
     Is based on `django.db.models.Model`.
 
-    Why does LaminDB call it `ORM` and not `Model`? ORM is the more specific
-    term and can't lead to confusion with statistical, machnine learning or
-    biological models.
+    Why does LaminDB call it `ORM` and not `Model`? The term "ORM" can't lead to
+    confusion with statistical, machine learning or biological models.
     """
 
     def add_synonym(self, synonym: Union[str, ListLike], force: bool = False):
@@ -240,6 +240,7 @@ class ORM(models.Model):
         abstract = True
 
 
+# -------------------------------------------------------------------------------------
 # A note on required fields at the ORM level
 #
 # As Django does most of its validation on the Form-level, it doesn't offer functionality
@@ -255,6 +256,7 @@ class ORM(models.Model):
 # a required field necessitates passing `default=None`. Without the validator it would trigger
 # an error at the SQL-level, with it, it triggers it at instantiation
 
+# -------------------------------------------------------------------------------------
 # A note on class and instance methods of core ORM
 #
 # All of these are defined and tested within lamindb, in files starting with _{orm_name}.py
@@ -524,7 +526,7 @@ class FeatureSet(ORM):
     >>> feature_set.save()
     >>> file = ln.File(adata, name="Mouse Lymph Node scRNA-seq")
     >>> file.save()
-    >>> file.featuresets.add(featureset)
+    >>> file.feature_sets.add(feature_set)
 
     """
 
@@ -742,3 +744,31 @@ class File(ORM):
     def save(self, *args, **kwargs) -> None:
         """Save the file to database & storage."""
         pass
+
+
+# -------------------------------------------------------------------------------------
+# Low-level logic needed in lamindb-setup
+
+# Below is needed within lnschema-core because lamindb-setup already performs
+# some logging
+
+
+def format_datetime(dt: Union[datetime, Any]) -> str:
+    if not isinstance(dt, datetime):
+        return dt
+    else:
+        return dt.strftime("%Y-%m-%d %H:%M:%S")
+
+
+def __repr__(self: ORM) -> str:
+    field_names = [field.name for field in self._meta.fields if not isinstance(field, (models.ForeignKey, models.DateTimeField))]
+    # skip created_at
+    field_names += [field.name for field in self._meta.fields if isinstance(field, models.DateTimeField) and field.name != "created_at"]
+    field_names += [f"{field.name}_id" for field in self._meta.fields if isinstance(field, models.ForeignKey)]
+    fields_str = {k: format_datetime(getattr(self, k)) for k in field_names if hasattr(self, k)}
+    fields_joined_str = ", ".join([f"{k}={fields_str[k]}" for k in fields_str])
+    return f"{self.__class__.__name__}({fields_joined_str})"
+
+
+ORM.__repr__ = __repr__  # type: ignore
+ORM.__str__ = __repr__  # type: ignore
