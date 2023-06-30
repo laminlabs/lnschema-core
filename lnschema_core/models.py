@@ -520,13 +520,13 @@ class FeatureSet(ORM):
 
     Examples:
 
-    >>> import lnschema_bionty as bt
-    >>> reference = bt.Gene(species="mouse")
-    >>> feature_set = ln.FeatureSet.from_values(adata.var["ensemble_id"], Gene.ensembl_gene_id)
-    >>> feature_set.save()
-    >>> file = ln.File(adata, name="Mouse Lymph Node scRNA-seq")
-    >>> file.save()
-    >>> file.feature_sets.add(feature_set)
+        >>> import lnschema_bionty as bt
+        >>> reference = bt.Gene(species="mouse")
+        >>> feature_set = ln.FeatureSet.from_values(adata.var["ensemble_id"], Gene.ensembl_gene_id)
+        >>> feature_set.save()
+        >>> file = ln.File(adata, name="Mouse Lymph Node scRNA-seq")
+        >>> file.save()
+        >>> file.feature_sets.add(feature_set)
 
     """
 
@@ -676,17 +676,17 @@ class File(ORM):
 
         Examples:
 
-        Say we made a change to the content of a file (e.g., edited the image
-        `paradisi05_laminopathic_nuclei.jpg`).
+            Say we made a change to the content of a file (e.g., edited the image
+            `paradisi05_laminopathic_nuclei.jpg`).
 
-        This is how we replace the old file in storage with the new file:
+            This is how we replace the old file in storage with the new file:
 
-        >>> file.replace("paradisi05_laminopathic_nuclei.jpg")
-        >>> file.save()
+            >>> file.replace("paradisi05_laminopathic_nuclei.jpg")
+            >>> file.save()
 
-        Note that this neither changes the storage key nor the filename.
+            Note that this neither changes the storage key nor the filename.
 
-        However, it will update the suffix if the file type changes.
+            However, it will update the suffix if the file type changes.
         """
         pass
 
@@ -726,7 +726,7 @@ class File(ORM):
         pass
 
     def delete(self, storage: Optional[bool] = None) -> None:
-        """Delete file, optionall from storage.
+        """Delete file, optionally from storage.
 
         Args:
             storage: `Optional[bool] = None` Indicate whether you want to delete the
@@ -734,9 +734,10 @@ class File(ORM):
 
         Example:
 
-        For any `File` object `file`, call:
+            For any `File` object `file`, call:
 
-        >>> file.delete(storage=True)  # storage=True auto-confirms deletion in storage
+            >>> file.delete()
+
         """
         pass
 
