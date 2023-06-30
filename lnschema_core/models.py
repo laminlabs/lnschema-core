@@ -657,6 +657,7 @@ class File(ORM):
         *,
         run: Optional[Run] = None,
     ) -> List["File"]:
+        """Create a list of file objects from a directory."""
         pass
 
     def replace(
@@ -668,10 +669,10 @@ class File(ORM):
         """Replace file content.
 
         Args:
-            data: `Union[PathLike, DataLike]` A file path or an in-memory data
+            data: ``Union[PathLike, DataLike]`` A file path or an in-memory data
                 object (`DataFrame`, `AnnData`).
-            run: `Optional[Run] = None` The run that created the file, gets
-                auto-linked if `ln.track()` was called.
+            run: ``Optional[Run] = None`` The run that created the file gets
+                auto-linked if ``ln.track()`` was called.
 
         Examples:
 
