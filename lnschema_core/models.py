@@ -42,6 +42,10 @@ class ORM(models.Model):
     """LaminDB's base ORM.
 
     Is based on `django.db.models.Model`.
+
+    Why does LaminDB call it `ORM` and not `Model`? ORM is the more specific
+    term and can't lead to confusion with statistical, machnine learning or
+    biological models.
     """
 
     def add_synonym(self, synonym: Union[str, ListLike], force: bool = False):
@@ -635,7 +639,7 @@ class File(ORM):
     @overload
     def __init__(
         self,
-        **kwargs,
+        *db_args,
     ):
         ...
 
