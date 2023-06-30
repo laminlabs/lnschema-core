@@ -568,24 +568,22 @@ class File(ORM):
     makes some configurable default choices (e.g., serialize a `DataFrame` as a
     `.parquet` file).
 
-    .. admonition:: Examples for storage-memory correspondence
+    .. admonition:: Formats in storage & their API access
 
-    Listed are typical `suffix` values & in memory data objects.
+        Listed are typical `suffix` values & in memory data objects.
 
-    - Table: `.csv`, `.tsv`, `.parquet`, `.ipc`
-        ⟷ `pd.DataFrame`, `polars.DataFrame`
-    - Annotated matrix: `.h5ad`, `.h5mu`, `.zrad` ⟷ `AnnData`, `MuData`
-    - Image: `.jpg`, `.png` ⟷ `np.ndarray`, ...
-    - Array: zarr directory, TileDB store ⟷ zarr loader, TileDB loader
-    - Fastq: `.fastq` ⟷ /
-    - VCF: `.vcf` ⟷ /
-    - QC: `.html` ⟷ /
+        - Table: `.csv`, `.tsv`, `.parquet`, `.ipc` ⟷ `DataFrame`, `pyarrow.Table`
+        - Annotated matrix: `.h5ad`, `.h5mu`, `.zrad` ⟷ `AnnData`, `MuData`
+        - Image: `.jpg`, `.png` ⟷ `np.ndarray`, ...
+        - Arrays: HDF5 group, zarr group, TileDB store ⟷ HDF5, zarr, TileDB loaders
+        - Fastq: `.fastq` ⟷ /
+        - VCF: `.vcf` ⟷ /
+        - QC: `.html` ⟷ /
 
     .. note::
 
-        In some cases (`.zarr`), a `File` is present as many small objects in what
-        appears to be a "folder" in storage. Hence, we often refer to files as data
-        artifacts.
+        In some cases, e.g. for zarr-based storage, a `File` object is stored as
+        many small objects in what appears to be a "folder" in storage.
 
     """
 
