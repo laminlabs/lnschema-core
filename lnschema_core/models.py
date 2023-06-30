@@ -761,9 +761,7 @@ def format_datetime(dt: Union[datetime, Any]) -> str:
 
 
 def __repr__(self: ORM) -> str:
-    field_names = [field.name for field in self._meta.fields if not isinstance(field, (models.ForeignKey, models.DateTimeField))]
-    # skip created_at
-    field_names += [field.name for field in self._meta.fields if isinstance(field, models.DateTimeField) and field.name != "created_at"]
+    field_names = [field.name for field in self._meta.fields if (not isinstance(field, models.ForeignKey) and field.name != "created_at")]
     field_names += [f"{field.name}_id" for field in self._meta.fields if isinstance(field, models.ForeignKey)]
     fields_str = {k: format_datetime(getattr(self, k)) for k in field_names if hasattr(self, k)}
     fields_joined_str = ", ".join([f"{k}={fields_str[k]}" for k in fields_str])
