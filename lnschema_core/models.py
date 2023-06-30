@@ -1,4 +1,5 @@
 import builtins
+from datetime import datetime
 from pathlib import Path
 from typing import (  # noqa
     TYPE_CHECKING,
@@ -34,14 +35,17 @@ from .users import current_user_id
 if TYPE_CHECKING:
     import pandas as pd
 
-is_run_from_ipython = getattr(builtins, "__IPYTHON__", False)
-TRANSFORM_TYPE_DEFAULT = TransformType.notebook if is_run_from_ipython else TransformType.pipeline
+IPYTHON = getattr(builtins, "__IPYTHON__", False)
+TRANSFORM_TYPE_DEFAULT = TransformType.notebook if IPYTHON else TransformType.pipeline
 
 
 class ORM(models.Model):
     """LaminDB's base ORM.
 
     Is based on `django.db.models.Model`.
+
+    Why does LaminDB call it `ORM` and not `Model`? The term "ORM" can't lead to
+    confusion with statistical, machine learning or biological models.
     """
 
     def add_synonym(self, synonym: Union[str, ListLike], force: bool = False):
@@ -236,6 +240,7 @@ class ORM(models.Model):
         abstract = True
 
 
+# -------------------------------------------------------------------------------------
 # A note on required fields at the ORM level
 #
 # As Django does most of its validation on the Form-level, it doesn't offer functionality
@@ -251,6 +256,7 @@ class ORM(models.Model):
 # a required field necessitates passing `default=None`. Without the validator it would trigger
 # an error at the SQL-level, with it, it triggers it at instantiation
 
+# -------------------------------------------------------------------------------------
 # A note on class and instance methods of core ORM
 #
 # All of these are defined and tested within lamindb, in files starting with _{orm_name}.py
@@ -514,13 +520,13 @@ class FeatureSet(ORM):
 
     Examples:
 
-    >>> import lnschema_bionty as bt
-    >>> reference = bt.Gene(species="mouse")
-    >>> feature_set = ln.FeatureSet.from_values(adata.var["ensemble_id"], Gene.ensembl_gene_id)
-    >>> feature_set.save()
-    >>> file = ln.File(adata, name="Mouse Lymph Node scRNA-seq")
-    >>> file.save()
-    >>> file.featuresets.add(featureset)
+        >>> import lnschema_bionty as bt
+        >>> reference = bt.Gene(species="mouse")
+        >>> feature_set = ln.FeatureSet.from_values(adata.var["ensemble_id"], Gene.ensembl_gene_id)
+        >>> feature_set.save()
+        >>> file = ln.File(adata, name="Mouse Lymph Node scRNA-seq")
+        >>> file.save()
+        >>> file.feature_sets.add(feature_set)
 
     """
 
@@ -562,24 +568,22 @@ class File(ORM):
     makes some configurable default choices (e.g., serialize a `DataFrame` as a
     `.parquet` file).
 
-    .. admonition:: Examples for storage-memory correspondence
+    .. admonition:: Formats in storage & their API access
 
-    Listed are typical `suffix` values & in memory data objects.
+        Listed are typical `suffix` values & in memory data objects.
 
-    - Table: `.csv`, `.tsv`, `.parquet`, `.ipc`
-        ⟷ `pd.DataFrame`, `polars.DataFrame`
-    - Annotated matrix: `.h5ad`, `.h5mu`, `.zrad` ⟷ `AnnData`, `MuData`
-    - Image: `.jpg`, `.png` ⟷ `np.ndarray`, ...
-    - Array: zarr directory, TileDB store ⟷ zarr loader, TileDB loader
-    - Fastq: `.fastq` ⟷ /
-    - VCF: `.vcf` ⟷ /
-    - QC: `.html` ⟷ /
+        - Table: `.csv`, `.tsv`, `.parquet`, `.ipc` ⟷ `DataFrame`, `pyarrow.Table`
+        - Annotated matrix: `.h5ad`, `.h5mu`, `.zrad` ⟷ `AnnData`, `MuData`
+        - Image: `.jpg`, `.png` ⟷ `np.ndarray`, ...
+        - Arrays: HDF5 group, zarr group, TileDB store ⟷ HDF5, zarr, TileDB loaders
+        - Fastq: `.fastq` ⟷ /
+        - VCF: `.vcf` ⟷ /
+        - QC: `.html` ⟷ /
 
     .. note::
 
-        In some cases (`.zarr`), a `File` is present as many small objects in what
-        appears to be a "folder" in storage. Hence, we often refer to files as data
-        artifacts.
+        In some cases, e.g. for zarr-based storage, a `File` object is stored as
+        many small objects in what appears to be a "folder" in storage.
 
     """
 
@@ -635,7 +639,7 @@ class File(ORM):
     @overload
     def __init__(
         self,
-        **kwargs,
+        *db_args,
     ):
         ...
 
@@ -653,6 +657,7 @@ class File(ORM):
         *,
         run: Optional[Run] = None,
     ) -> List["File"]:
+        """Create a list of file objects from a directory."""
         pass
 
     def replace(
@@ -664,24 +669,24 @@ class File(ORM):
         """Replace file content.
 
         Args:
-            data: `Union[PathLike, DataLike]` A file path or an in-memory data
+            data: ``Union[PathLike, DataLike]`` A file path or an in-memory data
                 object (`DataFrame`, `AnnData`).
-            run: `Optional[Run] = None` The run that created the file, gets
-                auto-linked if `ln.track()` was called.
+            run: ``Optional[Run] = None`` The run that created the file gets
+                auto-linked if ``ln.track()`` was called.
 
         Examples:
 
-        Say we made a change to the content of a file (e.g., edited the image
-        `paradisi05_laminopathic_nuclei.jpg`).
+            Say we made a change to the content of a file (e.g., edited the image
+            `paradisi05_laminopathic_nuclei.jpg`).
 
-        This is how we replace the old file in storage with the new file:
+            This is how we replace the old file in storage with the new file:
 
-        >>> file.replace("paradisi05_laminopathic_nuclei.jpg")
-        >>> file.save()
+            >>> file.replace("paradisi05_laminopathic_nuclei.jpg")
+            >>> file.save()
 
-        Note that this neither changes the storage key nor the filename.
+            Note that this neither changes the storage key nor the filename.
 
-        However, it will update the suffix if the file type changes.
+            However, it will update the suffix if the file type changes.
         """
         pass
 
@@ -721,7 +726,7 @@ class File(ORM):
         pass
 
     def delete(self, storage: Optional[bool] = None) -> None:
-        """Delete file, optionall from storage.
+        """Delete file, optionally from storage.
 
         Args:
             storage: `Optional[bool] = None` Indicate whether you want to delete the
@@ -729,12 +734,41 @@ class File(ORM):
 
         Example:
 
-        For any `File` object `file`, call:
+            For any `File` object `file`, call:
 
-        >>> file.delete(storage=True)  # storage=True auto-confirms deletion in storage
+            >>> file.delete()
+
         """
         pass
 
     def save(self, *args, **kwargs) -> None:
         """Save the file to database & storage."""
         pass
+
+
+# -------------------------------------------------------------------------------------
+# Low-level logic needed in lamindb-setup
+
+# Below is needed within lnschema-core because lamindb-setup already performs
+# some logging
+
+
+def format_datetime(dt: Union[datetime, Any]) -> str:
+    if not isinstance(dt, datetime):
+        return dt
+    else:
+        return dt.strftime("%Y-%m-%d %H:%M:%S")
+
+
+def __repr__(self: ORM) -> str:
+    field_names = [field.name for field in self._meta.fields if not isinstance(field, (models.ForeignKey, models.DateTimeField))]
+    # skip created_at
+    field_names += [field.name for field in self._meta.fields if isinstance(field, models.DateTimeField) and field.name != "created_at"]
+    field_names += [f"{field.name}_id" for field in self._meta.fields if isinstance(field, models.ForeignKey)]
+    fields_str = {k: format_datetime(getattr(self, k)) for k in field_names if hasattr(self, k)}
+    fields_joined_str = ", ".join([f"{k}={fields_str[k]}" for k in fields_str])
+    return f"{self.__class__.__name__}({fields_joined_str})"
+
+
+ORM.__repr__ = __repr__  # type: ignore
+ORM.__str__ = __repr__  # type: ignore
