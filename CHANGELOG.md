@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+📝 Fix docs | [215](https://github.com/laminlabs/lnschema-core/pull/215) | [falexwolf](https://github.com/falexwolf) | 2023-06-30 |
 🚚 Move file docstring and signatures | [214](https://github.com/laminlabs/lnschema-core/pull/214) | [falexwolf](https://github.com/falexwolf) | 2023-06-29 |
 🚚 Rename `BaseORM` to `ORM`, move `ORM` signatures here | [213](https://github.com/laminlabs/lnschema-core/pull/213) | [falexwolf](https://github.com/falexwolf) | 2023-06-29 |
 ✨ Add `Dataset` & `Feature` ORMs | [212](https://github.com/laminlabs/lnschema-core/pull/212) | [falexwolf](https://github.com/falexwolf) | 2023-06-29 | 0.37a1
