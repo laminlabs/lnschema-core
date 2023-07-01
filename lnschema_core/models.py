@@ -492,9 +492,11 @@ class Feature(ORM):
     name = models.CharField(max_length=255, db_index=True, default=None)
     """Name or title of feature (required)."""
     type = models.CharField(max_length=96, null=True, default=None)
-    """A way of grouping features of same type."""
+    """Type (a mere string description)."""
     description = models.TextField(null=True, default=None)
     """A description."""
+    synonyms = models.TextField(null=True, default=None)
+    """Bar-separated (|) synonyms."""
     feature_sets = models.ManyToManyField("FeatureSet", related_name="features")
     """Feature sets linked to this gene."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -530,10 +532,12 @@ class FeatureSet(ORM):
 
     """
 
-    id = models.CharField(max_length=64, primary_key=True, default=None)
-    """A universal id, valid across DB instances, a hash of the linked set of features."""
+    id = models.CharField(max_length=20, primary_key=True, default=None)
+    """A universal id (hash of the set of feature identifiers)."""
     type = models.CharField(max_length=64)
-    """A feature entity type."""
+    """Type formatted as ``"{schema_name}{ORM.__name__}"``."""
+    field = models.CharField(max_length=32)
+    """Field of ORM that was hashed."""
     files = models.ManyToManyField("File", related_name="feature_sets")
     """Files linked to the feature set."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
