@@ -16,6 +16,7 @@ from typing import (  # noqa
 
 from django.db import models
 from django.db.models import PROTECT, CharField, Manager, TextField
+from django.db.models.query_utils import DeferredAttribute as Field
 from upath import UPath
 
 from lnschema_core.types import (
@@ -57,7 +58,7 @@ class ORM(models.Model):
         pass
 
     @classmethod
-    def from_values(cls, identifiers: ListLike, field: StrField, **kwargs):
+    def from_values(cls, identifiers: ListLike, field: StrField, **kwargs) -> List["ORM"]:
         """Parse values for an identifier (a name, an id, etc.) and create records.
 
         This method helps avoid problems around duplication of entries,
@@ -492,9 +493,11 @@ class Feature(ORM):
     name = models.CharField(max_length=255, db_index=True, default=None)
     """Name or title of feature (required)."""
     type = models.CharField(max_length=96, null=True, default=None)
-    """A way of grouping features of same type."""
+    """Type (a mere string description)."""
     description = models.TextField(null=True, default=None)
     """A description."""
+    synonyms = models.TextField(null=True, default=None)
+    """Bar-separated (|) synonyms."""
     feature_sets = models.ManyToManyField("FeatureSet", related_name="features")
     """Feature sets linked to this gene."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -530,10 +533,12 @@ class FeatureSet(ORM):
 
     """
 
-    id = models.CharField(max_length=64, primary_key=True, default=None)
-    """A universal id, valid across DB instances, a hash of the linked set of features."""
+    id = models.CharField(max_length=20, primary_key=True, default=None)
+    """A universal id (hash of the set of feature identifiers)."""
     type = models.CharField(max_length=64)
-    """A feature entity type."""
+    """Type formatted as ``"{schema_name}{ORM.__name__}"``."""
+    field = models.CharField(max_length=32)
+    """Field of ORM that was hashed."""
     files = models.ManyToManyField("File", related_name="feature_sets")
     """Files linked to the feature set."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -542,6 +547,50 @@ class FeatureSet(ORM):
     """Time of last update to record."""
     created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_featuresets")
     """Creator of record, a :class:`~lamindb.User`."""
+
+    @overload
+    def __init__(
+        self,
+        features: Union[PathLike, DataLike],
+    ):
+        ...
+
+    @overload
+    def __init__(
+        self,
+        *db_args,
+    ):
+        ...
+
+    def __init__(
+        self,
+        *args,
+        **kwargs,
+    ):
+        pass
+
+    @classmethod  # type:ignore
+    def from_values(cls, values: ListLike, field: Field = Feature.name, **kwargs) -> "FeatureSet":  # type: ignore
+        """Create feature set from identifier values.
+
+        Args:
+           values: ``ListLike`` A list of identifiers, like feature names or ids.
+           field: ``Field = Feature.name`` The field of a reference ORM to
+               map values.
+           **kwargs: Can contain ``species`` or other context to interpret values.
+
+        Example:
+
+            >>> features = ["feat1", "feat2"]
+            >>> feature_set = ln.FeatureSet.from_values(features)
+
+            >>> genes = ["ENS980983409", "ENS980983410"]
+            >>> feature_set = ln.FeatureSet.from_values(features, lb.Gene.ensembl_gene_id)
+        """
+        pass
+
+    def save(self, *args, **kwargs) -> None:
+        """Save."""
 
 
 class File(ORM):
