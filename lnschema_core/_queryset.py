@@ -24,9 +24,15 @@ class QuerySet(models.QuerySet):
         """Return query as DataFrame."""
         import pandas as pd
 
-        field_names = [field.name for field in self.model._meta.fields if (not isinstance(field, models.ForeignKey) and field.name != "created_at")]
-        field_names += [f"{field.name}_id" for field in self.model._meta.fields if isinstance(field, models.ForeignKey)]
-        df = pd.DataFrame(self.values(), columns=field_names)
+        data = self.values()
+        if len(data) > 0:
+            keys = list(data[0].keys())
+            if "created_at" in keys:
+                keys.remove("created_at")
+        else:
+            keys = [field.name for field in self.model._meta.fields if (not isinstance(field, models.ForeignKey) and field.name != "created_at")]
+            keys += [f"{field.name}_id" for field in self.model._meta.fields if isinstance(field, models.ForeignKey)]
+        df = pd.DataFrame(self.values(), columns=keys)
         if len(df) > 0 and "updated_at" in df:
             df.updated_at = df.updated_at.dt.strftime("%Y-%m-%d %H:%M:%S")
         if "id" in df.columns:
