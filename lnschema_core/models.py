@@ -638,8 +638,8 @@ class File(ORM):
 
     id = models.CharField(max_length=20, primary_key=True)
     """A universal random id (20-char base62), valid across DB instances."""
-    name = models.CharField(max_length=255, db_index=True, null=True, default=None)
-    """A name or title for the file, mostly useful if no key is provided."""
+    storage: "Storage" = models.ForeignKey(Storage, PROTECT, related_name="files")
+    """Storage location (:class:`~lamindb.Storage`), e.g., an S3 bucket, local folder or network location."""
     key = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """Storage key, the relative path within the storage location."""
     suffix = models.CharField(max_length=30, db_index=True, null=True, default=None)
@@ -653,14 +653,17 @@ class File(ORM):
 
     Examples: 1KB is 1e3 bytes, 1MB is 1e6, 1GB is 1e9, 1TB is 1e12 etc.
     """
-    hash = models.CharField(max_length=86, db_index=True, null=True, default=None)
-    """Hash of file content. 86 base64 chars allow to store 64 bytes, 512 bits."""
+    hash = models.CharField(max_length=86, db_index=True, null=True, default=None)  # 86 base64 chars allow to store 64 bytes, 512 bits
+    """Hash of file content (MD5).
+
+    Useful to ascertain integrity and avoid duplication.
+    """
+    description = models.CharField(max_length=255, db_index=True, null=True, default=None)
+    """A description."""
     run = models.ForeignKey(Run, PROTECT, related_name="outputs", null=True)
     """:class:`~lamindb.Run` that created the `file`."""
     transform = models.ForeignKey(Transform, PROTECT, related_name="files", null=True)
     """:class:`~lamindb.Transform` whose run created the `file`."""
-    storage: "Storage" = models.ForeignKey(Storage, PROTECT, related_name="files")
-    """:class:`~lamindb.Storage` location of `file`, see `.path()` for full path."""
     # tags from Tags.files
     # features from Features.files
     # input_of from Run.inputs

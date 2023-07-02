@@ -25,4 +25,9 @@ class Migration(migrations.Migration):
             name="id",
             field=models.CharField(default=None, max_length=20, primary_key=True, serialize=False),
         ),
+        migrations.RenameField(
+            model_name="file",
+            old_name="name",
+            new_name="description",
+        ),
     ]
