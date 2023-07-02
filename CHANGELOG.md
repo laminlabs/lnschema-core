@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-🚚 Rename `File.name` to `File.description` | [218](https://github.com/laminlabs/lnschema-core/pull/218) | [falexwolf](https://github.com/falexwolf) | 2023-07-02 |
+🚚 Rename `File.name` to `File.description` | [218](https://github.com/laminlabs/lnschema-core/pull/218) | [falexwolf](https://github.com/falexwolf) | 2023-07-02 | 0.38.0
 🚚 Update `Feature` and `FeatureSet` | [217](https://github.com/laminlabs/lnschema-core/pull/217) | [falexwolf](https://github.com/falexwolf) | 2023-07-01 |
 💄 Prettify dataframe display | [216](https://github.com/laminlabs/lnschema-core/pull/216) | [falexwolf](https://github.com/falexwolf) | 2023-06-30 |
 📝 Fix docs | [215](https://github.com/laminlabs/lnschema-core/pull/215) | [falexwolf](https://github.com/falexwolf) | 2023-06-30 | 0.37.0
