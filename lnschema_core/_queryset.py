@@ -27,7 +27,7 @@ class QuerySet(models.QuerySet):
         field_names = [field.name for field in self.model._meta.fields if (not isinstance(field, models.ForeignKey) and field.name != "created_at")]
         field_names += [f"{field.name}_id" for field in self.model._meta.fields if isinstance(field, models.ForeignKey)]
         df = pd.DataFrame(self.values(), columns=field_names)
-        if "updated_at" in df:
+        if len(df) > 0 and "updated_at" in df:
             df.updated_at = df.updated_at.dt.strftime("%Y-%m-%d %H:%M:%S")
         if "id" in df.columns:
             df = df.set_index("id")
