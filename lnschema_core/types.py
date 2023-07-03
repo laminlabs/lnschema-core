@@ -36,11 +36,3 @@ class TransformType(ChoicesMixin, Enum):
     notebook = "notebook"
     app = "app"
     api = "api"
-
-
-class AnnDataAccessor:
-    pass
-
-
-class BackedAccessor:
-    pass
