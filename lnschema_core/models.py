@@ -19,16 +19,9 @@ from django.db.models import PROTECT, CharField, Manager, TextField
 from django.db.models.query_utils import DeferredAttribute as Field
 from upath import UPath
 
-from lnschema_core.types import (
-    AnnDataAccessor,
-    BackedAccessor,
-    DataLike,
-    ListLike,
-    PathLike,
-    StrField,
-)
+from lnschema_core.mocks import AnnDataAccessor, BackedAccessor, QuerySet
+from lnschema_core.types import DataLike, ListLike, PathLike, StrField
 
-from ._queryset import QuerySet
 from .ids import base62_8, base62_12, base62_20
 from .types import TransformType
 from .users import current_user_id
