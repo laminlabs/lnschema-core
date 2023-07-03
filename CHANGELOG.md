@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+💄 Do not show None fields | [221](https://github.com/laminlabs/lnschema-core/pull/221) | [falexwolf](https://github.com/falexwolf) | 2023-07-03 |
 🚚 Move `QuerySet` to lamindb | [220](https://github.com/laminlabs/lnschema-core/pull/220) | [falexwolf](https://github.com/falexwolf) | 2023-07-03 |
 ✨ Allow for annotate in `.df()` | [219](https://github.com/laminlabs/lnschema-core/pull/219) | [falexwolf](https://github.com/falexwolf) | 2023-07-02 |
 🚚 Rename `File.name` to `File.description` | [218](https://github.com/laminlabs/lnschema-core/pull/218) | [falexwolf](https://github.com/falexwolf) | 2023-07-02 | 0.38.0
