@@ -694,6 +694,7 @@ class File(ORM):
     ):
         pass
 
+    @classmethod
     def from_df(
         cls,
         df: "pd.DataFrame",
@@ -705,6 +706,7 @@ class File(ORM):
         """Create from ``DataFrame``, link column names as features."""
         pass
 
+    @classmethod
     def from_anndata(
         cls,
         adata: "AnnDataLike",
