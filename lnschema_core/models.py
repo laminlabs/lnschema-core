@@ -20,7 +20,7 @@ from django.db.models.query_utils import DeferredAttribute as Field
 from upath import UPath
 
 from lnschema_core.mocks import AnnDataAccessor, BackedAccessor, QuerySet
-from lnschema_core.types import DataLike, ListLike, PathLike, StrField
+from lnschema_core.types import AnnDataLike, DataLike, ListLike, PathLike, StrField
 
 from .ids import base62_8, base62_12, base62_20
 from .types import TransformType
@@ -60,28 +60,27 @@ class ORM(models.Model):
         Guide: :doc:`/biology/registries`.
 
         Args:
-            identifiers: `ListLike` A list of values for an identifier, e.g.
-                `["name1", "name2"]`.
-            field: `StrField` If `iterable` is `ListLike`, an `ORM` field to look
-                up, e.g. `lb.CellMarker.name`.
-            **kwargs: Can contain `species`. Either `"human"`, `"mouse"`, or any other
-                `name` of `Bionty.Species`. If `None`, will use default species in
+            identifiers: ``ListLike`` A list of values for an identifier, e.g.
+                ``["name1", "name2"]``.
+            field: ``StrField`` An ``ORM`` field to look up, e.g., ``lb.CellMarker.name``.
+            **kwargs: Can contain ``species``. Either ``"human"``, ``"mouse"``, or any other
+                `name` of `Bionty.Species`. If ``None``, will use default species in
                 bionty for each entity.
 
         Returns:
             A list of records.
 
-        For every `value` in an iterable of identifiers and a given `ORM.field`,
+        For every ``value`` in a list-like of identifiers and a given `ORM.field`,
         this function performs:
 
         1. It checks whether the value already exists in the database
-        (`ORM.select(field=value)`). If so, it adds the queried record to
-        the returned list and skips step 2. Otherwise, proceed with 2.
-        2. If the `ORM` is from `lnschema_bionty`, it checks whether there is an
-        exact match in the underlying ontology (`Bionty.inspect(value, field)`).
-        If so, it creates a record from Bionty and adds it to the returned list.
-        Otherwise, it creates a record that populates a single field using `value`
-        and adds the record to the returned list.
+           (``ORM.select(field=value)``). If so, it adds the queried record to
+           the returned list and skips step 2. Otherwise, proceed with 2.
+        2. If the ``ORM`` is from ``lnschema_bionty``, it checks whether there is an
+           exact match in the underlying ontology (``Bionty.inspect(value, field)``).
+           If so, it creates a record from Bionty and adds it to the returned list.
+           Otherwise, it creates a record that populates a single field using `value`
+           and adds the record to the returned list.
         """
         pass
 
@@ -693,6 +692,31 @@ class File(ORM):
         *args,
         **kwargs,
     ):
+        pass
+
+    @classmethod
+    def from_df(
+        cls,
+        df: "pd.DataFrame",
+        columns_ref: Field = Feature.name,
+        key: Optional[str] = None,
+        description: Optional[str] = None,
+        run: Optional[Run] = None,
+    ) -> "File":
+        """Create from ``DataFrame``, link column names as features."""
+        pass
+
+    @classmethod
+    def from_anndata(
+        cls,
+        adata: "AnnDataLike",
+        var_ref: Optional[Field],
+        obs_columns_ref: Optional[Field] = Feature.name,
+        key: Optional[str] = None,
+        description: Optional[str] = None,
+        run: Optional[Run] = None,
+    ) -> "File":
+        """Create from ``AnnData`` or ``.h5ad`` file, link ``var_names`` and ``obs.columns`` as features."""
         pass
 
     @classmethod

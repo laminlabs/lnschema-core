@@ -13,6 +13,7 @@ PathLike = TypeVar("PathLike", str, Path, UPath)
 # statically typing the following is hard because these are all heavy
 # dependencies, even DataFrame is heavy & slow to import
 DataLike = Any
+AnnDataLike = Any
 ListLike = TypeVar("ListLike", "pd.Series", list, "np.array")
 StrField = TypeVar("StrField", str, CharField, TextField)
 
