@@ -15,7 +15,7 @@ from typing import (  # noqa
 )
 
 from django.db import models
-from django.db.models import PROTECT, CharField, Manager, TextField
+from django.db.models import PROTECT, CharField, TextField
 from django.db.models.query_utils import DeferredAttribute as Field
 from upath import UPath
 
@@ -185,17 +185,16 @@ class ORM(models.Model):
         """
 
     @classmethod
-    def select(cls, **expressions) -> Union[QuerySet, Manager]:
+    def select(cls, **expressions) -> QuerySet:
         """Query records.
 
         Guide: :doc:`/guide/select`.
 
         Args:
-            ORM: An ORM class.
             expressions: Fields and values passed as Django query expressions.
 
         Returns:
-            A `QuerySet` or Django `Manager`.
+            A :class:`~lamindb.dev.QuerySet`.
         """
         from lamindb._select import select
 
