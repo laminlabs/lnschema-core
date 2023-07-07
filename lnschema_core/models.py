@@ -378,6 +378,11 @@ class Transform(ORM):
     reference = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """Reference for the transform, e.g., a URL.
     """
+    parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
+    """Parent transforms (predecessors) in data lineage.
+
+    These are auto-populated whenever a transform loads a file as run input.
+    """
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
@@ -639,18 +644,20 @@ class File(ORM):
     This is a file extension if the `file` is stored in a file format.
     It's `None` if the storage format doesn't have a canonical extension.
     """
+    description = models.CharField(max_length=255, db_index=True, null=True, default=None)
+    """A description."""
     size = models.BigIntegerField(null=True, db_index=True)
     """Size in bytes.
 
     Examples: 1KB is 1e3 bytes, 1MB is 1e6, 1GB is 1e9, 1TB is 1e12 etc.
     """
     hash = models.CharField(max_length=86, db_index=True, null=True, default=None)  # 86 base64 chars allow to store 64 bytes, 512 bits
-    """Hash of file content (MD5).
+    """Hash or pseudo-hash of file content.
 
     Useful to ascertain integrity and avoid duplication.
     """
-    description = models.CharField(max_length=255, db_index=True, null=True, default=None)
-    """A description."""
+    hash_type = models.CharField(max_length=30, db_index=True, null=True, default=None)
+    """Type of hash."""
     run = models.ForeignKey(Run, PROTECT, related_name="outputs", null=True)
     """:class:`~lamindb.Run` that created the `file`."""
     transform = models.ForeignKey(Transform, PROTECT, related_name="files", null=True)
