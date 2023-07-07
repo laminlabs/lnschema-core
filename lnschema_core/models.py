@@ -378,6 +378,11 @@ class Transform(ORM):
     reference = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """Reference for the transform, e.g., a URL.
     """
+    parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
+    """Parent transforms (predecessors) in data lineage.
+
+    These are auto-populated whenever a transform loads a file as run input.
+    """
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
