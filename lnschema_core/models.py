@@ -15,7 +15,7 @@ from typing import (  # noqa
 )
 
 from django.db import models
-from django.db.models import PROTECT, CharField, TextField
+from django.db.models import PROTECT
 from django.db.models.query_utils import DeferredAttribute as Field
 from upath import UPath
 
@@ -208,7 +208,7 @@ class ORM(models.Model):
         field: Optional[StrField] = None,
         top_hit: bool = False,
         case_sensitive: bool = True,
-        synonyms_field: Optional[Union[str, TextField, CharField]] = "synonyms",
+        synonyms_field: Optional[StrField] = None,
         synonyms_sep: str = "|",
     ) -> Union["pd.DataFrame", "ORM"]:
         """Search the table.
@@ -220,7 +220,7 @@ class ORM(models.Model):
             top_hit: `bool = False` If `True`, return only the top hit or hits (in
                 case of equal scores).
             case_sensitive: `bool = False` Whether the match is case sensitive.
-            synonyms_field: `bool = True` Also search synonyms. If `None`, is ignored.
+            synonyms_field: `Optional[StrField] = None` Search synonyms. If `None`, is ignored.
 
         Returns:
             A sorted `DataFrame` of search results with a score in column
