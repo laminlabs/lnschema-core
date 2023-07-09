@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-🚚 Add `Transform.parents` and `File.hash_type` | [223](https://github.com/laminlabs/lnschema-core/pull/223) | [falexwolf](https://github.com/falexwolf) | 2023-07-07 |
+🚚 Add `Transform.parents` and `File.hash_type` | [223](https://github.com/laminlabs/lnschema-core/pull/223) | [falexwolf](https://github.com/falexwolf) | 2023-07-07 | 0.38.3
 ✨ Add `from_df` and `from_anndata` to `File` | [222](https://github.com/laminlabs/lnschema-core/pull/222) | [falexwolf](https://github.com/falexwolf) | 2023-07-05 | 0.38.2
 💄 Do not show None fields | [221](https://github.com/laminlabs/lnschema-core/pull/221) | [falexwolf](https://github.com/falexwolf) | 2023-07-03 | 0.38.1
 🚚 Move `QuerySet` to lamindb | [220](https://github.com/laminlabs/lnschema-core/pull/220) | [falexwolf](https://github.com/falexwolf) | 2023-07-03 |
