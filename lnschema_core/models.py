@@ -206,7 +206,7 @@ class ORM(models.Model):
         field: Optional[StrField] = None,
         top_hit: bool = False,
         case_sensitive: bool = False,
-        synonyms_field: Optional[StrField] = None,
+        synonyms_field: Optional[StrField] = "synonyms",
     ) -> Union["pd.DataFrame", "ORM"]:
         """Search the table.
 
@@ -217,7 +217,8 @@ class ORM(models.Model):
             top_hit: `bool = False` If `True`, return only the top hit or hits (in
                 case of equal scores).
             case_sensitive: `bool = False` Whether the match is case sensitive.
-            synonyms_field: `Optional[StrField] = None` Search synonyms. If `None`, is ignored.
+            synonyms_field: `Optional[StrField] = "synonyms"` Search synonyms if
+                column is available. If `None`, is ignored.
 
         Returns:
             A sorted `DataFrame` of search results with a score in column
