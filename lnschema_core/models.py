@@ -150,7 +150,6 @@ class ORM(models.Model):
         case_sensitive: bool = False,
         keep: Literal["first", "last", False] = "first",
         synonyms_field: str = "synonyms",
-        synonyms_sep: str = "|",
         field: Optional[str] = None,
         **kwargs,
     ) -> Union[List[str], Dict[str, str]]:
@@ -170,7 +169,6 @@ class ORM(models.Model):
                     - "last": returns the last mapped standardized name
                     - `False`: returns all mapped standardized name
             synonyms_field: `str = "synonyms"` A field containing the concatenated synonyms.
-            synonyms_sep: `str = "|"` Which separator is used to separate synonyms.
             field: `Optional[str]` The field representing the standardized names.
 
         Returns:
@@ -207,9 +205,8 @@ class ORM(models.Model):
         *,
         field: Optional[StrField] = None,
         top_hit: bool = False,
-        case_sensitive: bool = True,
+        case_sensitive: bool = False,
         synonyms_field: Optional[StrField] = None,
-        synonyms_sep: str = "|",
     ) -> Union["pd.DataFrame", "ORM"]:
         """Search the table.
 
