@@ -517,6 +517,9 @@ class FeatureSet(ORM):
 
     Examples:
 
+        >>> features = ln.Feature.from_values(["feat1", "feat2"])
+        >>> ln.FeatureSet(features)
+
         >>> import lnschema_bionty as bt
         >>> reference = bt.Gene(species="mouse")
         >>> feature_set = ln.FeatureSet.from_values(adata.var["ensemble_id"], Gene.ensembl_gene_id)
@@ -545,7 +548,7 @@ class FeatureSet(ORM):
     @overload
     def __init__(
         self,
-        features: Union[PathLike, DataLike],
+        features: List[ORM],
     ):
         ...
 
