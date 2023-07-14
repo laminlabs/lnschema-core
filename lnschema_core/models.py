@@ -659,10 +659,10 @@ class File(ORM):
     """
     hash_type = models.CharField(max_length=30, db_index=True, null=True, default=None)
     """Type of hash."""
-    run = models.ForeignKey(Run, PROTECT, related_name="outputs", null=True)
-    """:class:`~lamindb.Run` that created the `file`."""
     transform = models.ForeignKey(Transform, PROTECT, related_name="files", null=True)
     """:class:`~lamindb.Transform` whose run created the `file`."""
+    run = models.ForeignKey(Run, PROTECT, related_name="outputs", null=True)
+    """:class:`~lamindb.Run` that created the `file`."""
     # tags from Tags.files
     # features from Features.files
     # input_of from Run.inputs
