@@ -534,6 +534,9 @@ class FeatureSet(ORM):
 
     Examples:
 
+        >>> features = ln.Feature.from_values(["feat1", "feat2"])
+        >>> ln.FeatureSet(features)
+
         >>> import lnschema_bionty as bt
         >>> reference = bt.Gene(species="mouse")
         >>> feature_set = ln.FeatureSet.from_values(adata.var["ensemble_id"], Gene.ensembl_gene_id)
@@ -562,7 +565,7 @@ class FeatureSet(ORM):
     @overload
     def __init__(
         self,
-        features: Union[PathLike, DataLike],
+        features: List[ORM],
     ):
         ...
 
@@ -673,10 +676,10 @@ class File(ORM):
     """
     hash_type = models.CharField(max_length=30, db_index=True, null=True, default=None)
     """Type of hash."""
-    run = models.ForeignKey(Run, PROTECT, related_name="outputs", null=True)
-    """:class:`~lamindb.Run` that created the `file`."""
     transform = models.ForeignKey(Transform, PROTECT, related_name="files", null=True)
     """:class:`~lamindb.Transform` whose run created the `file`."""
+    run = models.ForeignKey(Run, PROTECT, related_name="outputs", null=True)
+    """:class:`~lamindb.Run` that created the `file`."""
     # tags from Tags.files
     # features from Features.files
     # input_of from Run.inputs
