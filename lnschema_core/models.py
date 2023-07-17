@@ -42,12 +42,29 @@ class ORM(models.Model):
     confusion with statistical, machine learning or biological models.
     """
 
-    def add_synonym(self, synonym: Union[str, ListLike], force: bool = False):
+    def add_synonym(
+        self,
+        synonym: Union[str, ListLike],
+        force: bool = False,
+        save: Optional[bool] = None,
+    ):
         """Add synonyms to a record."""
         pass
 
     def remove_synonym(self, synonym: Union[str, ListLike]):
         """Remove synonyms from a record."""
+        pass
+
+    def describe(self):
+        """Rich representation of a record with relationships."""
+        pass
+
+    def view_parents(self, field: Optional[StrField] = None, distance: int = 100):
+        """View parents of a record in a graph."""
+        pass
+
+    def set_abbr(self, value: str):
+        """Set value for abbr field."""
         pass
 
     @classmethod
