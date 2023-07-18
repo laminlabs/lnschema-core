@@ -15,6 +15,7 @@ if _INSTANCE_SETUP:
         Dataset,
         Feature,
         FeatureSet,
+        FeatureValue,
         File,
         Project,
         Run,

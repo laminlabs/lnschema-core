@@ -505,7 +505,7 @@ class Feature(ORM):
     """Name of feature (required)."""
     type = models.CharField(max_length=96, null=True, default=None)
     """Type. If an ORM, is formatted as ``"{schema_name}{ORM.__name__}"``."""
-    field = models.CharField(max_length=32, null=True, default=True)
+    field = models.CharField(max_length=64, null=True, default=True)
     """If type is an ORM, the corresponding field."""
     description = models.TextField(null=True, default=None)
     """A description."""
@@ -522,12 +522,9 @@ class Feature(ORM):
 
 
 class FeatureSet(ORM):
-    """Feature sets: sets of features.
+    """Jointly measured sets of features.
 
-    A feature set is represented by the hash of the id set for the feature type.
-
-    The current supported feature types are `lnschema_bionty.Gene`,
-    `lnschema_bionty.Protein`, and `lnschema_bionty.CellMarker`.
+    A `feature_set` is represented by the hash of the id set for the feature type.
 
     Guides:
 
@@ -553,7 +550,7 @@ class FeatureSet(ORM):
     """A universal id (hash of the set of feature identifiers)."""
     type = models.CharField(max_length=64)
     """Type formatted as ``"{schema_name}{ORM.__name__}"``."""
-    field = models.CharField(max_length=32)
+    field = models.CharField(max_length=64)
     """Field of ORM that was hashed."""
     files = models.ManyToManyField("File", related_name="feature_sets")
     """Files linked to the feature set."""
