@@ -443,7 +443,7 @@ class Run(ORM):
 
 
 class Dataset(ORM):
-    """Datasets: measurements of features.
+    """Datasets.
 
     Datasets are measurements of features (aka observations of variables).
 
@@ -492,12 +492,26 @@ class Dataset(ORM):
 class Feature(ORM):
     """Features.
 
-    Note that you can use Bionty ORMs to manage common features like genes,
-    pathways, proteins & cell markers.
+    Examples:
 
-    Similarly, you can define custom ORMs to manage features like gene sets, nodes, etc.
+        >>> df = pd.DataFrame({"feat1": [1, 2], "feat2": [3.1, 4.2], "feat3": ["cond1", "cond2"]})
+        >>> features = ln.Feature.from_df(df)
+        >>> features.save()
+        >>> # the information from the DataFrame is now available in the Feature table
+        >>> ln.Feature.select().df()
+        id    name    type
+         a   feat1     int
+         b   feat2 float64
+         c   feat3     str
 
-    This ORM is a way of getting started without using Bionty or a custom schema.
+    Notes:
+
+        You can use `lnschema_bionty` ORMs to manage common features like genes,
+        pathways, proteins & cell markers.
+
+        Similarly, you can define custom ORMs to manage features like gene sets, nodes, etc.
+
+        This ORM is a way of getting started without using Bionty or a custom schema.
     """
 
     id = models.CharField(max_length=12, default=base62_12, primary_key=True)
@@ -521,6 +535,30 @@ class Feature(ORM):
     """Time of run execution."""
     created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_features")
     """Creator of record, a :class:`~lamindb.User`."""
+
+    @overload
+    def __init__(
+        self,
+        name: str,
+        type: str,
+        field: str,
+        description: str,
+    ):
+        ...
+
+    @overload
+    def __init__(
+        self,
+        *db_args,
+    ):
+        ...
+
+    def __init__(
+        self,
+        *args,
+        **kwargs,
+    ):
+        pass
 
     @classmethod
     def from_df(
