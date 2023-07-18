@@ -15,7 +15,7 @@ from typing import (  # noqa
 )
 
 from django.db import models
-from django.db.models import PROTECT
+from django.db.models import CASCADE, PROTECT
 from django.db.models.query_utils import DeferredAttribute as Field
 from upath import UPath
 
@@ -428,7 +428,7 @@ class Run(ORM):
     """Name or title of run."""
     external_id = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """External id (such as from a workflow tool)."""
-    transform = models.ForeignKey(Transform, PROTECT, related_name="runs")
+    transform = models.ForeignKey(Transform, CASCADE, related_name="runs")
     """The transform :class:`~lamindb.Transform` that is being run."""
     inputs = models.ManyToManyField("File", related_name="input_of")
     """The input files for the run."""
@@ -437,7 +437,7 @@ class Run(ORM):
     """Time of creation of record."""
     run_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of run execution."""
-    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_runs")
+    created_by = models.ForeignKey(User, CASCADE, default=current_user_id, related_name="created_runs")
     """Creator of record, a :class:`~lamindb.User`."""
 
 
@@ -489,7 +489,7 @@ class Dataset(ORM):
 
 
 class Feature(ORM):
-    """Features: column names of DataFrames.
+    """Features.
 
     Note that you can use Bionty ORMs to manage common features like genes,
     pathways, proteins & cell markers.
@@ -502,9 +502,11 @@ class Feature(ORM):
     id = models.CharField(max_length=12, default=base62_12, primary_key=True)
     """Universal id, valid across DB instances."""
     name = models.CharField(max_length=255, db_index=True, default=None)
-    """Name or title of feature (required)."""
+    """Name of feature (required)."""
     type = models.CharField(max_length=96, null=True, default=None)
-    """Type (a mere string description)."""
+    """Type. If an ORM, is formatted as ``"{schema_name}{ORM.__name__}"``."""
+    field = models.CharField(max_length=32, null=True, default=True)
+    """If type is an ORM, the corresponding field."""
     description = models.TextField(null=True, default=None)
     """A description."""
     synonyms = models.TextField(null=True, default=None)
@@ -605,6 +607,21 @@ class FeatureSet(ORM):
 
     def save(self, *args, **kwargs) -> None:
         """Save."""
+
+
+class FeatureValue(ORM):
+    """Feature values.
+
+    Stores values for feature types that don't have a dedicated ORM.
+    """
+
+    feature = models.ForeignKey(Feature, CASCADE)
+    """Feature."""
+    value = models.CharField(max_length=128)
+    """Value."""
+
+    class Meta:
+        unique_together = (("feature", "value"),)
 
 
 class File(ORM):
