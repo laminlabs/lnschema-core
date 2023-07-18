@@ -221,10 +221,11 @@ class ORM(models.Model):
         string: str,
         *,
         field: Optional[StrField] = None,
-        top_hit: bool = False,
+        return_queryset: bool = False,
+        limit: Optional[int] = None,
         case_sensitive: bool = False,
         synonyms_field: Optional[StrField] = "synonyms",
-    ) -> Union["pd.DataFrame", "ORM"]:
+    ) -> Union["pd.DataFrame", "QuerySet"]:
         """Search the table.
 
         Args:
