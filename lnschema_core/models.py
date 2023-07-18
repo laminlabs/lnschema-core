@@ -505,7 +505,8 @@ class Feature(ORM):
     """Name of feature (required)."""
     type = models.CharField(max_length=96, null=True, default=None)
     """Type. If an ORM, is formatted as ``"{schema_name}{ORM.__name__}"``."""
-    field = models.CharField(max_length=64, null=True, default=True)
+    # values through FeatureValue
+    field = models.CharField(max_length=64, null=True, default=None)
     """If type is an ORM, the corresponding field."""
     description = models.TextField(null=True, default=None)
     """A description."""
@@ -519,6 +520,18 @@ class Feature(ORM):
     """Time of run execution."""
     created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_features")
     """Creator of record, a :class:`~lamindb.User`."""
+
+    @classmethod
+    def from_df(
+        cls,
+        df: "pd.DataFrame",
+    ) -> List["Feature"]:
+        """Create Feature records for columns."""
+        pass
+
+    def save(self, *args, **kwargs) -> None:
+        """Save."""
+        pass
 
 
 class FeatureSet(ORM):
@@ -602,17 +615,27 @@ class FeatureSet(ORM):
         """
         pass
 
+    @classmethod
+    def from_df(
+        cls,
+        df: "pd.DataFrame",
+    ) -> "FeatureSet":
+        """Create Feature records for columns."""
+        pass
+
     def save(self, *args, **kwargs) -> None:
         """Save."""
 
 
 class FeatureValue(ORM):
-    """Feature values.
+    """Categorical values of features.
 
     Stores values for feature types that don't have a dedicated ORM.
+
+    Is analogous to, say, the `Gene` ORM in `lnschema_bionty`.
     """
 
-    feature = models.ForeignKey(Feature, CASCADE)
+    feature = models.ForeignKey(Feature, CASCADE, related_name="values")
     """Feature."""
     value = models.CharField(max_length=128)
     """Value."""
