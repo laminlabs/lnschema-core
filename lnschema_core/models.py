@@ -15,7 +15,7 @@ from typing import (  # noqa
 )
 
 from django.db import models
-from django.db.models import PROTECT
+from django.db.models import CASCADE, PROTECT
 from django.db.models.query_utils import DeferredAttribute as Field
 from upath import UPath
 
@@ -429,7 +429,7 @@ class Run(ORM):
     """Name or title of run."""
     external_id = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """External id (such as from a workflow tool)."""
-    transform = models.ForeignKey(Transform, PROTECT, related_name="runs")
+    transform = models.ForeignKey(Transform, CASCADE, related_name="runs")
     """The transform :class:`~lamindb.Transform` that is being run."""
     inputs = models.ManyToManyField("File", related_name="input_of")
     """The input files for the run."""
@@ -438,12 +438,12 @@ class Run(ORM):
     """Time of creation of record."""
     run_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of run execution."""
-    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_runs")
+    created_by = models.ForeignKey(User, CASCADE, default=current_user_id, related_name="created_runs")
     """Creator of record, a :class:`~lamindb.User`."""
 
 
 class Dataset(ORM):
-    """Datasets: measurements of features.
+    """Datasets.
 
     Datasets are measurements of features (aka observations of variables).
 
@@ -490,22 +490,39 @@ class Dataset(ORM):
 
 
 class Feature(ORM):
-    """Features: column names of DataFrames.
+    """Features.
 
-    Note that you can use Bionty ORMs to manage common features like genes,
-    pathways, proteins & cell markers.
+    Examples:
 
-    Similarly, you can define custom ORMs to manage features like gene sets, nodes, etc.
+        >>> df = pd.DataFrame({"feat1": [1, 2], "feat2": [3.1, 4.2], "feat3": ["cond1", "cond2"]})
+        >>> features = ln.Feature.from_df(df)
+        >>> features.save()
+        >>> # the information from the DataFrame is now available in the Feature table
+        >>> ln.Feature.select().df()
+        id    name    type
+         a   feat1     int
+         b   feat2 float64
+         c   feat3     str
 
-    This ORM is a way of getting started without using Bionty or a custom schema.
+    Notes:
+
+        You can use `lnschema_bionty` ORMs to manage common features like genes,
+        pathways, proteins & cell markers.
+
+        Similarly, you can define custom ORMs to manage features like gene sets, nodes, etc.
+
+        This ORM is a way of getting started without using Bionty or a custom schema.
     """
 
     id = models.CharField(max_length=12, default=base62_12, primary_key=True)
     """Universal id, valid across DB instances."""
     name = models.CharField(max_length=255, db_index=True, default=None)
-    """Name or title of feature (required)."""
+    """Name of feature (required)."""
     type = models.CharField(max_length=96, null=True, default=None)
-    """Type (a mere string description)."""
+    """Type. If an ORM, is formatted as ``"{schema_name}{ORM.__name__}"``."""
+    # values through FeatureValue
+    field = models.CharField(max_length=64, null=True, default=None)
+    """If type is an ORM, the corresponding field."""
     description = models.TextField(null=True, default=None)
     """A description."""
     synonyms = models.TextField(null=True, default=None)
@@ -519,14 +536,47 @@ class Feature(ORM):
     created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_features")
     """Creator of record, a :class:`~lamindb.User`."""
 
+    @overload
+    def __init__(
+        self,
+        name: str,
+        type: str,
+        field: str,
+        description: str,
+    ):
+        ...
+
+    @overload
+    def __init__(
+        self,
+        *db_args,
+    ):
+        ...
+
+    def __init__(
+        self,
+        *args,
+        **kwargs,
+    ):
+        pass
+
+    @classmethod
+    def from_df(
+        cls,
+        df: "pd.DataFrame",
+    ) -> List["Feature"]:
+        """Create Feature records for columns."""
+        pass
+
+    def save(self, *args, **kwargs) -> None:
+        """Save."""
+        pass
+
 
 class FeatureSet(ORM):
-    """Feature sets: sets of features.
+    """Jointly measured sets of features.
 
-    A feature set is represented by the hash of the id set for the feature type.
-
-    The current supported feature types are `lnschema_bionty.Gene`,
-    `lnschema_bionty.Protein`, and `lnschema_bionty.CellMarker`.
+    A `feature_set` is represented by the hash of the id set for the feature type.
 
     Guides:
 
@@ -552,7 +602,7 @@ class FeatureSet(ORM):
     """A universal id (hash of the set of feature identifiers)."""
     type = models.CharField(max_length=64)
     """Type formatted as ``"{schema_name}{ORM.__name__}"``."""
-    field = models.CharField(max_length=32)
+    field = models.CharField(max_length=64)
     """Field of ORM that was hashed."""
     files = models.ManyToManyField("File", related_name="feature_sets")
     """Files linked to the feature set."""
@@ -604,8 +654,33 @@ class FeatureSet(ORM):
         """
         pass
 
+    @classmethod
+    def from_df(
+        cls,
+        df: "pd.DataFrame",
+    ) -> "FeatureSet":
+        """Create Feature records for columns."""
+        pass
+
     def save(self, *args, **kwargs) -> None:
         """Save."""
+
+
+class FeatureValue(ORM):
+    """Categorical values of features.
+
+    Stores values for feature types that don't have a dedicated ORM.
+
+    Is analogous to, say, the `Gene` ORM in `lnschema_bionty`.
+    """
+
+    feature = models.ForeignKey(Feature, CASCADE, related_name="values")
+    """Feature."""
+    value = models.CharField(max_length=128)
+    """Value."""
+
+    class Meta:
+        unique_together = (("feature", "value"),)
 
 
 class File(ORM):
