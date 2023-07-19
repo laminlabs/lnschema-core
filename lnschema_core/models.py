@@ -835,11 +835,11 @@ class Feature(ORM):
     """Universal id, valid across DB instances."""
     name = models.CharField(max_length=255, db_index=True, default=None)
     """Name of feature (required)."""
-    type = models.CharField(max_length=96, null=True, default=None)
+    type = models.CharField(max_length=96, db_index=True, null=True, default=None)
     """Type. If an ORM, is formatted as ``"{schema_name}{ORM.__name__}"``."""
-    unit = models.CharField(max_length=30, null=True, default=None)
+    unit = models.CharField(max_length=30, db_index=True, null=True, default=None)
     """Unit of measure, ideally SI, e.g., `m`, `s`, `kg`, etc."""
-    description = models.TextField(null=True, default=None)
+    description = models.TextField(db_index=True, null=True, default=None)
     """A description."""
     synonyms = models.TextField(null=True, default=None)
     """Bar-separated (|) synonyms."""
@@ -1001,7 +1001,7 @@ class Category(ORM):
 
     id = models.CharField(max_length=12, default=base62_12, primary_key=True)
     """Universal id, valid across DB instances."""
-    name = models.CharField(max_length=128)
+    name = models.CharField(max_length=128, db_index=True)
     """The name or the string value of the category."""
     feature = models.ForeignKey(Feature, CASCADE, related_name="categories")
     """Feature."""
