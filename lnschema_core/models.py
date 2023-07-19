@@ -520,6 +520,8 @@ class Feature(ORM):
     """Name of feature (required)."""
     type = models.CharField(max_length=96, null=True, default=None)
     """Type. If an ORM, is formatted as ``"{schema_name}{ORM.__name__}"``."""
+    unit = models.CharField(max_length=30, null=True, default=None)
+    """Unit of measure, ideally SI, e.g., `m`, `s`, `kg`, etc."""
     # values through FeatureValue
     field = models.CharField(max_length=64, null=True, default=None)
     """If type is an ORM, the corresponding field."""
