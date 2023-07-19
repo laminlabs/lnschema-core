@@ -606,8 +606,6 @@ class FeatureSet(ORM):
     """Type formatted as ``"{schema_name}{ORM.__name__}"``."""
     field = models.CharField(max_length=64)
     """Field of ORM that was hashed."""
-    files = models.ManyToManyField("File", related_name="feature_sets")
-    """Files linked to the feature set."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
@@ -754,6 +752,8 @@ class File(ORM):
     """
     hash_type = models.CharField(max_length=30, db_index=True, null=True, default=None)
     """Type of hash."""
+    feature_sets = models.ManyToManyField(FeatureSet, related_name="files")
+    """Files linked to the feature set."""
     transform = models.ForeignKey(Transform, PROTECT, related_name="files", null=True)
     """:class:`~lamindb.Transform` whose run created the `file`."""
     run = models.ForeignKey(Run, PROTECT, related_name="outputs", null=True)
