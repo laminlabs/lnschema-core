@@ -1009,7 +1009,7 @@ class Category(ORM):
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
-    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_files")
+    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_categories")
     """Creator of record, a :class:`~lamindb.User`."""
 
     class Meta:
