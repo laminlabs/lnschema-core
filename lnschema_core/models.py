@@ -925,9 +925,11 @@ class FeatureSet(ORM):
 
     id = models.CharField(max_length=20, primary_key=True, default=None)
     """A universal id (hash of the set of feature identifiers)."""
-    type = models.CharField(max_length=64)
-    """Type formatted as ``"{schema_name}{ORM.__name__}"``."""
-    field = models.CharField(max_length=64)
+    type = models.CharField(max_length=64, db_index=True)
+    """Type, the ORM name."""
+    schema = models.CharField(max_length=64, db_index=True)
+    """The schema where the ORM is defined."""
+    field = models.CharField(max_length=64, db_index=True)
     """Field of ORM that was hashed."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""

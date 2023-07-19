@@ -74,4 +74,25 @@ class Migration(migrations.Migration):
                 "unique_together": {("name", "feature")},
             },
         ),
+        migrations.AddField(
+            model_name="featureset",
+            name="schema",
+            field=models.CharField(default="core", max_length=64),
+            preserve_default=False,
+        ),
+        migrations.AlterField(
+            model_name="featureset",
+            name="field",
+            field=models.CharField(db_index=True, max_length=64),
+        ),
+        migrations.AlterField(
+            model_name="featureset",
+            name="schema",
+            field=models.CharField(db_index=True, max_length=64),
+        ),
+        migrations.AlterField(
+            model_name="featureset",
+            name="type",
+            field=models.CharField(db_index=True, max_length=64),
+        ),
     ]
