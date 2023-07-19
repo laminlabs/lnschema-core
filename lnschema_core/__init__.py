@@ -12,10 +12,10 @@ if _INSTANCE_SETUP:
     from . import ids, types
     from .models import (  # type: ignore
         ORM,
+        Category,
         Dataset,
         Feature,
         FeatureSet,
-        FeatureValue,
         File,
         Project,
         Run,

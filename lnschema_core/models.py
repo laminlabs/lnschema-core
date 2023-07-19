@@ -839,9 +839,6 @@ class Feature(ORM):
     """Type. If an ORM, is formatted as ``"{schema_name}{ORM.__name__}"``."""
     unit = models.CharField(max_length=30, null=True, default=None)
     """Unit of measure, ideally SI, e.g., `m`, `s`, `kg`, etc."""
-    # values through FeatureValue
-    field = models.CharField(max_length=64, null=True, default=None)
-    """If type is an ORM, the corresponding field."""
     description = models.TextField(null=True, default=None)
     """A description."""
     synonyms = models.TextField(null=True, default=None)
@@ -895,14 +892,24 @@ class Feature(ORM):
 class FeatureSet(ORM):
     """Jointly measured sets of features.
 
-    A `feature_set` is represented by the hash of the id set for the feature type.
+    .. note::
 
-    Guides:
+        A `FeatureSet` is a useful entity as you might have millions of data batches
+        that measure the same features: All of them would link against a single
+        feature set. If instead, you'd link against single features (say, genes),
+        you'd face exploding link tables.
 
-    - :doc:`/biology/scrna`
-    - :doc:`/biology/flow`
+        A `feature_set` is identified by the hash of the id set for the feature type.
+
+    Notes:
+
+        - :doc:`/biology/scrna`
+        - :doc:`/biology/flow`
 
     Examples:
+
+        >>> df = pd.DataFrame({"feat1": [1, 2], "feat2": [3.1, 4.2], "feat3": ["cond1", "cond2"]})
+        >>> feature_set = ln.FeatureSet.from_df(df)
 
         >>> features = ln.Feature.from_values(["feat1", "feat2"])
         >>> ln.FeatureSet(features)
@@ -982,18 +989,28 @@ class FeatureSet(ORM):
         """Save."""
 
 
-class FeatureValue(ORM):
-    """Categorical values of features.
+class Category(ORM):
+    """Categories.
 
-    Stores values for feature types that don't have a dedicated ORM.
+    This is the default registry for categories.
 
-    Is analogous to, say, the `Gene` ORM in `lnschema_bionty`.
+    If you're working a lot with different cell lines, proteins, genes, or other
+    entities of complexity, consider using the pre-defined biological registries
+    in :mod:`lnschema_bionty`.
     """
 
+    id = models.CharField(max_length=12, default=base62_12, primary_key=True)
+    """Universal id, valid across DB instances."""
     feature = models.ForeignKey(Feature, CASCADE, related_name="values")
     """Feature."""
     value = models.CharField(max_length=128)
-    """Value."""
+    """String value of category."""
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    """Time of creation of record."""
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    """Time of last update to record."""
+    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_files")
+    """Creator of record, a :class:`~lamindb.User`."""
 
     class Meta:
         unique_together = (("feature", "value"),)
@@ -1184,7 +1201,7 @@ class File(ORM):
             >>> file
             File(id=kV3JQuBw4izvUdAkjO4p, suffix=.parquet, description=Iris flower dataset batch1, size=5334, hash=RraiKH9BAtAgS5jg7LWUiA, hash_type=md5, storage_id=Zl2q0vQB, created_by_id=DzTjkKse) # noqa
             >>> file.save()
-            💬 Created 2 FeatureValue records with a single field value
+            💬 Created 2 Category records with a single field value
             💡 storing file kV3JQuBw4izvUdAkjO4p with key .lamindb/kV3JQuBw4izvUdAkjO4p.parquet
         """
         pass
