@@ -990,9 +990,9 @@ class FeatureSet(ORM):
 
 
 class Category(ORM):
-    """Categories.
+    """Categories of categorical features.
 
-    This is the default registry for categories.
+    This is the default registry for tracking categories of categorical features.
 
     If you're working a lot with different cell lines, proteins, genes, or other
     entities of complexity, consider using the pre-defined biological registries
@@ -1033,8 +1033,8 @@ class File(ORM):
 
     Track where files come from by passing the generating :class:`~lamindb.Run`.
 
-    Often, files store jointly measured observations of features: track them
-    with :class:`~lamindb.FeatureSet`.
+    Often, files store jointly measured features: track them with
+    :class:`~lamindb.FeatureSet`.
 
     If files have corresponding representations in storage and memory, LaminDB
     makes some configurable default choices (e.g., serialize a `DataFrame` as a
