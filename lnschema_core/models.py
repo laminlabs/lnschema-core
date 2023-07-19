@@ -1013,7 +1013,7 @@ class Category(ORM):
     """Creator of record, a :class:`~lamindb.User`."""
 
     class Meta:
-        unique_together = (("feature", "value"),)
+        unique_together = (("name", "feature"),)
 
 
 class File(ORM):

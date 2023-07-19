@@ -61,7 +61,7 @@ class Migration(migrations.Migration):
                 ("feature", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="categories", to="lnschema_core.feature")),
             ],
             options={
-                "unique_together": {("feature", "value")},
+                "unique_together": {("name", "feature")},
             },
         ),
     ]
