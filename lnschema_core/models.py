@@ -56,15 +56,61 @@ class ORM(models.Model):
         pass
 
     def describe(self):
-        """Rich representation of a record with relationships."""
+        """Rich representation of a record with relationships.
+
+        Examples:
+
+            >>> ln.File(ln.dev.datasets.file_jpg_paradisi05(), description="paradisi05").save()
+            >>> file = ln.File.select(description="paradisi05").one()
+            >>> ln.save(ln.Tag.from_values(["image", "benchmark", "example"], field="name"))
+            >>> tags = ln.Tag.select(name__in = ["image", "benchmark", "example"]).all()
+            >>> file.tags.set(tags)
+            >>> file.describe()
+            File(id=jb7BY5UJoQVGMUOKiLcn, key=None, suffix=.jpg, description=paradisi05, size=29358, hash=r4tnqmKI_SjrkdLzpuWp4g, hash_type=md5, created_at=2023-07-19 15:48:26.485889+00:00, updated_at=2023-07-19 16:43:17.792241+00:00) # noqa
+            ...
+            One/Many-to-One:
+                🔗 storage: Storage(id=Zl2q0vQB, root=/home/runner/work/lamindb/lamindb/docs/guide/mydata, type=local, updated_at=2023-07-19 14:18:21, created_by_id=DzTjkKse)
+                🔗 transform: None
+                🔗 run: None
+                🔗 created_by: User(id=DzTjkKse, handle=testuser1, email=testuser1@lamin.ai, name=Test User1, updated_at=2023-07-19 14:18:21)
+            Many-to-Many:
+                🔗 tags (3): ['benchmark', 'example', 'image']
+        """
         pass
 
     def view_parents(self, field: Optional[StrField] = None, distance: int = 100):
-        """View parents of a record in a graph."""
+        """View parents of a record in a graph.
+
+        Examples:
+
+            >>> import lnschema_bionty as lb
+            >>> lb.Tissue.from_bionty(name="subsegmental bronchus").save()
+            >>> tissue = lb.Tissue.select(name="subsegmental bronchus").one()
+            >>> tissue.view_parents()
+
+        """
         pass
 
     def set_abbr(self, value: str):
-        """Set value for abbr field."""
+        """Set value for abbr field and add to synonyms.
+
+        Examples:
+
+            >>> import lnschema_bionty as lb
+            >>> lb.ExperimentalFactor.from_bionty(name="single-cell RNA sequencing").save()
+            >>> scrna = lb.ExperimentalFactor.select(name="single-cell RNA sequencing").one()
+            >>> scrna.abbr
+            None
+            >>> scrna.synonyms
+            'single-cell RNA-seq|single-cell transcriptome sequencing|scRNA-seq|single cell RNA sequencing'
+            >>> scrna.set_abbr("scRNA")
+            >>> scrna.abbr
+            'scRNA'
+            >>> scrna.synonyms
+            'scRNA|single-cell RNA-seq|single cell RNA sequencing|single-cell transcriptome sequencing|scRNA-seq'
+            >>> scrna.save()
+
+        """
         pass
 
     @classmethod
@@ -98,6 +144,47 @@ class ORM(models.Model):
            If so, it creates a record from Bionty and adds it to the returned list.
            Otherwise, it creates a record that populates a single field using `value`
            and adds the record to the returned list.
+
+        Examples:
+
+            Bulk create records:
+
+            >>> projects = ln.Project.from_values(["benchmark", "prediction", "test"], field="name")
+            💬 Created 3 Project records with a single field name
+            >>> projects
+            [Project(id=mDahtPrz, name=benchmark, created_by_id=DzTjkKse),
+            Project(id=2Sjmn9il, name=prediction, created_by_id=DzTjkKse),
+            Project(id=gdxrHdTA, name=test, created_by_id=DzTjkKse)]
+
+            Bulk create records with shared kwargs:
+
+            >>> pipelines = ln.Transform.from_values(["Pipeline 1", "Pipeline 2"], field="name",
+            ...                                      type="pipeline", version="1")
+            💬 Created 2 Transform records with a single field name
+            >>> pipelines
+            [Transform(id=Ts8k7LSZNZhO1t, name=Pipeline 1, stem_id=Ts8k7LSZNZhO, version=1, type=pipeline, created_by_id=DzTjkKse),
+            Transform(id=m2UXSAqqttuuXP, name=Pipeline 2, stem_id=m2UXSAqqttuu, version=1, type=pipeline, created_by_id=DzTjkKse)]
+
+            Returns existing records:
+
+            >>> ln.save(ln.Project.from_values(["benchmark", "prediction", "test"], field="name"))
+            >>> projects = ln.Project.from_values(["benchmark", "prediction", "test"], field="name")
+            💬 Returned 3 existing Project DB records that matched name field
+            >>> projects
+            [Project(id=iV3DXy70, name=benchmark, updated_at=2023-07-19 16:07:50, created_by_id=DzTjkKse),
+            Project(id=99aB57DI, name=prediction, updated_at=2023-07-19 16:07:50, created_by_id=DzTjkKse),
+            Project(id=ueaGXwuL, name=test, updated_at=2023-07-19 16:07:50, created_by_id=DzTjkKse)]
+
+            Bulk create records from bionty:
+
+            >>> import lnschema_bionty as lb
+            >>> records = lb.CellType.from_values(["T-cell", "B cell"], field="name")
+            💬 Created 1 CellType record from Bionty that matched name field (bionty_source_id=S2Yu)
+            💬 Created 1 CellType record from Bionty that matched synonyms (bionty_source_id=S2Yu)
+            >>> records
+            [CellType(id=BxNjby0x, name=T cell, ontology_id=CL:0000084, synonyms=T-cell|T lymphocyte|T-lymphocyte, description=A Type Of Lymphocyte Whose Defining Characteristic Is The Expression Of A T Cell Receptor Complex., bionty_source_id=S2Yu, created_by_id=DzTjkKse), # noqa
+            CellType(id=cx8VcggA, name=B cell, ontology_id=CL:0000236, synonyms=B lymphocyte|B-lymphocyte|B-cell, description=A Lymphocyte Of B Lineage That Is Capable Of B Cell Mediated Immunity., bionty_source_id=S2Yu, created_by_id=DzTjkKse)] # noqa
+
         """
         pass
 
@@ -275,6 +362,17 @@ class User(ORM):
 
     All data in this table is synched from the cloud user account to ensure a
     universal user identity, valid across DB instances, email & handle changes.
+
+    Examples:
+
+        Creating user records is managed via the :doc:`/guide/configure`.
+
+        Query a user by handle:
+
+        >>> user = ln.User.select(handle="testuser1").one()
+        >>> user
+        User(id=DzTjkKse, handle=testuser1, email=testuser1@lamin.ai, name=Test User1, updated_at=2023-07-10 18:37:26)
+
     """
 
     id = models.CharField(max_length=8, primary_key=True, default=None)
@@ -295,6 +393,27 @@ class Storage(ORM):
     """Storage locations.
 
     Either S3 or GCP buckets or local storage locations.
+
+    See Also:
+
+        :attr:`~lamindb.dev.Settings.storage`
+
+    Examples:
+
+        Configure a default storage upon initiation of a LaminDB instance:
+
+        `lamin init --storage ./mydata # or "s3://my-bucket" or "gs://my-bucket"`
+
+        >>> ln.settings.storage
+        PosixPath('/home/runner/work/lamindb/lamindb/docs/guide/mydata')
+
+        Set a new default storage (currently doesn't support SQLite instances):
+
+        >>> ln.load("my-postgres-db")
+        >>> ln.settings.storage = "./storage_2" # or a cloud bucket
+        >>> ln.settings.storage
+        PosixPath('/home/runner/work/lamindb-setup/lamindb-setup/docs/guide/storage_2')
+
     """
 
     id = models.CharField(max_length=8, default=base62_8, db_index=True, primary_key=True)
@@ -314,7 +433,50 @@ class Storage(ORM):
 
 
 class Tag(ORM):
-    """Tags."""
+    """Tags.
+
+    Examples:
+
+        Create a new tag:
+
+        >>> tag = ln.Tag(name="ML output")
+        >>> tag.save()
+        >>> tag
+        Tag(id=gelGp2P6, name=ML output, created_by_id=DzTjkKse)
+
+        Tag a file:
+
+        >>> tag = ln.Tag.select(name="ML output").one()
+        >>> tag
+        Tag(id=gelGp2P6, name=ML output, created_by_id=DzTjkKse)
+        >>> file = ln.File("./myfile.csv")
+        >>> file.save()
+        >>> file
+        File(id=MveGmGJImYY5qBwmr0j0, suffix=.csv, size=4, hash=CY9rzUYh03PK3k6DJie09g, hash_type=md5, updated_at=2023-07-19 13:47:59, storage_id=597Sgod0, created_by_id=DzTjkKse) # noqa
+        >>> file.tags.add(tag)
+        >>> file.tags.list("name")
+        ['ML output']
+
+        Tag a project:
+
+        >>> ln.Tag(name="benchmark").save()
+        >>> tag = ln.Tag.select(name="benchmark").one()
+        Tag(id=gelGp2P6, name=benchmark, created_by_id=DzTjkKse)
+        >>> ln.Project(name="My awesome project", external_id="Lamin-0001")
+        >>> project = ln.Tag.select(name="My awesome project").one()
+        >>> project
+        Project(id=23QgqohM, name=My awesome project, external_id=Lamin-0001, created_by_id=DzTjkKse)
+        >>> project.tags.add(tag)
+        >>> project.tags.list("name")
+        ['ML output']
+
+        Query by tag:
+
+        >>> ln.File.select(tags__name = "ML output").first()
+        File(id=MveGmGJImYY5qBwmr0j0, suffix=.csv, size=4, hash=CY9rzUYh03PK3k6DJie09g, hash_type=md5, updated_at=2023-07-19 13:47:59, storage_id=597Sgod0, created_by_id=DzTjkKse) # noqa
+        >>> ln.Project.select(tags__name = "benchmark").first()
+        Project(id=23QgqohM, name=My awesome project, external_id=Lamin-0001, created_by_id=DzTjkKse)
+    """
 
     id = models.CharField(max_length=8, default=base62_8, primary_key=True)
     """A universal random id, valid across DB instances."""
@@ -331,7 +493,35 @@ class Tag(ORM):
 
 
 class Project(ORM):
-    """Projects."""
+    """Projects.
+
+    Examples:
+
+        Create a new project:
+
+        >>> project = ln.Project(name="My awesome project", external_id="Lamin-0001")
+        >>> project.save()
+        >>> project
+        Project(id=23QgqohM, name=My awesome project, external_id=Lamin-0001, created_by_id=DzTjkKse)
+
+        Link files to a project:
+
+        >>> project = ln.Tag.select(name="My awesome project").one()
+        >>> project
+        Project(id=23QgqohM, name=My awesome project, external_id=Lamin-0001, created_by_id=DzTjkKse)
+        >>> file = ln.File("./myfile.csv")
+        >>> file.save()
+        >>> file
+        File(id=MveGmGJImYY5qBwmr0j0, suffix=.csv, size=4, hash=CY9rzUYh03PK3k6DJie09g, hash_type=md5, updated_at=2023-07-19 13:47:59, storage_id=597Sgod0, created_by_id=DzTjkKse) # noqa
+        >>> file.projects.add(project)
+        >>> file.projects.list("name")
+        ['My awesome project']
+
+        Query a file by project:
+
+        >>> ln.File.select(projects__name = "My awesome project").first()
+        File(id=MveGmGJImYY5qBwmr0j0, suffix=.csv, size=4, hash=CY9rzUYh03PK3k6DJie09g, hash_type=md5, updated_at=2023-07-19 13:47:59, storage_id=597Sgod0, created_by_id=DzTjkKse)
+    """
 
     id = models.CharField(max_length=8, default=base62_8, primary_key=True)
     """Universal id, valid across DB instances."""
@@ -359,6 +549,32 @@ class Transform(ORM):
     A pipeline is versioned software that transforms data.
     This can be anything from typical workflow tools (Nextflow, Snakemake,
     Prefect, Apache Airflow, etc.) to simple (versioned) scripts.
+
+    See Also:
+
+        :meth:`lamindb.track`
+            Track global Transform & Run for a notebook or pipeline.
+        :meth:`lamindb.context`
+            Global run context.
+
+    Notes:
+
+        For more info, see tutorial: :doc:`/guide/data-lineage`.
+
+    Examples:
+
+        Create a transform form a pipeline:
+
+        >>> transform = ln.Transform(name="Cell Ranger", version="7.2.0", type="pipeline")
+        >>> transform
+        Transform(id=JhiujsLlbTKLIt, name=Cell Ranger, stem_id=JhiujsLlbTKL, version=7.2.0, type=pipeline, created_by_id=DzTjkKse)
+        >>> transform.save()
+
+        Create a transform from a notebook:
+
+        >>> ln.track()
+        ✅ Saved: Transform(id=1LCd8kco9lZUBg, name=Track data lineage / provenance, short_name=02-data-lineage, stem_id=1LCd8kco9lZU, version=0, type=notebook, updated_at=2023-07-10 18:37:19, created_by_id=DzTjkKse) # noqa
+
     """
 
     id = models.CharField(max_length=14, db_index=True, primary_key=True, default=None)
@@ -421,6 +637,33 @@ class Run(ORM):
     - References to inputs are stored in the :class:`~lamindb.File` in the
       `input_of` field. Any `file` might serve as an input for multiple `runs`.
       Similarly, any `run` might have many `files` as inputs: `run.inputs`.
+
+    Notes:
+
+        For more info, see tutorial: :doc:`/guide/data-lineage`.
+
+    Examples:
+
+        Track a pipeline run:
+
+        >>> ln.Transform(name="Cell Ranger", version="7.2.0", type="pipeline").save()
+        >>> transform = ln.Transform.select(name="Cell Ranger", version="7.2.0").one()
+        >>> transform
+        Transform(id=JhiujsLlbTKLIt, name=Cell Ranger, stem_id=JhiujsLlbTKL, version=7.2.0, type=pipeline, created_by_id=DzTjkKse)
+        >>> ln.track(transform)
+        💬 Loaded: Transform(id=ceHkZMaiHFdoB6, name=Cell Ranger, stem_id=ceHkZMaiHFdo, version=7.2.0, type=pipeline, updated_at=2023-07-10 18:37:19, created_by_id=DzTjkKse)
+        ✅ Saved: Run(id=RcpWIKC8cF74Pn3RUJ1W, run_at=2023-07-10 18:37:19, transform_id=ceHkZMaiHFdoB6, created_by_id=DzTjkKse)
+        >>> ln.context.run
+        Run(id=RcpWIKC8cF74Pn3RUJ1W, run_at=2023-07-10 18:37:19, transform_id=ceHkZMaiHFdoB6, created_by_id=DzTjkKse)
+
+        Track a notebook run:
+
+        >>> ln.track()
+        ✅ Saved: Transform(id=1LCd8kco9lZUBg, name=Track data lineage / provenance, short_name=02-data-lineage, stem_id=1LCd8kco9lZU, version=0, type=notebook, updated_at=2023-07-10 18:37:19, created_by_id=DzTjkKse) # noqa
+        ✅ Saved: Run(id=pHgVICV9DxBaV6BAuKJl, run_at=2023-07-10 18:37:19, transform_id=1LCd8kco9lZUBg, created_by_id=DzTjkKse)
+        >>> ln.context.run
+        Run(id=pHgVICV9DxBaV6BAuKJl, run_at=2023-07-10 18:37:19, transform_id=1LCd8kco9lZUBg, created_by_id=DzTjkKse)
+
     """
 
     id = models.CharField(max_length=20, default=base62_20, primary_key=True)
@@ -465,6 +708,26 @@ class Dataset(ORM):
 
     One might also store a dataset in a SQL table or view, but this is not yet
     supported by LaminDB.
+
+    Notes:
+
+        For more info, see tutorial: :doc:`/guide/tutorial1`.
+
+    Examples:
+
+        >>> df = ln.dev.datasets.df_iris_in_meter_batch1()
+        >>> df.head()
+          sepal_length sepal_width petal_length petal_width iris_species_code
+        0        0.051       0.035        0.014       0.002                 0
+        1        0.049       0.030        0.014       0.002                 0
+        2        0.047       0.032        0.013       0.002                 0
+        3        0.046       0.031        0.015       0.002                 0
+        4        0.050       0.036        0.014       0.002                 0
+        >>> dataset = ln.Dataset(df, name="Iris flower dataset batch1")
+        >>> dataset
+        Dataset(id=uGQtiyepMdHOq3sZCFWV, name=Iris flower dataset batch1, hash=c5WgMCRPca2iZ2pqC3KiKQ, file_id=uGQtiyepMdHOq3sZCFWV, created_by_id=DzTjkKse)
+        >>> dataset.save()
+        💡 storing file uGQtiyepMdHOq3sZCFWV with key .lamindb/uGQtiyepMdHOq3sZCFWV.parquet
     """
 
     id = models.CharField(max_length=20, default=base62_20, primary_key=True)
@@ -492,6 +755,15 @@ class Dataset(ORM):
 class Feature(ORM):
     """Features.
 
+    Notes:
+
+        You can use `lnschema_bionty` ORMs to manage common features like genes,
+        pathways, proteins & cell markers.
+
+        Similarly, you can define custom ORMs to manage features like gene sets, nodes, etc.
+
+        This ORM is a way of getting started without using Bionty or a custom schema.
+
     Examples:
 
         >>> df = pd.DataFrame({"feat1": [1, 2], "feat2": [3.1, 4.2], "feat3": ["cond1", "cond2"]})
@@ -504,14 +776,7 @@ class Feature(ORM):
          b   feat2 float64
          c   feat3     str
 
-    Notes:
-
-        You can use `lnschema_bionty` ORMs to manage common features like genes,
-        pathways, proteins & cell markers.
-
-        Similarly, you can define custom ORMs to manage features like gene sets, nodes, etc.
-
-        This ORM is a way of getting started without using Bionty or a custom schema.
+        For more info, see tutorial: :doc:`/biology/features`.
     """
 
     id = models.CharField(max_length=12, default=base62_12, primary_key=True)
@@ -726,6 +991,41 @@ class File(ORM):
         In some cases, e.g. for zarr-based storage, a `File` object is stored as
         many small objects in what appears to be a "folder" in storage.
 
+    See Also:
+
+        :meth:`lamindb.File.from_df`
+            Create a file object from `DataFrame`.
+        :meth:`lamindb.File.from_anndata`
+            Create a file object from `AnnData`.
+        :meth:`lamindb.File.from_dir`
+            Bulk create file objects from a directory.
+
+    Notes:
+
+        For more info, see tutorial: :doc:`/guide/tutorial1`.
+
+    Examples:
+
+        Track a file from a local filepath:
+
+        >>> filepath = ln.dev.datasets.file_mini_csv()
+        >>> filepath
+        PosixPath('mini.csv')
+        >>> file = ln.File(filepath)
+        💡 File will be copied to storage upon `save()` using storage key = WpfMHb5u3Jp8mzoTs3SH.csv
+        >>> file
+        File(id=WpfMHb5u3Jp8mzoTs3SH, suffix=.csv, size=11, hash=z1LdF2qN4cN0M2sXrcW8aw, hash_type=md5, storage_id=Zl2q0vQB, created_by_id=DzTjkKse)
+        >>> file.save()
+        💡 storing file WpfMHb5u3Jp8mzoTs3SH with key .lamindb/WpfMHb5u3Jp8mzoTs3SH.csv
+
+        Track a file from a cloud storage (supports `s3://` and `gs://`):
+
+        >>> file = ln.File("s3://lamindb-ci/test-data/test.csv")
+        💡 File in storage ✓ using storage key = test-data/test.csv
+        >>> file
+        File(id=YDELGH3FqhtiZI7IMWnH, key=test-data/test.csv, suffix=.csv, size=329, hash=85-PotiFdQ2rpJvfLtOISA, hash_type=md5, storage_id=Z7zewD72, created_by_id=DzTjkKse)
+        >>> file.save()
+
     """
 
     id = models.CharField(max_length=20, primary_key=True)
@@ -805,7 +1105,39 @@ class File(ORM):
         description: Optional[str] = None,
         run: Optional[Run] = None,
     ) -> "File":
-        """Create from ``DataFrame``, link column names as features."""
+        """Create from ``DataFrame``, link column names as features.
+
+        See Also:
+
+            :meth:`lamindb.Dataset`
+                Track datasets.
+            :class:`lamindb.Feature`
+                Track features.
+
+        Notes:
+
+            For more info, see tutorial: :doc:`/guide/tutorial1`.
+
+        Examples:
+
+            >>> df = ln.dev.datasets.df_iris_in_meter_batch1()
+            >>> df.head()
+              sepal_length sepal_width petal_length petal_width iris_species_code
+            0        0.051       0.035        0.014       0.002                 0
+            1        0.049       0.030        0.014       0.002                 0
+            2        0.047       0.032        0.013       0.002                 0
+            3        0.046       0.031        0.015       0.002                 0
+            4        0.050       0.036        0.014       0.002                 0
+            >>> file = ln.File.from_df(df, description="Iris flower dataset batch1")
+            💡 File will be copied to storage upon `save()` using storage key = kV3JQuBw4izvUdAkjO4p.parquet
+            💬 Created 5 Feature records with a single field name
+            >>> file
+            File(id=kV3JQuBw4izvUdAkjO4p, suffix=.parquet, description=Iris flower dataset batch1, size=5334, hash=RraiKH9BAtAgS5jg7LWUiA, hash_type=md5, storage_id=Zl2q0vQB, created_by_id=DzTjkKse) # noqa
+            >>> file.save()
+            💬 Created 2 FeatureValue records with a single field value
+            💡 storing file kV3JQuBw4izvUdAkjO4p with key .lamindb/kV3JQuBw4izvUdAkjO4p.parquet
+
+        """
         pass
 
     @classmethod
@@ -818,7 +1150,41 @@ class File(ORM):
         description: Optional[str] = None,
         run: Optional[Run] = None,
     ) -> "File":
-        """Create from ``AnnData`` or ``.h5ad`` file, link ``var_names`` and ``obs.columns`` as features."""
+        """Create from ``AnnData`` or ``.h5ad`` file, link ``var_names`` and ``obs.columns`` as features.
+
+        See Also:
+
+            :meth:`lamindb.Dataset`
+                Track datasets.
+            :class:`lamindb.Feature`
+                Track features.
+
+        Notes:
+
+            For more info, see tutorial: :doc:`/guide/tutorial1`.
+
+        Examples:
+
+            >>> import lnschema_bionty as lb
+            lb.settings.species = "human"
+            ✅ Set species: Species(id=uHJU, name=human, taxon_id=9606, scientific_name=homo_sapiens, updated_at=2023-07-19 14:45:17, bionty_source_id=t317, created_by_id=DzTjkKse) # noqa
+            >>> adata = ln.dev.datasets.anndata_with_obs()
+            >>> adata
+            AnnData object with n_obs × n_vars = 40 × 100
+                obs: 'cell_type', 'cell_type_id', 'tissue', 'disease'
+            >>> adata.var_names[:2]
+            Index(['ENSG00000000003', 'ENSG00000000005'], dtype='object')
+            >>> file = ln.File.from_anndata(adata,
+            ...                             var_ref=lb.Gene.ensembl_gene_id,
+            ...                             description="mini anndata with obs")
+            💡 File will be copied to storage upon `save()` using storage key = XcohavbmpLDhAnCrALVC.h5ad
+            💬 Using global setting species = human
+            💬 Created 99 Gene records from Bionty that matched ensembl_gene_id field (bionty_source_id=abZr)
+            💬 Created 4 Feature records with a single field name
+            >>> file.save()
+            💡 storing file XcohavbmpLDhAnCrALVC with key .lamindb/XcohavbmpLDhAnCrALVC.h5ad
+
+        """
         pass
 
     @classmethod
@@ -828,7 +1194,21 @@ class File(ORM):
         *,
         run: Optional[Run] = None,
     ) -> List["File"]:
-        """Create a list of file objects from a directory."""
+        """Create a list of file objects from a directory.
+
+        Examples:
+
+            >>> dir_path = ln.dev.datasets.generate_cell_ranger_files("sample_001", ln.settings.storage)
+            >>> dir_path.name
+            'sample_001'
+            >>> files = ln.File.from_dir(dir_path)
+            💡 using storage prefix = sample_001/
+            💬 → 15 files
+            >>> files[0]
+            File(id=cbGk8IUFIERkTgjBQ2kb, key=sample_001/web_summary.html, suffix=.html, size=6, hash=n4HLxPQUWXUeKl-OLzq6ew, hash_type=md5, storage_id=Zl2q0vQB, created_by_id=DzTjkKse) # noqa
+            >>> ln.save(files)
+
+        """
         pass
 
     def replace(
@@ -862,7 +1242,26 @@ class File(ORM):
         pass
 
     def backed(self, is_run_input: Optional[bool] = None) -> Union["AnnDataAccessor", "BackedAccessor"]:
-        """Return a cloud-backed data object to stream."""
+        """Return a cloud-backed data object to stream.
+
+        Notes:
+            For more info, see tutorial: :doc:`/guide/stream`.
+
+        Examples:
+
+            Read AnnData in backed mode from cloud:
+
+            >>> file = ln.File.select(key="lndb-storage/pbmc68k.h5ad").one()
+            >>> file.backed()
+            AnnData object with n_obs × n_vars = 70 × 765 backed at 's3://lamindb-ci/lndb-storage/pbmc68k.h5ad'
+                obs: ['cell_type', 'index', 'louvain', 'n_genes', 'percent_mito']
+                obsm: ['X_pca', 'X_umap']
+                obsp: ['connectivities', 'distances']
+                uns: ['louvain', 'louvain_colors', 'neighbors', 'pca']
+                var: ['highly_variable', 'index', 'n_counts']
+                varm: ['PCs']
+
+        """
         pass
 
     @classmethod
@@ -874,25 +1273,117 @@ class File(ORM):
         limit_to_directories: bool = False,
         length_limit: int = 1000,
     ):
-        """Given a prefix, print a visual tree structure of files."""
+        """Given a prefix, print a visual tree structure of files.
+
+        Examples:
+
+            >>> dir_path = ln.dev.datasets.generate_cell_ranger_files("sample_001", ln.settings.storage)
+            >>> dir_path.name
+            'sample_001'
+            >>> ln.File.tree(dir_path)
+            sample_001
+            ├── web_summary.html
+            ├── metrics_summary.csv
+            ├── molecule_info.h5
+            ├── filtered_feature_bc_matrix
+            │   ├── features.tsv.gz
+            │   ├── barcodes.tsv.gz
+            │   └── matrix.mtx.gz
+            ├── analysis
+            │   └── analysis.csv
+            ├── raw_feature_bc_matrix
+            │   ├── features.tsv.gz
+            │   ├── barcodes.tsv.gz
+            │   └── matrix.mtx.gz
+            ├── possorted_genome_bam.bam.bai
+            ├── cloupe.cloupe
+            ├── possorted_genome_bam.bam
+            ├── filtered_feature_bc_matrix.h5
+            └── raw_feature_bc_matrix.h5
+            ...
+            3 directories, 15 files
+
+        """
         pass
 
     def path(self) -> Union[Path, UPath]:
-        """Path in storage."""
+        """Path in storage.
+
+        Examples:
+
+            File in cloud storage:
+
+            >>> ln.File("s3://lamindb-ci/lndb-storage/pbmc68k.h5ad").save()
+            >>> file = ln.File.select(key="lndb-storage/pbmc68k.h5ad").one()
+            >>> file.path()
+            S3Path('s3://lamindb-ci/lndb-storage/pbmc68k.h5ad')
+
+            File in local storage:
+
+            >>> ln.File("./myfile.csv", description="myfile").save()
+            >>> file = ln.File.select(description="myfile").one()
+            >>> file.path()
+            PosixPath('/home/runner/work/lamindb/lamindb/docs/guide/mydata/myfile.csv')
+
+        """
+        pass
 
     def load(self, is_run_input: Optional[bool] = None, stream: bool = False) -> DataLike:
         """Stage and load to memory.
 
-        Returns in-memory representation if possible, e.g., an `AnnData` object
-        for an `h5ad` file.
+        Returns in-memory representation if possible, e.g., an `AnnData` object for an `h5ad` file.
+
+        Examples:
+
+            Load as a `DataFrame`:
+
+            >>> ln.File.from_df(ln.dev.datasets.df_iris_in_meter_batch1(), description="iris").save()
+            >>> file = ln.File.select(description="iris").one()
+            >>> file.load().head()
+            sepal_length sepal_width petal_length petal_width iris_species_code
+            0        0.051       0.035        0.014       0.002                 0
+            1        0.049       0.030        0.014       0.002                 0
+            2        0.047       0.032        0.013       0.002                 0
+            3        0.046       0.031        0.015       0.002                 0
+            4        0.050       0.036        0.014       0.002                 0
+
+            Load as an `AnnData`:
+
+            >>> ln.File("s3://lamindb-ci/lndb-storage/pbmc68k.h5ad").save()
+            >>> file = ln.File.select(key="lndb-storage/pbmc68k.h5ad").one()
+            >>> file.load()
+            AnnData object with n_obs × n_vars = 70 × 765
+                obs: 'cell_type', 'n_genes', 'percent_mito', 'louvain'
+                var: 'n_counts', 'highly_variable'
+                uns: 'louvain', 'louvain_colors', 'neighbors', 'pca'
+                obsm: 'X_pca', 'X_umap'
+                varm: 'PCs'
+                obsp: 'connectivities', 'distances'
+
+            Fall back to :meth:`~lamindb.File.stage` if no in-memory representation is configured:
+
+            >>> ln.File(ln.dev.datasets.file_jpg_paradisi05(), description="paradisi05").save()
+            >>> file = ln.File.select(description="paradisi05").one()
+            >>> file.load()
+            PosixPath('/home/runner/work/lamindb/lamindb/docs/guide/mydata/.lamindb/jb7BY5UJoQVGMUOKiLcn.jpg')
+
         """
         pass
 
     def stage(self, is_run_input: Optional[bool] = None) -> Path:
         """Update cache from cloud storage if outdated.
 
-        Returns a path to a locally cached on-disk object (say, a
-        `.jpg` file).
+        Returns a path to a locally cached on-disk object (say, a `.jpg` file).
+
+        Examples:
+
+            Sync file from cloud and returns the local path of the cache:
+
+            >>> ln.File("s3://lamindb-ci/lndb-storage/pbmc68k.h5ad").save()
+            >>> file = ln.File.select(key="lndb-storage/pbmc68k.h5ad").one()
+            >>> file.stage()
+            PosixPath('/home/runner/work/Caches/lamindb/lamindb-ci/lndb-storage/pbmc68k.h5ad')
+
         """
         pass
 
@@ -903,7 +1394,7 @@ class File(ORM):
             storage: `Optional[bool] = None` Indicate whether you want to delete the
             file in storage.
 
-        Example:
+        Examples:
 
             For any `File` object `file`, call:
 
@@ -913,7 +1404,15 @@ class File(ORM):
         pass
 
     def save(self, *args, **kwargs) -> None:
-        """Save the file to database & storage."""
+        """Save the file to database & storage.
+
+        Examples:
+
+            >>> file = ln.File("./myfile.csv", key="myfile.csv")
+            💡 File will be copied to storage upon `save()` using storage key = myfile.csv
+            >>> file.save()
+            💡 storing file 2fO9kSKVXFXYoLccExOY with key myfile.csv
+        """
         pass
 
 
