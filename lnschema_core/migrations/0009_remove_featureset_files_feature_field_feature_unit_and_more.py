@@ -49,7 +49,7 @@ class Migration(migrations.Migration):
             name="Category",
             fields=[
                 ("id", models.CharField(default=lnschema_core.ids.base62_12, max_length=12, primary_key=True, serialize=False)),
-                ("value", models.CharField(max_length=128)),
+                ("name", models.CharField(max_length=128)),
                 ("created_at", models.DateTimeField(auto_now_add=True, db_index=True)),
                 ("updated_at", models.DateTimeField(auto_now=True, db_index=True)),
                 (

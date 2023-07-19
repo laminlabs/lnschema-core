@@ -1001,10 +1001,10 @@ class Category(ORM):
 
     id = models.CharField(max_length=12, default=base62_12, primary_key=True)
     """Universal id, valid across DB instances."""
+    name = models.CharField(max_length=128)
+    """The name or the string value of the category."""
     feature = models.ForeignKey(Feature, CASCADE, related_name="values")
     """Feature."""
-    value = models.CharField(max_length=128)
-    """String value of category."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
