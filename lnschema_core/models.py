@@ -540,9 +540,9 @@ class Feature(ORM):
     def __init__(
         self,
         name: str,
-        type: str,
-        field: str,
-        description: str,
+        type: Optional[str],
+        field: Optional[str],
+        description: Optional[str],
     ):
         ...
 
