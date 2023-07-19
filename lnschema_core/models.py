@@ -1003,7 +1003,7 @@ class Category(ORM):
     """Universal id, valid across DB instances."""
     name = models.CharField(max_length=128)
     """The name or the string value of the category."""
-    feature = models.ForeignKey(Feature, CASCADE, related_name="values")
+    feature = models.ForeignKey(Feature, CASCADE, related_name="categories")
     """Feature."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
