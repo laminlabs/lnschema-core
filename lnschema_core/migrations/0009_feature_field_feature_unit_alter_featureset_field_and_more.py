@@ -50,4 +50,14 @@ class Migration(migrations.Migration):
                 "unique_together": {("feature", "value")},
             },
         ),
+        migrations.AddField(
+            model_name="file",
+            name="feature_sets",
+            field=models.ManyToManyField(related_name="files", to="lnschema_core.featureset"),
+        ),
+        migrations.RunSQL("insert into lnschema_core_file_feature_sets (id, file_id, featureset_id) select id, file_id, featureset_id from lnschema_core_featureset_files"),
+        migrations.RemoveField(
+            model_name="featureset",
+            name="files",
+        ),
     ]
