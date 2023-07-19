@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+✨ Add `Feature.unit` | [227](https://github.com/laminlabs/lnschema-core/pull/227) | [falexwolf](https://github.com/falexwolf) | 2023-07-19 |
 ♻️ Refactor `Feature` and add `FeatureValue` | [225](https://github.com/laminlabs/lnschema-core/pull/225) | [falexwolf](https://github.com/falexwolf) | 2023-07-18 |
 🔥 Remove top_hit param from search | [226](https://github.com/laminlabs/lnschema-core/pull/226) | [sunnyosun](https://github.com/sunnyosun) | 2023-07-18 |
 🍱 Added more methods for signature | [224](https://github.com/laminlabs/lnschema-core/pull/224) | [sunnyosun](https://github.com/sunnyosun) | 2023-07-17 |
