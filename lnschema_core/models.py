@@ -48,18 +48,40 @@ class ORM(models.Model):
         force: bool = False,
         save: Optional[bool] = None,
     ):
-        """Add synonyms to a record."""
+        """Add synonyms to a record.
+
+        Examples:
+            >>> import lnschema_bionty as lb
+            >>> lb.CellType.from_bionty(name="T cell").save()
+            >>> lookup = lb.CellType.lookup()
+            >>> record = lookup.t_cell
+            >>> record.synonyms
+            'T-cell|T lymphocyte|T-lymphocyte'
+            >>> record.add_synonym("T cells")
+            >>> record.synonyms
+            'T cells|T-cell|T-lymphocyte|T lymphocyte'
+        """
         pass
 
     def remove_synonym(self, synonym: Union[str, ListLike]):
-        """Remove synonyms from a record."""
+        """Remove synonyms from a record.
+
+        Examples:
+            >>> import lnschema_bionty as lb
+            >>> lb.CellType.from_bionty(name="T cell").save()
+            >>> lookup = lb.CellType.lookup()
+            >>> record = lookup.t_cell
+            >>> record.synonyms
+            'T-cell|T lymphocyte|T-lymphocyte'
+            >>> record.remove_synonym("T-cell")
+            'T lymphocyte|T-lymphocyte'
+        """
         pass
 
     def describe(self):
         """Rich representation of a record with relationships.
 
         Examples:
-
             >>> ln.File(ln.dev.datasets.file_jpg_paradisi05(), description="paradisi05").save()
             >>> file = ln.File.select(description="paradisi05").one()
             >>> ln.save(ln.Tag.from_values(["image", "benchmark", "example"], field="name"))
@@ -82,12 +104,10 @@ class ORM(models.Model):
         """View parents of a record in a graph.
 
         Examples:
-
             >>> import lnschema_bionty as lb
             >>> lb.Tissue.from_bionty(name="subsegmental bronchus").save()
             >>> tissue = lb.Tissue.select(name="subsegmental bronchus").one()
             >>> tissue.view_parents()
-
         """
         pass
 
@@ -95,7 +115,6 @@ class ORM(models.Model):
         """Set value for abbr field and add to synonyms.
 
         Examples:
-
             >>> import lnschema_bionty as lb
             >>> lb.ExperimentalFactor.from_bionty(name="single-cell RNA sequencing").save()
             >>> scrna = lb.ExperimentalFactor.select(name="single-cell RNA sequencing").one()
@@ -109,7 +128,6 @@ class ORM(models.Model):
             >>> scrna.synonyms
             'scRNA|single-cell RNA-seq|single cell RNA sequencing|single-cell transcriptome sequencing|scRNA-seq'
             >>> scrna.save()
-
         """
         pass
 
@@ -219,8 +237,15 @@ class ORM(models.Model):
 
         Examples:
             >>> import lnschema_bionty as lb
-            >>> gene_symbols = ["A1CF", "A1BG", "FANCD1", "FANCD20"]
+            >>> lb.settings.species = "human"
+            >>> gene_synonyms = ["A1CF", "A1BG", "FANCD1", "FANCD20"]
+            >>> ln.save(lb.Gene.from_values(gene_synonyms, field="symbol"))
             >>> lb.Gene.inspect(gene_symbols, field=lb.Gene.symbol)
+            🔶 The identifiers contain synonyms!
+            To increase mappability, standardize them via '.map_synonyms()'
+            ✅ 3 terms (75.0%) are mapped
+            🔶 1 terms (25.0%) are not mapped
+            {'mapped': ['A1CF', 'A1BG', 'FANCD20'], 'not_mapped': ['FANCD1']}
         """
         pass
 
@@ -238,10 +263,14 @@ class ORM(models.Model):
 
         Examples:
             >>> import lnschema_bionty as lb
+            >>> lb.settings.species = "human"
+            >>> lb.Gene.from_bionty(symbol="ADGB-DT").save()
             >>> lookup = lb.Gene.lookup()
             >>> lookup.adgb_dt
+            Gene(id=SoZXq4Wor2vK, symbol=ADGB-DT, ensembl_gene_id=ENSG00000237468, ncbi_gene_ids=101928661, biotype=lncRNA, description=ADGB divergent transcript [Source:HGNC Symbol;Acc:HGNC:55654], synonyms=, updated_at=2023-07-19 18:31:16, species_id=uHJU, bionty_source_id=abZr, created_by_id=DzTjkKse) # noqa
             >>> lookup_dict = lookup.dict()
-            >>> lookup['ADGB-DT']
+            >>> lookup_dict['ADGB-DT']
+            Gene(id=SoZXq4Wor2vK, symbol=ADGB-DT, ensembl_gene_id=ENSG00000237468, ncbi_gene_ids=101928661, biotype=lncRNA, description=ADGB divergent transcript [Source:HGNC Symbol;Acc:HGNC:55654], synonyms=, updated_at=2023-07-19 18:31:16, species_id=uHJU, bionty_source_id=abZr, created_by_id=DzTjkKse) # noqa
         """
         pass
 
@@ -282,21 +311,37 @@ class ORM(models.Model):
 
         Examples:
             >>> import lnschema_bionty as lb
+            >>> lb.settings.species = "human"
             >>> gene_synonyms = ["A1CF", "A1BG", "FANCD1", "FANCD20"]
-            >>> standardized_names = lb.Gene.map_synonyms(gene_synonyms, species="human")
+            >>> ln.save(lb.Gene.from_values(gene_synonyms, field="symbol"))
+            >>> standardized_names = lb.Gene.map_synonyms(gene_synonyms)
+            >>> standardized_names
+            ['A1CF', 'A1BG', 'BRCA2', 'FANCD20']
         """
 
     @classmethod
     def select(cls, **expressions) -> QuerySet:
         """Query records.
 
-        Guide: :doc:`/guide/select`.
-
         Args:
             expressions: Fields and values passed as Django query expressions.
 
         Returns:
             A :class:`~lamindb.dev.QuerySet`.
+
+        See Also:
+
+            `django queries <https://docs.djangoproject.com/en/4.2/topics/db/queries/>`__
+
+        Notes:
+
+            For more info, see tutorial: :doc:`/guide/select`.
+
+        Examples:
+            >>> ln.Tag(name="my tag").save()
+            >>> tag = ln.Tag.select(name="my tag").one()
+            >>> tag
+            Tag(id=TMn5Zuju, name=my tag, updated_at=2023-07-19 18:24:49, created_by_id=DzTjkKse)
         """
         from lamindb._select import select
 
@@ -328,6 +373,15 @@ class ORM(models.Model):
         Returns:
             A sorted `DataFrame` of search results with a score in column
             `__ratio__`. If `top_hit` is `True`, the best match.
+
+        Examples:
+            >>> ln.save(ln.Tag.from_values(["Tag1", "Tag2", "Tag3"], field="name"))
+            >>> ln.Tag.search("Tag2")
+                        id   __ratio__
+            name
+            Tag2  o3FY3c5n  100.000000
+            Tag1  CcFPLmpq   75.000000
+            Tag3  Qi3c4utq   75.000000
         """
         pass
 
@@ -574,7 +628,6 @@ class Transform(ORM):
 
         >>> ln.track()
         ✅ Saved: Transform(id=1LCd8kco9lZUBg, name=Track data lineage / provenance, short_name=02-data-lineage, stem_id=1LCd8kco9lZU, version=0, type=notebook, updated_at=2023-07-10 18:37:19, created_by_id=DzTjkKse) # noqa
-
     """
 
     id = models.CharField(max_length=14, db_index=True, primary_key=True, default=None)
@@ -663,7 +716,6 @@ class Run(ORM):
         ✅ Saved: Run(id=pHgVICV9DxBaV6BAuKJl, run_at=2023-07-10 18:37:19, transform_id=1LCd8kco9lZUBg, created_by_id=DzTjkKse)
         >>> ln.context.run
         Run(id=pHgVICV9DxBaV6BAuKJl, run_at=2023-07-10 18:37:19, transform_id=1LCd8kco9lZUBg, created_by_id=DzTjkKse)
-
     """
 
     id = models.CharField(max_length=20, default=base62_20, primary_key=True)
@@ -862,7 +914,6 @@ class FeatureSet(ORM):
         >>> file = ln.File(adata, name="Mouse Lymph Node scRNA-seq")
         >>> file.save()
         >>> file.feature_sets.add(feature_set)
-
     """
 
     id = models.CharField(max_length=20, primary_key=True, default=None)
@@ -1025,7 +1076,6 @@ class File(ORM):
         >>> file
         File(id=YDELGH3FqhtiZI7IMWnH, key=test-data/test.csv, suffix=.csv, size=329, hash=85-PotiFdQ2rpJvfLtOISA, hash_type=md5, storage_id=Z7zewD72, created_by_id=DzTjkKse)
         >>> file.save()
-
     """
 
     id = models.CharField(max_length=20, primary_key=True)
@@ -1136,7 +1186,6 @@ class File(ORM):
             >>> file.save()
             💬 Created 2 FeatureValue records with a single field value
             💡 storing file kV3JQuBw4izvUdAkjO4p with key .lamindb/kV3JQuBw4izvUdAkjO4p.parquet
-
         """
         pass
 
@@ -1183,7 +1232,6 @@ class File(ORM):
             💬 Created 4 Feature records with a single field name
             >>> file.save()
             💡 storing file XcohavbmpLDhAnCrALVC with key .lamindb/XcohavbmpLDhAnCrALVC.h5ad
-
         """
         pass
 
@@ -1207,7 +1255,6 @@ class File(ORM):
             >>> files[0]
             File(id=cbGk8IUFIERkTgjBQ2kb, key=sample_001/web_summary.html, suffix=.html, size=6, hash=n4HLxPQUWXUeKl-OLzq6ew, hash_type=md5, storage_id=Zl2q0vQB, created_by_id=DzTjkKse) # noqa
             >>> ln.save(files)
-
         """
         pass
 
@@ -1260,7 +1307,6 @@ class File(ORM):
                 uns: ['louvain', 'louvain_colors', 'neighbors', 'pca']
                 var: ['highly_variable', 'index', 'n_counts']
                 varm: ['PCs']
-
         """
         pass
 
@@ -1302,7 +1348,6 @@ class File(ORM):
             └── raw_feature_bc_matrix.h5
             ...
             3 directories, 15 files
-
         """
         pass
 
@@ -1324,7 +1369,6 @@ class File(ORM):
             >>> file = ln.File.select(description="myfile").one()
             >>> file.path()
             PosixPath('/home/runner/work/lamindb/lamindb/docs/guide/mydata/myfile.csv')
-
         """
         pass
 
@@ -1366,7 +1410,6 @@ class File(ORM):
             >>> file = ln.File.select(description="paradisi05").one()
             >>> file.load()
             PosixPath('/home/runner/work/lamindb/lamindb/docs/guide/mydata/.lamindb/jb7BY5UJoQVGMUOKiLcn.jpg')
-
         """
         pass
 
@@ -1383,7 +1426,6 @@ class File(ORM):
             >>> file = ln.File.select(key="lndb-storage/pbmc68k.h5ad").one()
             >>> file.stage()
             PosixPath('/home/runner/work/Caches/lamindb/lamindb-ci/lndb-storage/pbmc68k.h5ad')
-
         """
         pass
 
@@ -1399,7 +1441,6 @@ class File(ORM):
             For any `File` object `file`, call:
 
             >>> file.delete()
-
         """
         pass
 
