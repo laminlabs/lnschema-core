@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+💄 Improve docstring | [231](https://github.com/laminlabs/lnschema-core/pull/231) | [sunnyosun](https://github.com/sunnyosun) | 2023-07-20 |
 🚚 Rename `FeatureValue` to `Category` | [230](https://github.com/laminlabs/lnschema-core/pull/230) | [falexwolf](https://github.com/falexwolf) | 2023-07-19 |
 📝 Add examples to docstring | [229](https://github.com/laminlabs/lnschema-core/pull/229) | [sunnyosun](https://github.com/sunnyosun) | 2023-07-19 |
 🚚 Move `feature_sets` to `File` instead of having `files` on `FeatureSet` | [228](https://github.com/laminlabs/lnschema-core/pull/228) | [falexwolf](https://github.com/falexwolf) | 2023-07-19 |
