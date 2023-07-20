@@ -444,7 +444,7 @@ class User(ORM):
 
     Examples:
 
-        Creating user records is managed via the :doc:`/guide/configure`.
+        Creating user records is managed via the :doc:`/guide/setup`.
 
         Query a user by handle:
 
