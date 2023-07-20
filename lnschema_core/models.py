@@ -36,7 +36,7 @@ TRANSFORM_TYPE_DEFAULT = TransformType.notebook if IPYTHON else TransformType.pi
 class ORM(models.Model):
     """LaminDB's base ORM.
 
-    Is based on `django.db.models.Model`.
+    Is based on django.db.models.Model.
 
     Why does LaminDB call it `ORM` and not `Model`? The term "ORM" can't lead to
     confusion with statistical, machine learning or biological models.
@@ -49,6 +49,10 @@ class ORM(models.Model):
         save: Optional[bool] = None,
     ):
         """Add synonyms to a record.
+
+        See Also:
+            :meth:`~lamindb.dev.ORM.remove_synonym`
+                Remove synonyms
 
         Examples:
             >>> import lnschema_bionty as lb
@@ -65,6 +69,10 @@ class ORM(models.Model):
 
     def remove_synonym(self, synonym: Union[str, ListLike]):
         """Remove synonyms from a record.
+
+        See Also:
+            :meth:`~lamindb.dev.ORM.add_synonym`
+                Add synonyms
 
         Examples:
             >>> import lnschema_bionty as lb
@@ -114,6 +122,10 @@ class ORM(models.Model):
     def set_abbr(self, value: str):
         """Set value for abbr field and add to synonyms.
 
+        See Also:
+            :meth:`~lamindb.dev.ORM.add_synonym`
+                Add synonyms
+
         Examples:
             >>> import lnschema_bionty as lb
             >>> lb.ExperimentalFactor.from_bionty(name="single-cell RNA sequencing").save()
@@ -138,8 +150,6 @@ class ORM(models.Model):
         This method helps avoid problems around duplication of entries,
         violation of idempotency, and performance when creating records in bulk.
 
-        Guide: :doc:`/biology/registries`.
-
         Args:
             identifiers: ``ListLike`` A list of values for an identifier, e.g.
                 ``["name1", "name2"]``.
@@ -162,6 +172,9 @@ class ORM(models.Model):
            If so, it creates a record from Bionty and adds it to the returned list.
            Otherwise, it creates a record that populates a single field using `value`
            and adds the record to the returned list.
+
+        Notes:
+            For more info, see tutorial: :doc:`/biology/registries`.
 
         Examples:
 
@@ -202,7 +215,6 @@ class ORM(models.Model):
             >>> records
             [CellType(id=BxNjby0x, name=T cell, ontology_id=CL:0000084, synonyms=T-cell|T lymphocyte|T-lymphocyte, description=A Type Of Lymphocyte Whose Defining Characteristic Is The Expression Of A T Cell Receptor Complex., bionty_source_id=S2Yu, created_by_id=DzTjkKse), # noqa
             CellType(id=cx8VcggA, name=B cell, ontology_id=CL:0000236, synonyms=B lymphocyte|B-lymphocyte|B-cell, description=A Lymphocyte Of B Lineage That Is Capable Of B Cell Mediated Immunity., bionty_source_id=S2Yu, created_by_id=DzTjkKse)] # noqa
-
         """
         pass
 
@@ -235,6 +247,10 @@ class ORM(models.Model):
             - If `return_df`: A DataFrame indexed by identifiers with a boolean `__mapped__`
                 column that indicates compliance with the identifiers.
 
+        See Also:
+            :meth:`~lamindb.dev.ORM.map_synonyms`
+                Standardize synonyms
+
         Examples:
             >>> import lnschema_bionty as lb
             >>> lb.settings.species = "human"
@@ -260,6 +276,9 @@ class ORM(models.Model):
         Returns:
             A `NamedTuple` of lookup information of the field values with a
             dictionary converter.
+
+        See Also:
+            :meth:`~lamindb.dev.ORM.search`
 
         Examples:
             >>> import lnschema_bionty as lb
@@ -309,6 +328,12 @@ class ORM(models.Model):
             a dictionary of mapped values with mappable synonyms as keys and
             standardized names as values.
 
+        See Also:
+            :meth:`~lamindb.dev.ORM.add_synonym`
+                Add synonyms
+            :meth:`~lamindb.dev.ORM.remove_synonym`
+                Remove synonyms
+
         Examples:
             >>> import lnschema_bionty as lb
             >>> lb.settings.species = "human"
@@ -330,11 +355,9 @@ class ORM(models.Model):
             A :class:`~lamindb.dev.QuerySet`.
 
         See Also:
-
             `django queries <https://docs.djangoproject.com/en/4.2/topics/db/queries/>`__
 
         Notes:
-
             For more info, see tutorial: :doc:`/guide/select`.
 
         Examples:
@@ -362,17 +385,19 @@ class ORM(models.Model):
 
         Args:
             string: `str` The input string to match against the field ontology values.
-            field: `Optional[StrField] = None` The field
-                against which the input string is matching.
-            top_hit: `bool = False` If `True`, return only the top hit or hits (in
-                case of equal scores).
+            field: `Optional[StrField] = None` The field against which the input string is matching.
+            return_queryset: `bool = False` Return search result as a sorted QuerySet.
+            limit: `Optional[int] = None` Maximum amount of top results to return.
             case_sensitive: `bool = False` Whether the match is case sensitive.
             synonyms_field: `Optional[StrField] = "synonyms"` Search synonyms if
                 column is available. If `None`, is ignored.
 
         Returns:
-            A sorted `DataFrame` of search results with a score in column
-            `__ratio__`. If `top_hit` is `True`, the best match.
+            A sorted `DataFrame` of search results with a score in column `__ratio__`.
+            If `return_queryset` is `True`, a sorted QuerySet.
+
+        See Also:
+            :meth:`~lamindb.dev.ORM.lookup`
 
         Examples:
             >>> ln.save(ln.Tag.from_values(["Tag1", "Tag2", "Tag3"], field="name"))
@@ -426,7 +451,6 @@ class User(ORM):
         >>> user = ln.User.select(handle="testuser1").one()
         >>> user
         User(id=DzTjkKse, handle=testuser1, email=testuser1@lamin.ai, name=Test User1, updated_at=2023-07-10 18:37:26)
-
     """
 
     id = models.CharField(max_length=8, primary_key=True, default=None)
@@ -449,7 +473,6 @@ class Storage(ORM):
     Either S3 or GCP buckets or local storage locations.
 
     See Also:
-
         :attr:`~lamindb.dev.Settings.storage`
 
     Examples:
@@ -467,7 +490,6 @@ class Storage(ORM):
         >>> ln.settings.storage = "./storage_2" # or a cloud bucket
         >>> ln.settings.storage
         PosixPath('/home/runner/work/lamindb-setup/lamindb-setup/docs/guide/storage_2')
-
     """
 
     id = models.CharField(max_length=8, default=base62_8, db_index=True, primary_key=True)
@@ -605,14 +627,14 @@ class Transform(ORM):
     Prefect, Apache Airflow, etc.) to simple (versioned) scripts.
 
     See Also:
-
         :meth:`lamindb.track`
             Track global Transform & Run for a notebook or pipeline.
         :meth:`lamindb.context`
             Global run context.
+        :class:`~lamindb.Run`
+            Executions of the transform.
 
     Notes:
-
         For more info, see tutorial: :doc:`/guide/data-lineage`.
 
     Examples:
@@ -691,8 +713,15 @@ class Run(ORM):
       `input_of` field. Any `file` might serve as an input for multiple `runs`.
       Similarly, any `run` might have many `files` as inputs: `run.inputs`.
 
-    Notes:
+    See Also:
+        :meth:`lamindb.track`
+            Track global Transform & Run for a notebook or pipeline.
+        :meth:`lamindb.context`
+            Global run context.
+        :class:`~lamindb.Transform`
+            Transformations that runs execute.
 
+    Notes:
         For more info, see tutorial: :doc:`/guide/data-lineage`.
 
     Examples:
@@ -761,12 +790,13 @@ class Dataset(ORM):
     One might also store a dataset in a SQL table or view, but this is not yet
     supported by LaminDB.
 
-    Notes:
+    See Also:
+        :class:`~lamindb.File`
 
+    Notes:
         For more info, see tutorial: :doc:`/guide/tutorial1`.
 
     Examples:
-
         >>> df = ln.dev.datasets.df_iris_in_meter_batch1()
         >>> df.head()
           sepal_length sepal_width petal_length petal_width iris_species_code
@@ -892,7 +922,7 @@ class Feature(ORM):
 class FeatureSet(ORM):
     """Jointly measured sets of features.
 
-    .. note::
+    Note:
 
         A `FeatureSet` is a useful entity as you might have millions of data batches
         that measure the same features: All of them would link against a single
@@ -903,8 +933,9 @@ class FeatureSet(ORM):
 
     Notes:
 
-        - :doc:`/biology/scrna`
-        - :doc:`/biology/flow`
+        For more info, see tutorials:
+            - :doc:`/biology/scrna`
+            - :doc:`/biology/flow`
 
     Examples:
 
@@ -969,7 +1000,7 @@ class FeatureSet(ORM):
                map values.
            **kwargs: Can contain ``species`` or other context to interpret values.
 
-        Example:
+        Examples:
 
             >>> features = ["feat1", "feat2"]
             >>> feature_set = ln.FeatureSet.from_values(features)
@@ -1054,13 +1085,11 @@ class File(ORM):
         - VCF: `.vcf` ⟷ /
         - QC: `.html` ⟷ /
 
-    .. note::
-
+    Note:
         In some cases, e.g. for zarr-based storage, a `File` object is stored as
         many small objects in what appears to be a "folder" in storage.
 
     See Also:
-
         :meth:`lamindb.File.from_df`
             Create a file object from `DataFrame`.
         :meth:`lamindb.File.from_anndata`
@@ -1069,7 +1098,6 @@ class File(ORM):
             Bulk create file objects from a directory.
 
     Notes:
-
         For more info, see tutorial: :doc:`/guide/tutorial1`.
 
     Examples:
@@ -1177,18 +1205,15 @@ class File(ORM):
         """Create from ``DataFrame``, link column names as features.
 
         See Also:
-
             :meth:`lamindb.Dataset`
                 Track datasets.
             :class:`lamindb.Feature`
                 Track features.
 
         Notes:
-
             For more info, see tutorial: :doc:`/guide/tutorial1`.
 
         Examples:
-
             >>> df = ln.dev.datasets.df_iris_in_meter_batch1()
             >>> df.head()
               sepal_length sepal_width petal_length petal_width iris_species_code
@@ -1232,7 +1257,6 @@ class File(ORM):
             For more info, see tutorial: :doc:`/guide/tutorial1`.
 
         Examples:
-
             >>> import lnschema_bionty as lb
             lb.settings.species = "human"
             ✅ Set species: Species(id=uHJU, name=human, taxon_id=9606, scientific_name=homo_sapiens, updated_at=2023-07-19 14:45:17, bionty_source_id=t317, created_by_id=DzTjkKse) # noqa
@@ -1264,7 +1288,6 @@ class File(ORM):
         """Create a list of file objects from a directory.
 
         Examples:
-
             >>> dir_path = ln.dev.datasets.generate_cell_ranger_files("sample_001", ln.settings.storage)
             >>> dir_path.name
             'sample_001'
@@ -1341,7 +1364,6 @@ class File(ORM):
         """Given a prefix, print a visual tree structure of files.
 
         Examples:
-
             >>> dir_path = ln.dev.datasets.generate_cell_ranger_files("sample_001", ln.settings.storage)
             >>> dir_path.name
             'sample_001'
@@ -1467,7 +1489,6 @@ class File(ORM):
         """Save the file to database & storage.
 
         Examples:
-
             >>> file = ln.File("./myfile.csv", key="myfile.csv")
             💡 File will be copied to storage upon `save()` using storage key = myfile.csv
             >>> file.save()
