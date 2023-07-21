@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚚 Add `description` and `parents` to `Tag`, delete `Project`, replace `Run.name` with `Run.reference_type`, `Run.inputs` as `File.input_of` | [233](https://github.com/laminlabs/lnschema-core/pull/233) | [falexwolf](https://github.com/falexwolf) | 2023-07-21 |
 🚚 Add categories to file and dataset | [232](https://github.com/laminlabs/lnschema-core/pull/232) | [falexwolf](https://github.com/falexwolf) | 2023-07-21 |
 💄 Improve docstring | [231](https://github.com/laminlabs/lnschema-core/pull/231) | [sunnyosun](https://github.com/sunnyosun) | 2023-07-20 | 0.39.0
 🚚 Rename `FeatureValue` to `Category` | [230](https://github.com/laminlabs/lnschema-core/pull/230) | [falexwolf](https://github.com/falexwolf) | 2023-07-19 |
