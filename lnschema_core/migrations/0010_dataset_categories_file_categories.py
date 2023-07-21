@@ -42,4 +42,14 @@ class Migration(migrations.Migration):
         migrations.DeleteModel(
             name="Project",
         ),
+        migrations.AddField(
+            model_name="file",
+            name="tags",
+            field=models.ManyToManyField(related_name="files", to="lnschema_core.tag"),
+        ),
+        migrations.RunSQL("insert into lnschema_core_file_tags (id, file_id, tag_id) select id, file_id, tag_id from lnschema_core_tag_files"),
+        migrations.RemoveField(
+            model_name="tag",
+            name="files",
+        ),
     ]

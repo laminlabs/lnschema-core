@@ -562,8 +562,6 @@ class Tag(ORM):
     """A description."""
     parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
     """Parent tags, useful to group, e.g., all tag tags."""
-    files = models.ManyToManyField("File", related_name="tags")
-    """:class:`~lamindb.File` records in tag."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
@@ -722,18 +720,18 @@ class Run(ORM):
 
 
 class Dataset(ORM):
-    """Datasets.
+    """Datasets (single file, multiple files, SQL table).
 
     Datasets are measurements of features (aka observations of variables).
 
-    1. A feature can be a “high-level” feature, i.e., it has meaning, can label
-       a column in a DataFrame, and can be modeled as a Feature or another ORM.
+    1. A feature can be a “high-level” feature with meaning: a labelled
+       column in a DataFrame with an entry in :class:`~lamindb.Feature` or another ORM.
        Examples: gene id, protein id, phenotype name, temperature,
        concentration, treatment label, treatment id, etc.
     2. In other cases, a feature might be a “low-level” feature without semantic
        meaning. Examples: pixels, single letters in sequences, etc.
 
-    LaminDB typically stores datasets as files (`.files`), either as
+    LaminDB typically stores datasets as one or multiple files (`.files`), either as
 
     1. serialized `DataFrame` or `AnnData` objects (for high-level features)
     2. a set of files of any type (for low-level features, e.g., a folder of
@@ -742,7 +740,7 @@ class Dataset(ORM):
     In simple cases, a single serialized DataFrame or AnnData object (`.file`)
     is enough.
 
-    One might also store a dataset in a SQL table or view, but this is not yet
+    One might also store a dataset in a SQL table or view, but this is *not* yet
     supported by LaminDB.
 
     See Also:
@@ -1114,7 +1112,8 @@ class File(ORM):
     """:class:`~lamindb.Transform` whose run created the `file`."""
     run = models.ForeignKey(Run, PROTECT, related_name="outputs", null=True)
     """:class:`~lamindb.Run` that created the `file`."""
-    # tags from Tags.files
+    tags = models.ManyToManyField(Tag, related_name="files")
+    """:class:`~lamindb.File` records in tag."""
     # input_of from Run.inputs
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
