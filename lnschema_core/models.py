@@ -437,14 +437,13 @@ class ORM(models.Model):
 
 
 class User(ORM):
-    """Users.
+    """Users collaborating within an instance.
 
     All data in this table is synched from the cloud user account to ensure a
-    universal user identity, valid across DB instances, email & handle changes.
+    universal user identity, valid across DB instances and email & handle
+    changes.
 
     Examples:
-
-        Creating user records is managed via the :doc:`/guide/setup`.
 
         Query a user by handle:
 
@@ -468,9 +467,7 @@ class User(ORM):
 
 
 class Storage(ORM):
-    """Storage locations.
-
-    Either S3 or GCP buckets or local storage locations.
+    """Storage locations, S3 or GCP buckets or local storage locations.
 
     See Also:
         :attr:`~lamindb.dev.Settings.storage`
@@ -509,7 +506,7 @@ class Storage(ORM):
 
 
 class Tag(ORM):
-    """Tags.
+    """Simple tags for files & datasets.
 
     Examples:
 
@@ -571,7 +568,7 @@ class Tag(ORM):
 
 
 class Transform(ORM):
-    """Transformations of files (:class:`~lamindb.File`).
+    """Transforms of files & datasets (:class:`~lamindb.File`).
 
     Pipelines, workflows, notebooks, app-based transformations.
 
@@ -655,7 +652,7 @@ class Transform(ORM):
 
 
 class Run(ORM):
-    """Runs of transformations (:class:`~lamindb.Transform`).
+    """Runs of transforms (:class:`~lamindb.Transform`).
 
     Typically, a run has inputs and outputs:
 
@@ -715,76 +712,6 @@ class Run(ORM):
     run_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of run execution."""
     created_by = models.ForeignKey(User, CASCADE, default=current_user_id, related_name="created_runs")
-    """Creator of record, a :class:`~lamindb.User`."""
-
-
-class Dataset(ORM):
-    """Datasets (single file, multiple files, SQL table).
-
-    Datasets are measurements of features (aka observations of variables).
-
-    1. A feature can be a “high-level” feature with meaning: a labelled
-       column in a DataFrame with an entry in :class:`~lamindb.Feature` or another ORM.
-       Examples: gene id, protein id, phenotype name, temperature,
-       concentration, treatment label, treatment id, etc.
-    2. In other cases, a feature might be a “low-level” feature without semantic
-       meaning. Examples: pixels, single letters in sequences, etc.
-
-    LaminDB typically stores datasets as one or multiple files (`.files`), either as
-
-    1. serialized `DataFrame` or `AnnData` objects (for high-level features)
-    2. a set of files of any type (for low-level features, e.g., a folder of
-       images or fastqs)
-
-    In simple cases, a single serialized DataFrame or AnnData object (`.file`)
-    is enough.
-
-    One might also store a dataset in a SQL table or view, but this is *not* yet
-    supported by LaminDB.
-
-    See Also:
-        :class:`~lamindb.File`
-
-    Notes:
-        For more info, see tutorial: :doc:`/guide/tutorial1`.
-
-    Examples:
-        >>> df = ln.dev.datasets.df_iris_in_meter_batch1()
-        >>> df.head()
-          sepal_length sepal_width petal_length petal_width iris_species_code
-        0        0.051       0.035        0.014       0.002                 0
-        1        0.049       0.030        0.014       0.002                 0
-        2        0.047       0.032        0.013       0.002                 0
-        3        0.046       0.031        0.015       0.002                 0
-        4        0.050       0.036        0.014       0.002                 0
-        >>> dataset = ln.Dataset(df, name="Iris flower dataset batch1")
-        >>> dataset
-        Dataset(id=uGQtiyepMdHOq3sZCFWV, name=Iris flower dataset batch1, hash=c5WgMCRPca2iZ2pqC3KiKQ, file_id=uGQtiyepMdHOq3sZCFWV, created_by_id=DzTjkKse)
-        >>> dataset.save()
-        💡 storing file uGQtiyepMdHOq3sZCFWV with key .lamindb/uGQtiyepMdHOq3sZCFWV.parquet
-    """
-
-    id = models.CharField(max_length=20, default=base62_20, primary_key=True)
-    """Universal id, valid across DB instances."""
-    name = models.CharField(max_length=255, db_index=True, default=None)
-    """Name or title of dataset (required)."""
-    description = models.TextField(null=True, default=None)
-    """A description."""
-    hash = models.CharField(max_length=86, db_index=True, null=True, default=None)
-    """Hash of dataset content. 86 base64 chars allow to store 64 bytes, 512 bits."""
-    feature_sets = models.ManyToManyField("FeatureSet", related_name="datasets")
-    """The feature sets measured in this dataset (see :class:`~lamindb.FeatureSet`)."""
-    categories = models.ManyToManyField("Category", related_name="datasets")
-    """Categories of categorical features sampled in the dataset (see :class:`~lamindb.Feature`)."""
-    file = models.ForeignKey("File", on_delete=PROTECT, null=True, unique=True, related_name="datasets")
-    """Storage of dataset as a one file."""
-    files = models.ManyToManyField("File", related_name="datasets")
-    """Storage of dataset as multiple file."""
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    """Time of creation of record."""
-    updated_at = models.DateTimeField(auto_now=True, db_index=True)
-    """Time of run execution."""
-    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_datasets")
     """Creator of record, a :class:`~lamindb.User`."""
 
 
@@ -1453,6 +1380,76 @@ class File(ORM):
             💡 storing file 2fO9kSKVXFXYoLccExOY with key myfile.csv
         """
         pass
+
+
+class Dataset(ORM):
+    """Datasets.
+
+    Datasets are measurements of features (aka observations of variables).
+
+    1. A feature can be a “high-level” feature with meaning: a labelled
+       column in a DataFrame with an entry in :class:`~lamindb.Feature` or another ORM.
+       Examples: gene id, protein id, phenotype name, temperature,
+       concentration, treatment label, treatment id, etc.
+    2. In other cases, a feature might be a “low-level” feature without semantic
+       meaning. Examples: pixels, single letters in sequences, etc.
+
+    LaminDB typically stores datasets as one or multiple files (`.files`), either as
+
+    1. serialized `DataFrame` or `AnnData` objects (for high-level features)
+    2. a set of files of any type (for low-level features, e.g., a folder of
+       images or fastqs)
+
+    In simple cases, a single serialized DataFrame or AnnData object (`.file`)
+    is enough.
+
+    One might also store a dataset in a SQL table or view, but this is *not* yet
+    supported by LaminDB.
+
+    See Also:
+        :class:`~lamindb.File`
+
+    Notes:
+        For more info, see tutorial: :doc:`/guide/tutorial1`.
+
+    Examples:
+        >>> df = ln.dev.datasets.df_iris_in_meter_batch1()
+        >>> df.head()
+          sepal_length sepal_width petal_length petal_width iris_species_code
+        0        0.051       0.035        0.014       0.002                 0
+        1        0.049       0.030        0.014       0.002                 0
+        2        0.047       0.032        0.013       0.002                 0
+        3        0.046       0.031        0.015       0.002                 0
+        4        0.050       0.036        0.014       0.002                 0
+        >>> dataset = ln.Dataset(df, name="Iris flower dataset batch1")
+        >>> dataset
+        Dataset(id=uGQtiyepMdHOq3sZCFWV, name=Iris flower dataset batch1, hash=c5WgMCRPca2iZ2pqC3KiKQ, file_id=uGQtiyepMdHOq3sZCFWV, created_by_id=DzTjkKse)
+        >>> dataset.save()
+        💡 storing file uGQtiyepMdHOq3sZCFWV with key .lamindb/uGQtiyepMdHOq3sZCFWV.parquet
+    """
+
+    id = models.CharField(max_length=20, default=base62_20, primary_key=True)
+    """Universal id, valid across DB instances."""
+    name = models.CharField(max_length=255, db_index=True, default=None)
+    """Name or title of dataset (required)."""
+    description = models.TextField(null=True, default=None)
+    """A description."""
+    hash = models.CharField(max_length=86, db_index=True, null=True, default=None)
+    """Hash of dataset content. 86 base64 chars allow to store 64 bytes, 512 bits."""
+    feature_sets = models.ManyToManyField("FeatureSet", related_name="datasets")
+    """The feature sets measured in this dataset (see :class:`~lamindb.FeatureSet`)."""
+    categories = models.ManyToManyField("Category", related_name="datasets")
+    """Categories of categorical features sampled in the dataset (see :class:`~lamindb.Feature`)."""
+    file = models.ForeignKey("File", on_delete=PROTECT, null=True, unique=True, related_name="datasets")
+    """Storage of dataset as a one file."""
+    files = models.ManyToManyField("File", related_name="datasets")
+    """Storage of dataset as multiple file."""
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    """Time of creation of record."""
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    """Time of run execution."""
+    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_datasets")
+    """Creator of record, a :class:`~lamindb.User`."""
 
 
 # -------------------------------------------------------------------------------------
