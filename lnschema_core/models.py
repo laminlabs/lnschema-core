@@ -572,55 +572,6 @@ class Tag(ORM):
     """Creator of record, a :class:`~lamindb.User`."""
 
 
-class Project(ORM):
-    """Projects.
-
-    Examples:
-
-        Create a new project:
-
-        >>> project = ln.Project(name="My awesome project", external_id="Lamin-0001")
-        >>> project.save()
-        >>> project
-        Project(id=23QgqohM, name=My awesome project, external_id=Lamin-0001, created_by_id=DzTjkKse)
-
-        Link files to a project:
-
-        >>> project = ln.Tag.select(name="My awesome project").one()
-        >>> project
-        Project(id=23QgqohM, name=My awesome project, external_id=Lamin-0001, created_by_id=DzTjkKse)
-        >>> file = ln.File("./myfile.csv")
-        >>> file.save()
-        >>> file
-        File(id=MveGmGJImYY5qBwmr0j0, suffix=.csv, size=4, hash=CY9rzUYh03PK3k6DJie09g, hash_type=md5, updated_at=2023-07-19 13:47:59, storage_id=597Sgod0, created_by_id=DzTjkKse) # noqa
-        >>> file.projects.add(project)
-        >>> file.projects.list("name")
-        ['My awesome project']
-
-        Query a file by project:
-
-        >>> ln.File.select(projects__name = "My awesome project").first()
-        File(id=MveGmGJImYY5qBwmr0j0, suffix=.csv, size=4, hash=CY9rzUYh03PK3k6DJie09g, hash_type=md5, updated_at=2023-07-19 13:47:59, storage_id=597Sgod0, created_by_id=DzTjkKse)
-    """
-
-    id = models.CharField(max_length=8, default=base62_8, primary_key=True)
-    """Universal id, valid across DB instances."""
-    name = models.CharField(max_length=255, db_index=True, unique=True, default=None)
-    """Project name or title."""
-    external_id = models.CharField(max_length=40, db_index=True, null=True, default=None)
-    """External id (such as from a project management tool)."""
-    tags = models.ManyToManyField("Tag", related_name="projects")
-    """Project tags."""
-    files = models.ManyToManyField("File", related_name="projects")
-    """Project files."""
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    """Time of creation of record."""
-    updated_at = models.DateTimeField(auto_now=True, db_index=True)
-    """Time of last update to record."""
-    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_projects")
-    """Creator of record, a :class:`~lamindb.User`."""
-
-
 class Transform(ORM):
     """Transformations of files (:class:`~lamindb.File`).
 

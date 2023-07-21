@@ -39,4 +39,7 @@ class Migration(migrations.Migration):
             old_name="name",
             new_name="reference_type",
         ),
+        migrations.DeleteModel(
+            name="Project",
+        ),
     ]

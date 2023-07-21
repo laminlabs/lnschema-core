@@ -17,7 +17,6 @@ if _INSTANCE_SETUP:
         Feature,
         FeatureSet,
         File,
-        Project,
         Run,
         Storage,
         Tag,
