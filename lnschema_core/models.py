@@ -1005,7 +1005,7 @@ class Category(ORM):
 
 
 class File(ORM):
-    """Files.
+    """Batches of data stored as files and objects.
 
     Args:
         data: `Union[PathLike, DataLike]` A file path or an in-memory data
