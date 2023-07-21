@@ -19,4 +19,14 @@ class Migration(migrations.Migration):
             name="categories",
             field=models.ManyToManyField(related_name="files", to="lnschema_core.category"),
         ),
+        migrations.AddField(
+            model_name="tag",
+            name="description",
+            field=models.TextField(default=None, null=True),
+        ),
+        migrations.AddField(
+            model_name="tag",
+            name="parents",
+            field=models.ManyToManyField(related_name="children", to="lnschema_core.tag"),
+        ),
     ]
