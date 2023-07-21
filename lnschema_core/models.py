@@ -180,12 +180,12 @@ class ORM(models.Model):
 
             Bulk create records:
 
-            >>> projects = ln.Project.from_values(["benchmark", "prediction", "test"], field="name")
-            💬 Created 3 Project records with a single field name
-            >>> projects
-            [Project(id=mDahtPrz, name=benchmark, created_by_id=DzTjkKse),
-            Project(id=2Sjmn9il, name=prediction, created_by_id=DzTjkKse),
-            Project(id=gdxrHdTA, name=test, created_by_id=DzTjkKse)]
+            >>> tags = ln.Tag.from_values(["benchmark", "prediction", "test"], field="name")
+            💬 Created 3 Tag records with a single field name
+            >>> tags
+            [Tag(id=mDahtPrz, name=benchmark, created_by_id=DzTjkKse),
+            Tag(id=2Sjmn9il, name=prediction, created_by_id=DzTjkKse),
+            Tag(id=gdxrHdTA, name=test, created_by_id=DzTjkKse)]
 
             Bulk create records with shared kwargs:
 
@@ -198,13 +198,13 @@ class ORM(models.Model):
 
             Returns existing records:
 
-            >>> ln.save(ln.Project.from_values(["benchmark", "prediction", "test"], field="name"))
-            >>> projects = ln.Project.from_values(["benchmark", "prediction", "test"], field="name")
-            💬 Returned 3 existing Project DB records that matched name field
-            >>> projects
-            [Project(id=iV3DXy70, name=benchmark, updated_at=2023-07-19 16:07:50, created_by_id=DzTjkKse),
-            Project(id=99aB57DI, name=prediction, updated_at=2023-07-19 16:07:50, created_by_id=DzTjkKse),
-            Project(id=ueaGXwuL, name=test, updated_at=2023-07-19 16:07:50, created_by_id=DzTjkKse)]
+            >>> ln.save(ln.Tag.from_values(["benchmark", "prediction", "test"], field="name"))
+            >>> tags = ln.Tag.from_values(["benchmark", "prediction", "test"], field="name")
+            💬 Returned 3 existing Tag DB records that matched name field
+            >>> tags
+            [Tag(id=iV3DXy70, name=benchmark, updated_at=2023-07-19 16:07:50, created_by_id=DzTjkKse),
+            Tag(id=99aB57DI, name=prediction, updated_at=2023-07-19 16:07:50, created_by_id=DzTjkKse),
+            Tag(id=ueaGXwuL, name=test, updated_at=2023-07-19 16:07:50, created_by_id=DzTjkKse)]
 
             Bulk create records from bionty:
 
@@ -355,7 +355,7 @@ class ORM(models.Model):
             A :class:`~lamindb.dev.QuerySet`.
 
         See Also:
-            `django queries <https://docs.djangoproject.com/en/4.2/topics/db/queries/>`__
+            `django queries <https://docs.djangotag.com/en/4.2/topics/db/queries/>`__
 
         Notes:
             For more info, see tutorial: :doc:`/guide/select`.
@@ -437,14 +437,13 @@ class ORM(models.Model):
 
 
 class User(ORM):
-    """Users.
+    """Users collaborating within an instance.
 
     All data in this table is synched from the cloud user account to ensure a
-    universal user identity, valid across DB instances, email & handle changes.
+    universal user identity, valid across DB instances and email & handle
+    changes.
 
     Examples:
-
-        Creating user records is managed via the :doc:`/guide/setup`.
 
         Query a user by handle:
 
@@ -468,9 +467,7 @@ class User(ORM):
 
 
 class Storage(ORM):
-    """Storage locations.
-
-    Either S3 or GCP buckets or local storage locations.
+    """Storage locations, S3 or GCP buckets or local storage locations.
 
     See Also:
         :attr:`~lamindb.dev.Settings.storage`
@@ -509,7 +506,7 @@ class Storage(ORM):
 
 
 class Tag(ORM):
-    """Tags.
+    """Simple tags for files & datasets.
 
     Examples:
 
@@ -533,33 +530,35 @@ class Tag(ORM):
         >>> file.tags.list("name")
         ['ML output']
 
-        Tag a project:
+        Tag a tag:
 
         >>> ln.Tag(name="benchmark").save()
         >>> tag = ln.Tag.select(name="benchmark").one()
         Tag(id=gelGp2P6, name=benchmark, created_by_id=DzTjkKse)
-        >>> ln.Project(name="My awesome project", external_id="Lamin-0001")
-        >>> project = ln.Tag.select(name="My awesome project").one()
-        >>> project
-        Project(id=23QgqohM, name=My awesome project, external_id=Lamin-0001, created_by_id=DzTjkKse)
-        >>> project.tags.add(tag)
-        >>> project.tags.list("name")
+        >>> ln.Tag(name="My awesome tag", external_id="Lamin-0001")
+        >>> tag = ln.Tag.select(name="My awesome tag").one()
+        >>> tag
+        Tag(id=23QgqohM, name=My awesome tag, external_id=Lamin-0001, created_by_id=DzTjkKse)
+        >>> tag.tags.add(tag)
+        >>> tag.tags.list("name")
         ['ML output']
 
         Query by tag:
 
         >>> ln.File.select(tags__name = "ML output").first()
         File(id=MveGmGJImYY5qBwmr0j0, suffix=.csv, size=4, hash=CY9rzUYh03PK3k6DJie09g, hash_type=md5, updated_at=2023-07-19 13:47:59, storage_id=597Sgod0, created_by_id=DzTjkKse) # noqa
-        >>> ln.Project.select(tags__name = "benchmark").first()
-        Project(id=23QgqohM, name=My awesome project, external_id=Lamin-0001, created_by_id=DzTjkKse)
+        >>> ln.Tag.select(tags__name = "benchmark").first()
+        Tag(id=23QgqohM, name=My awesome tag, external_id=Lamin-0001, created_by_id=DzTjkKse)
     """
 
     id = models.CharField(max_length=8, default=base62_8, primary_key=True)
     """A universal random id, valid across DB instances."""
     name = models.CharField(max_length=255, db_index=True, unique=True, default=None)
     """Name or title of tag."""
-    files = models.ManyToManyField("File", related_name="tags")
-    """:class:`~lamindb.File` records in tag."""
+    description = models.TextField(null=True, default=None)
+    """A description."""
+    parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
+    """Parent tags, useful to group, e.g., all tag tags."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
@@ -568,57 +567,8 @@ class Tag(ORM):
     """Creator of record, a :class:`~lamindb.User`."""
 
 
-class Project(ORM):
-    """Projects.
-
-    Examples:
-
-        Create a new project:
-
-        >>> project = ln.Project(name="My awesome project", external_id="Lamin-0001")
-        >>> project.save()
-        >>> project
-        Project(id=23QgqohM, name=My awesome project, external_id=Lamin-0001, created_by_id=DzTjkKse)
-
-        Link files to a project:
-
-        >>> project = ln.Tag.select(name="My awesome project").one()
-        >>> project
-        Project(id=23QgqohM, name=My awesome project, external_id=Lamin-0001, created_by_id=DzTjkKse)
-        >>> file = ln.File("./myfile.csv")
-        >>> file.save()
-        >>> file
-        File(id=MveGmGJImYY5qBwmr0j0, suffix=.csv, size=4, hash=CY9rzUYh03PK3k6DJie09g, hash_type=md5, updated_at=2023-07-19 13:47:59, storage_id=597Sgod0, created_by_id=DzTjkKse) # noqa
-        >>> file.projects.add(project)
-        >>> file.projects.list("name")
-        ['My awesome project']
-
-        Query a file by project:
-
-        >>> ln.File.select(projects__name = "My awesome project").first()
-        File(id=MveGmGJImYY5qBwmr0j0, suffix=.csv, size=4, hash=CY9rzUYh03PK3k6DJie09g, hash_type=md5, updated_at=2023-07-19 13:47:59, storage_id=597Sgod0, created_by_id=DzTjkKse)
-    """
-
-    id = models.CharField(max_length=8, default=base62_8, primary_key=True)
-    """Universal id, valid across DB instances."""
-    name = models.CharField(max_length=255, db_index=True, unique=True, default=None)
-    """Project name or title."""
-    external_id = models.CharField(max_length=40, db_index=True, null=True, default=None)
-    """External id (such as from a project management tool)."""
-    tags = models.ManyToManyField("Tag", related_name="projects")
-    """Project tags."""
-    files = models.ManyToManyField("File", related_name="projects")
-    """Project files."""
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    """Time of creation of record."""
-    updated_at = models.DateTimeField(auto_now=True, db_index=True)
-    """Time of last update to record."""
-    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_projects")
-    """Creator of record, a :class:`~lamindb.User`."""
-
-
 class Transform(ORM):
-    """Transformations of files (:class:`~lamindb.File`).
+    """Transforms of files & datasets (:class:`~lamindb.File`).
 
     Pipelines, workflows, notebooks, app-based transformations.
 
@@ -629,8 +579,6 @@ class Transform(ORM):
     See Also:
         :meth:`lamindb.track`
             Track global Transform & Run for a notebook or pipeline.
-        :meth:`lamindb.context`
-            Global run context.
         :class:`~lamindb.Run`
             Executions of the transform.
 
@@ -702,7 +650,7 @@ class Transform(ORM):
 
 
 class Run(ORM):
-    """Runs of transformations (:class:`~lamindb.Transform`).
+    """Runs of transforms (:class:`~lamindb.Transform`).
 
     Typically, a run has inputs and outputs:
 
@@ -749,15 +697,14 @@ class Run(ORM):
 
     id = models.CharField(max_length=20, default=base62_20, primary_key=True)
     """Universal id, valid across DB instances."""
-    name = models.CharField(max_length=255, db_index=True, null=True, default=None)
-    """Name or title of run."""
-    external_id = models.CharField(max_length=255, db_index=True, null=True, default=None)
-    """External id (such as from a workflow tool)."""
+    reference = models.CharField(max_length=255, db_index=True, null=True, default=None)
+    """A reference like a URL or external ID (such as from a workflow manager)."""
+    reference_type = models.CharField(max_length=255, db_index=True, null=True, default=None)
+    """Type of reference, e.g., a workflow manager execution ID."""
     transform = models.ForeignKey(Transform, CASCADE, related_name="runs")
     """The transform :class:`~lamindb.Transform` that is being run."""
-    inputs = models.ManyToManyField("File", related_name="input_of")
-    """The input files for the run."""
-    # outputs on File
+    # input_files on File
+    # output_files on File
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     run_at = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -766,87 +713,17 @@ class Run(ORM):
     """Creator of record, a :class:`~lamindb.User`."""
 
 
-class Dataset(ORM):
-    """Datasets.
-
-    Datasets are measurements of features (aka observations of variables).
-
-    1. A feature can be a “high-level” feature, i.e., it has meaning, can label
-       a column in a DataFrame, and can be modeled as a Feature or another ORM.
-       Examples: gene id, protein id, phenotype name, temperature,
-       concentration, treatment label, treatment id, etc.
-    2. In other cases, a feature might be a “low-level” feature without semantic
-       meaning. Examples: pixels, single letters in sequences, etc.
-
-    LaminDB typically stores datasets as files (`.files`), either as
-
-    1. serialized `DataFrame` or `AnnData` objects (for high-level features)
-    2. a set of files of any type (for low-level features, e.g., a folder of
-       images or fastqs)
-
-    In simple cases, a single serialized DataFrame or AnnData object (`.file`)
-    is enough.
-
-    One might also store a dataset in a SQL table or view, but this is not yet
-    supported by LaminDB.
-
-    See Also:
-        :class:`~lamindb.File`
-
-    Notes:
-        For more info, see tutorial: :doc:`/guide/tutorial1`.
-
-    Examples:
-        >>> df = ln.dev.datasets.df_iris_in_meter_batch1()
-        >>> df.head()
-          sepal_length sepal_width petal_length petal_width iris_species_code
-        0        0.051       0.035        0.014       0.002                 0
-        1        0.049       0.030        0.014       0.002                 0
-        2        0.047       0.032        0.013       0.002                 0
-        3        0.046       0.031        0.015       0.002                 0
-        4        0.050       0.036        0.014       0.002                 0
-        >>> dataset = ln.Dataset(df, name="Iris flower dataset batch1")
-        >>> dataset
-        Dataset(id=uGQtiyepMdHOq3sZCFWV, name=Iris flower dataset batch1, hash=c5WgMCRPca2iZ2pqC3KiKQ, file_id=uGQtiyepMdHOq3sZCFWV, created_by_id=DzTjkKse)
-        >>> dataset.save()
-        💡 storing file uGQtiyepMdHOq3sZCFWV with key .lamindb/uGQtiyepMdHOq3sZCFWV.parquet
-    """
-
-    id = models.CharField(max_length=20, default=base62_20, primary_key=True)
-    """Universal id, valid across DB instances."""
-    name = models.CharField(max_length=255, db_index=True, default=None)
-    """Name or title of dataset (required)."""
-    description = models.TextField(null=True, default=None)
-    """A description."""
-    hash = models.CharField(max_length=86, db_index=True, null=True, default=None)
-    """Hash of dataset content. 86 base64 chars allow to store 64 bytes, 512 bits."""
-    feature_sets = models.ManyToManyField("FeatureSet", related_name="datasets")
-    """The feature sets measured in this dataset (see :class:`~lamindb.FeatureSet`)."""
-    categories = models.ManyToManyField("Category", related_name="datasets")
-    """Categories of categorical features sampled in the dataset (see :class:`~lamindb.Feature`)."""
-    file = models.ForeignKey("File", on_delete=PROTECT, null=True, unique=True, related_name="datasets")
-    """Storage of dataset as a one file."""
-    files = models.ManyToManyField("File", related_name="datasets")
-    """Storage of dataset as multiple file."""
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    """Time of creation of record."""
-    updated_at = models.DateTimeField(auto_now=True, db_index=True)
-    """Time of run execution."""
-    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_datasets")
-    """Creator of record, a :class:`~lamindb.User`."""
-
-
 class Feature(ORM):
-    """Features.
+    """Numerical and categorical features measured in files & datasets.
 
     Notes:
 
-        You can use `lnschema_bionty` ORMs to manage common features like genes,
-        pathways, proteins & cell markers.
+        For more control, you can use `lnschema_bionty` ORMs to manage common
+        basic biological features like expression of genes, proteins & cell
+        markers.
 
-        Similarly, you can define custom ORMs to manage features like gene sets, nodes, etc.
-
-        This ORM is a way of getting started without using Bionty or a custom schema.
+        Similarly, you can define custom ORMs to manage high-level derived
+        features like gene sets, nodes, etc.
 
     Examples:
 
@@ -857,7 +734,7 @@ class Feature(ORM):
         >>> ln.Feature.select().df()
         id    name    type
          a   feat1     int
-         b   feat2 float64
+         b   feat2   float
          c   feat3     str
 
         For more info, see tutorial: :doc:`/biology/features`.
@@ -1025,9 +902,10 @@ class FeatureSet(ORM):
 
 
 class Category(ORM):
-    """Categories of categorical features.
+    """Sampled categories for features.
 
-    This is the default registry for tracking categories of categorical features.
+    This is the default registry for tracking categories sampled for categorical
+    features.
 
     If you're working a lot with different cell lines, proteins, genes, or other
     entities of complexity, consider using the pre-defined biological registries
@@ -1052,7 +930,7 @@ class Category(ORM):
 
 
 class File(ORM):
-    """Files.
+    """Batches of data stored as files and objects.
 
     Args:
         data: `Union[PathLike, DataLike]` A file path or an in-memory data
@@ -1157,10 +1035,12 @@ class File(ORM):
     """Categories of categorical features sampled in the file (see :class:`~lamindb.Feature`)."""
     transform = models.ForeignKey(Transform, PROTECT, related_name="files", null=True)
     """:class:`~lamindb.Transform` whose run created the `file`."""
-    run = models.ForeignKey(Run, PROTECT, related_name="outputs", null=True)
+    tags = models.ManyToManyField(Tag, related_name="files")
+    """:class:`~lamindb.File` records in tag."""
+    run = models.ForeignKey(Run, PROTECT, related_name="output_files", null=True)
     """:class:`~lamindb.Run` that created the `file`."""
-    # tags from Tags.files
-    # input_of from Run.inputs
+    input_of = models.ManyToManyField(Run, related_name="input_files")
+    """Runs that use this file as an input."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
@@ -1498,6 +1378,76 @@ class File(ORM):
             💡 storing file 2fO9kSKVXFXYoLccExOY with key myfile.csv
         """
         pass
+
+
+class Dataset(ORM):
+    """Datasets.
+
+    Datasets are measurements of features (aka observations of variables).
+
+    1. A feature can be a “high-level” feature with meaning: a labelled
+       column in a DataFrame with an entry in :class:`~lamindb.Feature` or another ORM.
+       Examples: gene id, protein id, phenotype name, temperature,
+       concentration, treatment label, treatment id, etc.
+    2. In other cases, a feature might be a “low-level” feature without semantic
+       meaning. Examples: pixels, single letters in sequences, etc.
+
+    LaminDB typically stores datasets as one or multiple files (`.files`), either as
+
+    1. serialized `DataFrame` or `AnnData` objects (for high-level features)
+    2. a set of files of any type (for low-level features, e.g., a folder of
+       images or fastqs)
+
+    In simple cases, a single serialized DataFrame or AnnData object (`.file`)
+    is enough.
+
+    One might also store a dataset in a SQL table or view, but this is *not* yet
+    supported by LaminDB.
+
+    See Also:
+        :class:`~lamindb.File`
+
+    Notes:
+        For more info, see tutorial: :doc:`/guide/tutorial1`.
+
+    Examples:
+        >>> df = ln.dev.datasets.df_iris_in_meter_batch1()
+        >>> df.head()
+          sepal_length sepal_width petal_length petal_width iris_species_code
+        0        0.051       0.035        0.014       0.002                 0
+        1        0.049       0.030        0.014       0.002                 0
+        2        0.047       0.032        0.013       0.002                 0
+        3        0.046       0.031        0.015       0.002                 0
+        4        0.050       0.036        0.014       0.002                 0
+        >>> dataset = ln.Dataset(df, name="Iris flower dataset batch1")
+        >>> dataset
+        Dataset(id=uGQtiyepMdHOq3sZCFWV, name=Iris flower dataset batch1, hash=c5WgMCRPca2iZ2pqC3KiKQ, file_id=uGQtiyepMdHOq3sZCFWV, created_by_id=DzTjkKse)
+        >>> dataset.save()
+        💡 storing file uGQtiyepMdHOq3sZCFWV with key .lamindb/uGQtiyepMdHOq3sZCFWV.parquet
+    """
+
+    id = models.CharField(max_length=20, default=base62_20, primary_key=True)
+    """Universal id, valid across DB instances."""
+    name = models.CharField(max_length=255, db_index=True, default=None)
+    """Name or title of dataset (required)."""
+    description = models.TextField(null=True, default=None)
+    """A description."""
+    hash = models.CharField(max_length=86, db_index=True, null=True, default=None)
+    """Hash of dataset content. 86 base64 chars allow to store 64 bytes, 512 bits."""
+    feature_sets = models.ManyToManyField("FeatureSet", related_name="datasets")
+    """The feature sets measured in this dataset (see :class:`~lamindb.FeatureSet`)."""
+    categories = models.ManyToManyField("Category", related_name="datasets")
+    """Categories of categorical features sampled in the dataset (see :class:`~lamindb.Feature`)."""
+    file = models.ForeignKey("File", on_delete=PROTECT, null=True, unique=True, related_name="datasets")
+    """Storage of dataset as a one file."""
+    files = models.ManyToManyField("File", related_name="datasets")
+    """Storage of dataset as multiple file."""
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    """Time of creation of record."""
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    """Time of run execution."""
+    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_datasets")
+    """Creator of record, a :class:`~lamindb.User`."""
 
 
 # -------------------------------------------------------------------------------------
