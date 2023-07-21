@@ -789,16 +789,16 @@ class Dataset(ORM):
 
 
 class Feature(ORM):
-    """Features.
+    """Numerical and categorical features measured in files & datasets.
 
     Notes:
 
-        You can use `lnschema_bionty` ORMs to manage common features like genes,
-        pathways, proteins & cell markers.
+        For more control, you can use `lnschema_bionty` ORMs to manage common
+        basic biological features like expression of genes, proteins & cell
+        markers.
 
-        Similarly, you can define custom ORMs to manage features like gene sets, nodes, etc.
-
-        This ORM is a way of getting started without using Bionty or a custom schema.
+        Similarly, you can define custom ORMs to manage high-level derived
+        features like gene sets, nodes, etc.
 
     Examples:
 
@@ -809,7 +809,7 @@ class Feature(ORM):
         >>> ln.Feature.select().df()
         id    name    type
          a   feat1     int
-         b   feat2 float64
+         b   feat2   float
          c   feat3     str
 
         For more info, see tutorial: :doc:`/biology/features`.
@@ -977,9 +977,10 @@ class FeatureSet(ORM):
 
 
 class Category(ORM):
-    """Categories of categorical features.
+    """Sampled categories for features.
 
-    This is the default registry for tracking categories of categorical features.
+    This is the default registry for tracking categories sampled for categorical
+    features.
 
     If you're working a lot with different cell lines, proteins, genes, or other
     entities of complexity, consider using the pre-defined biological registries
@@ -1113,7 +1114,7 @@ class File(ORM):
     """:class:`~lamindb.File` records in tag."""
     run = models.ForeignKey(Run, PROTECT, related_name="output_files", null=True)
     """:class:`~lamindb.Run` that created the `file`."""
-    input_of = models.ManyToManyField("File", related_name="input_files")
+    input_of = models.ManyToManyField(Run, related_name="input_files")
     """Runs that use this file as an input."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""

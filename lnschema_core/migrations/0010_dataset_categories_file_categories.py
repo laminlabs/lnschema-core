@@ -56,7 +56,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="file",
             name="input_of",
-            field=models.ManyToManyField(related_name="input_files", to="lnschema_core.file"),
+            field=models.ManyToManyField(related_name="input_files", to="lnschema_core.run"),
         ),
         migrations.RunSQL("insert into lnschema_core_file_input_of (id, file_id, run_id) select id, file_id, run_id from lnschema_core_run_inputs"),
         migrations.RemoveField(
