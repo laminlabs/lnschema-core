@@ -579,8 +579,6 @@ class Transform(ORM):
     See Also:
         :meth:`lamindb.track`
             Track global Transform & Run for a notebook or pipeline.
-        :meth:`lamindb.context`
-            Global run context.
         :class:`~lamindb.Run`
             Executions of the transform.
 
