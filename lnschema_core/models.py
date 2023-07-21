@@ -821,7 +821,9 @@ class Dataset(ORM):
     hash = models.CharField(max_length=86, db_index=True, null=True, default=None)
     """Hash of dataset content. 86 base64 chars allow to store 64 bytes, 512 bits."""
     feature_sets = models.ManyToManyField("FeatureSet", related_name="datasets")
-    """The feature sets measured in this dataset."""
+    """The feature sets measured in this dataset (see :class:`~lamindb.FeatureSet`)."""
+    categories = models.ManyToManyField("Category", related_name="datasets")
+    """Categories of categorical features sampled in the dataset (see :class:`~lamindb.Feature`)."""
     file = models.ForeignKey("File", on_delete=PROTECT, null=True, unique=True, related_name="datasets")
     """Storage of dataset as a one file."""
     files = models.ManyToManyField("File", related_name="datasets")
@@ -1124,8 +1126,8 @@ class File(ORM):
     """
 
     id = models.CharField(max_length=20, primary_key=True)
-    """A universal random id (20-char base62), valid across DB instances."""
-    storage: "Storage" = models.ForeignKey(Storage, PROTECT, related_name="files")
+    """A universal random id (20-char base62 ~ UUID), valid across DB instances."""
+    storage = models.ForeignKey(Storage, PROTECT, related_name="files")
     """Storage location (:class:`~lamindb.Storage`), e.g., an S3 bucket, local folder or network location."""
     key = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """Storage key, the relative path within the storage location."""
@@ -1150,13 +1152,14 @@ class File(ORM):
     hash_type = models.CharField(max_length=30, db_index=True, null=True, default=None)
     """Type of hash."""
     feature_sets = models.ManyToManyField(FeatureSet, related_name="files")
-    """Files linked to the feature set."""
+    """The feature sets measured in the file (see :class:`~lamindb.FeatureSet`)."""
+    categories = models.ManyToManyField(Category, related_name="files")
+    """Categories of categorical features sampled in the file (see :class:`~lamindb.Feature`)."""
     transform = models.ForeignKey(Transform, PROTECT, related_name="files", null=True)
     """:class:`~lamindb.Transform` whose run created the `file`."""
     run = models.ForeignKey(Run, PROTECT, related_name="outputs", null=True)
     """:class:`~lamindb.Run` that created the `file`."""
     # tags from Tags.files
-    # features from Features.files
     # input_of from Run.inputs
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
