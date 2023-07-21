@@ -29,4 +29,14 @@ class Migration(migrations.Migration):
             name="parents",
             field=models.ManyToManyField(related_name="children", to="lnschema_core.tag"),
         ),
+        migrations.RenameField(
+            model_name="run",
+            old_name="external_id",
+            new_name="reference",
+        ),
+        migrations.RenameField(
+            model_name="run",
+            old_name="name",
+            new_name="reference_type",
+        ),
     ]

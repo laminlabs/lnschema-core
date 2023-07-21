@@ -753,10 +753,10 @@ class Run(ORM):
 
     id = models.CharField(max_length=20, default=base62_20, primary_key=True)
     """Universal id, valid across DB instances."""
-    name = models.CharField(max_length=255, db_index=True, null=True, default=None)
-    """Name or title of run."""
-    external_id = models.CharField(max_length=255, db_index=True, null=True, default=None)
-    """External id (such as from a workflow tool)."""
+    reference = models.CharField(max_length=255, db_index=True, null=True, default=None)
+    """A reference like a URL or external ID (such as from a workflow manager)."""
+    reference_type = models.CharField(max_length=255, db_index=True, null=True, default=None)
+    """Type of reference, e.g., a workflow manager execution ID."""
     transform = models.ForeignKey(Transform, CASCADE, related_name="runs")
     """The transform :class:`~lamindb.Transform` that is being run."""
     inputs = models.ManyToManyField("File", related_name="input_of")
