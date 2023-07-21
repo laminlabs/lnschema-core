@@ -708,9 +708,8 @@ class Run(ORM):
     """Type of reference, e.g., a workflow manager execution ID."""
     transform = models.ForeignKey(Transform, CASCADE, related_name="runs")
     """The transform :class:`~lamindb.Transform` that is being run."""
-    inputs = models.ManyToManyField("File", related_name="input_of")
-    """The input files for the run."""
-    # outputs on File
+    # input_files on File
+    # output_files on File
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     run_at = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -1110,11 +1109,12 @@ class File(ORM):
     """Categories of categorical features sampled in the file (see :class:`~lamindb.Feature`)."""
     transform = models.ForeignKey(Transform, PROTECT, related_name="files", null=True)
     """:class:`~lamindb.Transform` whose run created the `file`."""
-    run = models.ForeignKey(Run, PROTECT, related_name="outputs", null=True)
-    """:class:`~lamindb.Run` that created the `file`."""
     tags = models.ManyToManyField(Tag, related_name="files")
     """:class:`~lamindb.File` records in tag."""
-    # input_of from Run.inputs
+    run = models.ForeignKey(Run, PROTECT, related_name="output_files", null=True)
+    """:class:`~lamindb.Run` that created the `file`."""
+    input_of = models.ManyToManyField("File", related_name="input_files")
+    """Runs that use this file as an input."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
