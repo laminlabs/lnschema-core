@@ -466,6 +466,29 @@ class User(ORM):
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
 
+    @overload
+    def __init__(
+        self,
+        handle: str,
+        email: str,
+        name: Optional[str] = None,
+    ):
+        ...
+
+    @overload
+    def __init__(
+        self,
+        *db_args,
+    ):
+        ...
+
+    def __init__(
+        self,
+        *args,
+        **kwargs,
+    ):
+        pass
+
 
 class Storage(ORM):
     """Storage locations.
@@ -506,6 +529,29 @@ class Storage(ORM):
     """Time of last update to record."""
     created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_storages")
     """Creator of record, a :class:`~lamindb.User`."""
+
+    @overload
+    def __init__(
+        self,
+        root: str,
+        type: str,
+        region: Optional[str] = None,
+    ):
+        ...
+
+    @overload
+    def __init__(
+        self,
+        *db_args,
+    ):
+        ...
+
+    def __init__(
+        self,
+        *args,
+        **kwargs,
+    ):
+        pass
 
 
 class Tag(ORM):
@@ -566,6 +612,28 @@ class Tag(ORM):
     """Time of last update to record."""
     created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_tags")
     """Creator of record, a :class:`~lamindb.User`."""
+
+    @overload
+    def __init__(
+        self,
+        name: Optional[str] = None,
+        files: Optional[List["File"]] = None,
+    ):
+        ...
+
+    @overload
+    def __init__(
+        self,
+        *db_args,
+    ):
+        ...
+
+    def __init__(
+        self,
+        *args,
+        **kwargs,
+    ):
+        pass
 
 
 class Project(ORM):
@@ -700,6 +768,30 @@ class Transform(ORM):
     class Meta:
         unique_together = (("stem_id", "version"),)
 
+    @overload
+    def __init__(
+        self,
+        type: Literal["notebook", "pipeline", "app", "api"],
+        name: Optional[str] = None,
+        short_name: Optional[str] = None,
+        version: Optional[str] = "0",
+    ):
+        ...
+
+    @overload
+    def __init__(
+        self,
+        *db_args,
+    ):
+        ...
+
+    def __init__(
+        self,
+        *args,
+        **kwargs,
+    ):
+        pass
+
 
 class Run(ORM):
     """Runs of transformations (:class:`~lamindb.Transform`).
@@ -764,6 +856,29 @@ class Run(ORM):
     """Time of run execution."""
     created_by = models.ForeignKey(User, CASCADE, default=current_user_id, related_name="created_runs")
     """Creator of record, a :class:`~lamindb.User`."""
+
+    @overload
+    def __init__(
+        self,
+        transform: "Transform",
+        external_id: Optional[str] = None,
+        inputs: Optional[List["File"]] = None,
+    ):
+        ...
+
+    @overload
+    def __init__(
+        self,
+        *db_args,
+    ):
+        ...
+
+    def __init__(
+        self,
+        *args,
+        **kwargs,
+    ):
+        pass
 
 
 class Dataset(ORM):
@@ -833,6 +948,31 @@ class Dataset(ORM):
     created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_datasets")
     """Creator of record, a :class:`~lamindb.User`."""
 
+    @overload
+    def __init__(
+        self,
+        name: Optional[str] = None,
+        description: Optional[str] = None,
+        hash: Optional[str] = None,
+        feature_sets: Optional[List["FeatureSet"]] = None,
+        files: Optional[List["File"]] = None,
+    ):
+        ...
+
+    @overload
+    def __init__(
+        self,
+        *db_args,
+    ):
+        ...
+
+    def __init__(
+        self,
+        *args,
+        **kwargs,
+    ):
+        pass
+
 
 class Feature(ORM):
     """Features.
@@ -886,9 +1026,10 @@ class Feature(ORM):
     def __init__(
         self,
         name: str,
-        type: Optional[str],
-        field: Optional[str],
-        description: Optional[str],
+        type: Optional[str] = None,
+        unit: Optional[str] = None,
+        description: Optional[str] = None,
+        synonyms: Optional[str] = None,
     ):
         ...
 
@@ -1047,6 +1188,28 @@ class Category(ORM):
 
     class Meta:
         unique_together = (("name", "feature"),)
+
+    @overload
+    def __init__(
+        self,
+        name: str,
+        feature: Feature,
+    ):
+        ...
+
+    @overload
+    def __init__(
+        self,
+        *db_args,
+    ):
+        ...
+
+    def __init__(
+        self,
+        *args,
+        **kwargs,
+    ):
+        pass
 
 
 class File(ORM):
