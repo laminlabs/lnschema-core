@@ -180,12 +180,12 @@ class ORM(models.Model):
 
             Bulk create records:
 
-            >>> projects = ln.Project.from_values(["benchmark", "prediction", "test"], field="name")
-            💬 Created 3 Project records with a single field name
-            >>> projects
-            [Project(id=mDahtPrz, name=benchmark, created_by_id=DzTjkKse),
-            Project(id=2Sjmn9il, name=prediction, created_by_id=DzTjkKse),
-            Project(id=gdxrHdTA, name=test, created_by_id=DzTjkKse)]
+            >>> tags = ln.Tag.from_values(["benchmark", "prediction", "test"], field="name")
+            💬 Created 3 Tag records with a single field name
+            >>> tags
+            [Tag(id=mDahtPrz, name=benchmark, created_by_id=DzTjkKse),
+            Tag(id=2Sjmn9il, name=prediction, created_by_id=DzTjkKse),
+            Tag(id=gdxrHdTA, name=test, created_by_id=DzTjkKse)]
 
             Bulk create records with shared kwargs:
 
@@ -198,13 +198,13 @@ class ORM(models.Model):
 
             Returns existing records:
 
-            >>> ln.save(ln.Project.from_values(["benchmark", "prediction", "test"], field="name"))
-            >>> projects = ln.Project.from_values(["benchmark", "prediction", "test"], field="name")
-            💬 Returned 3 existing Project DB records that matched name field
-            >>> projects
-            [Project(id=iV3DXy70, name=benchmark, updated_at=2023-07-19 16:07:50, created_by_id=DzTjkKse),
-            Project(id=99aB57DI, name=prediction, updated_at=2023-07-19 16:07:50, created_by_id=DzTjkKse),
-            Project(id=ueaGXwuL, name=test, updated_at=2023-07-19 16:07:50, created_by_id=DzTjkKse)]
+            >>> ln.save(ln.Tag.from_values(["benchmark", "prediction", "test"], field="name"))
+            >>> tags = ln.Tag.from_values(["benchmark", "prediction", "test"], field="name")
+            💬 Returned 3 existing Tag DB records that matched name field
+            >>> tags
+            [Tag(id=iV3DXy70, name=benchmark, updated_at=2023-07-19 16:07:50, created_by_id=DzTjkKse),
+            Tag(id=99aB57DI, name=prediction, updated_at=2023-07-19 16:07:50, created_by_id=DzTjkKse),
+            Tag(id=ueaGXwuL, name=test, updated_at=2023-07-19 16:07:50, created_by_id=DzTjkKse)]
 
             Bulk create records from bionty:
 
@@ -355,7 +355,7 @@ class ORM(models.Model):
             A :class:`~lamindb.dev.QuerySet`.
 
         See Also:
-            `django queries <https://docs.djangoproject.com/en/4.2/topics/db/queries/>`__
+            `django queries <https://docs.djangotag.com/en/4.2/topics/db/queries/>`__
 
         Notes:
             For more info, see tutorial: :doc:`/guide/select`.
@@ -533,25 +533,25 @@ class Tag(ORM):
         >>> file.tags.list("name")
         ['ML output']
 
-        Tag a project:
+        Tag a tag:
 
         >>> ln.Tag(name="benchmark").save()
         >>> tag = ln.Tag.select(name="benchmark").one()
         Tag(id=gelGp2P6, name=benchmark, created_by_id=DzTjkKse)
-        >>> ln.Project(name="My awesome project", external_id="Lamin-0001")
-        >>> project = ln.Tag.select(name="My awesome project").one()
-        >>> project
-        Project(id=23QgqohM, name=My awesome project, external_id=Lamin-0001, created_by_id=DzTjkKse)
-        >>> project.tags.add(tag)
-        >>> project.tags.list("name")
+        >>> ln.Tag(name="My awesome tag", external_id="Lamin-0001")
+        >>> tag = ln.Tag.select(name="My awesome tag").one()
+        >>> tag
+        Tag(id=23QgqohM, name=My awesome tag, external_id=Lamin-0001, created_by_id=DzTjkKse)
+        >>> tag.tags.add(tag)
+        >>> tag.tags.list("name")
         ['ML output']
 
         Query by tag:
 
         >>> ln.File.select(tags__name = "ML output").first()
         File(id=MveGmGJImYY5qBwmr0j0, suffix=.csv, size=4, hash=CY9rzUYh03PK3k6DJie09g, hash_type=md5, updated_at=2023-07-19 13:47:59, storage_id=597Sgod0, created_by_id=DzTjkKse) # noqa
-        >>> ln.Project.select(tags__name = "benchmark").first()
-        Project(id=23QgqohM, name=My awesome project, external_id=Lamin-0001, created_by_id=DzTjkKse)
+        >>> ln.Tag.select(tags__name = "benchmark").first()
+        Tag(id=23QgqohM, name=My awesome tag, external_id=Lamin-0001, created_by_id=DzTjkKse)
     """
 
     id = models.CharField(max_length=8, default=base62_8, primary_key=True)
@@ -561,7 +561,7 @@ class Tag(ORM):
     description = models.TextField(null=True, default=None)
     """A description."""
     parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
-    """Parent tags, useful to group, e.g., all project tags."""
+    """Parent tags, useful to group, e.g., all tag tags."""
     files = models.ManyToManyField("File", related_name="tags")
     """:class:`~lamindb.File` records in tag."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
