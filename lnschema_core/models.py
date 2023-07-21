@@ -822,7 +822,7 @@ class Dataset(ORM):
     """Hash of dataset content. 86 base64 chars allow to store 64 bytes, 512 bits."""
     feature_sets = models.ManyToManyField("FeatureSet", related_name="datasets")
     """The feature sets measured in this dataset (see :class:`~lamindb.FeatureSet`)."""
-    categories = models.ManyToManyField("FeatureSet", related_name="datasets")
+    categories = models.ManyToManyField("Category", related_name="datasets")
     """Categories of categorical features sampled in the dataset (see :class:`~lamindb.Feature`)."""
     file = models.ForeignKey("File", on_delete=PROTECT, null=True, unique=True, related_name="datasets")
     """Storage of dataset as a one file."""
@@ -1153,7 +1153,7 @@ class File(ORM):
     """Type of hash."""
     feature_sets = models.ManyToManyField(FeatureSet, related_name="files")
     """The feature sets measured in the file (see :class:`~lamindb.FeatureSet`)."""
-    categories = models.ManyToManyField(FeatureSet, related_name="files")
+    categories = models.ManyToManyField(Category, related_name="files")
     """Categories of categorical features sampled in the file (see :class:`~lamindb.Feature`)."""
     transform = models.ForeignKey(Transform, PROTECT, related_name="files", null=True)
     """:class:`~lamindb.Transform` whose run created the `file`."""
