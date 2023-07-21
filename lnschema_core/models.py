@@ -558,6 +558,10 @@ class Tag(ORM):
     """A universal random id, valid across DB instances."""
     name = models.CharField(max_length=255, db_index=True, unique=True, default=None)
     """Name or title of tag."""
+    description = models.TextField(null=True, default=None)
+    """A description."""
+    parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
+    """Parent tags, useful to group, e.g., all project tags."""
     files = models.ManyToManyField("File", related_name="tags")
     """:class:`~lamindb.File` records in tag."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
