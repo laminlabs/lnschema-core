@@ -74,17 +74,10 @@ class Migration(migrations.Migration):
             old_name="Tag",
             new_name="Label",
         ),
-        migrations.AlterUniqueTogether(
-            name="category",
-            unique_together=None,
-        ),
-        migrations.RemoveField(
-            model_name="category",
-            name="created_by",
-        ),
-        migrations.RemoveField(
-            model_name="category",
-            name="feature",
+        migrations.RenameField(
+            model_name="file",
+            old_name="tags",
+            new_name="labels",
         ),
         migrations.RemoveField(
             model_name="dataset",
@@ -97,24 +90,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="dataset",
             name="labels",
-            field=models.ManyToManyField(related_name="datasets", to="category"),
+            field=models.ManyToManyField(related_name="datasets", to="lnschema_core.label"),
         ),
         migrations.AddField(
             model_name="label",
             name="feature",
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name="labels", to="lnschema_core.feature"),
-        ),
-        migrations.AlterUniqueTogether(
-            name="label",
-            unique_together={("name", "feature")},
-        ),
-        migrations.DeleteModel(
-            name="Category",
-        ),
-        migrations.RenameField(
-            model_name="file",
-            old_name="tags",
-            new_name="labels",
+            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.CASCADE, related_name="labels", to="lnschema_core.feature"),
         ),
         migrations.AlterField(
             model_name="file",
@@ -133,14 +114,11 @@ class Migration(migrations.Migration):
                 default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.PROTECT, related_name="created_labels", to="lnschema_core.user"
             ),
         ),
-        migrations.AlterField(
-            model_name="label",
-            name="feature",
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.CASCADE, related_name="labels", to="lnschema_core.feature"),
+        migrations.AlterUniqueTogether(
+            name="label",
+            unique_together={("name", "feature")},
         ),
-        migrations.AlterField(
-            model_name="dataset",
-            name="labels",
-            field=models.ManyToManyField(related_name="datasets", to="lnschema_core.label"),
+        migrations.DeleteModel(
+            name="Category",
         ),
     ]
