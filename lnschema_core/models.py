@@ -508,18 +508,26 @@ class Storage(ORM):
 class Label(ORM):
     """Labels for files & datasets.
 
-    A label can be used to simply annotating entire files or datasets as desired.
+    A label can be used to annotate a file or dataset as a whole. For instance,
+    a label could belong to "Project 1", be "curated", or indicate that a
+    dataset characterizes the "Iris flower".
 
-    A label can also be sampled _within_ a file or dataset as part of a
-    :class:`~lamindb.Feature`. In that case, annotating the file or dataset
-    means that the label occurs for some of their observations.
+    In some cases, a label is measured only within a part of a file or dataset.
+    Then, a :class:`~lamindb.Feature` qualifies the measurement and slot for the
+    label measurements (typically, a column name). For instance, the dataset
+    might contain measurements across 2 species of the Iris flower: "setosa" &
+    "versicolor".
 
     If you work with complex entities like cell lines, cell types, tissues,
     etc., consider using the pre-defined biological registries in
     :mod:`lnschema_bionty` to label files & datasets.
 
     If you work with biological samples, likely, the only sustainable way of
-    tracking metadata associated with it, is to create a custom schema module.
+    tracking metadata, is to create a custom schema module.
+
+    See Also:
+        :meth:`lamindb.Feature`
+            Qualifiers for measurements in files & datasets.
 
     Examples:
 
@@ -675,8 +683,6 @@ class Run(ORM):
     See Also:
         :meth:`lamindb.track`
             Track global Transform & Run for a notebook or pipeline.
-        :meth:`lamindb.context`
-            Global run context.
         :class:`~lamindb.Transform`
             Transformations that runs execute.
 
@@ -725,7 +731,16 @@ class Run(ORM):
 
 
 class Feature(ORM):
-    """Numerical and categorical features measured in files & datasets.
+    """Qualifiers for measurements in files & datasets.
+
+    .. info:
+        Features and labels are two ways of using entities to categorize data:
+        1. a feature qualifies which entity is measured as part of a joint measurement
+        2. a label *is* a measured value of an entity
+
+    See Also:
+        :meth:`lamindb.Label`
+            Labels for files & datasets.
 
     Notes:
 
