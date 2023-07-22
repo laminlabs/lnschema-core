@@ -506,7 +506,20 @@ class Storage(ORM):
 
 
 class Label(ORM):
-    """Simple labels for files & datasets.
+    """Labels for files & datasets.
+
+    A label can be used to simply annotating entire files or datasets as desired.
+
+    A label can also be sampled _within_ a file or dataset as part of a
+    :class:`~lamindb.Feature`. In that case, annotating the file or dataset
+    means that the label occurs for some of their observations.
+
+    If you work with complex entities like cell lines, cell types, tissues,
+    etc., consider using the pre-defined biological registries in
+    :mod:`lnschema_bionty` to label files & datasets.
+
+    If you work with biological samples, likely, the only sustainable way of
+    tracking metadata associated with it, is to create a custom schema module.
 
     Examples:
 
@@ -530,25 +543,18 @@ class Label(ORM):
         >>> file.labels.list("name")
         ['ML output']
 
-        Label a label:
+        Group labels:
 
-        >>> ln.Label(name="benchmark").save()
-        >>> label = ln.Label.select(name="benchmark").one()
-        Label(id=gelGp2P6, name=benchmark, created_by_id=DzTjkKse)
-        >>> ln.Label(name="My awesome label", external_id="Lamin-0001")
-        >>> label = ln.Label.select(name="My awesome label").one()
-        >>> label
-        Label(id=23QgqohM, name=My awesome label, external_id=Lamin-0001, created_by_id=DzTjkKse)
-        >>> label.labels.add(label)
-        >>> label.labels.list("name")
-        ['ML output']
+        >>> ln.Label(name="Project 1").save()
+        >>> project1 = ln.Label.select(name="Project 1").one()
+        >>> ln.Label(name="is_project").save()
+        >>> is_project = ln.Label.select(name="is_project").one()
+        >>> project1.parents.add(is_project)
 
         Query by label:
 
-        >>> ln.File.select(labels__name = "ML output").first()
+        >>> ln.File.select(labels=project).first()
         File(id=MveGmGJImYY5qBwmr0j0, suffix=.csv, size=4, hash=CY9rzUYh03PK3k6DJie09g, hash_type=md5, updated_at=2023-07-19 13:47:59, storage_id=597Sgod0, created_by_id=DzTjkKse) # noqa
-        >>> ln.Label.select(labels__name = "benchmark").first()
-        Label(id=23QgqohM, name=My awesome label, external_id=Lamin-0001, created_by_id=DzTjkKse)
     """
 
     id = models.CharField(max_length=8, default=base62_8, primary_key=True)
