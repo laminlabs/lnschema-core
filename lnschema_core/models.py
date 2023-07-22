@@ -437,7 +437,7 @@ class ORM(models.Model):
 
 
 class User(ORM):
-    """Users collaborating within an instance.
+    """Users.
 
     All data in this table is synched from the cloud user account to ensure a
     universal user identity, valid across DB instances and email & handle
@@ -467,16 +467,18 @@ class User(ORM):
 
 
 class Storage(ORM):
-    """Storage locations, S3 or GCP buckets or local storage locations.
+    """Storage locations: S3 or GCP buckets or local storage locations.
 
     See Also:
         :attr:`~lamindb.dev.Settings.storage`
 
     Examples:
 
-        Configure a default storage upon initiation of a LaminDB instance:
+        Configure the default storage location upon initiation of a LaminDB instance:
 
         `lamin init --storage ./mydata # or "s3://my-bucket" or "gs://my-bucket"`
+
+        View the default storage location:
 
         >>> ln.settings.storage
         PosixPath('/home/runner/work/lamindb/lamindb/docs/guide/mydata')
@@ -653,7 +655,7 @@ class Label(ORM):
     """Labels for files & datasets.
 
     A label can be used to annotate a file or dataset as a whole. For instance,
-    "Project 1", "curated", or "Iris flower".
+    with "Project 1", "curated", or "Iris flower".
 
     In some cases, a label is measured only within a part of a file or dataset.
     Then, a :class:`~lamindb.Feature` qualifies the measurement and slot for the
@@ -661,12 +663,14 @@ class Label(ORM):
     might contain measurements across 2 species of the Iris flower: "setosa" &
     "versicolor".
 
-    If you work with complex entities like cell lines, cell types, tissues,
-    etc., consider using the pre-defined biological registries in
-    :mod:`lnschema_bionty` to label files & datasets.
+    .. note::
 
-    If you work with biological samples, likely, the only sustainable way of
-    tracking metadata, is to create a custom schema module.
+        If you work with complex entities like cell lines, cell types, tissues,
+        etc., consider using the pre-defined biological registries in
+        :mod:`lnschema_bionty` to label files & datasets.
+
+        If you work with biological samples, likely, the only sustainable way of
+        tracking metadata, is to create a custom schema module.
 
     See Also:
         :meth:`lamindb.Feature`
