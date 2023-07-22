@@ -355,16 +355,16 @@ class ORM(models.Model):
             A :class:`~lamindb.dev.QuerySet`.
 
         See Also:
-            `django queries <https://docs.djangotag.com/en/4.2/topics/db/queries/>`__
+            `django queries <https://docs.djangoproject.com/en/4.2/topics/db/queries/>`__
 
         Notes:
             For more info, see tutorial: :doc:`/guide/select`.
 
         Examples:
-            >>> ln.Label(name="my tag").save()
-            >>> tag = ln.Label.select(name="my tag").one()
-            >>> tag
-            Label(id=TMn5Zuju, name=my tag, updated_at=2023-07-19 18:24:49, created_by_id=DzTjkKse)
+            >>> ln.Label(name="my label").save()
+            >>> label = ln.Label.select(name="my label").one()
+            >>> label
+            Label(id=TMn5Zuju, name=my label, updated_at=2023-07-19 18:24:49, created_by_id=DzTjkKse)
         """
         from lamindb._select import select
 
@@ -510,55 +510,55 @@ class Label(ORM):
 
     Examples:
 
-        Create a new tag:
+        Create a new label:
 
-        >>> tag = ln.Label(name="ML output")
-        >>> tag.save()
-        >>> tag
+        >>> label = ln.Label(name="ML output")
+        >>> label.save()
+        >>> label
         Label(id=gelGp2P6, name=ML output, created_by_id=DzTjkKse)
 
         Label a file:
 
-        >>> tag = ln.Label.select(name="ML output").one()
-        >>> tag
+        >>> label = ln.Label.select(name="ML output").one()
+        >>> label
         Label(id=gelGp2P6, name=ML output, created_by_id=DzTjkKse)
         >>> file = ln.File("./myfile.csv")
         >>> file.save()
         >>> file
         File(id=MveGmGJImYY5qBwmr0j0, suffix=.csv, size=4, hash=CY9rzUYh03PK3k6DJie09g, hash_type=md5, updated_at=2023-07-19 13:47:59, storage_id=597Sgod0, created_by_id=DzTjkKse) # noqa
-        >>> file.labels.add(tag)
+        >>> file.labels.add(label)
         >>> file.labels.list("name")
         ['ML output']
 
-        Label a tag:
+        Label a label:
 
         >>> ln.Label(name="benchmark").save()
-        >>> tag = ln.Label.select(name="benchmark").one()
+        >>> label = ln.Label.select(name="benchmark").one()
         Label(id=gelGp2P6, name=benchmark, created_by_id=DzTjkKse)
-        >>> ln.Label(name="My awesome tag", external_id="Lamin-0001")
-        >>> tag = ln.Label.select(name="My awesome tag").one()
-        >>> tag
-        Label(id=23QgqohM, name=My awesome tag, external_id=Lamin-0001, created_by_id=DzTjkKse)
-        >>> tag.labels.add(tag)
-        >>> tag.labels.list("name")
+        >>> ln.Label(name="My awesome label", external_id="Lamin-0001")
+        >>> label = ln.Label.select(name="My awesome label").one()
+        >>> label
+        Label(id=23QgqohM, name=My awesome label, external_id=Lamin-0001, created_by_id=DzTjkKse)
+        >>> label.labels.add(label)
+        >>> label.labels.list("name")
         ['ML output']
 
-        Query by tag:
+        Query by label:
 
         >>> ln.File.select(labels__name = "ML output").first()
         File(id=MveGmGJImYY5qBwmr0j0, suffix=.csv, size=4, hash=CY9rzUYh03PK3k6DJie09g, hash_type=md5, updated_at=2023-07-19 13:47:59, storage_id=597Sgod0, created_by_id=DzTjkKse) # noqa
         >>> ln.Label.select(labels__name = "benchmark").first()
-        Label(id=23QgqohM, name=My awesome tag, external_id=Lamin-0001, created_by_id=DzTjkKse)
+        Label(id=23QgqohM, name=My awesome label, external_id=Lamin-0001, created_by_id=DzTjkKse)
     """
 
     id = models.CharField(max_length=8, default=base62_8, primary_key=True)
     """A universal random id, valid across DB instances."""
     name = models.CharField(max_length=255, db_index=True, unique=True, default=None)
-    """Name or title of tag (required)."""
+    """Name or title of label (required)."""
     description = models.TextField(null=True, default=None)
     """A description (optional)."""
     parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
-    """Parent labels, useful to group, e.g., all tag labels (optional)."""
+    """Parent labels, useful to group, e.g., all label labels (optional)."""
     feature = models.ForeignKey("Feature", CASCADE, related_name="labels", null=True, default=None)
     """The feature in which the label is sampled (optional)."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -1011,7 +1011,7 @@ class File(ORM):
     transform = models.ForeignKey(Transform, PROTECT, related_name="files", null=True, default=None)
     """:class:`~lamindb.Transform` whose run created the `file`."""
     labels = models.ManyToManyField(Label, related_name="files")
-    """:class:`~lamindb.File` records in tag."""
+    """:class:`~lamindb.File` records in label."""
     run = models.ForeignKey(Run, PROTECT, related_name="output_files", null=True, default=None)
     """:class:`~lamindb.Run` that created the `file`."""
     input_of = models.ManyToManyField(Run, related_name="input_files")
@@ -1272,7 +1272,7 @@ class File(ORM):
         pass
 
     def load(self, is_run_input: Optional[bool] = None, stream: bool = False) -> DataLike:
-        """Stage and load to memory.
+        """Slabele and load to memory.
 
         Returns in-memory representation if possible, e.g., an `AnnData` object for an `h5ad` file.
 
@@ -1303,7 +1303,7 @@ class File(ORM):
                 varm: 'PCs'
                 obsp: 'connectivities', 'distances'
 
-            Fall back to :meth:`~lamindb.File.stage` if no in-memory representation is configured:
+            Fall back to :meth:`~lamindb.File.slabele` if no in-memory representation is configured:
 
             >>> ln.File(ln.dev.datasets.file_jpg_paradisi05(), description="paradisi05").save()
             >>> file = ln.File.select(description="paradisi05").one()
@@ -1312,7 +1312,7 @@ class File(ORM):
         """
         pass
 
-    def stage(self, is_run_input: Optional[bool] = None) -> Path:
+    def slabele(self, is_run_input: Optional[bool] = None) -> Path:
         """Update cache from cloud storage if outdated.
 
         Returns a path to a locally cached on-disk object (say, a `.jpg` file).
@@ -1323,7 +1323,7 @@ class File(ORM):
 
             >>> ln.File("s3://lamindb-ci/lndb-storage/pbmc68k.h5ad").save()
             >>> file = ln.File.select(key="lndb-storage/pbmc68k.h5ad").one()
-            >>> file.stage()
+            >>> file.slabele()
             PosixPath('/home/runner/work/Caches/lamindb/lamindb-ci/lndb-storage/pbmc68k.h5ad')
         """
         pass
