@@ -508,7 +508,7 @@ class Storage(ORM):
 
 
 class Transform(ORM):
-    """Transforms of files & datasets (:class:`~lamindb.File`).
+    """Transforms of files & datasets.
 
     Pipelines, workflows, notebooks, app-based transformations.
 
@@ -719,9 +719,15 @@ class Label(ORM):
     description = models.TextField(null=True, default=None)
     """A description (optional)."""
     parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
-    """Parent labels, useful to group, e.g., all label labels (optional)."""
+    """Parent labels, useful to hierarchically group labels (optional)."""
     feature = models.ForeignKey("Feature", CASCADE, related_name="labels", null=True, default=None)
     """The feature in which the label is sampled (optional)."""
+    ref_id = models.CharField(max_length=20, default=None, null=True)
+    """Record from a reference ontology (optional)."""
+    ref_orm = models.CharField(max_length=30, default=None, null=True)
+    """ORM providing the reference ontology (optional)."""
+    ref_schema = models.CharField(max_length=30, default=None, null=True)
+    """Schema of the ORM (optional)."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
@@ -776,7 +782,7 @@ class Feature(ORM):
     name = models.CharField(max_length=255, db_index=True, default=None)
     """Name of feature (required)."""
     type = models.CharField(max_length=96, db_index=True, null=True, default=None)
-    """Type. If an ORM, is formatted as ``"{schema_name}{ORM.__name__}"``."""
+    """Simple type."""
     unit = models.CharField(max_length=30, db_index=True, null=True, default=None)
     """Unit of measure, ideally SI, e.g., `m`, `s`, `kg`, etc."""
     description = models.TextField(db_index=True, null=True, default=None)
@@ -834,18 +840,17 @@ class FeatureSet(ORM):
 
     Note:
 
-        A `FeatureSet` is a useful entity as you might have millions of data batches
+        Feature sets are useful as you might have millions of data batches
         that measure the same features: All of them would link against a single
         feature set. If instead, you'd link against single features (say, genes),
         you'd face exploding link tables.
 
-        A `feature_set` is identified by the hash of the id set for the feature type.
+        A `feature_set` is identified by the hash of feature identifiers.
 
     Notes:
 
-        For more info, see tutorials:
-            - :doc:`/biology/scrna`
-            - :doc:`/biology/flow`
+        - :doc:`/biology/scrna`
+        - :doc:`/biology/flow`
 
     Examples:
 
@@ -866,11 +871,18 @@ class FeatureSet(ORM):
 
     id = models.CharField(max_length=20, primary_key=True, default=None)
     """A universal id (hash of the set of feature identifiers)."""
-    type = models.CharField(max_length=64, db_index=True)
-    """Type, the ORM name."""
-    schema = models.CharField(max_length=64, db_index=True)
-    """The schema where the ORM is defined."""
-    field = models.CharField(max_length=64, db_index=True)
+    name = models.CharField(max_length=128, null=True, default=None)
+    """A name (optional)."""
+    readout_abbr = models.CharField(max_length=64, null=True, default=None)
+    """The readout type, e.g., "meta", "RNA", etc.
+
+    Consider using :mod:`lnschema_bionty.ExperimentalFactor.abbr`.
+    """
+    ref_orm = models.CharField(max_length=64, db_index=True)
+    """The reference ORM for feature identifiers."""
+    ref_schema = models.CharField(max_length=64, db_index=True)
+    """The schema where the reference ORM is defined."""
+    ref_field = models.CharField(max_length=64, db_index=True)
     """Field of ORM that was hashed."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
