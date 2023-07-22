@@ -1303,7 +1303,7 @@ class File(ORM):
                 varm: 'PCs'
                 obsp: 'connectivities', 'distances'
 
-            Fall back to :meth:`~lamindb.File.slabele` if no in-memory representation is configured:
+            Fall back to :meth:`~lamindb.File.stage` if no in-memory representation is configured:
 
             >>> ln.File(ln.dev.datasets.file_jpg_paradisi05(), description="paradisi05").save()
             >>> file = ln.File.select(description="paradisi05").one()
@@ -1312,7 +1312,7 @@ class File(ORM):
         """
         pass
 
-    def slabele(self, is_run_input: Optional[bool] = None) -> Path:
+    def stage(self, is_run_input: Optional[bool] = None) -> Path:
         """Update cache from cloud storage if outdated.
 
         Returns a path to a locally cached on-disk object (say, a `.jpg` file).
@@ -1323,7 +1323,7 @@ class File(ORM):
 
             >>> ln.File("s3://lamindb-ci/lndb-storage/pbmc68k.h5ad").save()
             >>> file = ln.File.select(key="lndb-storage/pbmc68k.h5ad").one()
-            >>> file.slabele()
+            >>> file.stage()
             PosixPath('/home/runner/work/Caches/lamindb/lamindb-ci/lndb-storage/pbmc68k.h5ad')
         """
         pass
