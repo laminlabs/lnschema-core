@@ -138,4 +138,9 @@ class Migration(migrations.Migration):
             name="feature",
             field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.CASCADE, related_name="labels", to="lnschema_core.feature"),
         ),
+        migrations.AlterField(
+            model_name="dataset",
+            name="labels",
+            field=models.ManyToManyField(related_name="datasets", to="lnschema_core.label"),
+        ),
     ]

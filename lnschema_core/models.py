@@ -1086,7 +1086,7 @@ class File(ORM):
             >>> file
             File(id=kV3JQuBw4izvUdAkjO4p, suffix=.parquet, description=Iris flower dataset batch1, size=5334, hash=RraiKH9BAtAgS5jg7LWUiA, hash_type=md5, storage_id=Zl2q0vQB, created_by_id=DzTjkKse) # noqa
             >>> file.save()
-            💬 Created 2 Category records with a single field value
+            💬 Created 2 Label records with a single field value
             💡 storing file kV3JQuBw4izvUdAkjO4p with key .lamindb/kV3JQuBw4izvUdAkjO4p.parquet
         """
         pass
@@ -1411,7 +1411,7 @@ class Dataset(ORM):
     """Hash of dataset content. 86 base64 chars allow to store 64 bytes, 512 bits."""
     feature_sets = models.ManyToManyField("FeatureSet", related_name="datasets")
     """The feature sets measured in this dataset (see :class:`~lamindb.FeatureSet`)."""
-    labels = models.ManyToManyField("Category", related_name="datasets")
+    labels = models.ManyToManyField("Label", related_name="datasets")
     """Categories of categorical features sampled in the dataset (see :class:`~lamindb.Feature`)."""
     file = models.ForeignKey("File", on_delete=PROTECT, null=True, unique=True, related_name="datasets")
     """Storage of dataset as a one file."""
