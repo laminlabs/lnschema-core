@@ -92,9 +92,9 @@ class ORM(models.Model):
         Examples:
             >>> ln.File(ln.dev.datasets.file_jpg_paradisi05(), description="paradisi05").save()
             >>> file = ln.File.select(description="paradisi05").one()
-            >>> ln.save(ln.Tag.from_values(["image", "benchmark", "example"], field="name"))
-            >>> tags = ln.Tag.select(name__in = ["image", "benchmark", "example"]).all()
-            >>> file.tags.set(tags)
+            >>> ln.save(ln.Label.from_values(["image", "benchmark", "example"], field="name"))
+            >>> labels = ln.Label.select(name__in = ["image", "benchmark", "example"]).all()
+            >>> file.labels.set(labels)
             >>> file.describe()
             File(id=jb7BY5UJoQVGMUOKiLcn, key=None, suffix=.jpg, description=paradisi05, size=29358, hash=r4tnqmKI_SjrkdLzpuWp4g, hash_type=md5, created_at=2023-07-19 15:48:26.485889+00:00, updated_at=2023-07-19 16:43:17.792241+00:00) # noqa
             ...
@@ -104,7 +104,7 @@ class ORM(models.Model):
                 🔗 run: None
                 🔗 created_by: User(id=DzTjkKse, handle=testuser1, email=testuser1@lamin.ai, name=Test User1, updated_at=2023-07-19 14:18:21)
             Many-to-Many:
-                🔗 tags (3): ['benchmark', 'example', 'image']
+                🔗 labels (3): ['benchmark', 'example', 'image']
         """
         pass
 
@@ -180,12 +180,12 @@ class ORM(models.Model):
 
             Bulk create records:
 
-            >>> tags = ln.Tag.from_values(["benchmark", "prediction", "test"], field="name")
-            💬 Created 3 Tag records with a single field name
-            >>> tags
-            [Tag(id=mDahtPrz, name=benchmark, created_by_id=DzTjkKse),
-            Tag(id=2Sjmn9il, name=prediction, created_by_id=DzTjkKse),
-            Tag(id=gdxrHdTA, name=test, created_by_id=DzTjkKse)]
+            >>> labels = ln.Label.from_values(["benchmark", "prediction", "test"], field="name")
+            💬 Created 3 Label records with a single field name
+            >>> labels
+            [Label(id=mDahtPrz, name=benchmark, created_by_id=DzTjkKse),
+            Label(id=2Sjmn9il, name=prediction, created_by_id=DzTjkKse),
+            Label(id=gdxrHdTA, name=test, created_by_id=DzTjkKse)]
 
             Bulk create records with shared kwargs:
 
@@ -198,13 +198,13 @@ class ORM(models.Model):
 
             Returns existing records:
 
-            >>> ln.save(ln.Tag.from_values(["benchmark", "prediction", "test"], field="name"))
-            >>> tags = ln.Tag.from_values(["benchmark", "prediction", "test"], field="name")
-            💬 Returned 3 existing Tag DB records that matched name field
-            >>> tags
-            [Tag(id=iV3DXy70, name=benchmark, updated_at=2023-07-19 16:07:50, created_by_id=DzTjkKse),
-            Tag(id=99aB57DI, name=prediction, updated_at=2023-07-19 16:07:50, created_by_id=DzTjkKse),
-            Tag(id=ueaGXwuL, name=test, updated_at=2023-07-19 16:07:50, created_by_id=DzTjkKse)]
+            >>> ln.save(ln.Label.from_values(["benchmark", "prediction", "test"], field="name"))
+            >>> labels = ln.Label.from_values(["benchmark", "prediction", "test"], field="name")
+            💬 Returned 3 existing Label DB records that matched name field
+            >>> labels
+            [Label(id=iV3DXy70, name=benchmark, updated_at=2023-07-19 16:07:50, created_by_id=DzTjkKse),
+            Label(id=99aB57DI, name=prediction, updated_at=2023-07-19 16:07:50, created_by_id=DzTjkKse),
+            Label(id=ueaGXwuL, name=test, updated_at=2023-07-19 16:07:50, created_by_id=DzTjkKse)]
 
             Bulk create records from bionty:
 
@@ -355,16 +355,16 @@ class ORM(models.Model):
             A :class:`~lamindb.dev.QuerySet`.
 
         See Also:
-            `django queries <https://docs.djangotag.com/en/4.2/topics/db/queries/>`__
+            `django queries <https://docs.djangoproject.com/en/4.2/topics/db/queries/>`__
 
         Notes:
             For more info, see tutorial: :doc:`/guide/select`.
 
         Examples:
-            >>> ln.Tag(name="my tag").save()
-            >>> tag = ln.Tag.select(name="my tag").one()
-            >>> tag
-            Tag(id=TMn5Zuju, name=my tag, updated_at=2023-07-19 18:24:49, created_by_id=DzTjkKse)
+            >>> ln.Label(name="my label").save()
+            >>> label = ln.Label.select(name="my label").one()
+            >>> label
+            Label(id=TMn5Zuju, name=my label, updated_at=2023-07-19 18:24:49, created_by_id=DzTjkKse)
         """
         from lamindb._select import select
 
@@ -400,13 +400,13 @@ class ORM(models.Model):
             :meth:`~lamindb.dev.ORM.lookup`
 
         Examples:
-            >>> ln.save(ln.Tag.from_values(["Tag1", "Tag2", "Tag3"], field="name"))
-            >>> ln.Tag.search("Tag2")
+            >>> ln.save(ln.Label.from_values(["Label1", "Label2", "Label3"], field="name"))
+            >>> ln.Label.search("Label2")
                         id   __ratio__
             name
-            Tag2  o3FY3c5n  100.000000
-            Tag1  CcFPLmpq   75.000000
-            Tag3  Qi3c4utq   75.000000
+            Label2  o3FY3c5n  100.000000
+            Label1  CcFPLmpq   75.000000
+            Label3  Qi3c4utq   75.000000
         """
         pass
 
@@ -505,66 +505,77 @@ class Storage(ORM):
     """Creator of record, a :class:`~lamindb.User`."""
 
 
-class Tag(ORM):
-    """Simple tags for files & datasets.
+class Label(ORM):
+    """Labels for files & datasets.
+
+    A label can be used to simply annotating entire files or datasets as desired.
+
+    A label can also be sampled _within_ a file or dataset as part of a
+    :class:`~lamindb.Feature`. In that case, annotating the file or dataset
+    means that the label occurs for some of their observations.
+
+    If you work with complex entities like cell lines, cell types, tissues,
+    etc., consider using the pre-defined biological registries in
+    :mod:`lnschema_bionty` to label files & datasets.
+
+    If you work with biological samples, likely, the only sustainable way of
+    tracking metadata associated with it, is to create a custom schema module.
 
     Examples:
 
-        Create a new tag:
+        Create a new label:
 
-        >>> tag = ln.Tag(name="ML output")
-        >>> tag.save()
-        >>> tag
-        Tag(id=gelGp2P6, name=ML output, created_by_id=DzTjkKse)
+        >>> label = ln.Label(name="ML output")
+        >>> label.save()
+        >>> label
+        Label(id=gelGp2P6, name=ML output, created_by_id=DzTjkKse)
 
-        Tag a file:
+        Label a file:
 
-        >>> tag = ln.Tag.select(name="ML output").one()
-        >>> tag
-        Tag(id=gelGp2P6, name=ML output, created_by_id=DzTjkKse)
+        >>> label = ln.Label.select(name="ML output").one()
+        >>> label
+        Label(id=gelGp2P6, name=ML output, created_by_id=DzTjkKse)
         >>> file = ln.File("./myfile.csv")
         >>> file.save()
         >>> file
         File(id=MveGmGJImYY5qBwmr0j0, suffix=.csv, size=4, hash=CY9rzUYh03PK3k6DJie09g, hash_type=md5, updated_at=2023-07-19 13:47:59, storage_id=597Sgod0, created_by_id=DzTjkKse) # noqa
-        >>> file.tags.add(tag)
-        >>> file.tags.list("name")
+        >>> file.labels.add(label)
+        >>> file.labels.list("name")
         ['ML output']
 
-        Tag a tag:
+        Group labels:
 
-        >>> ln.Tag(name="benchmark").save()
-        >>> tag = ln.Tag.select(name="benchmark").one()
-        Tag(id=gelGp2P6, name=benchmark, created_by_id=DzTjkKse)
-        >>> ln.Tag(name="My awesome tag", external_id="Lamin-0001")
-        >>> tag = ln.Tag.select(name="My awesome tag").one()
-        >>> tag
-        Tag(id=23QgqohM, name=My awesome tag, external_id=Lamin-0001, created_by_id=DzTjkKse)
-        >>> tag.tags.add(tag)
-        >>> tag.tags.list("name")
-        ['ML output']
+        >>> ln.Label(name="Project 1").save()
+        >>> project1 = ln.Label.select(name="Project 1").one()
+        >>> ln.Label(name="is_project").save()
+        >>> is_project = ln.Label.select(name="is_project").one()
+        >>> project1.parents.add(is_project)
 
-        Query by tag:
+        Query by label:
 
-        >>> ln.File.select(tags__name = "ML output").first()
+        >>> ln.File.select(labels=project).first()
         File(id=MveGmGJImYY5qBwmr0j0, suffix=.csv, size=4, hash=CY9rzUYh03PK3k6DJie09g, hash_type=md5, updated_at=2023-07-19 13:47:59, storage_id=597Sgod0, created_by_id=DzTjkKse) # noqa
-        >>> ln.Tag.select(tags__name = "benchmark").first()
-        Tag(id=23QgqohM, name=My awesome tag, external_id=Lamin-0001, created_by_id=DzTjkKse)
     """
 
     id = models.CharField(max_length=8, default=base62_8, primary_key=True)
     """A universal random id, valid across DB instances."""
     name = models.CharField(max_length=255, db_index=True, unique=True, default=None)
-    """Name or title of tag."""
+    """Name or title of label (required)."""
     description = models.TextField(null=True, default=None)
-    """A description."""
+    """A description (optional)."""
     parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
-    """Parent tags, useful to group, e.g., all tag tags."""
+    """Parent labels, useful to group, e.g., all label labels (optional)."""
+    feature = models.ForeignKey("Feature", CASCADE, related_name="labels", null=True, default=None)
+    """The feature in which the label is sampled (optional)."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
-    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_tags")
+    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_labels")
     """Creator of record, a :class:`~lamindb.User`."""
+
+    class Meta:
+        unique_together = (("name", "feature"),)
 
 
 class Transform(ORM):
@@ -901,34 +912,6 @@ class FeatureSet(ORM):
         """Save."""
 
 
-class Category(ORM):
-    """Sampled categories for features.
-
-    This is the default registry for tracking categories sampled for categorical
-    features.
-
-    If you're working a lot with different cell lines, proteins, genes, or other
-    entities of complexity, consider using the pre-defined biological registries
-    in :mod:`lnschema_bionty`.
-    """
-
-    id = models.CharField(max_length=12, default=base62_12, primary_key=True)
-    """Universal id, valid across DB instances."""
-    name = models.CharField(max_length=128, db_index=True)
-    """The name or the string value of the category."""
-    feature = models.ForeignKey(Feature, CASCADE, related_name="categories")
-    """Feature."""
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    """Time of creation of record."""
-    updated_at = models.DateTimeField(auto_now=True, db_index=True)
-    """Time of last update to record."""
-    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_categories")
-    """Creator of record, a :class:`~lamindb.User`."""
-
-    class Meta:
-        unique_together = (("name", "feature"),)
-
-
 class File(ORM):
     """Batches of data stored as files and objects.
 
@@ -1031,13 +1014,11 @@ class File(ORM):
     """Type of hash."""
     feature_sets = models.ManyToManyField(FeatureSet, related_name="files")
     """The feature sets measured in the file (see :class:`~lamindb.FeatureSet`)."""
-    categories = models.ManyToManyField(Category, related_name="files")
-    """Categories of categorical features sampled in the file (see :class:`~lamindb.Feature`)."""
-    transform = models.ForeignKey(Transform, PROTECT, related_name="files", null=True)
+    transform = models.ForeignKey(Transform, PROTECT, related_name="files", null=True, default=None)
     """:class:`~lamindb.Transform` whose run created the `file`."""
-    tags = models.ManyToManyField(Tag, related_name="files")
-    """:class:`~lamindb.File` records in tag."""
-    run = models.ForeignKey(Run, PROTECT, related_name="output_files", null=True)
+    labels = models.ManyToManyField(Label, related_name="files")
+    """:class:`~lamindb.File` records in label."""
+    run = models.ForeignKey(Run, PROTECT, related_name="output_files", null=True, default=None)
     """:class:`~lamindb.Run` that created the `file`."""
     input_of = models.ManyToManyField(Run, related_name="input_files")
     """Runs that use this file as an input."""
@@ -1111,7 +1092,7 @@ class File(ORM):
             >>> file
             File(id=kV3JQuBw4izvUdAkjO4p, suffix=.parquet, description=Iris flower dataset batch1, size=5334, hash=RraiKH9BAtAgS5jg7LWUiA, hash_type=md5, storage_id=Zl2q0vQB, created_by_id=DzTjkKse) # noqa
             >>> file.save()
-            💬 Created 2 Category records with a single field value
+            💬 Created 2 Label records with a single field value
             💡 storing file kV3JQuBw4izvUdAkjO4p with key .lamindb/kV3JQuBw4izvUdAkjO4p.parquet
         """
         pass
@@ -1297,7 +1278,7 @@ class File(ORM):
         pass
 
     def load(self, is_run_input: Optional[bool] = None, stream: bool = False) -> DataLike:
-        """Stage and load to memory.
+        """Slabele and load to memory.
 
         Returns in-memory representation if possible, e.g., an `AnnData` object for an `h5ad` file.
 
@@ -1436,7 +1417,7 @@ class Dataset(ORM):
     """Hash of dataset content. 86 base64 chars allow to store 64 bytes, 512 bits."""
     feature_sets = models.ManyToManyField("FeatureSet", related_name="datasets")
     """The feature sets measured in this dataset (see :class:`~lamindb.FeatureSet`)."""
-    categories = models.ManyToManyField("Category", related_name="datasets")
+    labels = models.ManyToManyField("Label", related_name="datasets")
     """Categories of categorical features sampled in the dataset (see :class:`~lamindb.Feature`)."""
     file = models.ForeignKey("File", on_delete=PROTECT, null=True, unique=True, related_name="datasets")
     """Storage of dataset as a one file."""

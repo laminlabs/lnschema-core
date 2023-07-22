@@ -12,16 +12,13 @@ if _INSTANCE_SETUP:
     from . import ids, types
     from .models import (  # type: ignore
         ORM,
-        Category,
         Dataset,
         Feature,
         FeatureSet,
         File,
+        Label,
         Run,
         Storage,
-        Tag,
         Transform,
         User,
     )
-
-    Features = FeatureSet  # backward compat
