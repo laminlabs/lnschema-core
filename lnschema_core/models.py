@@ -505,87 +505,6 @@ class Storage(ORM):
     """Creator of record, a :class:`~lamindb.User`."""
 
 
-class Label(ORM):
-    """Labels for files & datasets.
-
-    A label can be used to annotate a file or dataset as a whole. For instance,
-    a label could belong to "Project 1", be "curated", or indicate that a
-    dataset characterizes the "Iris flower".
-
-    In some cases, a label is measured only within a part of a file or dataset.
-    Then, a :class:`~lamindb.Feature` qualifies the measurement and slot for the
-    label measurements (typically, a column name). For instance, the dataset
-    might contain measurements across 2 species of the Iris flower: "setosa" &
-    "versicolor".
-
-    If you work with complex entities like cell lines, cell types, tissues,
-    etc., consider using the pre-defined biological registries in
-    :mod:`lnschema_bionty` to label files & datasets.
-
-    If you work with biological samples, likely, the only sustainable way of
-    tracking metadata, is to create a custom schema module.
-
-    See Also:
-        :meth:`lamindb.Feature`
-            Qualifiers for measurements in files & datasets.
-
-    Examples:
-
-        Create a new label:
-
-        >>> label = ln.Label(name="ML output")
-        >>> label.save()
-        >>> label
-        Label(id=gelGp2P6, name=ML output, created_by_id=DzTjkKse)
-
-        Label a file:
-
-        >>> label = ln.Label.select(name="ML output").one()
-        >>> label
-        Label(id=gelGp2P6, name=ML output, created_by_id=DzTjkKse)
-        >>> file = ln.File("./myfile.csv")
-        >>> file.save()
-        >>> file
-        File(id=MveGmGJImYY5qBwmr0j0, suffix=.csv, size=4, hash=CY9rzUYh03PK3k6DJie09g, hash_type=md5, updated_at=2023-07-19 13:47:59, storage_id=597Sgod0, created_by_id=DzTjkKse) # noqa
-        >>> file.labels.add(label)
-        >>> file.labels.list("name")
-        ['ML output']
-
-        Group labels:
-
-        >>> ln.Label(name="Project 1").save()
-        >>> project1 = ln.Label.select(name="Project 1").one()
-        >>> ln.Label(name="is_project").save()
-        >>> is_project = ln.Label.select(name="is_project").one()
-        >>> project1.parents.add(is_project)
-
-        Query by label:
-
-        >>> ln.File.select(labels=project).first()
-        File(id=MveGmGJImYY5qBwmr0j0, suffix=.csv, size=4, hash=CY9rzUYh03PK3k6DJie09g, hash_type=md5, updated_at=2023-07-19 13:47:59, storage_id=597Sgod0, created_by_id=DzTjkKse) # noqa
-    """
-
-    id = models.CharField(max_length=8, default=base62_8, primary_key=True)
-    """A universal random id, valid across DB instances."""
-    name = models.CharField(max_length=255, db_index=True, unique=True, default=None)
-    """Name or title of label (required)."""
-    description = models.TextField(null=True, default=None)
-    """A description (optional)."""
-    parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
-    """Parent labels, useful to group, e.g., all label labels (optional)."""
-    feature = models.ForeignKey("Feature", CASCADE, related_name="labels", null=True, default=None)
-    """The feature in which the label is sampled (optional)."""
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    """Time of creation of record."""
-    updated_at = models.DateTimeField(auto_now=True, db_index=True)
-    """Time of last update to record."""
-    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_labels")
-    """Creator of record, a :class:`~lamindb.User`."""
-
-    class Meta:
-        unique_together = (("name", "feature"),)
-
-
 class Transform(ORM):
     """Transforms of files & datasets (:class:`~lamindb.File`).
 
@@ -730,12 +649,94 @@ class Run(ORM):
     """Creator of record, a :class:`~lamindb.User`."""
 
 
+class Label(ORM):
+    """Labels for files & datasets.
+
+    A label can be used to annotate a file or dataset as a whole. For instance,
+    "Project 1", "curated", or "Iris flower".
+
+    In some cases, a label is measured only within a part of a file or dataset.
+    Then, a :class:`~lamindb.Feature` qualifies the measurement and slot for the
+    label measurements (typically, a column name). For instance, the dataset
+    might contain measurements across 2 species of the Iris flower: "setosa" &
+    "versicolor".
+
+    If you work with complex entities like cell lines, cell types, tissues,
+    etc., consider using the pre-defined biological registries in
+    :mod:`lnschema_bionty` to label files & datasets.
+
+    If you work with biological samples, likely, the only sustainable way of
+    tracking metadata, is to create a custom schema module.
+
+    See Also:
+        :meth:`lamindb.Feature`
+            Qualifiers for measurements in files & datasets.
+
+    Examples:
+
+        Create a new label:
+
+        >>> label = ln.Label(name="ML output")
+        >>> label.save()
+        >>> label
+        Label(id=gelGp2P6, name=ML output, created_by_id=DzTjkKse)
+
+        Label a file:
+
+        >>> label = ln.Label.select(name="ML output").one()
+        >>> label
+        Label(id=gelGp2P6, name=ML output, created_by_id=DzTjkKse)
+        >>> file = ln.File("./myfile.csv")
+        >>> file.save()
+        >>> file
+        File(id=MveGmGJImYY5qBwmr0j0, suffix=.csv, size=4, hash=CY9rzUYh03PK3k6DJie09g, hash_type=md5, updated_at=2023-07-19 13:47:59, storage_id=597Sgod0, created_by_id=DzTjkKse) # noqa
+        >>> file.labels.add(label)
+        >>> file.labels.list("name")
+        ['ML output']
+
+        Group labels:
+
+        >>> ln.Label(name="Project 1").save()
+        >>> project1 = ln.Label.select(name="Project 1").one()
+        >>> ln.Label(name="is_project").save()
+        >>> is_project = ln.Label.select(name="is_project").one()
+        >>> project1.parents.add(is_project)
+
+        Query by label:
+
+        >>> ln.File.select(labels=project).first()
+        File(id=MveGmGJImYY5qBwmr0j0, suffix=.csv, size=4, hash=CY9rzUYh03PK3k6DJie09g, hash_type=md5, updated_at=2023-07-19 13:47:59, storage_id=597Sgod0, created_by_id=DzTjkKse) # noqa
+    """
+
+    id = models.CharField(max_length=8, default=base62_8, primary_key=True)
+    """A universal random id, valid across DB instances."""
+    name = models.CharField(max_length=255, db_index=True, unique=True, default=None)
+    """Name or title of label (required)."""
+    description = models.TextField(null=True, default=None)
+    """A description (optional)."""
+    parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
+    """Parent labels, useful to group, e.g., all label labels (optional)."""
+    feature = models.ForeignKey("Feature", CASCADE, related_name="labels", null=True, default=None)
+    """The feature in which the label is sampled (optional)."""
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    """Time of creation of record."""
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    """Time of last update to record."""
+    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_labels")
+    """Creator of record, a :class:`~lamindb.User`."""
+
+    class Meta:
+        unique_together = (("name", "feature"),)
+
+
 class Feature(ORM):
     """Qualifiers for measurements in files & datasets.
 
-    .. info:
-        Features and labels are two ways of using entities to categorize data:
-        1. a feature qualifies which entity is measured as part of a joint measurement
+    .. note::
+
+        *Features* and *labels* are two ways of using entities to structure & categorize data:
+
+        1. a feature qualifies *which entity* is measured as part of a *joint* measurement
         2. a label *is* a measured value of an entity
 
     See Also:
@@ -744,12 +745,12 @@ class Feature(ORM):
 
     Notes:
 
-        For more control, you can use `lnschema_bionty` ORMs to manage common
-        basic biological features like expression of genes, proteins & cell
-        markers.
+        For more control, you can use :mod:`lnschema_bionty` ORMs to manage
+        common basic biological entities like genes, proteins & cell markers
+        involved in expression/count measurements.
 
         Similarly, you can define custom ORMs to manage high-level derived
-        features like gene sets, nodes, etc.
+        features like gene sets, malignancy, etc.
 
     Examples:
 
