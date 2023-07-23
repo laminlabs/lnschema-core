@@ -847,18 +847,11 @@ class Feature(ORM):
 class FeatureSet(ORM):
     """Jointly measured sets of features.
 
-    Args:
-        features: `Iterable[ORM]` An iterable of :class:`~lamindb.Feature`
-            records to hash, e.g., `[Feature(...), Feature(...)]. Is turned into
-            a set upon instantiation. If you'd like to pass values, use
-            :meth:`~lamindb.FeatureSet.from_values` or
-            :meth:`~lamindb.FeatureSet.from_df`.
-        ref_field: `Optional[str] = "id"` The field providing the identifier to
-            hash.
-        readout: Optional[str]: `Optional[str] = None` An abbreviation for
-            the readout measured for each feature, ideally from,
-            :mod:`lnschema_bionty.ExperimentalFactor.abbr`.
-        name: `Optional[str] = None` A name.
+    See Also:
+        :meth:`~lamindb.FeatureSet.from_values`
+            Create from values.
+        :meth:`~lamindb.FeatureSet.from_df`
+            Create from dataframe columns.
 
     Note:
 
@@ -869,11 +862,21 @@ class FeatureSet(ORM):
 
         A `feature_set` is identified by the hash of feature identifiers.
 
-    See Also:
-        :meth:`~lamindb.FeatureSet.from_values`
-            Create from values.
-        :meth:`~lamindb.FeatureSet.from_df`
-            Create from dataframe columns.
+    Args:
+        features: `Iterable[ORM]` An iterable of :class:`~lamindb.Feature`
+            records to hash, e.g., `[Feature(...), Feature(...)]. Is turned into
+            a set upon instantiation. If you'd like to pass values, use
+            :meth:`~lamindb.FeatureSet.from_values` or
+            :meth:`~lamindb.FeatureSet.from_df`.
+        ref_field: `Optional[str] = "id"` The field providing the identifier to
+            hash.
+        type: `Optional[Union[Type, str]] = None` The simple type. Defaults to
+            `None` if reference ORM is :class:`~lamindb.Feature`, defaults to
+            `"float"` otherwise.
+        readout: Optional[str]: `Optional[str] = None` An abbreviation for
+            the readout measured for each feature, ideally from,
+            :mod:`lnschema_bionty.ExperimentalFactor.abbr`.
+        name: `Optional[str] = None` A name.
 
     Notes:
 
@@ -925,9 +928,10 @@ class FeatureSet(ORM):
     def __init__(
         self,
         features: Iterable[ORM],
-        ref_field: Optional[str],
-        readout: Optional[str],
-        name: Optional[str],
+        ref_field: Optional[str] = None,
+        type: Optional[Union[Type, str]] = None,
+        readout: Optional[str] = None,
+        name: Optional[str] = None,
     ):
         ...
 
