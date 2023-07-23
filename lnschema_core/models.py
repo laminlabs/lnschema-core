@@ -10,6 +10,7 @@ from typing import (  # noqa
     Literal,
     NamedTuple,
     Optional,
+    Type,
     Union,
     overload,
 )
@@ -437,7 +438,7 @@ class ORM(models.Model):
 
 
 class User(ORM):
-    """Users collaborating within an instance.
+    """Users.
 
     All data in this table is synched from the cloud user account to ensure a
     universal user identity, valid across DB instances and email & handle
@@ -467,16 +468,18 @@ class User(ORM):
 
 
 class Storage(ORM):
-    """Storage locations, S3 or GCP buckets or local storage locations.
+    """Storage locations: S3 or GCP buckets or local storage locations.
 
     See Also:
         :attr:`~lamindb.dev.Settings.storage`
 
     Examples:
 
-        Configure a default storage upon initiation of a LaminDB instance:
+        Configure the default storage location upon initiation of a LaminDB instance:
 
         `lamin init --storage ./mydata # or "s3://my-bucket" or "gs://my-bucket"`
+
+        View the default storage location:
 
         >>> ln.settings.storage
         PosixPath('/home/runner/work/lamindb/lamindb/docs/guide/mydata')
@@ -505,81 +508,8 @@ class Storage(ORM):
     """Creator of record, a :class:`~lamindb.User`."""
 
 
-class Label(ORM):
-    """Labels for files & datasets.
-
-    A label can be used to simply annotating entire files or datasets as desired.
-
-    A label can also be sampled _within_ a file or dataset as part of a
-    :class:`~lamindb.Feature`. In that case, annotating the file or dataset
-    means that the label occurs for some of their observations.
-
-    If you work with complex entities like cell lines, cell types, tissues,
-    etc., consider using the pre-defined biological registries in
-    :mod:`lnschema_bionty` to label files & datasets.
-
-    If you work with biological samples, likely, the only sustainable way of
-    tracking metadata associated with it, is to create a custom schema module.
-
-    Examples:
-
-        Create a new label:
-
-        >>> label = ln.Label(name="ML output")
-        >>> label.save()
-        >>> label
-        Label(id=gelGp2P6, name=ML output, created_by_id=DzTjkKse)
-
-        Label a file:
-
-        >>> label = ln.Label.select(name="ML output").one()
-        >>> label
-        Label(id=gelGp2P6, name=ML output, created_by_id=DzTjkKse)
-        >>> file = ln.File("./myfile.csv")
-        >>> file.save()
-        >>> file
-        File(id=MveGmGJImYY5qBwmr0j0, suffix=.csv, size=4, hash=CY9rzUYh03PK3k6DJie09g, hash_type=md5, updated_at=2023-07-19 13:47:59, storage_id=597Sgod0, created_by_id=DzTjkKse) # noqa
-        >>> file.labels.add(label)
-        >>> file.labels.list("name")
-        ['ML output']
-
-        Group labels:
-
-        >>> ln.Label(name="Project 1").save()
-        >>> project1 = ln.Label.select(name="Project 1").one()
-        >>> ln.Label(name="is_project").save()
-        >>> is_project = ln.Label.select(name="is_project").one()
-        >>> project1.parents.add(is_project)
-
-        Query by label:
-
-        >>> ln.File.select(labels=project).first()
-        File(id=MveGmGJImYY5qBwmr0j0, suffix=.csv, size=4, hash=CY9rzUYh03PK3k6DJie09g, hash_type=md5, updated_at=2023-07-19 13:47:59, storage_id=597Sgod0, created_by_id=DzTjkKse) # noqa
-    """
-
-    id = models.CharField(max_length=8, default=base62_8, primary_key=True)
-    """A universal random id, valid across DB instances."""
-    name = models.CharField(max_length=255, db_index=True, unique=True, default=None)
-    """Name or title of label (required)."""
-    description = models.TextField(null=True, default=None)
-    """A description (optional)."""
-    parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
-    """Parent labels, useful to group, e.g., all label labels (optional)."""
-    feature = models.ForeignKey("Feature", CASCADE, related_name="labels", null=True, default=None)
-    """The feature in which the label is sampled (optional)."""
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    """Time of creation of record."""
-    updated_at = models.DateTimeField(auto_now=True, db_index=True)
-    """Time of last update to record."""
-    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_labels")
-    """Creator of record, a :class:`~lamindb.User`."""
-
-    class Meta:
-        unique_together = (("name", "feature"),)
-
-
 class Transform(ORM):
-    """Transforms of files & datasets (:class:`~lamindb.File`).
+    """Transforms of files & datasets.
 
     Pipelines, workflows, notebooks, app-based transformations.
 
@@ -675,8 +605,6 @@ class Run(ORM):
     See Also:
         :meth:`lamindb.track`
             Track global Transform & Run for a notebook or pipeline.
-        :meth:`lamindb.context`
-            Global run context.
         :class:`~lamindb.Transform`
             Transformations that runs execute.
 
@@ -724,17 +652,127 @@ class Run(ORM):
     """Creator of record, a :class:`~lamindb.User`."""
 
 
+class Label(ORM):
+    """Labels for files & datasets.
+
+    A label can be used to annotate a file or dataset as a whole. For instance,
+    with "Project 1", "curated", or "Iris flower".
+
+    In some cases, a label is measured only within a part of a file or dataset.
+    Then, a :class:`~lamindb.Feature` qualifies the measurement and slot for the
+    label measurements (typically, a column name). For instance, the dataset
+    might contain measurements across 2 species of the Iris flower: "setosa" &
+    "versicolor".
+
+    .. note::
+
+        If you work with complex entities like cell lines, cell types, tissues,
+        etc., consider using the pre-defined biological registries in
+        :mod:`lnschema_bionty` to label files & datasets.
+
+        If you work with biological samples, likely, the only sustainable way of
+        tracking metadata, is to create a custom schema module.
+
+    See Also:
+        :meth:`lamindb.Feature`
+            Qualifiers for measurements in files & datasets.
+
+    Examples:
+
+        Create a new label:
+
+        >>> label = ln.Label(name="ML output")
+        >>> label.save()
+        >>> label
+        Label(id=gelGp2P6, name=ML output, created_by_id=DzTjkKse)
+
+        Label a file:
+
+        >>> label = ln.Label.select(name="ML output").one()
+        >>> label
+        Label(id=gelGp2P6, name=ML output, created_by_id=DzTjkKse)
+        >>> file = ln.File("./myfile.csv")
+        >>> file.save()
+        >>> file
+        File(id=MveGmGJImYY5qBwmr0j0, suffix=.csv, size=4, hash=CY9rzUYh03PK3k6DJie09g, hash_type=md5, updated_at=2023-07-19 13:47:59, storage_id=597Sgod0, created_by_id=DzTjkKse) # noqa
+        >>> file.labels.add(label)
+        >>> file.labels.list("name")
+        ['ML output']
+
+        Group labels:
+
+        >>> ln.Label(name="Project 1").save()
+        >>> project1 = ln.Label.select(name="Project 1").one()
+        >>> ln.Label(name="is_project").save()
+        >>> is_project = ln.Label.select(name="is_project").one()
+        >>> project1.parents.add(is_project)
+
+        Query by label:
+
+        >>> ln.File.select(labels=project).first()
+        File(id=MveGmGJImYY5qBwmr0j0, suffix=.csv, size=4, hash=CY9rzUYh03PK3k6DJie09g, hash_type=md5, updated_at=2023-07-19 13:47:59, storage_id=597Sgod0, created_by_id=DzTjkKse) # noqa
+    """
+
+    id = models.CharField(max_length=8, default=base62_8, primary_key=True)
+    """A universal random id, valid across DB instances."""
+    name = models.CharField(max_length=255, db_index=True, unique=True, default=None)
+    """Name or title of label (required)."""
+    description = models.TextField(null=True, default=None)
+    """A description (optional)."""
+    parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
+    """Parent labels, useful to hierarchically group labels (optional)."""
+    feature = models.ForeignKey("Feature", CASCADE, related_name="labels", null=True, default=None)
+    """The feature in which the label is sampled (optional)."""
+    ref_id = models.CharField(max_length=20, default=None, null=True)
+    """Record from a reference ontology (optional)."""
+    ref_orm = models.CharField(max_length=30, default=None, null=True)
+    """ORM providing the reference ontology (optional)."""
+    ref_schema = models.CharField(max_length=30, default=None, null=True)
+    """Schema of the ORM (optional)."""
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    """Time of creation of record."""
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    """Time of last update to record."""
+    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_labels")
+    """Creator of record, a :class:`~lamindb.User`."""
+
+    class Meta:
+        unique_together = (("name", "feature"),)
+
+
 class Feature(ORM):
-    """Numerical and categorical features measured in files & datasets.
+    """Qualifiers for measurements in files & datasets.
+
+    See Also:
+        :meth:`~lamindb.Feature.from_df`
+            Create feature records from DataFrame.
+        :meth:`lamindb.Label`
+            Labels for files & datasets.
+
+    Args:
+        name: `str` Name of the feature, typically, a column name.
+        type: `str` Simple type ("float", "int", "str", "categorical"). If
+            "categorical", consider managing categories with
+            :class:`~lamindb.Label`.
+        unit: `Optional[str] = None` Unit of measure, ideally SI (`m`, `s`, `kg`, etc.) or 'normalized' etc.
+        description: `Optional[str] = None` A description.
+        synonyms: `Optional[str] = None` Bar-separated synonyms.
+
+    .. note::
+
+        *Features* and *labels* are two ways of using entities to structure & categorize data:
+
+        1. a feature qualifies *which entity* is measured as part of a *joint* measurement
+        2. a label *is* a measured value of an entity
 
     Notes:
 
-        For more control, you can use `lnschema_bionty` ORMs to manage common
-        basic biological features like expression of genes, proteins & cell
-        markers.
+        For more control, you can use :mod:`lnschema_bionty` ORMs to manage
+        common basic biological entities like genes, proteins & cell markers
+        involved in expression/count measurements.
 
         Similarly, you can define custom ORMs to manage high-level derived
-        features like gene sets, nodes, etc.
+        features like gene sets, malignancy, etc.
 
     Examples:
 
@@ -755,16 +793,19 @@ class Feature(ORM):
     """Universal id, valid across DB instances."""
     name = models.CharField(max_length=255, db_index=True, default=None)
     """Name of feature (required)."""
-    type = models.CharField(max_length=96, db_index=True, null=True, default=None)
-    """Type. If an ORM, is formatted as ``"{schema_name}{ORM.__name__}"``."""
+    type = models.CharField(max_length=64, db_index=True, default=None)
+    """Simple type ("float", "int", "str", "categorical").
+
+    If "categorical", consider managing categories with :class:`~lamindb.Label`.
+    """
     unit = models.CharField(max_length=30, db_index=True, null=True, default=None)
-    """Unit of measure, ideally SI, e.g., `m`, `s`, `kg`, etc."""
+    """Unit of measure, ideally SI (`m`, `s`, `kg`, etc.) or 'normalized' etc."""
     description = models.TextField(db_index=True, null=True, default=None)
     """A description."""
     synonyms = models.TextField(null=True, default=None)
     """Bar-separated (|) synonyms."""
     feature_sets = models.ManyToManyField("FeatureSet", related_name="features")
-    """Feature sets linked to this gene."""
+    """Feature sets linked to this feature."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
@@ -773,13 +814,7 @@ class Feature(ORM):
     """Creator of record, a :class:`~lamindb.User`."""
 
     @overload
-    def __init__(
-        self,
-        name: str,
-        type: Optional[str],
-        field: Optional[str],
-        description: Optional[str],
-    ):
+    def __init__(self, name: str, type: str, unit: Optional[str], description: Optional[str], synonyms: Optional[str]):
         ...
 
     @overload
@@ -812,27 +847,48 @@ class Feature(ORM):
 class FeatureSet(ORM):
     """Jointly measured sets of features.
 
+    See Also:
+        :meth:`~lamindb.FeatureSet.from_values`
+            Create from values.
+        :meth:`~lamindb.FeatureSet.from_df`
+            Create from dataframe columns.
+
     Note:
 
-        A `FeatureSet` is a useful entity as you might have millions of data batches
-        that measure the same features: All of them would link against a single
+        Feature sets are useful as you might have millions of data batches
+        that measure the same features: all of them link against the same
         feature set. If instead, you'd link against single features (say, genes),
         you'd face exploding link tables.
 
-        A `feature_set` is identified by the hash of the id set for the feature type.
+        A `feature_set` is identified by the hash of feature identifiers.
+
+    Args:
+        features: `Iterable[ORM]` An iterable of :class:`~lamindb.Feature`
+            records to hash, e.g., `[Feature(...), Feature(...)]. Is turned into
+            a set upon instantiation. If you'd like to pass values, use
+            :meth:`~lamindb.FeatureSet.from_values` or
+            :meth:`~lamindb.FeatureSet.from_df`.
+        ref_field: `Optional[str] = "id"` The field providing the identifier to
+            hash.
+        type: `Optional[Union[Type, str]] = None` The simple type. Defaults to
+            `None` if reference ORM is :class:`~lamindb.Feature`, defaults to
+            `"float"` otherwise.
+        readout: Optional[str]: `Optional[str] = None` An abbreviation for
+            the readout measured for each feature, ideally from,
+            :mod:`lnschema_bionty.ExperimentalFactor.abbr`.
+        name: `Optional[str] = None` A name.
 
     Notes:
 
-        For more info, see tutorials:
-            - :doc:`/biology/scrna`
-            - :doc:`/biology/flow`
+        - :doc:`/biology/scrna`
+        - :doc:`/biology/flow`
 
     Examples:
 
         >>> df = pd.DataFrame({"feat1": [1, 2], "feat2": [3.1, 4.2], "feat3": ["cond1", "cond2"]})
         >>> feature_set = ln.FeatureSet.from_df(df)
 
-        >>> features = ln.Feature.from_values(["feat1", "feat2"])
+        >>> features = ln.Feature.from_values(["feat1", "feat2"], type=float)
         >>> ln.FeatureSet(features)
 
         >>> import lnschema_bionty as bt
@@ -846,12 +902,23 @@ class FeatureSet(ORM):
 
     id = models.CharField(max_length=20, primary_key=True, default=None)
     """A universal id (hash of the set of feature identifiers)."""
-    type = models.CharField(max_length=64, db_index=True)
-    """Type, the ORM name."""
-    schema = models.CharField(max_length=64, db_index=True)
-    """The schema where the ORM is defined."""
-    field = models.CharField(max_length=64, db_index=True)
+    name = models.CharField(max_length=128, null=True, default=None)
+    """A name (optional)."""
+    n = models.IntegerField()
+    """Number of features in the set."""
+    type = models.CharField(max_length=64, null=True, default=None)
+    """Simple type, e.g., "str", "int". Is `None` for :class:`~lamindb.Feature` (optional)."""
+    readout = models.CharField(max_length=64, null=True, default=None)
+    """The readout type, e.g., "RNA", "Protein", etc.
+
+    Consider using :mod:`lnschema_bionty.ExperimentalFactor.abbr`.
+    """
+    ref_field = models.CharField(max_length=64, db_index=True)
     """Field of ORM that was hashed."""
+    ref_orm = models.CharField(max_length=64, db_index=True)
+    """The reference ORM for feature identifiers."""
+    ref_schema = models.CharField(max_length=64, db_index=True)
+    """The schema where the reference ORM is defined."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
@@ -862,7 +929,11 @@ class FeatureSet(ORM):
     @overload
     def __init__(
         self,
-        features: List[ORM],
+        features: Iterable[ORM],
+        ref_field: Optional[str] = None,
+        type: Optional[Union[Type, str]] = None,
+        readout: Optional[str] = None,
+        name: Optional[str] = None,
     ):
         ...
 
@@ -881,14 +952,21 @@ class FeatureSet(ORM):
         pass
 
     @classmethod  # type:ignore
-    def from_values(cls, values: ListLike, field: Field = Feature.name, **kwargs) -> "FeatureSet":  # type: ignore
+    def from_values(cls, values: ListLike, field: Field = Feature.name, type: Optional[Union[Type, str]] = None, name: Optional[str] = None, readout: Optional[str] = None, **kwargs) -> "FeatureSet":  # type: ignore  # noqa
         """Create feature set from identifier values.
 
         Args:
-           values: ``ListLike`` A list of identifiers, like feature names or ids.
-           field: ``Field = Feature.name`` The field of a reference ORM to
-               map values.
-           **kwargs: Can contain ``species`` or other context to interpret values.
+            values: ``ListLike`` A list of identifiers, like feature names or ids.
+            field: ``Field = Feature.name`` The field of a reference ORM to
+                map values.
+            type: `Optional[Union[Type, str]] = None` The simple type. Defaults to
+                `None` if reference ORM is :class:`~lamindb.Feature`, defaults to
+                `"float"` otherwise.
+            readout: Optional[str]: `Optional[str] = None` An abbreviation for
+                the readout measured for each feature, ideally from,
+                :mod:`lnschema_bionty.ExperimentalFactor.abbr`.
+            name: `Optional[str] = None` A name.
+            **kwargs: Can contain ``species`` or other context to interpret values.
 
         Examples:
 
@@ -896,7 +974,7 @@ class FeatureSet(ORM):
             >>> feature_set = ln.FeatureSet.from_values(features)
 
             >>> genes = ["ENS980983409", "ENS980983410"]
-            >>> feature_set = ln.FeatureSet.from_values(features, lb.Gene.ensembl_gene_id)
+            >>> feature_set = ln.FeatureSet.from_values(features, lb.Gene.ensembl_gene_id, float)
         """
         pass
 
@@ -904,6 +982,7 @@ class FeatureSet(ORM):
     def from_df(
         cls,
         df: "pd.DataFrame",
+        name: Optional[str] = None,
     ) -> "FeatureSet":
         """Create Feature records for columns."""
         pass
@@ -924,8 +1003,6 @@ class File(ORM):
         name: `Optional[str] = None` A description.
         run: `Optional[Run] = None` The run that created the file, gets auto-linked
             if `ln.track()` was called.
-        feature_sets: `Optional[List[FeatureSet]] = None` A list of `FeatureSet`
-            records describing the features measured in the file.
 
     Track where files come from by passing the generating :class:`~lamindb.Run`.
 
@@ -954,9 +1031,9 @@ class File(ORM):
 
     See Also:
         :meth:`lamindb.File.from_df`
-            Create a file object from `DataFrame`.
+            Create a file object from `DataFrame` and track features.
         :meth:`lamindb.File.from_anndata`
-            Create a file object from `AnnData`.
+            Create a file object from `AnnData` and track features.
         :meth:`lamindb.File.from_dir`
             Bulk create file objects from a directory.
 
@@ -1039,7 +1116,6 @@ class File(ORM):
         key: Optional[str] = None,
         run: Optional[Run] = None,
         name: Optional[str] = None,
-        feature_sets: Optional[List[FeatureSet]] = None,
     ):
         ...
 

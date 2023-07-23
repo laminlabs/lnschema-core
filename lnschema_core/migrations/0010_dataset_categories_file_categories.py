@@ -121,4 +121,60 @@ class Migration(migrations.Migration):
         migrations.DeleteModel(
             name="Category",
         ),
+        migrations.RenameField(
+            model_name="featureset",
+            old_name="type",
+            new_name="ref_orm",
+        ),
+        migrations.AddField(
+            model_name="label",
+            name="ref_id",
+            field=models.CharField(default=None, max_length=20, null=True),
+        ),
+        migrations.AddField(
+            model_name="label",
+            name="ref_orm",
+            field=models.CharField(default=None, max_length=30, null=True),
+        ),
+        migrations.AddField(
+            model_name="label",
+            name="ref_schema",
+            field=models.CharField(default=None, max_length=30, null=True),
+        ),
+        migrations.RenameField(
+            model_name="featureset",
+            old_name="schema",
+            new_name="ref_schema",
+        ),
+        migrations.AddField(
+            model_name="featureset",
+            name="name",
+            field=models.CharField(default=None, max_length=128, null=True),
+        ),
+        migrations.RenameField(
+            model_name="featureset",
+            old_name="field",
+            new_name="ref_field",
+        ),
+        migrations.AddField(
+            model_name="featureset",
+            name="readout",
+            field=models.CharField(default=None, max_length=64, null=True),
+        ),
+        migrations.AlterField(
+            model_name="feature",
+            name="type",
+            field=models.CharField(db_index=True, default=None, max_length=64),
+        ),
+        migrations.AddField(
+            model_name="featureset",
+            name="type",
+            field=models.CharField(default=None, max_length=64, null=True),
+        ),
+        migrations.AddField(
+            model_name="featureset",
+            name="n",
+            field=models.IntegerField(default=0),
+            preserve_default=False,
+        ),
     ]
