@@ -109,14 +109,23 @@ class ORM(models.Model):
         """
         pass
 
-    def view_parents(self, field: Optional[StrField] = None, distance: int = 100):
+    def view_parents(
+        self,
+        field: Optional[StrField] = None,
+        with_children: bool = False,
+        distance: int = 100,
+    ):
         """View parents of a record in a graph.
+
+        Notes:
+            For more info, see tutorial: :doc:`/guide/data-lineage`.
 
         Examples:
             >>> import lnschema_bionty as lb
             >>> lb.Tissue.from_bionty(name="subsegmental bronchus").save()
-            >>> tissue = lb.Tissue.select(name="subsegmental bronchus").one()
-            >>> tissue.view_parents()
+            >>> record = lb.Tissue.select(name="respiratory tube").one()
+            >>> record.view_parents()
+            >>> tissue.view_parents(with_children=True)
         """
         pass
 
@@ -816,7 +825,14 @@ class Feature(ORM):
     """Creator of record, a :class:`~lamindb.User`."""
 
     @overload
-    def __init__(self, name: str, type: str, unit: Optional[str], description: Optional[str], synonyms: Optional[str]):
+    def __init__(
+        self,
+        name: str,
+        type: str,
+        unit: Optional[str],
+        description: Optional[str],
+        synonyms: Optional[str],
+    ):
         ...
 
     @overload
