@@ -171,4 +171,10 @@ class Migration(migrations.Migration):
             name="type",
             field=models.CharField(default=None, max_length=64, null=True),
         ),
+        migrations.AddField(
+            model_name="featureset",
+            name="n",
+            field=models.IntegerField(default=0),
+            preserve_default=False,
+        ),
     ]

@@ -904,6 +904,8 @@ class FeatureSet(ORM):
     """A universal id (hash of the set of feature identifiers)."""
     name = models.CharField(max_length=128, null=True, default=None)
     """A name (optional)."""
+    n = models.IntegerField()
+    """Number of features in the set."""
     type = models.CharField(max_length=64, null=True, default=None)
     """Simple type, e.g., "str", "int". Is `None` for :class:`~lamindb.Feature` (optional)."""
     readout = models.CharField(max_length=64, null=True, default=None)
