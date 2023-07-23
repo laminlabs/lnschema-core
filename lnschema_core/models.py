@@ -950,14 +950,21 @@ class FeatureSet(ORM):
         pass
 
     @classmethod  # type:ignore
-    def from_values(cls, values: ListLike, field: Field = Feature.name, type: Union[Type, str] = float, **kwargs) -> "FeatureSet":  # type: ignore
+    def from_values(cls, values: ListLike, field: Field = Feature.name, type: Optional[Union[Type, str]] = None, name: Optional[str] = None, readout: Optional[str] = None, **kwargs) -> "FeatureSet":  # type: ignore  # noqa
         """Create feature set from identifier values.
 
         Args:
-           values: ``ListLike`` A list of identifiers, like feature names or ids.
-           field: ``Field = Feature.name`` The field of a reference ORM to
-               map values.
-           **kwargs: Can contain ``species`` or other context to interpret values.
+            values: ``ListLike`` A list of identifiers, like feature names or ids.
+            field: ``Field = Feature.name`` The field of a reference ORM to
+                map values.
+            type: `Optional[Union[Type, str]] = None` The simple type. Defaults to
+                `None` if reference ORM is :class:`~lamindb.Feature`, defaults to
+                `"float"` otherwise.
+            readout: Optional[str]: `Optional[str] = None` An abbreviation for
+                the readout measured for each feature, ideally from,
+                :mod:`lnschema_bionty.ExperimentalFactor.abbr`.
+            name: `Optional[str] = None` A name.
+            **kwargs: Can contain ``species`` or other context to interpret values.
 
         Examples:
 
@@ -965,7 +972,7 @@ class FeatureSet(ORM):
             >>> feature_set = ln.FeatureSet.from_values(features)
 
             >>> genes = ["ENS980983409", "ENS980983410"]
-            >>> feature_set = ln.FeatureSet.from_values(features, lb.Gene.ensembl_gene_id)
+            >>> feature_set = ln.FeatureSet.from_values(features, lb.Gene.ensembl_gene_id, float)
         """
         pass
 
@@ -973,6 +980,7 @@ class FeatureSet(ORM):
     def from_df(
         cls,
         df: "pd.DataFrame",
+        name: Optional[str] = None,
     ) -> "FeatureSet":
         """Create Feature records for columns."""
         pass
