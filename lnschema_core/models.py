@@ -767,6 +767,9 @@ class Feature(ORM):
 
     Notes:
 
+        - :doc:`/biology/scrna`
+        - :doc:`/biology/flow`
+
         For more control, you can use :mod:`lnschema_bionty` ORMs to manage
         common basic biological entities like genes, proteins & cell markers
         involved in expression/count measurements.
@@ -786,7 +789,6 @@ class Feature(ORM):
          b   feat2   float
          c   feat3     str
 
-        For more info, see tutorial: :doc:`/biology/features`.
     """
 
     id = models.CharField(max_length=12, default=base62_12, primary_key=True)
