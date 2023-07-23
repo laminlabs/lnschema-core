@@ -945,7 +945,7 @@ class FeatureSet(ORM):
         pass
 
     @classmethod  # type:ignore
-    def from_values(cls, values: ListLike, field: Field = Feature.name, **kwargs) -> "FeatureSet":  # type: ignore
+    def from_values(cls, values: ListLike, field: Field = Feature.name, type: Union[type, str] = float, **kwargs) -> "FeatureSet":  # type: ignore
         """Create feature set from identifier values.
 
         Args:
@@ -988,8 +988,6 @@ class File(ORM):
         name: `Optional[str] = None` A description.
         run: `Optional[Run] = None` The run that created the file, gets auto-linked
             if `ln.track()` was called.
-        feature_sets: `Optional[List[FeatureSet]] = None` A list of `FeatureSet`
-            records describing the features measured in the file.
 
     Track where files come from by passing the generating :class:`~lamindb.Run`.
 
@@ -1018,9 +1016,9 @@ class File(ORM):
 
     See Also:
         :meth:`lamindb.File.from_df`
-            Create a file object from `DataFrame`.
+            Create a file object from `DataFrame` and track features.
         :meth:`lamindb.File.from_anndata`
-            Create a file object from `AnnData`.
+            Create a file object from `AnnData` and track features.
         :meth:`lamindb.File.from_dir`
             Bulk create file objects from a directory.
 
@@ -1103,7 +1101,6 @@ class File(ORM):
         key: Optional[str] = None,
         run: Optional[Run] = None,
         name: Optional[str] = None,
-        feature_sets: Optional[List[FeatureSet]] = None,
     ):
         ...
 
