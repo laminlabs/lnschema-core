@@ -10,6 +10,7 @@ from typing import (  # noqa
     Literal,
     NamedTuple,
     Optional,
+    Type,
     Union,
     overload,
 )
@@ -884,7 +885,7 @@ class FeatureSet(ORM):
         >>> df = pd.DataFrame({"feat1": [1, 2], "feat2": [3.1, 4.2], "feat3": ["cond1", "cond2"]})
         >>> feature_set = ln.FeatureSet.from_df(df)
 
-        >>> features = ln.Feature.from_values(["feat1", "feat2"])
+        >>> features = ln.Feature.from_values(["feat1", "feat2"], type=float)
         >>> ln.FeatureSet(features)
 
         >>> import lnschema_bionty as bt
@@ -945,7 +946,7 @@ class FeatureSet(ORM):
         pass
 
     @classmethod  # type:ignore
-    def from_values(cls, values: ListLike, field: Field = Feature.name, type: Union[type, str] = float, **kwargs) -> "FeatureSet":  # type: ignore
+    def from_values(cls, values: ListLike, field: Field = Feature.name, type: Union[Type, str] = float, **kwargs) -> "FeatureSet":  # type: ignore
         """Create feature set from identifier values.
 
         Args:
