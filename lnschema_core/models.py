@@ -838,14 +838,33 @@ class Feature(ORM):
 class FeatureSet(ORM):
     """Jointly measured sets of features.
 
+    Args:
+        features: `Iterable[ORM]` An iterable of :class:`~lamindb.Feature`
+            records to hash, e.g., `[Feature(...), Feature(...)]. Is turned into
+            a set upon instantiation. If you'd like to pass values, use
+            :meth:`~lamindb.FeatureSet.from_values` or
+            :meth:`~lamindb.FeatureSet.from_df`.
+        ref_field: `Optional[str] = "id"` The field providing the identifier to
+            hash.
+        readout_abbr: Optional[str]: `Optional[str] = None` An abbreviation for
+            the readout measured for each feature, ideally from,
+            :mod:`lnschema_bionty.ExperimentalFactor.abbr`.
+        name: `Optional[str] = None` A name.
+
     Note:
 
         Feature sets are useful as you might have millions of data batches
-        that measure the same features: All of them would link against a single
+        that measure the same features: all of them link against the same
         feature set. If instead, you'd link against single features (say, genes),
         you'd face exploding link tables.
 
         A `feature_set` is identified by the hash of feature identifiers.
+
+    See Also:
+        :meth:`~lamindb.FeatureSet.from_values`
+            Create from values.
+        :meth:`~lamindb.FeatureSet.from_df`
+            Create from dataframe columns.
 
     Notes:
 
@@ -894,7 +913,10 @@ class FeatureSet(ORM):
     @overload
     def __init__(
         self,
-        features: List[ORM],
+        features: Iterable[ORM],
+        ref_field: Optional[str],
+        readout_abbr: Optional[str],
+        name: Optional[str],
     ):
         ...
 
