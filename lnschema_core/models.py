@@ -907,12 +907,12 @@ class FeatureSet(ORM):
 
     Consider using :mod:`lnschema_bionty.ExperimentalFactor.abbr`.
     """
+    ref_field = models.CharField(max_length=64, db_index=True)
+    """Field of ORM that was hashed."""
     ref_orm = models.CharField(max_length=64, db_index=True)
     """The reference ORM for feature identifiers."""
     ref_schema = models.CharField(max_length=64, db_index=True)
     """The schema where the reference ORM is defined."""
-    ref_field = models.CharField(max_length=64, db_index=True)
-    """Field of ORM that was hashed."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
