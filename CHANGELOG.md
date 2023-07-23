@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+📝 Updated view_parents signature | [237](https://github.com/laminlabs/lnschema-core/pull/237) | [sunnyosun](https://github.com/sunnyosun) | 2023-07-23 |
 🚚 More comprehensive `Label` and `FeatureSet` fields | [236](https://github.com/laminlabs/lnschema-core/pull/236) | [falexwolf](https://github.com/falexwolf) | 2023-07-23 |
 🚚 Integrate `Category` and `Tag` into `Label` | [235](https://github.com/laminlabs/lnschema-core/pull/235) | [falexwolf](https://github.com/falexwolf) | 2023-07-22 |
 🚚 Add `description` and `parents` to `Tag`, delete `Project`, replace `Run.name` with `Run.reference_type`, `Run.inputs` as `File.input_of` | [233](https://github.com/laminlabs/lnschema-core/pull/233) | [falexwolf](https://github.com/falexwolf) | 2023-07-21 |
