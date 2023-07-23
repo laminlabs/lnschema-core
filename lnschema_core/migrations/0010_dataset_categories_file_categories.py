@@ -158,7 +158,17 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name="featureset",
-            name="readout_abbr",
+            name="readout",
+            field=models.CharField(default=None, max_length=64, null=True),
+        ),
+        migrations.AlterField(
+            model_name="feature",
+            name="type",
+            field=models.CharField(db_index=True, default=None, max_length=64),
+        ),
+        migrations.AddField(
+            model_name="featureset",
+            name="type",
             field=models.CharField(default=None, max_length=64, null=True),
         ),
     ]

@@ -742,16 +742,27 @@ class Label(ORM):
 class Feature(ORM):
     """Qualifiers for measurements in files & datasets.
 
+    See Also:
+        :meth:`~lamindb.Feature.from_df`
+            Create feature records from DataFrame.
+        :meth:`lamindb.Label`
+            Labels for files & datasets.
+
+    Args:
+        name: `str` Name of the feature, typically, a column name.
+        type: `str` Simple type ("float", "int", "str", "categorical"). If
+            "categorical", consider managing categories with
+            :class:`~lamindb.Label`.
+        unit: `Optional[str] = None` Unit of measure, ideally SI (`m`, `s`, `kg`, etc.) or 'normalized' etc.
+        description: `Optional[str] = None` A description.
+        synonyms: `Optional[str] = None` Bar-separated synonyms.
+
     .. note::
 
         *Features* and *labels* are two ways of using entities to structure & categorize data:
 
         1. a feature qualifies *which entity* is measured as part of a *joint* measurement
         2. a label *is* a measured value of an entity
-
-    See Also:
-        :meth:`lamindb.Label`
-            Labels for files & datasets.
 
     Notes:
 
@@ -781,16 +792,19 @@ class Feature(ORM):
     """Universal id, valid across DB instances."""
     name = models.CharField(max_length=255, db_index=True, default=None)
     """Name of feature (required)."""
-    type = models.CharField(max_length=96, db_index=True, null=True, default=None)
-    """Simple type."""
+    type = models.CharField(max_length=64, db_index=True, default=None)
+    """Simple type ("float", "int", "str", "categorical").
+
+    If "categorical", consider managing categories with :class:`~lamindb.Label`.
+    """
     unit = models.CharField(max_length=30, db_index=True, null=True, default=None)
-    """Unit of measure, ideally SI, e.g., `m`, `s`, `kg`, etc."""
+    """Unit of measure, ideally SI (`m`, `s`, `kg`, etc.) or 'normalized' etc."""
     description = models.TextField(db_index=True, null=True, default=None)
     """A description."""
     synonyms = models.TextField(null=True, default=None)
     """Bar-separated (|) synonyms."""
     feature_sets = models.ManyToManyField("FeatureSet", related_name="features")
-    """Feature sets linked to this gene."""
+    """Feature sets linked to this feature."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
@@ -799,13 +813,7 @@ class Feature(ORM):
     """Creator of record, a :class:`~lamindb.User`."""
 
     @overload
-    def __init__(
-        self,
-        name: str,
-        type: Optional[str],
-        field: Optional[str],
-        description: Optional[str],
-    ):
+    def __init__(self, name: str, type: str, unit: Optional[str], description: Optional[str], synonyms: Optional[str]):
         ...
 
     @overload
@@ -846,7 +854,7 @@ class FeatureSet(ORM):
             :meth:`~lamindb.FeatureSet.from_df`.
         ref_field: `Optional[str] = "id"` The field providing the identifier to
             hash.
-        readout_abbr: Optional[str]: `Optional[str] = None` An abbreviation for
+        readout: Optional[str]: `Optional[str] = None` An abbreviation for
             the readout measured for each feature, ideally from,
             :mod:`lnschema_bionty.ExperimentalFactor.abbr`.
         name: `Optional[str] = None` A name.
@@ -892,8 +900,10 @@ class FeatureSet(ORM):
     """A universal id (hash of the set of feature identifiers)."""
     name = models.CharField(max_length=128, null=True, default=None)
     """A name (optional)."""
-    readout_abbr = models.CharField(max_length=64, null=True, default=None)
-    """The readout type, e.g., "meta", "RNA", etc.
+    type = models.CharField(max_length=64, null=True, default=None)
+    """Simple type, e.g., "str", "int". Is `None` for :class:`~lamindb.Feature` (optional)."""
+    readout = models.CharField(max_length=64, null=True, default=None)
+    """The readout type, e.g., "RNA", "Protein", etc.
 
     Consider using :mod:`lnschema_bionty.ExperimentalFactor.abbr`.
     """
@@ -915,7 +925,7 @@ class FeatureSet(ORM):
         self,
         features: Iterable[ORM],
         ref_field: Optional[str],
-        readout_abbr: Optional[str],
+        readout: Optional[str],
         name: Optional[str],
     ):
         ...
