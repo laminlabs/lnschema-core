@@ -799,20 +799,20 @@ class Feature(ORM):
     name = models.CharField(max_length=255, db_index=True, default=None)
     """Name of feature (required)."""
     type = models.CharField(max_length=64, db_index=True, default=None)
-    """Simple type ("float", "int", "str", "categorical").
+    """Simple type ("float", "int", "str", "category").
 
-    If "categorical", consider managing categories with :class:`~lamindb.Label`.
+    If "category", consider managing categories with :class:`~lamindb.Label` or another label ORM.
     """
     unit = models.CharField(max_length=30, db_index=True, null=True, default=None)
-    """Unit of measure, ideally SI (`m`, `s`, `kg`, etc.) or 'normalized' etc."""
+    """Unit of measure, ideally SI (`m`, `s`, `kg`, etc.) or 'normalized' etc. (optional)"""
     description = models.TextField(db_index=True, null=True, default=None)
     """A description."""
     labels_orm = models.CharField(max_length=40, db_index=True, default=None, null=True)
-    """ORM providing the vocabulary for labels (optional)."""
+    """ORM providing the vocabulary for labels, e.g., :class:`lnschema_bionty.CellLine` (optional)."""
     labels_schema = models.CharField(max_length=40, db_index=True, default=None, null=True)
     """Schema of the ORM (optional)."""
     synonyms = models.TextField(null=True, default=None)
-    """Bar-separated (|) synonyms."""
+    """Bar-separated (|) synonyms (optional)."""
     feature_sets = models.ManyToManyField("FeatureSet", related_name="features")
     """Feature sets linked to this feature."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
