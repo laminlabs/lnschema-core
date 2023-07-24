@@ -56,8 +56,8 @@ class Migration(migrations.Migration):
                 "unique_together": {("dataset", "feature_set")},
             },
         ),
-        migrations.RunSQL("CREATE TABLE lnschema_core_filefeatureset_tmp (id BIGINT, file_id text, feature_set_id text)"),
-        migrations.RunSQL("INSERT INTO lnschema_core_filefeatureset_tmp (id, file_id, feature_set_id) SELECT id, file_id, feature_set_id from lnschema_core_file_feature_sets"),
+        migrations.RunSQL("CREATE TABLE lnschema_core_filefeatureset_tmp (id BIGINT, file_id TEXT, feature_set_id TEXT)"),
+        migrations.RunSQL("INSERT INTO lnschema_core_filefeatureset_tmp (id, file_id, feature_set_id) SELECT id, file_id, featureset_id from lnschema_core_file_feature_sets"),
         migrations.RemoveField(
             model_name="file",
             name="feature_sets",
@@ -77,5 +77,5 @@ class Migration(migrations.Migration):
             field=models.ManyToManyField(related_name="files", through="lnschema_core.FileFeatureSet", to="lnschema_core.featureset"),
         ),
         migrations.RunSQL("INSERT INTO lnschema_core_filefeatureset (id, file_id, feature_set_id) SELECT id, file_id, feature_set_id from lnschema_core_filefeatureset_tmp"),
-        migrations.RunSQL("DROP lnschema_core_filefeatureset_tmp"),
+        migrations.RunSQL("DROP TABLE lnschema_core_filefeatureset_tmp"),
     ]
