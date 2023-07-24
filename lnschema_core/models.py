@@ -1532,7 +1532,7 @@ class Dataset(ORM):
 
 class FileFeatureSet(ORM):
     file = models.ForeignKey(File, on_delete=models.CASCADE)
-    feature_set = models.ForeignKey(FeatureSet, on_delete=models.CASCADE)
+    featureset = models.ForeignKey(FeatureSet, on_delete=models.CASCADE)
     slot = models.CharField(max_length=40, null=True, default=None)
 
     class Meta:
@@ -1541,7 +1541,7 @@ class FileFeatureSet(ORM):
 
 class DatasetFeatureSet(ORM):
     dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE)
-    feature_set = models.ForeignKey(FeatureSet, on_delete=models.CASCADE)
+    featureset = models.ForeignKey(FeatureSet, on_delete=models.CASCADE)
     slot = models.CharField(max_length=50, null=True, default=None)
 
     class Meta:
