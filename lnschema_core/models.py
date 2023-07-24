@@ -1536,7 +1536,7 @@ class FileFeatureSet(ORM):
     slot = models.CharField(max_length=40, null=True, default=None)
 
     class Meta:
-        unique_together = ("file", "feature_set")
+        unique_together = ("file", "featureset")
 
 
 class DatasetFeatureSet(ORM):
@@ -1545,7 +1545,7 @@ class DatasetFeatureSet(ORM):
     slot = models.CharField(max_length=50, null=True, default=None)
 
     class Meta:
-        unique_together = ("dataset", "feature_set")
+        unique_together = ("dataset", "featureset")
 
 
 # -------------------------------------------------------------------------------------
