@@ -1105,7 +1105,7 @@ class File(ORM):
     """
     hash_type = models.CharField(max_length=30, db_index=True, null=True, default=None)
     """Type of hash."""
-    feature_sets = models.ManyToManyField(FeatureSet, related_name="files")
+    feature_sets = models.ManyToManyField(FeatureSet, related_name="files", through="FileFeatureSet")
     """The feature sets measured in the file (see :class:`~lamindb.FeatureSet`)."""
     transform = models.ForeignKey(Transform, PROTECT, related_name="files", null=True, default=None)
     """:class:`~lamindb.Transform` whose run created the `file`."""
@@ -1507,7 +1507,7 @@ class Dataset(ORM):
     """A description."""
     hash = models.CharField(max_length=86, db_index=True, null=True, default=None)
     """Hash of dataset content. 86 base64 chars allow to store 64 bytes, 512 bits."""
-    feature_sets = models.ManyToManyField("FeatureSet", related_name="datasets")
+    feature_sets = models.ManyToManyField("FeatureSet", related_name="datasets", through="DatasetFeatureSet")
     """The feature sets measured in this dataset (see :class:`~lamindb.FeatureSet`)."""
     labels = models.ManyToManyField("Label", related_name="datasets")
     """Categories of categorical features sampled in the dataset (see :class:`~lamindb.Feature`)."""
@@ -1521,6 +1521,24 @@ class Dataset(ORM):
     """Time of run execution."""
     created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_datasets")
     """Creator of record, a :class:`~lamindb.User`."""
+
+
+class FileFeatureSet(ORM):
+    file = models.ForeignKey(File, on_delete=models.CASCADE)
+    feature_set = models.ForeignKey(FeatureSet, on_delete=models.CASCADE)
+    slot = models.CharField(max_length=40, null=True, default=None)
+
+    class Meta:
+        unique_together = ("file", "feature_set")
+
+
+class DatasetFeatureSet(ORM):
+    dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE)
+    feature_set = models.ForeignKey(FeatureSet, on_delete=models.CASCADE)
+    slot = models.CharField(max_length=50, null=True, default=None)
+
+    class Meta:
+        unique_together = ("dataset", "feature_set")
 
 
 # -------------------------------------------------------------------------------------
