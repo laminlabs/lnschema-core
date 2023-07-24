@@ -1452,6 +1452,10 @@ class File(ORM):
         """
         pass
 
+    @property
+    def features(self):
+        return self._features
+
 
 class Dataset(ORM):
     """Datasets.
