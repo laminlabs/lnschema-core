@@ -732,12 +732,6 @@ class Label(ORM):
     """Parent labels, useful to hierarchically group labels (optional)."""
     feature = models.ForeignKey("Feature", CASCADE, related_name="labels", null=True, default=None)
     """The feature in which the label is sampled (optional)."""
-    ref_id = models.CharField(max_length=20, default=None, null=True)
-    """Record from a reference ontology (optional)."""
-    ref_orm = models.CharField(max_length=30, default=None, null=True)
-    """ORM providing the reference ontology (optional)."""
-    ref_schema = models.CharField(max_length=30, default=None, null=True)
-    """Schema of the ORM (optional)."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
@@ -805,16 +799,20 @@ class Feature(ORM):
     name = models.CharField(max_length=255, db_index=True, default=None)
     """Name of feature (required)."""
     type = models.CharField(max_length=64, db_index=True, default=None)
-    """Simple type ("float", "int", "str", "categorical").
+    """Simple type ("float", "int", "str", "category").
 
-    If "categorical", consider managing categories with :class:`~lamindb.Label`.
+    If "category", consider managing categories with :class:`~lamindb.Label` or another label ORM.
     """
     unit = models.CharField(max_length=30, db_index=True, null=True, default=None)
-    """Unit of measure, ideally SI (`m`, `s`, `kg`, etc.) or 'normalized' etc."""
+    """Unit of measure, ideally SI (`m`, `s`, `kg`, etc.) or 'normalized' etc. (optional)"""
     description = models.TextField(db_index=True, null=True, default=None)
     """A description."""
+    labels_orm = models.CharField(max_length=40, db_index=True, default=None, null=True)
+    """ORM providing the vocabulary for labels, e.g., :class:`lnschema_bionty.CellLine` (optional)."""
+    labels_schema = models.CharField(max_length=40, db_index=True, default=None, null=True)
+    """Schema of the ORM (optional)."""
     synonyms = models.TextField(null=True, default=None)
-    """Bar-separated (|) synonyms."""
+    """Bar-separated (|) synonyms (optional)."""
     feature_sets = models.ManyToManyField("FeatureSet", related_name="features")
     """Feature sets linked to this feature."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -1107,7 +1105,7 @@ class File(ORM):
     """
     hash_type = models.CharField(max_length=30, db_index=True, null=True, default=None)
     """Type of hash."""
-    feature_sets = models.ManyToManyField(FeatureSet, related_name="files")
+    feature_sets = models.ManyToManyField(FeatureSet, related_name="files", through="FileFeatureSet")
     """The feature sets measured in the file (see :class:`~lamindb.FeatureSet`)."""
     transform = models.ForeignKey(Transform, PROTECT, related_name="files", null=True, default=None)
     """:class:`~lamindb.Transform` whose run created the `file`."""
@@ -1454,6 +1452,13 @@ class File(ORM):
         """
         pass
 
+    @property
+    def features(self):
+        """Feature manager (:class:`~lamindb.dev.FeatureManager`)."""
+        from lamindb._feature_manager import FeatureManager
+
+        return FeatureManager(self)
+
 
 class Dataset(ORM):
     """Datasets.
@@ -1509,7 +1514,7 @@ class Dataset(ORM):
     """A description."""
     hash = models.CharField(max_length=86, db_index=True, null=True, default=None)
     """Hash of dataset content. 86 base64 chars allow to store 64 bytes, 512 bits."""
-    feature_sets = models.ManyToManyField("FeatureSet", related_name="datasets")
+    feature_sets = models.ManyToManyField("FeatureSet", related_name="datasets", through="DatasetFeatureSet")
     """The feature sets measured in this dataset (see :class:`~lamindb.FeatureSet`)."""
     labels = models.ManyToManyField("Label", related_name="datasets")
     """Categories of categorical features sampled in the dataset (see :class:`~lamindb.Feature`)."""
@@ -1523,6 +1528,24 @@ class Dataset(ORM):
     """Time of run execution."""
     created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_datasets")
     """Creator of record, a :class:`~lamindb.User`."""
+
+
+class FileFeatureSet(ORM):
+    file = models.ForeignKey(File, on_delete=models.CASCADE)
+    featureset = models.ForeignKey(FeatureSet, on_delete=models.CASCADE)
+    slot = models.CharField(max_length=40, null=True, default=None)
+
+    class Meta:
+        unique_together = ("file", "featureset")
+
+
+class DatasetFeatureSet(ORM):
+    dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE)
+    featureset = models.ForeignKey(FeatureSet, on_delete=models.CASCADE)
+    slot = models.CharField(max_length=50, null=True, default=None)
+
+    class Meta:
+        unique_together = ("dataset", "featureset")
 
 
 # -------------------------------------------------------------------------------------
