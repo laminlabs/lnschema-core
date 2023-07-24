@@ -56,8 +56,9 @@ class Migration(migrations.Migration):
                 "unique_together": {("dataset", "feature_set")},
             },
         ),
-        migrations.RunSQL("CREATE TABLE lnschema_core_filefeatureset_tmp LIKE lnschema_core_file_feature_sets"),
-        migrations.RunSQL("INSERT INTO lnschema_core_filefeatureset_tmp (id, file_id, feature_set_id) SELECT id, file_id, feature_set_id from lnschema_core_file_feature_sets"),
+        migrations.RunSQL(
+            "CREATE TABLE lnschema_core_filefeatureset_tmp (id, file_id, feature_set_id) SELECT id, file_id, feature_set_id from lnschema_core_file_feature_sets"
+        ),
         migrations.RemoveField(
             model_name="file",
             name="feature_sets",
