@@ -732,12 +732,6 @@ class Label(ORM):
     """Parent labels, useful to hierarchically group labels (optional)."""
     feature = models.ForeignKey("Feature", CASCADE, related_name="labels", null=True, default=None)
     """The feature in which the label is sampled (optional)."""
-    ref_id = models.CharField(max_length=20, default=None, null=True)
-    """Record from a reference ontology (optional)."""
-    ref_orm = models.CharField(max_length=30, default=None, null=True)
-    """ORM providing the reference ontology (optional)."""
-    ref_schema = models.CharField(max_length=30, default=None, null=True)
-    """Schema of the ORM (optional)."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
@@ -813,6 +807,10 @@ class Feature(ORM):
     """Unit of measure, ideally SI (`m`, `s`, `kg`, etc.) or 'normalized' etc."""
     description = models.TextField(db_index=True, null=True, default=None)
     """A description."""
+    labels_orm = models.CharField(max_length=40, db_index=True, default=None, null=True)
+    """ORM providing the vocabulary for labels (optional)."""
+    labels_schema = models.CharField(max_length=40, db_index=True, default=None, null=True)
+    """Schema of the ORM (optional)."""
     synonyms = models.TextField(null=True, default=None)
     """Bar-separated (|) synonyms."""
     feature_sets = models.ManyToManyField("FeatureSet", related_name="features")
