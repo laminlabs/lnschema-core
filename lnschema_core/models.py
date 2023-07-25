@@ -1092,6 +1092,11 @@ class File(ORM):
     This is a file extension if the `file` is stored in a file format.
     It's `None` if the storage format doesn't have a canonical extension.
     """
+    accessor = models.CharField(max_length=64, db_index=True, null=True, default=None)
+    """Default backed or memory accessor, e.g., DataFrame, AnnData.
+
+    Soon, also: SOMA, MuData, zarr.Group, tiledb.Array, etc.
+    """
     description = models.CharField(max_length=255, db_index=True, null=True, default=None)
     """A description."""
     size = models.BigIntegerField(null=True, db_index=True)
