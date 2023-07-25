@@ -631,7 +631,7 @@ class Run(ORM):
         >>> ln.track(transform)
         💬 Loaded: Transform(id=ceHkZMaiHFdoB6, name=Cell Ranger, stem_id=ceHkZMaiHFdo, version=7.2.0, type=pipeline, updated_at=2023-07-10 18:37:19, created_by_id=DzTjkKse)
         ✅ Saved: Run(id=RcpWIKC8cF74Pn3RUJ1W, run_at=2023-07-10 18:37:19, transform_id=ceHkZMaiHFdoB6, created_by_id=DzTjkKse)
-        >>> ln.context.run
+        >>> ln.dev.context.run
         Run(id=RcpWIKC8cF74Pn3RUJ1W, run_at=2023-07-10 18:37:19, transform_id=ceHkZMaiHFdoB6, created_by_id=DzTjkKse)
 
         Track a notebook run:
@@ -639,7 +639,7 @@ class Run(ORM):
         >>> ln.track()
         ✅ Saved: Transform(id=1LCd8kco9lZUBg, name=Track data lineage / provenance, short_name=02-data-lineage, stem_id=1LCd8kco9lZU, version=0, type=notebook, updated_at=2023-07-10 18:37:19, created_by_id=DzTjkKse) # noqa
         ✅ Saved: Run(id=pHgVICV9DxBaV6BAuKJl, run_at=2023-07-10 18:37:19, transform_id=1LCd8kco9lZUBg, created_by_id=DzTjkKse)
-        >>> ln.context.run
+        >>> ln.dev.context.run
         Run(id=pHgVICV9DxBaV6BAuKJl, run_at=2023-07-10 18:37:19, transform_id=1LCd8kco9lZUBg, created_by_id=DzTjkKse)
     """
 
@@ -908,6 +908,8 @@ class FeatureSet(ORM):
             Create from values.
         :meth:`~lamindb.FeatureSet.from_df`
             Create from dataframe columns.
+        :class:`~lamindb.Modality`
+            Type of measurement.
 
     Note:
 
@@ -929,9 +931,7 @@ class FeatureSet(ORM):
         type: `Optional[Union[Type, str]] = None` The simple type. Defaults to
             `None` if reference ORM is :class:`~lamindb.Feature`, defaults to
             `"float"` otherwise.
-        readout: Optional[str]: `Optional[str] = None` An abbreviation for
-            the readout measured for each feature, ideally from,
-            :mod:`lnschema_bionty.ExperimentalFactor.abbr`.
+        modality: `Optional[str] = None` A name or id for :class:`~lamindb.Modality`.
         name: `Optional[str] = None` A name.
 
     Notes:
@@ -965,7 +965,7 @@ class FeatureSet(ORM):
     type = models.CharField(max_length=64, null=True, default=None)
     """Simple type, e.g., "str", "int". Is `None` for :class:`~lamindb.Feature` (optional)."""
     modality = models.ForeignKey(Modality, PROTECT, null=True, default=None)
-    """The readout modality, e.g., "RNA", "Protein", (:class:`~lamindb.Modality`)."""
+    """The measurement modality, e.g., "RNA", "Protein", "Gene Module", "pathway" (:class:`~lamindb.Modality`)."""
     ref_field = models.CharField(max_length=64, db_index=True)
     """Field of ORM that was hashed."""
     ref_orm = models.CharField(max_length=64, db_index=True)
@@ -1005,7 +1005,7 @@ class FeatureSet(ORM):
         pass
 
     @classmethod  # type:ignore
-    def from_values(cls, values: ListLike, field: Field = Feature.name, type: Optional[Union[Type, str]] = None, name: Optional[str] = None, readout: Optional[str] = None, **kwargs) -> "FeatureSet":  # type: ignore  # noqa
+    def from_values(cls, values: ListLike, field: Field = Feature.name, type: Optional[Union[Type, str]] = None, name: Optional[str] = None, modality: Optional[str] = None, **kwargs) -> "FeatureSet":  # type: ignore  # noqa
         """Create feature set from identifier values.
 
         Args:
@@ -1015,9 +1015,7 @@ class FeatureSet(ORM):
             type: `Optional[Union[Type, str]] = None` The simple type. Defaults to
                 `None` if reference ORM is :class:`~lamindb.Feature`, defaults to
                 `"float"` otherwise.
-            readout: Optional[str]: `Optional[str] = None` An abbreviation for
-                the readout measured for each feature, ideally from,
-                :mod:`lnschema_bionty.ExperimentalFactor.abbr`.
+            modality: `Optional[str] = None` A name or id for :class:`~lamindb.Modality`.
             name: `Optional[str] = None` A name.
             **kwargs: Can contain ``species`` or other context to interpret values.
 
