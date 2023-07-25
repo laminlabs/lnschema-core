@@ -788,7 +788,7 @@ class Feature(ORM):
     See Also:
         :meth:`~lamindb.Feature.from_df`
             Create feature records from DataFrame.
-        :meth:`lamindb.File.features`
+        :attr:`lamindb.File.features`
             Manage feature annotations of files.
         :meth:`lamindb.Label`
             Labels for files & datasets.
