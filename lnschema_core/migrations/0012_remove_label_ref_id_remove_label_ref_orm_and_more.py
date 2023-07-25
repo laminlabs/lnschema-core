@@ -3,6 +3,8 @@
 import django.db.models.deletion
 from django.db import migrations, models
 
+import lnschema_core.ids
+
 
 class Migration(migrations.Migration):
     dependencies = [
@@ -82,5 +84,40 @@ class Migration(migrations.Migration):
             model_name="file",
             name="accessor",
             field=models.CharField(db_index=True, default=None, max_length=64, null=True),
+        ),
+        migrations.RemoveField(
+            model_name="featureset",
+            name="readout",
+        ),
+        migrations.CreateModel(
+            name="Modality",
+            fields=[
+                ("id", models.CharField(default=lnschema_core.ids.base62_8, max_length=8, primary_key=True, serialize=False)),
+                ("name", models.CharField(db_index=True, max_length=256)),
+                ("ontology_id", models.CharField(db_index=True, default=None, max_length=32, null=True)),
+                ("abbr", models.CharField(db_index=True, default=None, max_length=32, null=True, unique=True)),
+                ("synonyms", models.TextField(default=None, null=True)),
+                ("description", models.TextField(default=None, null=True)),
+                ("molecule", models.TextField(db_index=True, default=None, null=True)),
+                ("instrument", models.TextField(db_index=True, default=None, null=True)),
+                ("measurement", models.TextField(db_index=True, default=None, null=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True, db_index=True)),
+                ("updated_at", models.DateTimeField(auto_now=True, db_index=True)),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.PROTECT, related_name="created_modalities", to="lnschema_core.user"
+                    ),
+                ),
+                ("parents", models.ManyToManyField(related_name="children", to="lnschema_core.modality")),
+            ],
+            options={
+                "abstract": False,
+            },
+        ),
+        migrations.AddField(
+            model_name="featureset",
+            name="modality",
+            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, to="lnschema_core.modality"),
         ),
     ]

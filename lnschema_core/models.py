@@ -743,6 +743,45 @@ class Label(ORM):
         unique_together = (("name", "feature"),)
 
 
+class Modality(ORM):
+    """Type of measurement.
+
+    This borrows largely from the experimental factor ontology.
+    """
+
+    id = models.CharField(max_length=8, default=base62_8, primary_key=True)
+    """Universal id, valid across DB instances."""
+    name = models.CharField(max_length=256, db_index=True)
+    """Name of the modality (required)."""
+    ontology_id = models.CharField(max_length=32, db_index=True, null=True, default=None)
+    """Ontology ID of the modality."""
+    abbr = models.CharField(max_length=32, db_index=True, unique=True, null=True, default=None)
+    """A unique abbreviation for the modality (optional)."""
+    synonyms = models.TextField(null=True, default=None)
+    """Bar-separated (|) synonyms that correspond to this modality."""
+    description = models.TextField(null=True, default=None)
+    """Description."""
+    molecule = models.TextField(null=True, default=None, db_index=True)
+    """Molecular experimental factor, parsed from EFO."""
+    instrument = models.TextField(null=True, default=None, db_index=True)
+    """Instrument used to measure, parsed from EFO."""
+    measurement = models.TextField(null=True, default=None, db_index=True)
+    """Phenotypic experimental factor, parsed from EFO."""
+    parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
+    """Parents."""
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    """Time of creation of record."""
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    """Time of last update to record."""
+    created_by = models.ForeignKey(
+        User,
+        models.PROTECT,
+        default=current_user_id,
+        related_name="created_modalities",
+    )
+    """Creator of record, a :class:`~lamindb.User`."""
+
+
 class Feature(ORM):
     """Qualifiers for measurements in files & datasets.
 
@@ -925,11 +964,8 @@ class FeatureSet(ORM):
     """Number of features in the set."""
     type = models.CharField(max_length=64, null=True, default=None)
     """Simple type, e.g., "str", "int". Is `None` for :class:`~lamindb.Feature` (optional)."""
-    readout = models.CharField(max_length=64, null=True, default=None)
-    """The readout type, e.g., "RNA", "Protein", etc.
-
-    Consider using :mod:`lnschema_bionty.ExperimentalFactor.abbr`.
-    """
+    modality = models.ForeignKey(Modality, PROTECT, null=True, default=None)
+    """The readout modality, e.g., "RNA", "Protein", (:class:`~lamindb.Modality`)."""
     ref_field = models.CharField(max_length=64, db_index=True)
     """Field of ORM that was hashed."""
     ref_orm = models.CharField(max_length=64, db_index=True)
