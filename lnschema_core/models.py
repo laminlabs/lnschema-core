@@ -1046,24 +1046,19 @@ class File(ORM):
     """Objects in storage.
 
     Args:
-        data: `Union[PathLike, DataLike]` A file path or an in-memory data
-            object (`DataFrame`, `AnnData`) to serialize. Can be a cloud path, e.g.,
-            `"s3://my-bucket/my_samples/my_file.fcs"`.
-        key: `Optional[str] = None` A storage key: a relative filepath within the
-            current default storage, e.g., `"my_samples/my_file.fcs"`.
-        name: `Optional[str] = None` A description.
-        run: `Optional[Run] = None` The run that created the file, gets auto-linked
-            if `ln.track()` was called.
-
-    Track where files come from by passing the generating :class:`~lamindb.Run`.
-
-    If files have corresponding representations in storage and memory, LaminDB
-    makes some configurable default choices (e.g., serialize a `DataFrame` as a
-    `.parquet` file).
+        data: `Union[PathLike, DataLike]` A file path or a data
+            object (`DataFrame`, `AnnData`) to serialize. Can be a cloud path,
+            e.g., `"s3://my-bucket/myfolder/myfile.fcs"`.
+        key: `Optional[str] = None` The desired storage key: a relative filepath
+            within the a storage location, e.g., `"myfolder/myfile.fcs"`. If
+            `None`, gets auto-populated for data in the cloud.
+        description: `Optional[str] = None` A description.
+        run: `Optional[Run] = None` The run that created the file. If `None`,
+            gets auto-linked if you generated a run context with :meth:`~lamindb.track`.
 
     .. admonition:: Typical formats in storage & their API accessors
 
-        Listed are typical `suffix` & `accessor` values:
+        Listed are typical values for :attr:`~lamindb.File.suffix` & :attr:`~lamindb.File.accessor`.
 
         - Table: `.csv`, `.tsv`, `.parquet`, `.ipc` ⟷ `DataFrame`, `pyarrow.Table`
         - Annotated matrix: `.h5ad`, `.h5mu`, `.zrad` ⟷ `AnnData`, `MuData`
@@ -1072,6 +1067,10 @@ class File(ORM):
         - Fastq: `.fastq` ⟷ /
         - VCF: `.vcf` ⟷ /
         - QC: `.html` ⟷ /
+
+        If files have corresponding representations in storage and memory, LaminDB
+        makes some configurable default choices (e.g., serialize a `DataFrame` as a
+        `.parquet` file).
 
     Note:
         In some cases, e.g. for zarr-based storage, a `File` object is stored as
