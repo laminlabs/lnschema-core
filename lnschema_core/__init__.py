@@ -1,4 +1,4 @@
-"""Data objects & lineage (`yvzi`)."""
+"""Data objects & lineage."""
 _schema_id = "yvzi"
 _name = "core"
 __version__ = "0.41.0"
@@ -17,6 +17,7 @@ if _INSTANCE_SETUP:
         FeatureSet,
         File,
         Label,
+        Modality,
         Run,
         Storage,
         Transform,
