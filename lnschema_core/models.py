@@ -744,7 +744,7 @@ class Label(ORM):
 
 
 class Modality(ORM):
-    """Type of measurement.
+    """Types of measurement.
 
     This borrows largely from the experimental factor ontology.
     """
@@ -1043,7 +1043,7 @@ class FeatureSet(ORM):
 
 
 class File(ORM):
-    """Batches of data stored as files and objects.
+    """Objects in storage.
 
     Args:
         data: `Union[PathLike, DataLike]` A file path or an in-memory data
@@ -1057,16 +1057,13 @@ class File(ORM):
 
     Track where files come from by passing the generating :class:`~lamindb.Run`.
 
-    Often, files store jointly measured features: track them with
-    :class:`~lamindb.FeatureSet`.
-
     If files have corresponding representations in storage and memory, LaminDB
     makes some configurable default choices (e.g., serialize a `DataFrame` as a
     `.parquet` file).
 
-    .. admonition:: Formats in storage & their API access
+    .. admonition:: Typical formats in storage & their API accessors
 
-        Listed are typical `suffix` values & in memory data objects.
+        Listed are typical `suffix` & `accessor` values:
 
         - Table: `.csv`, `.tsv`, `.parquet`, `.ipc` ⟷ `DataFrame`, `pyarrow.Table`
         - Annotated matrix: `.h5ad`, `.h5mu`, `.zrad` ⟷ `AnnData`, `MuData`
