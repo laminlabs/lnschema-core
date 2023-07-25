@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-🚚 Remove reference ORM from Label and add it to Feature, add slot to FeatureSet link models | [238](https://github.com/laminlabs/lnschema-core/pull/238) | [falexwolf](https://github.com/falexwolf) | 2023-07-24 |
+🚚 Remove reference ORM from Label and add it to Feature, add slot to FeatureSet link models | [238](https://github.com/laminlabs/lnschema-core/pull/238) | [falexwolf](https://github.com/falexwolf) | 2023-07-24 | 0.41.0
 📝 Updated view_parents signature | [237](https://github.com/laminlabs/lnschema-core/pull/237) | [sunnyosun](https://github.com/sunnyosun) | 2023-07-23 | 0.40.1
 🚚 More comprehensive `Label` and `FeatureSet` fields | [236](https://github.com/laminlabs/lnschema-core/pull/236) | [falexwolf](https://github.com/falexwolf) | 2023-07-23 |
 🚚 Integrate `Category` and `Tag` into `Label` | [235](https://github.com/laminlabs/lnschema-core/pull/235) | [falexwolf](https://github.com/falexwolf) | 2023-07-22 |

@@ -1,7 +1,7 @@
 """Data objects & lineage (`yvzi`)."""
 _schema_id = "yvzi"
 _name = "core"
-__version__ = "0.40.1"
+__version__ = "0.41.0"
 
 
 from lamindb_setup import _check_instance_setup
