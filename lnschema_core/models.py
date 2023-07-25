@@ -880,7 +880,7 @@ class FeatureSet(ORM):
 
     Args:
         features: `Iterable[ORM]` An iterable of :class:`~lamindb.Feature`
-            records to hash, e.g., `[Feature(...), Feature(...)]. Is turned into
+            records to hash, e.g., `[Feature(...), Feature(...)]`. Is turned into
             a set upon instantiation. If you'd like to pass values, use
             :meth:`~lamindb.FeatureSet.from_values` or
             :meth:`~lamindb.FeatureSet.from_df`.
