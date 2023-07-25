@@ -78,4 +78,9 @@ class Migration(migrations.Migration):
         ),
         migrations.RunSQL("INSERT INTO lnschema_core_filefeatureset (id, file_id, featureset_id) SELECT id, file_id, featureset_id from lnschema_core_filefeatureset_tmp"),
         migrations.RunSQL("DROP TABLE lnschema_core_filefeatureset_tmp"),
+        migrations.AddField(
+            model_name="file",
+            name="accessor",
+            field=models.CharField(db_index=True, default=None, max_length=64, null=True),
+        ),
     ]
