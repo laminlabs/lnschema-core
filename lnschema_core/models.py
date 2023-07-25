@@ -1240,6 +1240,7 @@ class File(ORM):
         path: PathLike,
         *,
         run: Optional[Run] = None,
+        storage_root: Optional[PathLike] = None,
     ) -> List["File"]:
         """Create a list of file objects from a directory.
 
