@@ -749,15 +749,15 @@ class Feature(ORM):
     See Also:
         :meth:`~lamindb.Feature.from_df`
             Create feature records from DataFrame.
+        :meth:`lamindb.File.features`
+            Manage feature annotations of files.
         :meth:`lamindb.Label`
             Labels for files & datasets.
 
     Args:
         name: `str` Name of the feature, typically, a column name.
-        type: `str` Simple type ("float", "int", "str", "categorical"). If
-            "categorical", consider managing categories with
-            :class:`~lamindb.Label`.
-        unit: `Optional[str] = None` Unit of measure, ideally SI (`m`, `s`, `kg`, etc.) or 'normalized' etc.
+        type: `str` Simple type ("float", "int", "str", "category").
+        unit: `Optional[str] = None` Unit of measure, ideally SI (`"m"`, `"s"`, `"kg"`, etc.) or `"normalized"` etc.
         description: `Optional[str] = None` A description.
         synonyms: `Optional[str] = None` Bar-separated synonyms.
 
@@ -801,10 +801,11 @@ class Feature(ORM):
     type = models.CharField(max_length=64, db_index=True, default=None)
     """Simple type ("float", "int", "str", "category").
 
-    If "category", consider managing categories with :class:`~lamindb.Label` or another label ORM.
+    If "category", consider managing categories with :class:`~lamindb.Label` or
+    another ORM for managing labels.
     """
     unit = models.CharField(max_length=30, db_index=True, null=True, default=None)
-    """Unit of measure, ideally SI (`m`, `s`, `kg`, etc.) or 'normalized' etc. (optional)"""
+    """Unit of measure, ideally SI (`m`, `s`, `kg`, etc.) or 'normalized' etc. (optional)."""
     description = models.TextField(db_index=True, null=True, default=None)
     """A description."""
     labels_orm = models.CharField(max_length=40, db_index=True, default=None, null=True)
