@@ -891,16 +891,16 @@ class Label(ORM):
 class Modality(ORM):
     """Types of measurement.
 
-    .. info::
+    .. note::
 
         This will soon borrow readout-related records from the experimental factor
         ontology, see :class:`~lnschema_bionty.ExperimentalFactor`.
 
     Args:
-        name: str
-        ontology_id: str
-        abbr: Optional[str]
-        description: Optional[str]
+        name: `str` A name.
+        ontology_id: `Optional[str]` A public ontology ID.
+        abbr: `Optional[str]` An abbreviation.
+        description: `Optional[str]` A description.
     """
 
     id = models.CharField(max_length=8, default=base62_8, primary_key=True)
@@ -1683,7 +1683,7 @@ class Dataset(ORM):
         This is still in an early stage and subject to change.
 
     Args:
-        data: `DataLike]` A data object (`DataFrame`, `AnnData`) to store.
+        data: `DataLike` A data object (`DataFrame`, `AnnData`) to store.
         name: `str` A name.
         description: `Optional[str] = None` A description.
 
@@ -1756,7 +1756,7 @@ class Dataset(ORM):
     @overload
     def __init__(
         self,
-        data: DataLike,
+        data: Any,
         name: str,
         description: Optional[str] = None,
     ):
