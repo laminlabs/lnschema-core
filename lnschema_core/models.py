@@ -977,6 +977,8 @@ class FeatureSet(ORM):
     """The reference ORM for feature identifiers."""
     ref_schema = models.CharField(max_length=64, db_index=True)
     """The schema where the reference ORM is defined."""
+    hash = models.CharField(max_length=20, default=None, db_index=True)
+    """The hash of the set."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
@@ -990,7 +992,7 @@ class FeatureSet(ORM):
         features: Iterable[ORM],
         ref_field: Optional[str] = None,
         type: Optional[Union[Type, str]] = None,
-        readout: Optional[str] = None,
+        modality: Optional[str] = None,
         name: Optional[str] = None,
     ):
         ...
