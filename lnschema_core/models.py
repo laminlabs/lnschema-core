@@ -18,6 +18,7 @@ from typing import (  # noqa
 from django.db import models
 from django.db.models import CASCADE, PROTECT
 from django.db.models.query_utils import DeferredAttribute as Field
+from lamindb_setup import _check_instance_setup
 from upath import UPath
 
 from lnschema_core.mocks import AnnDataAccessor, BackedAccessor, QuerySet
@@ -27,8 +28,12 @@ from .ids import base62_8, base62_12, base62_20
 from .types import TransformType
 from .users import current_user_id
 
-if TYPE_CHECKING:
+_INSTANCE_SETUP = _check_instance_setup()
+
+if TYPE_CHECKING or _INSTANCE_SETUP:
     import pandas as pd
+    from lamindb.dev import FeatureManager
+
 
 IPYTHON = getattr(builtins, "__IPYTHON__", False)
 TRANSFORM_TYPE_DEFAULT = TransformType.notebook if IPYTHON else TransformType.pipeline
@@ -1490,7 +1495,7 @@ class File(ORM):
         pass
 
     @property
-    def features(self):
+    def features(self) -> "FeatureManager":
         """Feature manager (:class:`~lamindb.dev.FeatureManager`)."""
         from lamindb._feature_manager import FeatureManager
 
