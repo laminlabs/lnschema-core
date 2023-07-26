@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚚 Rename `featureset_id` to `feature_set_id` in `FeatureSetFile` link table | [242](https://github.com/laminlabs/lnschema-core/pull/242) | [falexwolf](https://github.com/falexwolf) | 2023-07-26 |
 🚚 Add `Modality` | [240](https://github.com/laminlabs/lnschema-core/pull/240) | [falexwolf](https://github.com/falexwolf) | 2023-07-25 |
 🚚 Add `File.accessor` | [239](https://github.com/laminlabs/lnschema-core/pull/239) | [falexwolf](https://github.com/falexwolf) | 2023-07-25 |
 🚚 Remove reference ORM from Label and add it to Feature, add slot to FeatureSet link models | [238](https://github.com/laminlabs/lnschema-core/pull/238) | [falexwolf](https://github.com/falexwolf) | 2023-07-24 | 0.41.0
