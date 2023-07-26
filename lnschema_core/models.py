@@ -1678,6 +1678,15 @@ class File(ORM):
 class Dataset(ORM):
     """Datasets.
 
+    .. note::
+
+        This is still in an early stage and subject to change.
+
+    Args:
+        data: `DataLike]` A data object (`DataFrame`, `AnnData`) to store.
+        name: `str` A name.
+        description: `Optional[str] = None` A description.
+
     Datasets are measurements of features (aka observations of variables).
 
     1. A feature can be a “high-level” feature with meaning: a labelled
@@ -1743,6 +1752,29 @@ class Dataset(ORM):
     """Time of run execution."""
     created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_datasets")
     """Creator of record, a :class:`~lamindb.User`."""
+
+    @overload
+    def __init__(
+        self,
+        data: DataLike,
+        name: str,
+        description: Optional[str] = None,
+    ):
+        ...
+
+    @overload
+    def __init__(
+        self,
+        *db_args,
+    ):
+        ...
+
+    def __init__(
+        self,
+        *args,
+        **kwargs,
+    ):
+        pass
 
 
 class FileFeatureSet(ORM):
