@@ -39,11 +39,11 @@ class Migration(migrations.Migration):
             fields=[
                 ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 ("slot", models.CharField(default=None, max_length=40, null=True)),
-                ("featureset", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="lnschema_core.featureset")),
+                ("feature_set", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="lnschema_core.featureset")),
                 ("file", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="lnschema_core.file")),
             ],
             options={
-                "unique_together": {("file", "featureset")},
+                "unique_together": {("file", "feature_set")},
             },
         ),
         migrations.CreateModel(
@@ -52,14 +52,14 @@ class Migration(migrations.Migration):
                 ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 ("slot", models.CharField(default=None, max_length=50, null=True)),
                 ("dataset", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="lnschema_core.dataset")),
-                ("featureset", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="lnschema_core.featureset")),
+                ("feature_set", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="lnschema_core.featureset")),
             ],
             options={
-                "unique_together": {("dataset", "featureset")},
+                "unique_together": {("dataset", "feature_set")},
             },
         ),
-        migrations.RunSQL("CREATE TABLE lnschema_core_filefeatureset_tmp (id BIGINT, file_id TEXT, featureset_id TEXT)"),
-        migrations.RunSQL("INSERT INTO lnschema_core_filefeatureset_tmp (id, file_id, featureset_id) SELECT id, file_id, featureset_id from lnschema_core_file_feature_sets"),
+        migrations.RunSQL("CREATE TABLE lnschema_core_filefeatureset_tmp (id BIGINT, file_id TEXT, feature_set_id TEXT)"),
+        migrations.RunSQL("INSERT INTO lnschema_core_filefeatureset_tmp (id, file_id, feature_set_id) SELECT id, file_id, featureset_id from lnschema_core_file_feature_sets"),
         migrations.RemoveField(
             model_name="file",
             name="feature_sets",
@@ -78,7 +78,7 @@ class Migration(migrations.Migration):
             name="feature_sets",
             field=models.ManyToManyField(related_name="files", through="lnschema_core.FileFeatureSet", to="lnschema_core.featureset"),
         ),
-        migrations.RunSQL("INSERT INTO lnschema_core_filefeatureset (id, file_id, featureset_id) SELECT id, file_id, featureset_id from lnschema_core_filefeatureset_tmp"),
+        migrations.RunSQL("INSERT INTO lnschema_core_filefeatureset (id, file_id, feature_set_id) SELECT id, file_id, feature_set_id from lnschema_core_filefeatureset_tmp"),
         migrations.RunSQL("DROP TABLE lnschema_core_filefeatureset_tmp"),
         migrations.AddField(
             model_name="file",
