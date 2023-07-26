@@ -669,8 +669,14 @@ class Run(ORM):
 class Label(ORM):
     """Labels for files & datasets.
 
-    A label can be used to annotate a file or dataset as a whole. For instance,
-    with "Project 1", "curated", or "Iris flower".
+    Args:
+        name: `str` A name.
+        description: `str` A description.
+        feature: `Optional[Union["Feature", str]]` A :class:`~lamindb.Feature`
+            record or its name.
+
+    A label can be used to annotate a file or dataset as a whole: "Project 1",
+    "curated", or "Iris flower".
 
     In some cases, a label is measured only within a part of a file or dataset.
     Then, a :class:`~lamindb.Feature` qualifies the measurement and slot for the
@@ -747,11 +753,43 @@ class Label(ORM):
     class Meta:
         unique_together = (("name", "feature"),)
 
+    @overload
+    def __init__(
+        self,
+        name: str,
+        description: str,
+        feature: Optional[Union["Feature", str]],
+    ):
+        ...
+
+    @overload
+    def __init__(
+        self,
+        *db_args,
+    ):
+        ...
+
+    def __init__(
+        self,
+        *args,
+        **kwargs,
+    ):
+        pass
+
 
 class Modality(ORM):
     """Types of measurement.
 
-    This borrows largely from the experimental factor ontology.
+    .. info::
+
+        This will soon borrow readout-related records from the experimental factor
+        ontology, see :class:`~lnschema_bionty.ExperimentalFactor`.
+
+    Args:
+        name: str
+        ontology_id: str
+        abbr: Optional[str]
+        description: Optional[str]
     """
 
     id = models.CharField(max_length=8, default=base62_8, primary_key=True)
@@ -785,6 +823,30 @@ class Modality(ORM):
         related_name="created_modalities",
     )
     """Creator of record, a :class:`~lamindb.User`."""
+
+    @overload
+    def __init__(
+        self,
+        name: str,
+        ontology_id: str,
+        abbr: Optional[str],
+        description: Optional[str],
+    ):
+        ...
+
+    @overload
+    def __init__(
+        self,
+        *db_args,
+    ):
+        ...
+
+    def __init__(
+        self,
+        *args,
+        **kwargs,
+    ):
+        pass
 
 
 class Feature(ORM):
