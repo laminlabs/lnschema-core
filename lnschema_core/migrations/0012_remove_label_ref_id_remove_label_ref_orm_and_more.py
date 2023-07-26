@@ -120,4 +120,11 @@ class Migration(migrations.Migration):
             name="modality",
             field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, to="lnschema_core.modality"),
         ),
+        migrations.AlterField(
+            model_name="featureset",
+            name="created_by",
+            field=models.ForeignKey(
+                default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.PROTECT, related_name="created_feature_sets", to="lnschema_core.user"
+            ),
+        ),
     ]
