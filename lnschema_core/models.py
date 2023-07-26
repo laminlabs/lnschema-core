@@ -503,7 +503,7 @@ class User(ORM):
         *args,
         **kwargs,
     ):
-        super(self, User).__init__(*args, **kwargs)
+        super(User, self).__init__(*args, **kwargs)
 
 
 class Storage(ORM):
@@ -569,7 +569,7 @@ class Storage(ORM):
         *args,
         **kwargs,
     ):
-        super(self, Storage).__init__(*args, **kwargs)
+        super(Storage, self).__init__(*args, **kwargs)
 
 
 class Transform(ORM):
@@ -684,7 +684,7 @@ class Transform(ORM):
         *args,
         **kwargs,
     ):
-        super(self, Transform).__init__(*args, **kwargs)
+        super(Transform, self).__init__(*args, **kwargs)
 
 
 class Run(ORM):
@@ -774,7 +774,7 @@ class Run(ORM):
         *args,
         **kwargs,
     ):
-        super(self, Run).__init__(*args, **kwargs)
+        super(Run, self).__init__(*args, **kwargs)
 
 
 class Label(ORM):
@@ -957,7 +957,7 @@ class Modality(ORM):
         *args,
         **kwargs,
     ):
-        super(self, Modality).__init__(*args, **kwargs)
+        super(Modality, self).__init__(*args, **kwargs)
 
 
 class Feature(ORM):
