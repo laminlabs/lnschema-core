@@ -992,7 +992,7 @@ class FeatureSet(ORM):
         features: Iterable[ORM],
         ref_field: Optional[str] = None,
         type: Optional[Union[Type, str]] = None,
-        readout: Optional[str] = None,
+        modality: Optional[str] = None,
         name: Optional[str] = None,
     ):
         ...
