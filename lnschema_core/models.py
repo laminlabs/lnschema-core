@@ -454,6 +454,8 @@ class ORM(models.Model):
 class User(ORM):
     """Users.
 
+    Is auto-managed. No need to create objects.
+
     All data in this table is synched from the cloud user account to ensure a
     universal user identity, valid across DB instances and email & handle
     changes.
@@ -480,9 +482,34 @@ class User(ORM):
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
 
+    @overload
+    def __init__(
+        self,
+        handle: str,
+        email: str,
+        name: Optional[str],
+    ):
+        ...
+
+    @overload
+    def __init__(
+        self,
+        *db_args,
+    ):
+        ...
+
+    def __init__(
+        self,
+        *args,
+        **kwargs,
+    ):
+        super(self, User).__init__(*args, **kwargs)
+
 
 class Storage(ORM):
     """Storage locations: S3 or GCP buckets or local storage locations.
+
+    Is auto-managed, no need to create objects.
 
     See Also:
         :attr:`~lamindb.dev.Settings.storage`
@@ -521,6 +548,29 @@ class Storage(ORM):
     created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_storages")
     """Creator of record, a :class:`~lamindb.User`."""
 
+    @overload
+    def __init__(
+        self,
+        root: str,
+        type: str,
+        region: Optional[str],
+    ):
+        ...
+
+    @overload
+    def __init__(
+        self,
+        *db_args,
+    ):
+        ...
+
+    def __init__(
+        self,
+        *args,
+        **kwargs,
+    ):
+        super(self, Storage).__init__(*args, **kwargs)
+
 
 class Transform(ORM):
     """Transforms of files & datasets.
@@ -530,6 +580,15 @@ class Transform(ORM):
     A pipeline is versioned software that transforms data.
     This can be anything from typical workflow tools (Nextflow, Snakemake,
     Prefect, Apache Airflow, etc.) to simple (versioned) scripts.
+
+    Args:
+        name: `str` A name.
+        short_name: `Optional[str] = None` A description.
+        version: `Optional[str] = "0"` A :class:`~lamindb.Transform` record or its name.
+        type: `Optional[TransformType] = None` Either `'notebook'`, `'pipeline'`
+            or `'app'`. If `None`, defaults to `'notebook'` within a notebook (IPython
+            environment), and to `'pipeline'` outside of it.
+        reference: `Optional[str] = None` A reference like a URL.
 
     See Also:
         :meth:`lamindb.track`
@@ -561,10 +620,9 @@ class Transform(ORM):
     """Transform name or title, a pipeline name, notebook title, etc..
     """
     short_name = models.CharField(max_length=128, db_index=True, null=True, default=None)
-    """A short name.
-    """
+    """A short name (optional)."""
     stem_id = models.CharField(max_length=12, default=base62_12, db_index=True)
-    """Stem of id, identifying transform up to version."""
+    """Stem of id, identifying the transform up to version (auto-managed)."""
     version = models.CharField(max_length=10, default="0", db_index=True)
     """Version, defaults to `"0"`.
 
@@ -603,18 +661,39 @@ class Transform(ORM):
     class Meta:
         unique_together = (("stem_id", "version"),)
 
+    @overload
+    def __init__(
+        self,
+        name: str,
+        short_name: Optional[str] = None,
+        version: Optional[str] = "0",
+        type: Optional[TransformType] = None,
+        reference: Optional[str] = None,
+    ):
+        ...
+
+    @overload
+    def __init__(
+        self,
+        *db_args,
+    ):
+        ...
+
+    def __init__(
+        self,
+        *args,
+        **kwargs,
+    ):
+        super(self, Transform).__init__(*args, **kwargs)
+
 
 class Run(ORM):
     """Runs of transforms (:class:`~lamindb.Transform`).
 
-    Typically, a run has inputs and outputs:
-
-    - References to outputs are stored in :class:`~lamindb.File` in the `run` field.
-      This is possible as every given file has a unique run that created it. Any
-      given `Run` can output multiple `files`: `run.outputs`.
-    - References to inputs are stored in the :class:`~lamindb.File` in the
-      `input_of` field. Any `file` might serve as an input for multiple `runs`.
-      Similarly, any `run` might have many `files` as inputs: `run.inputs`.
+    Args:
+        reference: `str` A name.
+        reference_type: `str` A description.
+        transform: `Transform` A :class:`~lamindb.Transform` record or its name.
 
     See Also:
         :meth:`lamindb.track`
@@ -623,7 +702,16 @@ class Run(ORM):
             Transformations that runs execute.
 
     Notes:
-        For more info, see tutorial: :doc:`/guide/data-lineage`.
+        See guide: :doc:`/guide/data-lineage`.
+
+        Typically, a run has inputs and outputs:
+
+            - References to outputs are stored in :class:`~lamindb.File` in the `run` field.
+              This is possible as every given file has a unique run that created it. Any
+              given `Run` can output multiple `files`: `run.outputs`.
+            - References to inputs are stored in the :class:`~lamindb.File` in the
+              `input_of` field. Any `file` might serve as an input for multiple `runs`.
+              Similarly, any `run` might have many `files` as inputs: `run.inputs`.
 
     Examples:
 
@@ -664,6 +752,29 @@ class Run(ORM):
     """Time of run execution."""
     created_by = models.ForeignKey(User, CASCADE, default=current_user_id, related_name="created_runs")
     """Creator of record, a :class:`~lamindb.User`."""
+
+    @overload
+    def __init__(
+        self,
+        reference: str,
+        reference_type: str,
+        transform: Transform,
+    ):
+        ...
+
+    @overload
+    def __init__(
+        self,
+        *db_args,
+    ):
+        ...
+
+    def __init__(
+        self,
+        *args,
+        **kwargs,
+    ):
+        super(self, Run).__init__(*args, **kwargs)
 
 
 class Label(ORM):
@@ -846,7 +957,7 @@ class Modality(ORM):
         *args,
         **kwargs,
     ):
-        pass
+        super(self, Modality).__init__(*args, **kwargs)
 
 
 class Feature(ORM):
