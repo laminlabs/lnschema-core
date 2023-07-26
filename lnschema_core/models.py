@@ -977,7 +977,7 @@ class FeatureSet(ORM):
     """The reference ORM for feature identifiers."""
     ref_schema = models.CharField(max_length=64, db_index=True)
     """The schema where the reference ORM is defined."""
-    hash = models.CharField(max_length=20, primary_key=True, default=None)
+    hash = models.CharField(max_length=20, default=None, db_index=True)
     """The hash of the set."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""

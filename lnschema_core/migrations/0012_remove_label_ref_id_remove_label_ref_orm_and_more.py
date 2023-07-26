@@ -130,6 +130,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="featureset",
             name="hash",
-            field=models.CharField(default=None, max_length=20, primary_key=True),
+            field=models.CharField(db_index=True, default=None, max_length=20),
         ),
     ]
