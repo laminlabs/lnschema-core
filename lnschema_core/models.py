@@ -976,7 +976,7 @@ class FeatureSet(ORM):
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
-    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_featuresets")
+    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_feature_sets")
     """Creator of record, a :class:`~lamindb.User`."""
 
     @overload
@@ -1569,20 +1569,20 @@ class Dataset(ORM):
 
 class FileFeatureSet(ORM):
     file = models.ForeignKey(File, on_delete=models.CASCADE)
-    featureset = models.ForeignKey(FeatureSet, on_delete=models.CASCADE)
+    feature_set = models.ForeignKey(FeatureSet, on_delete=models.CASCADE)
     slot = models.CharField(max_length=40, null=True, default=None)
 
     class Meta:
-        unique_together = ("file", "featureset")
+        unique_together = ("file", "feature_set")
 
 
 class DatasetFeatureSet(ORM):
     dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE)
-    featureset = models.ForeignKey(FeatureSet, on_delete=models.CASCADE)
+    feature_set = models.ForeignKey(FeatureSet, on_delete=models.CASCADE)
     slot = models.CharField(max_length=50, null=True, default=None)
 
     class Meta:
-        unique_together = ("dataset", "featureset")
+        unique_together = ("dataset", "feature_set")
 
 
 # -------------------------------------------------------------------------------------
