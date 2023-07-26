@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚑️ Hash can be null | [246](https://github.com/laminlabs/lnschema-core/pull/246) | [falexwolf](https://github.com/falexwolf) | 2023-07-26 |
 📝 Add signatures to remaining ORMs | [245](https://github.com/laminlabs/lnschema-core/pull/245) | [falexwolf](https://github.com/falexwolf) | 2023-07-26 | 0.42.1
 🚚 Add field `hash` to `FeatureSet` | [244](https://github.com/laminlabs/lnschema-core/pull/244) | [falexwolf](https://github.com/falexwolf) | 2023-07-26 |
 🚸 Type-annotate `FeatureManager` | [243](https://github.com/laminlabs/lnschema-core/pull/243) | [falexwolf](https://github.com/falexwolf) | 2023-07-26 |
