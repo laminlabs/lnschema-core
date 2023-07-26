@@ -1497,9 +1497,7 @@ class File(ORM):
     @property
     def features(self) -> "FeatureManager":
         """Feature manager (:class:`~lamindb.dev.FeatureManager`)."""
-        from lamindb._feature_manager import FeatureManager
-
-        return FeatureManager(self)
+        pass
 
 
 class Dataset(ORM):
