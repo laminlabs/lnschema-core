@@ -127,4 +127,9 @@ class Migration(migrations.Migration):
                 default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.PROTECT, related_name="created_feature_sets", to="lnschema_core.user"
             ),
         ),
+        migrations.AddField(
+            model_name="featureset",
+            name="hash",
+            field=models.CharField(default=None, max_length=20, primary_key=True),
+        ),
     ]
