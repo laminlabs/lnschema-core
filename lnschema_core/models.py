@@ -1025,10 +1025,8 @@ class Feature(ORM):
     """Unit of measure, ideally SI (`m`, `s`, `kg`, etc.) or 'normalized' etc. (optional)."""
     description = models.TextField(db_index=True, null=True, default=None)
     """A description."""
-    labels_orm = models.CharField(max_length=40, db_index=True, default=None, null=True)
-    """ORM providing the vocabulary for labels, e.g., :class:`lnschema_bionty.CellLine` (optional)."""
-    labels_schema = models.CharField(max_length=40, db_index=True, default=None, null=True)
-    """Schema of the ORM (optional)."""
+    label_orms = models.CharField(max_length=128, db_index=True, default=None, null=True)
+    """ORMs that provide identifiers for labels, bar-separated (|) (optional)."""
     synonyms = models.TextField(null=True, default=None)
     """Bar-separated (|) synonyms (optional)."""
     feature_sets = models.ManyToManyField("FeatureSet", related_name="features")
