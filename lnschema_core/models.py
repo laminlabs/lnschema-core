@@ -806,7 +806,7 @@ class Label(ORM):
 
     See Also:
         :meth:`lamindb.Feature`
-            Qualifiers for measurements in files & datasets.
+            Dimensions of measurement for files & datasets.
 
     Examples:
 
@@ -961,7 +961,7 @@ class Modality(ORM):
 
 
 class Feature(ORM):
-    """Qualifiers for measurements in files & datasets.
+    """Dimensions of measurement for files & datasets.
 
     See Also:
         :meth:`~lamindb.Feature.from_df`
