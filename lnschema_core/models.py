@@ -1344,8 +1344,8 @@ class File(ORM):
         self,
         data: Union[PathLike, DataLike],
         key: Optional[str] = None,
+        description: Optional[str] = None,
         run: Optional[Run] = None,
-        name: Optional[str] = None,
     ):
         ...
 
