@@ -806,7 +806,7 @@ class Label(ORM):
 
     See Also:
         :meth:`lamindb.Feature`
-            Qualifiers for measurements in files & datasets.
+            Dimensions of measurement for files & datasets.
 
     Examples:
 
@@ -961,7 +961,7 @@ class Modality(ORM):
 
 
 class Feature(ORM):
-    """Qualifiers for measurements in files & datasets.
+    """Dimensions of measurement for files & datasets.
 
     See Also:
         :meth:`~lamindb.Feature.from_df`
@@ -1025,10 +1025,8 @@ class Feature(ORM):
     """Unit of measure, ideally SI (`m`, `s`, `kg`, etc.) or 'normalized' etc. (optional)."""
     description = models.TextField(db_index=True, null=True, default=None)
     """A description."""
-    labels_orm = models.CharField(max_length=40, db_index=True, default=None, null=True)
-    """ORM providing the vocabulary for labels, e.g., :class:`lnschema_bionty.CellLine` (optional)."""
-    labels_schema = models.CharField(max_length=40, db_index=True, default=None, null=True)
-    """Schema of the ORM (optional)."""
+    label_orms = models.CharField(max_length=128, db_index=True, default=None, null=True)
+    """ORMs that provide identifiers for labels, bar-separated (|) (optional)."""
     synonyms = models.TextField(null=True, default=None)
     """Bar-separated (|) synonyms (optional)."""
     feature_sets = models.ManyToManyField("FeatureSet", related_name="features")
@@ -1141,7 +1139,10 @@ class FeatureSet(ORM):
     n = models.IntegerField()
     """Number of features in the set."""
     type = models.CharField(max_length=64, null=True, default=None)
-    """Simple type, e.g., "str", "int". Is `None` for :class:`~lamindb.Feature` (optional)."""
+    """Simple type, e.g., "str", "int". Is `None` for :class:`~lamindb.Feature` (optional).
+
+    For :class:`~lamindb.Feature`, types are expected to be in-homogeneous and defined on a per-feature level.
+    """
     modality = models.ForeignKey(Modality, PROTECT, null=True, default=None)
     """The measurement modality, e.g., "RNA", "Protein", "Gene Module", "pathway" (:class:`~lamindb.Modality`)."""
     ref_field = models.CharField(max_length=64, db_index=True)
@@ -1223,7 +1224,7 @@ class FeatureSet(ORM):
 
 
 class File(ORM):
-    """Objects in storage.
+    """Access to objects in storage.
 
     Args:
         data: `Union[PathLike, DataLike]` A file path or a data
@@ -1248,8 +1249,7 @@ class File(ORM):
         - VCF: `.vcf` ⟷ /
         - QC: `.html` ⟷ /
 
-        If files have corresponding representations in storage and memory, LaminDB
-        makes some configurable default choices (e.g., serialize a `DataFrame` as a
+        LaminDB makes some default choices (e.g., serialize a `DataFrame` as a
         `.parquet` file).
 
     Note:
@@ -1678,9 +1678,12 @@ class File(ORM):
 class Dataset(ORM):
     """Datasets.
 
-    .. note::
+    .. warning::
 
-        This is still in an early stage and subject to change.
+        The `Dataset` ORM builds on all other ORMs and might change in the future.
+
+        What's not going to change is that a Dataset can be stored in a single
+        file, and can be stored sharded into several files.
 
     Args:
         data: `DataLike` A data object (`DataFrame`, `AnnData`) to store.
