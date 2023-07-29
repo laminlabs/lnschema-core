@@ -853,7 +853,7 @@ class Label(ORM):
     parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
     """Parent labels, useful to hierarchically group labels (optional)."""
     feature = models.ForeignKey("Feature", CASCADE, related_name="labels", null=True, default=None)
-    """The feature in which the label is sampled (optional)."""
+    """The feature for which the label is sampled (optional)."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
