@@ -1224,7 +1224,7 @@ class FeatureSet(ORM):
 
 
 class File(ORM):
-    """Objects in storage.
+    """Access to objects in storage.
 
     Args:
         data: `Union[PathLike, DataLike]` A file path or a data
@@ -1249,8 +1249,7 @@ class File(ORM):
         - VCF: `.vcf` ⟷ /
         - QC: `.html` ⟷ /
 
-        If files have corresponding representations in storage and memory, LaminDB
-        makes some configurable default choices (e.g., serialize a `DataFrame` as a
+        LaminDB makes some default choices (e.g., serialize a `DataFrame` as a
         `.parquet` file).
 
     Note:
