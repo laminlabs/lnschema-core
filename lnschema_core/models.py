@@ -1139,7 +1139,10 @@ class FeatureSet(ORM):
     n = models.IntegerField()
     """Number of features in the set."""
     type = models.CharField(max_length=64, null=True, default=None)
-    """Simple type, e.g., "str", "int". Is `None` for :class:`~lamindb.Feature` (optional)."""
+    """Simple type, e.g., "str", "int". Is `None` for :class:`~lamindb.Feature` (optional).
+
+    For :class:`~lamindb.Feature`, types are expected to be in-homogeneous and defined on a per-feature level.
+    """
     modality = models.ForeignKey(Modality, PROTECT, null=True, default=None)
     """The measurement modality, e.g., "RNA", "Protein", "Gene Module", "pathway" (:class:`~lamindb.Modality`)."""
     ref_field = models.CharField(max_length=64, db_index=True)
@@ -1676,9 +1679,12 @@ class File(ORM):
 class Dataset(ORM):
     """Datasets.
 
-    .. note::
+    .. warning::
 
-        This is still in an early stage and subject to change.
+        The `Dataset` ORM builds on all other ORMs and might change in the future.
+
+        What's not going to change is that a Dataset can be stored in a single
+        file, and can be stored sharded into several files.
 
     Args:
         data: `DataLike` A data object (`DataFrame`, `AnnData`) to store.
