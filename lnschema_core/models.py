@@ -159,24 +159,22 @@ class ORM(models.Model):
         pass
 
     @classmethod
-    def from_values(cls, identifiers: ListLike, field: StrField, **kwargs) -> List["ORM"]:
+    def from_values(cls, values: ListLike, field: StrField, **kwargs) -> List["ORM"]:
         """Parse values for an identifier (a name, an id, etc.) and create records.
 
         This method helps avoid problems around duplication of entries,
         violation of idempotency, and performance when creating records in bulk.
 
         Args:
-            identifiers: ``ListLike`` A list of values for an identifier, e.g.
-                ``["name1", "name2"]``.
-            field: ``StrField`` An ``ORM`` field to look up, e.g., ``lb.CellMarker.name``.
-            **kwargs: Can contain ``species``. Either ``"human"``, ``"mouse"``, or any other
-                `name` of `Bionty.Species`. If ``None``, will use default species in
-                bionty for each entity.
+            values: `ListLike` A list of values for an identifier, e.g.
+                `["name1", "name2"]`.
+            field: `StrField` An ``ORM`` field to look up, e.g., `lb.CellMarker.name`.
+            **kwargs: Additional conditions for creation of records, e.g., `species="human"`.
 
         Returns:
             A list of records.
 
-        For every ``value`` in a list-like of identifiers and a given `ORM.field`,
+        For every `value` in a list-like of identifiers and a given `ORM.field`,
         this function performs:
 
         1. It checks whether the value already exists in the database
