@@ -23,10 +23,10 @@ class Migration(migrations.Migration):
             name="label_orms",
             field=models.CharField(db_index=True, default=None, max_length=128, null=True),
         ),
-        migrations.RemoveField(
-            model_name="label",
-            name="feature",
-        ),
+        # migrations.RemoveField(
+        #     model_name="label",
+        #     name="feature",
+        # ),
         migrations.AlterUniqueTogether(
             name="label",
             unique_together=set(),

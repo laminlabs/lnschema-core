@@ -1793,7 +1793,7 @@ class DatasetFeatureSet(ORM):
 class FileLabel(ORM):
     file = models.ForeignKey(File, on_delete=models.CASCADE)
     label = models.ForeignKey(Label, on_delete=models.CASCADE)
-    feature = models.ForeignKey("Feature", CASCADE, null=True, default=None)
+    feature = models.ForeignKey(Feature, CASCADE, null=True, default=None)
 
     class Meta:
         unique_together = ("file", "label")
