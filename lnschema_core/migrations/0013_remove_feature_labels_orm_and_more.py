@@ -56,4 +56,22 @@ class Migration(migrations.Migration):
             model_name="label",
             name="feature",
         ),
+        migrations.RemoveField(
+            model_name="featureset",
+            name="ref_field",
+        ),
+        migrations.RenameField(
+            model_name="featureset",
+            old_name="ref_orm",
+            new_name="ref_field",
+        ),
+        migrations.RemoveField(
+            model_name="featureset",
+            name="ref_schema",
+        ),
+        migrations.AlterField(
+            model_name="featureset",
+            name="ref_field",
+            field=models.CharField(db_index=True, max_length=128),
+        ),
     ]

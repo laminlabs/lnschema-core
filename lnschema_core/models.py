@@ -1137,12 +1137,8 @@ class FeatureSet(ORM):
     """
     modality = models.ForeignKey(Modality, PROTECT, null=True, default=None)
     """The measurement modality, e.g., "RNA", "Protein", "Gene Module", "pathway" (:class:`~lamindb.Modality`)."""
-    ref_field = models.CharField(max_length=64, db_index=True)
-    """Field of ORM that was hashed."""
-    ref_orm = models.CharField(max_length=64, db_index=True)
-    """The reference ORM for feature identifiers."""
-    ref_schema = models.CharField(max_length=64, db_index=True)
-    """The schema where the reference ORM is defined."""
+    ref_field = models.CharField(max_length=128, db_index=True)
+    """The registry/ORM field that provides identifiers including schema and ORM, e.g., `'bionty.Gene.ensemble_gene_id'`."""
     hash = models.CharField(max_length=20, default=None, db_index=True, null=True)
     """The hash of the set."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
