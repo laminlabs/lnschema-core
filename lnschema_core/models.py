@@ -857,9 +857,6 @@ class Label(ORM):
     created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_labels")
     """Creator of record, a :class:`~lamindb.User`."""
 
-    class Meta:
-        unique_together = (("name", "feature"),)
-
     @overload
     def __init__(
         self,
