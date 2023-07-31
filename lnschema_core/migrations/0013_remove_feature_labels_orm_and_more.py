@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.RunSQL("CREATE TABLE lnschema_core_filelabel_tmp (id BIGINT, file_id TEXT, label_id TEXT)"),
-        migrations.RunSQL("INSERT INTO lnschema_core_filelabel_tmp (id, file_id, label_id) SELECT id, file_id, featureset_id from lnschema_core_file_labels"),
+        migrations.RunSQL("INSERT INTO lnschema_core_filelabel_tmp (id, file_id, label_id) SELECT id, file_id, label_id from lnschema_core_file_labels"),
         migrations.RemoveField(
             model_name="file",
             name="labels",
