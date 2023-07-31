@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name="feature",
-            name="label_orms",
+            name="registries",
             field=models.CharField(db_index=True, default=None, max_length=128, null=True),
         ),
         migrations.AlterUniqueTogether(

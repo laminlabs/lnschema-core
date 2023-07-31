@@ -1017,7 +1017,7 @@ class Feature(ORM):
     """Unit of measure, ideally SI (`m`, `s`, `kg`, etc.) or 'normalized' etc. (optional)."""
     description = models.TextField(db_index=True, null=True, default=None)
     """A description."""
-    label_orms = models.CharField(max_length=128, db_index=True, default=None, null=True)
+    registries = models.CharField(max_length=128, db_index=True, default=None, null=True)
     """ORMs that provide identifiers for labels, bar-separated (|) (optional)."""
     synonyms = models.TextField(null=True, default=None)
     """Bar-separated (|) synonyms (optional)."""
