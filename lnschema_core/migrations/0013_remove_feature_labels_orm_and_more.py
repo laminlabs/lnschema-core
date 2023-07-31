@@ -39,6 +39,8 @@ class Migration(migrations.Migration):
                 "unique_together": {("file", "label")},
             },
         ),
+        migrations.RunSQL("CREATE TABLE lnschema_core_filelabel_tmp (id BIGINT, file_id TEXT, label_id TEXT)"),
+        migrations.RunSQL("INSERT INTO lnschema_core_filelabel_tmp (id, file_id, label_id) SELECT id, file_id, featureset_id from lnschema_core_file_labels"),
         migrations.RemoveField(
             model_name="file",
             name="labels",
@@ -48,6 +50,8 @@ class Migration(migrations.Migration):
             name="labels",
             field=models.ManyToManyField(related_name="files", through="lnschema_core.FileLabel", to="lnschema_core.label"),
         ),
+        migrations.RunSQL("INSERT INTO lnschema_core_filelabel (id, file_id, label_id) SELECT id, file_id, label_id from lnschema_core_filelabel_tmp"),
+        migrations.RunSQL("DROP TABLE lnschema_core_filelabel_tmp"),
         migrations.RemoveField(
             model_name="label",
             name="feature",
