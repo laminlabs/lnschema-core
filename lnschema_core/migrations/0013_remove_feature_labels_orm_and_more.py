@@ -23,10 +23,6 @@ class Migration(migrations.Migration):
             name="label_orms",
             field=models.CharField(db_index=True, default=None, max_length=128, null=True),
         ),
-        # migrations.RemoveField(
-        #     model_name="label",
-        #     name="feature",
-        # ),
         migrations.AlterUniqueTogether(
             name="label",
             unique_together=set(),
@@ -51,5 +47,9 @@ class Migration(migrations.Migration):
             model_name="file",
             name="labels",
             field=models.ManyToManyField(related_name="files", through="lnschema_core.FileLabel", to="lnschema_core.label"),
+        ),
+        migrations.RemoveField(
+            model_name="label",
+            name="feature",
         ),
     ]
