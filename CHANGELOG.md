@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚚 Move feature foreign key from Label to link model | [249](https://github.com/laminlabs/lnschema-core/pull/249) | [falexwolf](https://github.com/falexwolf) | 2023-07-31 |
 🚚 Allow multiple label ORMs in feature | [247](https://github.com/laminlabs/lnschema-core/pull/247) | [falexwolf](https://github.com/falexwolf) | 2023-07-29 |
 🚑️ Hash can be null | [246](https://github.com/laminlabs/lnschema-core/pull/246) | [falexwolf](https://github.com/falexwolf) | 2023-07-26 |
 📝 Add signatures to remaining ORMs | [245](https://github.com/laminlabs/lnschema-core/pull/245) | [falexwolf](https://github.com/falexwolf) | 2023-07-26 | 0.42.1
