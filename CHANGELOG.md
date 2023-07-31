@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚚 Rename `Feature.label_orms` to `Feature.registries` | [251](https://github.com/laminlabs/lnschema-core/pull/251) | [falexwolf](https://github.com/falexwolf) | 2023-07-31 |
 ♻️ Aggregate ref_field, ref_orm, ref_schema into ref_field | [250](https://github.com/laminlabs/lnschema-core/pull/250) | [falexwolf](https://github.com/falexwolf) | 2023-07-31 |
 🚚 Move feature foreign key from Label to link model | [249](https://github.com/laminlabs/lnschema-core/pull/249) | [falexwolf](https://github.com/falexwolf) | 2023-07-31 |
 🚚 Allow multiple label ORMs in feature | [247](https://github.com/laminlabs/lnschema-core/pull/247) | [falexwolf](https://github.com/falexwolf) | 2023-07-29 |
