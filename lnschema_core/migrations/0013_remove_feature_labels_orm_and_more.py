@@ -27,6 +27,10 @@ class Migration(migrations.Migration):
             model_name="label",
             name="feature",
         ),
+        migrations.AlterUniqueTogether(
+            name="label",
+            unique_together=set(),
+        ),
         migrations.CreateModel(
             name="FileLabel",
             fields=[
