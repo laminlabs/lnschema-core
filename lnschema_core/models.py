@@ -850,8 +850,6 @@ class Label(ORM):
     """A description (optional)."""
     parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
     """Parent labels, useful to hierarchically group labels (optional)."""
-    feature = models.ForeignKey("Feature", CASCADE, related_name="labels", null=True, default=None)
-    """The feature for which the label is sampled (optional)."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
@@ -867,7 +865,6 @@ class Label(ORM):
         self,
         name: str,
         description: str,
-        feature: Optional[Union["Feature", str]],
     ):
         ...
 
@@ -1323,7 +1320,7 @@ class File(ORM):
     """The feature sets measured in the file (see :class:`~lamindb.FeatureSet`)."""
     transform = models.ForeignKey(Transform, PROTECT, related_name="files", null=True, default=None)
     """:class:`~lamindb.Transform` whose run created the `file`."""
-    labels = models.ManyToManyField(Label, related_name="files")
+    labels = models.ManyToManyField(Label, through="FileLabel", related_name="files")
     """:class:`~lamindb.File` records in label."""
     run = models.ForeignKey(Run, PROTECT, related_name="output_files", null=True, default=None)
     """:class:`~lamindb.Run` that created the `file`."""
@@ -1794,6 +1791,15 @@ class DatasetFeatureSet(ORM):
 
     class Meta:
         unique_together = ("dataset", "feature_set")
+
+
+class FileLabel(ORM):
+    file = models.ForeignKey(File, on_delete=models.CASCADE)
+    label = models.ForeignKey(Label, on_delete=models.CASCADE)
+    feature = models.ForeignKey("Feature", CASCADE, null=True, default=None)
+
+    class Meta:
+        unique_together = ("file", "label")
 
 
 # -------------------------------------------------------------------------------------
