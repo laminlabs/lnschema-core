@@ -97,9 +97,9 @@ class ORM(models.Model):
 
         Examples:
             >>> ln.File(ln.dev.datasets.file_jpg_paradisi05(), description="paradisi05").save()
-            >>> file = ln.File.select(description="paradisi05").one()
+            >>> file = ln.File.filter(description="paradisi05").one()
             >>> ln.save(ln.Label.from_values(["image", "benchmark", "example"], field="name"))
-            >>> labels = ln.Label.select(name__in = ["image", "benchmark", "example"]).all()
+            >>> labels = ln.Label.filter(name__in = ["image", "benchmark", "example"]).all()
             >>> file.labels.set(labels)
             >>> file.describe()
             File(id=jb7BY5UJoQVGMUOKiLcn, key=None, suffix=.jpg, description=paradisi05, size=29358, hash=r4tnqmKI_SjrkdLzpuWp4g, hash_type=md5, created_at=2023-07-19 15:48:26.485889+00:00, updated_at=2023-07-19 16:43:17.792241+00:00) # noqa
@@ -128,7 +128,7 @@ class ORM(models.Model):
         Examples:
             >>> import lnschema_bionty as lb
             >>> lb.Tissue.from_bionty(name="subsegmental bronchus").save()
-            >>> record = lb.Tissue.select(name="respiratory tube").one()
+            >>> record = lb.Tissue.filter(name="respiratory tube").one()
             >>> record.view_parents()
             >>> tissue.view_parents(with_children=True)
         """
@@ -144,7 +144,7 @@ class ORM(models.Model):
         Examples:
             >>> import lnschema_bionty as lb
             >>> lb.ExperimentalFactor.from_bionty(name="single-cell RNA sequencing").save()
-            >>> scrna = lb.ExperimentalFactor.select(name="single-cell RNA sequencing").one()
+            >>> scrna = lb.ExperimentalFactor.filter(name="single-cell RNA sequencing").one()
             >>> scrna.abbr
             None
             >>> scrna.synonyms
@@ -178,7 +178,7 @@ class ORM(models.Model):
         this function performs:
 
         1. It checks whether the value already exists in the database
-           (``ORM.select(field=value)``). If so, it adds the queried record to
+           (``ORM.filter(field=value)``). If so, it adds the queried record to
            the returned list and skips step 2. Otherwise, proceed with 2.
         2. If the ``ORM`` is from ``lnschema_bionty``, it checks whether there is an
            exact match in the underlying ontology (``Bionty.inspect(value, field)``).
@@ -358,7 +358,7 @@ class ORM(models.Model):
         """
 
     @classmethod
-    def select(cls, **expressions) -> QuerySet:
+    def filter(cls, **expressions) -> QuerySet:
         """Query records.
 
         Args:
@@ -375,13 +375,13 @@ class ORM(models.Model):
 
         Examples:
             >>> ln.Label(name="my label").save()
-            >>> label = ln.Label.select(name="my label").one()
+            >>> label = ln.Label.filter(name="my label").one()
             >>> label
             Label(id=TMn5Zuju, name=my label, updated_at=2023-07-19 18:24:49, created_by_id=DzTjkKse)
         """
-        from lamindb._select import select
+        from lamindb._filter import filter
 
-        return select(cls, **expressions)
+        return filter(cls, **expressions)
 
     @classmethod
     def search(
@@ -462,7 +462,7 @@ class User(ORM):
 
         Query a user by handle:
 
-        >>> user = ln.User.select(handle="testuser1").one()
+        >>> user = ln.User.filter(handle="testuser1").one()
         >>> user
         User(id=DzTjkKse, handle=testuser1, email=testuser1@lamin.ai, name=Test User1, updated_at=2023-07-10 18:37:26)
     """
@@ -716,7 +716,7 @@ class Run(ORM):
         Track a pipeline run:
 
         >>> ln.Transform(name="Cell Ranger", version="7.2.0", type="pipeline").save()
-        >>> transform = ln.Transform.select(name="Cell Ranger", version="7.2.0").one()
+        >>> transform = ln.Transform.filter(name="Cell Ranger", version="7.2.0").one()
         >>> transform
         Transform(id=JhiujsLlbTKLIt, name=Cell Ranger, stem_id=JhiujsLlbTKL, version=7.2.0, type=pipeline, created_by_id=DzTjkKse)
         >>> ln.track(transform)
@@ -817,7 +817,7 @@ class Label(ORM):
 
         Label a file:
 
-        >>> label = ln.Label.select(name="ML output").one()
+        >>> label = ln.Label.filter(name="ML output").one()
         >>> label
         Label(id=gelGp2P6, name=ML output, created_by_id=DzTjkKse)
         >>> file = ln.File("./myfile.csv")
@@ -831,14 +831,14 @@ class Label(ORM):
         Group labels:
 
         >>> ln.Label(name="Project 1").save()
-        >>> project1 = ln.Label.select(name="Project 1").one()
+        >>> project1 = ln.Label.filter(name="Project 1").one()
         >>> ln.Label(name="is_project").save()
-        >>> is_project = ln.Label.select(name="is_project").one()
+        >>> is_project = ln.Label.filter(name="is_project").one()
         >>> project1.parents.add(is_project)
 
         Query by label:
 
-        >>> ln.File.select(labels=project).first()
+        >>> ln.File.filter(labels=project).first()
         File(id=MveGmGJImYY5qBwmr0j0, suffix=.csv, size=4, hash=CY9rzUYh03PK3k6DJie09g, hash_type=md5, updated_at=2023-07-19 13:47:59, storage_id=597Sgod0, created_by_id=DzTjkKse) # noqa
     """
 
@@ -995,7 +995,7 @@ class Feature(ORM):
         >>> features = ln.Feature.from_df(df)
         >>> features.save()
         >>> # the information from the DataFrame is now available in the Feature table
-        >>> ln.Feature.select().df()
+        >>> ln.Feature.filter().df()
         id    name    type
          a   feat1     int
          b   feat2   float
@@ -1501,7 +1501,7 @@ class File(ORM):
 
             Read AnnData in backed mode from cloud:
 
-            >>> file = ln.File.select(key="lndb-storage/pbmc68k.h5ad").one()
+            >>> file = ln.File.filter(key="lndb-storage/pbmc68k.h5ad").one()
             >>> file.backed()
             AnnData object with n_obs × n_vars = 70 × 765 backed at 's3://lamindb-ci/lndb-storage/pbmc68k.h5ad'
                 obs: ['cell_type', 'index', 'louvain', 'n_genes', 'percent_mito']
@@ -1561,14 +1561,14 @@ class File(ORM):
             File in cloud storage:
 
             >>> ln.File("s3://lamindb-ci/lndb-storage/pbmc68k.h5ad").save()
-            >>> file = ln.File.select(key="lndb-storage/pbmc68k.h5ad").one()
+            >>> file = ln.File.filter(key="lndb-storage/pbmc68k.h5ad").one()
             >>> file.path()
             S3Path('s3://lamindb-ci/lndb-storage/pbmc68k.h5ad')
 
             File in local storage:
 
             >>> ln.File("./myfile.csv", description="myfile").save()
-            >>> file = ln.File.select(description="myfile").one()
+            >>> file = ln.File.filter(description="myfile").one()
             >>> file.path()
             PosixPath('/home/runner/work/lamindb/lamindb/docs/guide/mydata/myfile.csv')
         """
@@ -1584,7 +1584,7 @@ class File(ORM):
             Load as a `DataFrame`:
 
             >>> ln.File.from_df(ln.dev.datasets.df_iris_in_meter_batch1(), description="iris").save()
-            >>> file = ln.File.select(description="iris").one()
+            >>> file = ln.File.filter(description="iris").one()
             >>> file.load().head()
             sepal_length sepal_width petal_length petal_width iris_species_code
             0        0.051       0.035        0.014       0.002                 0
@@ -1596,7 +1596,7 @@ class File(ORM):
             Load as an `AnnData`:
 
             >>> ln.File("s3://lamindb-ci/lndb-storage/pbmc68k.h5ad").save()
-            >>> file = ln.File.select(key="lndb-storage/pbmc68k.h5ad").one()
+            >>> file = ln.File.filter(key="lndb-storage/pbmc68k.h5ad").one()
             >>> file.load()
             AnnData object with n_obs × n_vars = 70 × 765
                 obs: 'cell_type', 'n_genes', 'percent_mito', 'louvain'
@@ -1609,7 +1609,7 @@ class File(ORM):
             Fall back to :meth:`~lamindb.File.stage` if no in-memory representation is configured:
 
             >>> ln.File(ln.dev.datasets.file_jpg_paradisi05(), description="paradisi05").save()
-            >>> file = ln.File.select(description="paradisi05").one()
+            >>> file = ln.File.filter(description="paradisi05").one()
             >>> file.load()
             PosixPath('/home/runner/work/lamindb/lamindb/docs/guide/mydata/.lamindb/jb7BY5UJoQVGMUOKiLcn.jpg')
         """
@@ -1625,7 +1625,7 @@ class File(ORM):
             Sync file from cloud and returns the local path of the cache:
 
             >>> ln.File("s3://lamindb-ci/lndb-storage/pbmc68k.h5ad").save()
-            >>> file = ln.File.select(key="lndb-storage/pbmc68k.h5ad").one()
+            >>> file = ln.File.filter(key="lndb-storage/pbmc68k.h5ad").one()
             >>> file.stage()
             PosixPath('/home/runner/work/Caches/lamindb/lamindb-ci/lndb-storage/pbmc68k.h5ad')
         """
