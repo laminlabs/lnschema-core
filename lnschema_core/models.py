@@ -1448,7 +1448,7 @@ class File(ORM):
     ) -> List["File"]:
         """Create a list of file objects from a directory.
 
-        Args
+        Args:
             path: `PathLike` Source path of folder.
             key: `Optional[str]` Key for storage destination. If `None` and
                 directory is in a registered location, an inferred `key` will
