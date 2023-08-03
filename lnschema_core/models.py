@@ -1442,11 +1442,19 @@ class File(ORM):
     def from_dir(
         cls,
         path: PathLike,
+        key: Optional[str] = None,
         *,
         run: Optional[Run] = None,
-        storage_root: Optional[PathLike] = None,
     ) -> List["File"]:
         """Create a list of file objects from a directory.
+
+        Args
+            path: `PathLike` Source path of folder.
+            key: `Optional[str]` Key for storage destination. If `None` and
+                directory is in a registered location, an inferred `key` will
+                reflect the relative position. If `None` and directory is outside
+                of a registered storage location, the inferred key defaults to `path.name`.
+            run: `Run` A `Run` object.
 
         Examples:
             >>> dir_path = ln.dev.datasets.generate_cell_ranger_files("sample_001", ln.settings.storage)
@@ -1516,7 +1524,7 @@ class File(ORM):
     @classmethod
     def tree(
         cls,
-        prefix: Optional[str] = None,
+        path: Optional[PathLike] = None,
         *,
         level: int = -1,
         limit_to_directories: bool = False,
