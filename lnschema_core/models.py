@@ -736,20 +736,20 @@ class Run(ORM):
 
     id = models.CharField(max_length=20, default=base62_20, primary_key=True)
     """Universal id, valid across DB instances."""
-    reference = models.CharField(max_length=255, db_index=True, null=True, default=None)
-    """A reference like a URL or external ID (such as from a workflow manager)."""
-    reference_type = models.CharField(max_length=255, db_index=True, null=True, default=None)
-    """Type of reference, e.g., a workflow manager execution ID."""
     transform = models.ForeignKey(Transform, CASCADE, related_name="runs")
     """The transform :class:`~lamindb.Transform` that is being run."""
-    # input_files on File
-    # output_files on File
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    """Time of creation of record."""
     run_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of run execution."""
     created_by = models.ForeignKey(User, CASCADE, default=current_user_id, related_name="created_runs")
     """Creator of record, a :class:`~lamindb.User`."""
+    # input_files on File
+    # output_files on File
+    reference = models.CharField(max_length=255, db_index=True, null=True, default=None)
+    """A reference like a URL or external ID (such as from a workflow manager)."""
+    reference_type = models.CharField(max_length=255, db_index=True, null=True, default=None)
+    """Type of reference, e.g., a workflow manager execution ID."""
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    """Time of creation of record."""
 
     @overload
     def __init__(
