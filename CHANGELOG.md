@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-🚚 Type Link ORMs with LinkORM | [253](https://github.com/laminlabs/lnschema-core/pull/253) | [falexwolf](https://github.com/falexwolf) | 2023-08-04 |
+🚚 Type Link ORMs with `LinkORM` | [253](https://github.com/laminlabs/lnschema-core/pull/253) | [falexwolf](https://github.com/falexwolf) | 2023-08-04 | 0.43.3
 🚚 Rename select to filter | [252](https://github.com/laminlabs/lnschema-core/pull/252) | [falexwolf](https://github.com/falexwolf) | 2023-07-31 | 0.43.0
 🚚 Rename `Feature.label_orms` to `Feature.registries` | [251](https://github.com/laminlabs/lnschema-core/pull/251) | [falexwolf](https://github.com/falexwolf) | 2023-07-31 |
 ♻️ Aggregate ref_field, ref_orm, ref_schema into ref_field | [250](https://github.com/laminlabs/lnschema-core/pull/250) | [falexwolf](https://github.com/falexwolf) | 2023-07-31 |
