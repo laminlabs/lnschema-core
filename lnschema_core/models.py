@@ -1776,7 +1776,11 @@ class Dataset(ORM):
         pass
 
 
-class FileFeatureSet(ORM):
+class LinkORM:
+    pass
+
+
+class FileFeatureSet(ORM, LinkORM):
     file = models.ForeignKey(File, on_delete=models.CASCADE)
     feature_set = models.ForeignKey(FeatureSet, on_delete=models.CASCADE)
     slot = models.CharField(max_length=40, null=True, default=None)
@@ -1785,7 +1789,7 @@ class FileFeatureSet(ORM):
         unique_together = ("file", "feature_set")
 
 
-class DatasetFeatureSet(ORM):
+class DatasetFeatureSet(ORM, LinkORM):
     dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE)
     feature_set = models.ForeignKey(FeatureSet, on_delete=models.CASCADE)
     slot = models.CharField(max_length=50, null=True, default=None)
@@ -1794,7 +1798,7 @@ class DatasetFeatureSet(ORM):
         unique_together = ("dataset", "feature_set")
 
 
-class FileLabel(ORM):
+class FileLabel(ORM, LinkORM):
     file = models.ForeignKey(File, on_delete=models.CASCADE)
     label = models.ForeignKey(Label, on_delete=models.CASCADE)
     feature = models.ForeignKey(Feature, CASCADE, null=True, default=None)
