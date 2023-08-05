@@ -427,6 +427,15 @@ class Registry(models.Model):
         abstract = True
 
 
+class Data:
+    """Base class for File & Dataset."""
+
+    @property
+    def features(self) -> "FeatureManager":
+        """Feature manager (:class:`~lamindb.dev.FeatureManager`)."""
+        pass
+
+
 # -------------------------------------------------------------------------------------
 # A note on required fields at the Registry level
 #
@@ -1211,7 +1220,7 @@ class FeatureSet(Registry):
         """Save."""
 
 
-class File(Registry):
+class File(Registry, Data):
     """File registry: data batches.
 
     Args:
@@ -1665,13 +1674,8 @@ class File(Registry):
         """
         pass
 
-    @property
-    def features(self) -> "FeatureManager":
-        """Feature manager (:class:`~lamindb.dev.FeatureManager`)."""
-        pass
 
-
-class Dataset(Registry):
+class Dataset(Registry, Data):
     """Dataset registry: collections of data batches.
 
     .. warning::
