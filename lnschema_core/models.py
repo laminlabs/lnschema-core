@@ -428,7 +428,7 @@ class Registry(models.Model):
 
 
 class Data:
-    """Base class for File & Dataset."""
+    """Base class for :class`~lamdindb.File` & :class`~lamdindb.Dataset`."""
 
     @property
     def features(self) -> "FeatureManager":
