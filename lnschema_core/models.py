@@ -1833,3 +1833,10 @@ Registry.__str__ = __repr__  # type: ignore
 
 # backward compat
 ORM = Registry
+
+
+def deferred_attribute__repr__(self):
+    return f"Field({self.field.model.__name__}.{self.field.name})"
+
+
+Field.__repr__ = deferred_attribute__repr__
