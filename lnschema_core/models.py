@@ -1533,14 +1533,15 @@ class File(Registry, Data):
         level: int = -1,
         limit_to_directories: bool = False,
         length_limit: int = 1000,
-    ):
-        """Given a prefix, print a visual tree structure of files.
+    ) -> None:
+        """Print a visual tree structure of files & directories.
 
         Examples:
             >>> dir_path = ln.dev.datasets.generate_cell_ranger_files("sample_001", ln.settings.storage)
             >>> dir_path.name
             'sample_001'
             >>> ln.File.tree(dir_path)
+            3 subdirectories, 15 files
             sample_001
             ├── web_summary.html
             ├── metrics_summary.csv
@@ -1560,8 +1561,6 @@ class File(Registry, Data):
             ├── possorted_genome_bam.bam
             ├── filtered_feature_bc_matrix.h5
             └── raw_feature_bc_matrix.h5
-            ...
-            3 directories, 15 files
         """
         pass
 
