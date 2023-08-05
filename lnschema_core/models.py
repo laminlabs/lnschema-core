@@ -450,9 +450,9 @@ class Registry(models.Model):
 
 
 class User(Registry):
-    """Users.
+    """User registry: humans and bots.
 
-    Is auto-managed. No need to create objects.
+    Is auto-managed. No need to create records.
 
     All data in this table is synched from the cloud user account to ensure a
     universal user identity, valid across DB instances and email & handle
@@ -505,7 +505,7 @@ class User(Registry):
 
 
 class Storage(Registry):
-    """Storage locations: S3 or GCP buckets or local storage locations.
+    """Storage locations: S3/GCP buckets or local directories.
 
     Is auto-managed, no need to create objects.
 
@@ -686,7 +686,7 @@ class Transform(Registry):
 
 
 class Run(Registry):
-    """Runs of transforms (:class:`~lamindb.Transform`).
+    """Runs of transforms.
 
     Args:
         reference: `str` A name.
@@ -881,7 +881,7 @@ class Label(Registry):
 
 
 class Modality(Registry):
-    """Types of measurement.
+    """Measurement types of features.
 
     .. note::
 
@@ -953,7 +953,7 @@ class Modality(Registry):
 
 
 class Feature(Registry):
-    """Dimensions of measurement for files & datasets.
+    """Dimensions of measurements in files & datasets.
 
     See Also:
         :meth:`~lamindb.Feature.from_df`
@@ -1212,7 +1212,7 @@ class FeatureSet(Registry):
 
 
 class File(Registry):
-    """Access to objects in storage.
+    """File registry: data batches.
 
     Args:
         data: `Union[PathLike, DataLike]` A file path or a data
@@ -1672,14 +1672,15 @@ class File(Registry):
 
 
 class Dataset(Registry):
-    """Datasets.
+    """Dataset registry: collections of data batches.
 
     .. warning::
 
-        The `Dataset` Registry builds on all other ORMs and might change in the future.
+        The `Dataset` registry builds on all other registries and might change
+        in the future.
 
-        What's not going to change is that a Dataset can be stored in a single
-        file, and can be stored sharded into several files.
+        What's not going to change is that a dataset can both be stored in a
+        single file and sharded across several files.
 
     Args:
         data: `DataLike` A data object (`DataFrame`, `AnnData`) to store.
