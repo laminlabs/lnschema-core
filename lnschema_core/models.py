@@ -39,12 +39,12 @@ IPYTHON = getattr(builtins, "__IPYTHON__", False)
 TRANSFORM_TYPE_DEFAULT = TransformType.notebook if IPYTHON else TransformType.pipeline
 
 
-class ORM(models.Model):
-    """LaminDB's base ORM.
+class Registry(models.Model):
+    """LaminDB's base Registry.
 
     Is based on django.db.models.Model.
 
-    Why does LaminDB call it `ORM` and not `Model`? The term "ORM" can't lead to
+    Why does LaminDB call it `Registry` and not `Model`? The term "Registry" can't lead to
     confusion with statistical, machine learning or biological models.
     """
 
@@ -57,7 +57,7 @@ class ORM(models.Model):
         """Add synonyms to a record.
 
         See Also:
-            :meth:`~lamindb.dev.ORM.remove_synonym`
+            :meth:`~lamindb.dev.Registry.remove_synonym`
                 Remove synonyms
 
         Examples:
@@ -77,7 +77,7 @@ class ORM(models.Model):
         """Remove synonyms from a record.
 
         See Also:
-            :meth:`~lamindb.dev.ORM.add_synonym`
+            :meth:`~lamindb.dev.Registry.add_synonym`
                 Add synonyms
 
         Examples:
@@ -138,7 +138,7 @@ class ORM(models.Model):
         """Set value for abbr field and add to synonyms.
 
         See Also:
-            :meth:`~lamindb.dev.ORM.add_synonym`
+            :meth:`~lamindb.dev.Registry.add_synonym`
                 Add synonyms
 
         Examples:
@@ -159,7 +159,7 @@ class ORM(models.Model):
         pass
 
     @classmethod
-    def from_values(cls, values: ListLike, field: StrField, **kwargs) -> List["ORM"]:
+    def from_values(cls, values: ListLike, field: StrField, **kwargs) -> List["Registry"]:
         """Parse values for an identifier (a name, an id, etc.) and create records.
 
         This method helps avoid problems around duplication of entries,
@@ -168,19 +168,19 @@ class ORM(models.Model):
         Args:
             values: `ListLike` A list of values for an identifier, e.g.
                 `["name1", "name2"]`.
-            field: `StrField` An ``ORM`` field to look up, e.g., `lb.CellMarker.name`.
+            field: `StrField` An ``Registry`` field to look up, e.g., `lb.CellMarker.name`.
             **kwargs: Additional conditions for creation of records, e.g., `species="human"`.
 
         Returns:
             A list of records.
 
-        For every `value` in a list-like of identifiers and a given `ORM.field`,
+        For every `value` in a list-like of identifiers and a given `Registry.field`,
         this function performs:
 
         1. It checks whether the value already exists in the database
-           (``ORM.filter(field=value)``). If so, it adds the queried record to
+           (``Registry.filter(field=value)``). If so, it adds the queried record to
            the returned list and skips step 2. Otherwise, proceed with 2.
-        2. If the ``ORM`` is from ``lnschema_bionty``, it checks whether there is an
+        2. If the ``Registry`` is from ``lnschema_bionty``, it checks whether there is an
            exact match in the underlying ontology (``Bionty.inspect(value, field)``).
            If so, it creates a record from Bionty and adds it to the returned list.
            Otherwise, it creates a record that populates a single field using `value`
@@ -261,7 +261,7 @@ class ORM(models.Model):
                 column that indicates compliance with the identifiers.
 
         See Also:
-            :meth:`~lamindb.dev.ORM.map_synonyms`
+            :meth:`~lamindb.dev.Registry.map_synonyms`
                 Standardize synonyms
 
         Examples:
@@ -291,7 +291,7 @@ class ORM(models.Model):
             dictionary converter.
 
         See Also:
-            :meth:`~lamindb.dev.ORM.search`
+            :meth:`~lamindb.dev.Registry.search`
 
         Examples:
             >>> import lnschema_bionty as lb
@@ -342,9 +342,9 @@ class ORM(models.Model):
             standardized names as values.
 
         See Also:
-            :meth:`~lamindb.dev.ORM.add_synonym`
+            :meth:`~lamindb.dev.Registry.add_synonym`
                 Add synonyms
-            :meth:`~lamindb.dev.ORM.remove_synonym`
+            :meth:`~lamindb.dev.Registry.remove_synonym`
                 Remove synonyms
 
         Examples:
@@ -410,7 +410,7 @@ class ORM(models.Model):
             If `return_queryset` is `True`, a sorted QuerySet.
 
         See Also:
-            :meth:`~lamindb.dev.ORM.lookup`
+            :meth:`~lamindb.dev.Registry.lookup`
 
         Examples:
             >>> ln.save(ln.Label.from_values(["Label1", "Label2", "Label3"], field="name"))
@@ -428,13 +428,13 @@ class ORM(models.Model):
 
 
 # -------------------------------------------------------------------------------------
-# A note on required fields at the ORM level
+# A note on required fields at the Registry level
 #
 # As Django does most of its validation on the Form-level, it doesn't offer functionality
-# for validating the integrity of an ORM object upon instantation (similar to pydantic)
+# for validating the integrity of an Registry object upon instantation (similar to pydantic)
 #
 # For required fields, we define them as commonly done on the SQL level together
-# with a validator in ORM (validate_required_fields)
+# with a validator in Registry (validate_required_fields)
 #
 # This goes against the Django convention, but goes with the SQLModel convention
 # (Optional fields can be null on the SQL level, non-optional fields cannot)
@@ -444,12 +444,12 @@ class ORM(models.Model):
 # an error at the SQL-level, with it, it triggers it at instantiation
 
 # -------------------------------------------------------------------------------------
-# A note on class and instance methods of core ORM
+# A note on class and instance methods of core Registry
 #
 # All of these are defined and tested within lamindb, in files starting with _{orm_name}.py
 
 
-class User(ORM):
+class User(Registry):
     """Users.
 
     Is auto-managed. No need to create objects.
@@ -504,7 +504,7 @@ class User(ORM):
         super(User, self).__init__(*args, **kwargs)
 
 
-class Storage(ORM):
+class Storage(Registry):
     """Storage locations: S3 or GCP buckets or local storage locations.
 
     Is auto-managed, no need to create objects.
@@ -570,7 +570,7 @@ class Storage(ORM):
         super(Storage, self).__init__(*args, **kwargs)
 
 
-class Transform(ORM):
+class Transform(Registry):
     """Transforms of files & datasets.
 
     Pipelines, workflows, notebooks, app-based transformations.
@@ -685,7 +685,7 @@ class Transform(ORM):
         super(Transform, self).__init__(*args, **kwargs)
 
 
-class Run(ORM):
+class Run(Registry):
     """Runs of transforms (:class:`~lamindb.Transform`).
 
     Args:
@@ -775,7 +775,7 @@ class Run(ORM):
         super(Run, self).__init__(*args, **kwargs)
 
 
-class Label(ORM):
+class Label(Registry):
     """Labels for files & datasets.
 
     Args:
@@ -880,7 +880,7 @@ class Label(ORM):
         pass
 
 
-class Modality(ORM):
+class Modality(Registry):
     """Types of measurement.
 
     .. note::
@@ -952,7 +952,7 @@ class Modality(ORM):
         super(Modality, self).__init__(*args, **kwargs)
 
 
-class Feature(ORM):
+class Feature(Registry):
     """Dimensions of measurement for files & datasets.
 
     See Also:
@@ -1011,7 +1011,7 @@ class Feature(ORM):
     """Simple type ("float", "int", "str", "category").
 
     If "category", consider managing categories with :class:`~lamindb.Label` or
-    another ORM for managing labels.
+    another Registry for managing labels.
     """
     unit = models.CharField(max_length=30, db_index=True, null=True, default=None)
     """Unit of measure, ideally SI (`m`, `s`, `kg`, etc.) or 'normalized' etc. (optional)."""
@@ -1068,7 +1068,7 @@ class Feature(ORM):
         pass
 
 
-class FeatureSet(ORM):
+class FeatureSet(Registry):
     """Jointly measured sets of features.
 
     See Also:
@@ -1089,7 +1089,7 @@ class FeatureSet(ORM):
         A `feature_set` is identified by the hash of feature identifiers.
 
     Args:
-        features: `Iterable[ORM]` An iterable of :class:`~lamindb.Feature`
+        features: `Iterable[Registry]` An iterable of :class:`~lamindb.Feature`
             records to hash, e.g., `[Feature(...), Feature(...)]`. Is turned into
             a set upon instantiation. If you'd like to pass values, use
             :meth:`~lamindb.FeatureSet.from_values` or
@@ -1097,7 +1097,7 @@ class FeatureSet(ORM):
         ref_field: `Optional[str] = "id"` The field providing the identifier to
             hash.
         type: `Optional[Union[Type, str]] = None` The simple type. Defaults to
-            `None` if reference ORM is :class:`~lamindb.Feature`, defaults to
+            `None` if reference Registry is :class:`~lamindb.Feature`, defaults to
             `"float"` otherwise.
         modality: `Optional[str] = None` A name or id for :class:`~lamindb.Modality`.
         name: `Optional[str] = None` A name.
@@ -1138,7 +1138,7 @@ class FeatureSet(ORM):
     modality = models.ForeignKey(Modality, PROTECT, null=True, default=None)
     """The measurement modality, e.g., "RNA", "Protein", "Gene Module", "pathway" (:class:`~lamindb.Modality`)."""
     ref_field = models.CharField(max_length=128, db_index=True)
-    """The registry/ORM field that provides identifiers including schema and ORM, e.g., `'bionty.Gene.ensemble_gene_id'`."""
+    """The registry/Registry field that provides identifiers including schema and Registry, e.g., `'bionty.Gene.ensemble_gene_id'`."""
     hash = models.CharField(max_length=20, default=None, db_index=True, null=True)
     """The hash of the set."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -1151,7 +1151,7 @@ class FeatureSet(ORM):
     @overload
     def __init__(
         self,
-        features: Iterable[ORM],
+        features: Iterable[Registry],
         ref_field: Optional[str] = None,
         type: Optional[Union[Type, str]] = None,
         modality: Optional[str] = None,
@@ -1179,10 +1179,10 @@ class FeatureSet(ORM):
 
         Args:
             values: ``ListLike`` A list of identifiers, like feature names or ids.
-            field: ``Field = Feature.name`` The field of a reference ORM to
+            field: ``Field = Feature.name`` The field of a reference Registry to
                 map values.
             type: `Optional[Union[Type, str]] = None` The simple type. Defaults to
-                `None` if reference ORM is :class:`~lamindb.Feature`, defaults to
+                `None` if reference Registry is :class:`~lamindb.Feature`, defaults to
                 `"float"` otherwise.
             modality: `Optional[str] = None` A name or id for :class:`~lamindb.Modality`.
             name: `Optional[str] = None` A name.
@@ -1211,7 +1211,7 @@ class FeatureSet(ORM):
         """Save."""
 
 
-class File(ORM):
+class File(Registry):
     """Access to objects in storage.
 
     Args:
@@ -1671,12 +1671,12 @@ class File(ORM):
         pass
 
 
-class Dataset(ORM):
+class Dataset(Registry):
     """Datasets.
 
     .. warning::
 
-        The `Dataset` ORM builds on all other ORMs and might change in the future.
+        The `Dataset` Registry builds on all other ORMs and might change in the future.
 
         What's not going to change is that a Dataset can be stored in a single
         file, and can be stored sharded into several files.
@@ -1689,7 +1689,7 @@ class Dataset(ORM):
     Datasets are measurements of features (aka observations of variables).
 
     1. A feature can be a “high-level” feature with meaning: a labelled
-       column in a DataFrame with an entry in :class:`~lamindb.Feature` or another ORM.
+       column in a DataFrame with an entry in :class:`~lamindb.Feature` or another Registry.
        Examples: gene id, protein id, phenotype name, temperature,
        concentration, treatment label, treatment id, etc.
     2. In other cases, a feature might be a “low-level” feature without semantic
@@ -1780,7 +1780,7 @@ class LinkORM:
     pass
 
 
-class FileFeatureSet(ORM, LinkORM):
+class FileFeatureSet(Registry, LinkORM):
     file = models.ForeignKey(File, on_delete=models.CASCADE)
     feature_set = models.ForeignKey(FeatureSet, on_delete=models.CASCADE)
     slot = models.CharField(max_length=40, null=True, default=None)
@@ -1789,7 +1789,7 @@ class FileFeatureSet(ORM, LinkORM):
         unique_together = ("file", "feature_set")
 
 
-class DatasetFeatureSet(ORM, LinkORM):
+class DatasetFeatureSet(Registry, LinkORM):
     dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE)
     feature_set = models.ForeignKey(FeatureSet, on_delete=models.CASCADE)
     slot = models.CharField(max_length=50, null=True, default=None)
@@ -1798,7 +1798,7 @@ class DatasetFeatureSet(ORM, LinkORM):
         unique_together = ("dataset", "feature_set")
 
 
-class FileLabel(ORM, LinkORM):
+class FileLabel(Registry, LinkORM):
     file = models.ForeignKey(File, on_delete=models.CASCADE)
     label = models.ForeignKey(Label, on_delete=models.CASCADE)
     feature = models.ForeignKey(Feature, CASCADE, null=True, default=None)
@@ -1821,7 +1821,7 @@ def format_datetime(dt: Union[datetime, Any]) -> str:
         return dt.strftime("%Y-%m-%d %H:%M:%S")
 
 
-def __repr__(self: ORM) -> str:
+def __repr__(self: Registry) -> str:
     field_names = [field.name for field in self._meta.fields if (not isinstance(field, models.ForeignKey) and field.name != "created_at")]
     field_names += [f"{field.name}_id" for field in self._meta.fields if isinstance(field, models.ForeignKey)]
     fields_str = {k: format_datetime(getattr(self, k)) for k in field_names if hasattr(self, k)}
@@ -1829,5 +1829,5 @@ def __repr__(self: ORM) -> str:
     return f"{self.__class__.__name__}({fields_joined_str})"
 
 
-ORM.__repr__ = __repr__  # type: ignore
-ORM.__str__ = __repr__  # type: ignore
+Registry.__repr__ = __repr__  # type: ignore
+Registry.__str__ = __repr__  # type: ignore
