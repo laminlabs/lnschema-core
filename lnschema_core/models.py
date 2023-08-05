@@ -1813,17 +1813,19 @@ class FileLabel(Registry, LinkORM):
 # some logging
 
 
-def format_datetime(dt: Union[datetime, Any]) -> str:
-    if not isinstance(dt, datetime):
-        return dt
+def format_field_value(value: Union[datetime, str, Any]) -> Any:
+    if isinstance(value, datetime):
+        return value.strftime("%Y-%m-%d %H:%M:%S")
+    elif isinstance(value, str):
+        return f"'{value}'"
     else:
-        return dt.strftime("%Y-%m-%d %H:%M:%S")
+        return value
 
 
 def __repr__(self: Registry) -> str:
     field_names = [field.name for field in self._meta.fields if (not isinstance(field, models.ForeignKey) and field.name != "created_at")]
     field_names += [f"{field.name}_id" for field in self._meta.fields if isinstance(field, models.ForeignKey)]
-    fields_str = {k: format_datetime(getattr(self, k)) for k in field_names if hasattr(self, k)}
+    fields_str = {k: format_field_value(getattr(self, k)) for k in field_names if hasattr(self, k)}
     fields_joined_str = ", ".join([f"{k}={fields_str[k]}" for k in fields_str if fields_str[k] is not None])
     return f"{self.__class__.__name__}({fields_joined_str})"
 
