@@ -1831,3 +1831,6 @@ def __repr__(self: Registry) -> str:
 
 Registry.__repr__ = __repr__  # type: ignore
 Registry.__str__ = __repr__  # type: ignore
+
+# backward compat
+ORM = Registry

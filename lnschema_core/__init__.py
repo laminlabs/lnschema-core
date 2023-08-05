@@ -10,6 +10,7 @@ _INSTANCE_SETUP = _check_instance_setup()
 
 if _INSTANCE_SETUP:
     from . import ids, types
+    from .models import ORM  # backward compat
     from .models import (  # type: ignore
         Dataset,
         Feature,
