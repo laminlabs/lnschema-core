@@ -988,9 +988,6 @@ class Feature(Registry):
 
     Notes:
 
-        - :doc:`/biology/scrna`
-        - :doc:`/biology/flow`
-
         For more control, you can use :mod:`lnschema_bionty` ORMs to manage
         common basic biological entities like genes, proteins & cell markers
         involved in expression/count measurements.
@@ -1110,11 +1107,6 @@ class FeatureSet(Registry):
             `"float"` otherwise.
         modality: `Optional[str] = None` A name or id for :class:`~lamindb.Modality`.
         name: `Optional[str] = None` A name.
-
-    Notes:
-
-        - :doc:`/biology/scrna`
-        - :doc:`/biology/flow`
 
     Examples:
 
