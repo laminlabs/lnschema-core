@@ -1257,7 +1257,7 @@ class File(Registry, Data):
             Bulk create file objects from a directory.
 
     Notes:
-        For more info, see tutorial: :doc:`/guide/tutorial1`.
+        For more info, see tutorial: :doc:`/tutorial1`.
 
     Examples:
 
@@ -1375,7 +1375,7 @@ class File(Registry, Data):
                 Track features.
 
         Notes:
-            For more info, see tutorial: :doc:`/guide/tutorial1`.
+            For more info, see tutorial: :doc:`/tutorial1`.
 
         Examples:
             >>> df = ln.dev.datasets.df_iris_in_meter_batch1()
@@ -1418,7 +1418,7 @@ class File(Registry, Data):
 
         Notes:
 
-            For more info, see tutorial: :doc:`/guide/tutorial1`.
+            For more info, see tutorial: :doc:`/tutorial1`.
 
         Examples:
             >>> import lnschema_bionty as lb
@@ -1710,7 +1710,7 @@ class Dataset(Registry, Data):
         :class:`~lamindb.File`
 
     Notes:
-        For more info, see tutorial: :doc:`/guide/tutorial1`.
+        For more info, see tutorial: :doc:`/tutorial1`.
 
     Examples:
         >>> df = ln.dev.datasets.df_iris_in_meter_batch1()
