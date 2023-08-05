@@ -1182,16 +1182,18 @@ class FeatureSet(Registry):
     ):
         pass
 
-    @classmethod  # type:ignore
-    def from_values(cls, values: ListLike, field: Field = Feature.name, type: Optional[Union[Type, str]] = None, name: Optional[str] = None, modality: Optional[str] = None, **kwargs) -> "FeatureSet":  # type: ignore  # noqa
-        """Create feature set from identifier values.
+    @classmethod
+    def from_values(  # type: ignore
+        cls, values: ListLike, field: Field = Feature.name, type: Optional[Union[Type, str]] = None, name: Optional[str] = None, modality: Optional[str] = None, **kwargs
+    ) -> Optional["FeatureSet"]:
+        """Create feature set for validated features.
 
         Args:
             values: ``ListLike`` A list of identifiers, like feature names or ids.
             field: ``Field = Feature.name`` The field of a reference Registry to
                 map values.
             type: `Optional[Union[Type, str]] = None` The simple type. Defaults to
-                `None` if reference Registry is :class:`~lamindb.Feature`, defaults to
+                `None` if reference registry is :class:`~lamindb.Feature`, defaults to
                 `"float"` otherwise.
             modality: `Optional[str] = None` A name or id for :class:`~lamindb.Modality`.
             name: `Optional[str] = None` A name.
@@ -1212,12 +1214,13 @@ class FeatureSet(Registry):
         cls,
         df: "pd.DataFrame",
         name: Optional[str] = None,
-    ) -> "FeatureSet":
-        """Create Feature records for columns."""
+    ) -> Optional["FeatureSet"]:
+        """Create feature set for validated features."""
         pass
 
     def save(self, *args, **kwargs) -> None:
         """Save."""
+        pass
 
 
 class File(Registry, Data):
