@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+♻️ Add `Data` base class for `File` & `Dataset` | [255](https://github.com/laminlabs/lnschema-core/pull/255) | [falexwolf](https://github.com/falexwolf) | 2023-08-05 |
 🚚 Rename ORM to Registry | [254](https://github.com/laminlabs/lnschema-core/pull/254) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-05 |
 🚚 Type Link ORMs with `LinkORM` | [253](https://github.com/laminlabs/lnschema-core/pull/253) | [falexwolf](https://github.com/falexwolf) | 2023-08-04 | 0.43.3
 🚚 Rename select to filter | [252](https://github.com/laminlabs/lnschema-core/pull/252) | [falexwolf](https://github.com/falexwolf) | 2023-07-31 | 0.43.0
