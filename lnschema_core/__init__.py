@@ -21,6 +21,8 @@ if _INSTANCE_SETUP:
         Registry,
         Run,
         Storage,
+        SynonymsAware,
         Transform,
         User,
+        ValidationAware,
     )

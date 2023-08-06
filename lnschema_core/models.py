@@ -46,21 +46,19 @@ class ValidationAware:
     @classmethod
     def inspect(
         cls,
-        identifiers: ListLike,
+        values: ListLike,
         field: StrField,
         *,
-        case_sensitive: bool = False,
-        inspect_synonyms: bool = True,
         return_df: bool = False,
-        logging: bool = True,
+        mute: bool = False,
         **kwargs,
     ) -> Union["pd.DataFrame", Dict[str, List[str]]]:
-        """Inspect if a list of identifiers are mappable to existing values of a field.
+        """Inspect if a list of values are mappable to existing values of a field.
 
         Args:
-            identifiers: `ListLike` Identifiers that will be checked against the
+            values: `ListLike` Identifiers that will be checked against the
                 field.
-            field: `StrField` The field of identifiers.
+            field: `StrField` The field of values.
                     Examples are 'ontology_id' to map against the source ID
                     or 'name' to map against the ontologies field names.
             case_sensitive: Whether the identifier inspection is case sensitive.
@@ -68,9 +66,9 @@ class ValidationAware:
             return_df: Whether to return a Pandas DataFrame.
 
         Returns:
-            - A Dictionary of "mapped" and "unmapped" identifiers
-            - If `return_df`: A DataFrame indexed by identifiers with a boolean `__mapped__`
-                column that indicates compliance with the identifiers.
+            - A Dictionary of "mapped" and "unmapped" values
+            - If `return_df`: A DataFrame indexed by values with a boolean `__mapped__`
+                column that indicates compliance with the values.
 
         See Also:
             :meth:`~lamindb.dev.Registry.map_synonyms`
@@ -82,7 +80,7 @@ class ValidationAware:
             >>> gene_synonyms = ["A1CF", "A1BG", "FANCD1", "FANCD20"]
             >>> ln.save(lb.Gene.from_values(gene_synonyms, field="symbol"))
             >>> lb.Gene.inspect(gene_symbols, field=lb.Gene.symbol)
-            🔶 The identifiers contain synonyms!
+            🔶 The values contain synonyms!
             To increase mappability, standardize them via '.map_synonyms()'
             ✅ 3 terms (75.0%) are mapped
             🔶 1 terms (25.0%) are not mapped
@@ -91,14 +89,14 @@ class ValidationAware:
         pass
 
     @classmethod
-    def validate(cls, identifiers: ListLike, field: StrField, **kwargs) -> "np.ndarray[bool]":
-        """Validate identifiers against existing values of a string field.
+    def validate(cls, values: ListLike, field: StrField, **kwargs) -> "np.ndarray[bool]":
+        """Validate values against existing values of a string field.
 
         Note this is strict validation, only asserts exact matches.
 
         Args:
-            identifiers: `ListLike` Identifiers that will be validated against the field.
-            field: `StrField` The field of identifiers.
+            values: `ListLike` Identifiers that will be validated against the field.
+            field: `StrField` The field of values.
                     Examples are 'ontology_id' to map against the source ID
                     or 'name' to map against the ontologies field names.
 
@@ -298,7 +296,7 @@ class Registry(models.Model, ValidationAware, SynonymsAware):
         Returns:
             A list of records.
 
-        For every `value` in a list-like of identifiers and a given `Registry.field`,
+        For every `value` in a list-like of values and a given `Registry.field`,
         this function performs:
 
         1. It checks whether the value already exists in the database
@@ -1067,7 +1065,7 @@ class Feature(Registry):
     description = models.TextField(db_index=True, null=True, default=None)
     """A description."""
     registries = models.CharField(max_length=128, db_index=True, default=None, null=True)
-    """ORMs that provide identifiers for labels, bar-separated (|) (optional)."""
+    """ORMs that provide values for labels, bar-separated (|) (optional)."""
     synonyms = models.TextField(null=True, default=None)
     """Bar-separated (|) synonyms (optional)."""
     feature_sets = models.ManyToManyField("FeatureSet", related_name="features")
@@ -1135,7 +1133,7 @@ class FeatureSet(Registry):
         feature set. If instead, you'd link against single features (say, genes),
         you'd face exploding link tables.
 
-        A `feature_set` is identified by the hash of feature identifiers.
+        A `feature_set` is identified by the hash of feature values.
 
     Args:
         features: `Iterable[Registry]` An iterable of :class:`~lamindb.Feature`
@@ -1167,7 +1165,7 @@ class FeatureSet(Registry):
     """
 
     id = models.CharField(max_length=20, primary_key=True, default=None)
-    """A universal id (hash of the set of feature identifiers)."""
+    """A universal id (hash of the set of feature values)."""
     name = models.CharField(max_length=128, null=True, default=None)
     """A name (optional)."""
     n = models.IntegerField()
@@ -1227,7 +1225,7 @@ class FeatureSet(Registry):
         """Create feature set for validated features.
 
         Args:
-            values: ``ListLike`` A list of identifiers, like feature names or ids.
+            values: ``ListLike`` A list of values, like feature names or ids.
             field: ``Field = Feature.name`` The field of a reference Registry to
                 map values.
             type: `Optional[Union[Type, str]] = None` The simple type. Defaults to
