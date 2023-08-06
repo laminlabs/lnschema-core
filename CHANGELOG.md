@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-🚸 Turn path into property | [259](https://github.com/laminlabs/lnschema-core/pull/259) | [falexwolf](https://github.com/falexwolf) | 2023-08-06 |
+🚸 Turn path into property | [259](https://github.com/laminlabs/lnschema-core/pull/259) | [falexwolf](https://github.com/falexwolf) | 2023-08-06 | 0.44.1
 ✨ Added validate | [257](https://github.com/laminlabs/lnschema-core/pull/257) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-06 | 0.44.0
 🚚 Rename `ref_field` to `registry` | [256](https://github.com/laminlabs/lnschema-core/pull/256) | [falexwolf](https://github.com/falexwolf) | 2023-08-06 |
 ♻️ Add `Data` base class for `File` & `Dataset` | [255](https://github.com/laminlabs/lnschema-core/pull/255) | [falexwolf](https://github.com/falexwolf) | 2023-08-05 |
