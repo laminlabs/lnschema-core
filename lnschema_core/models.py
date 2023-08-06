@@ -31,6 +31,7 @@ from .users import current_user_id
 _INSTANCE_SETUP = _check_instance_setup()
 
 if TYPE_CHECKING or _INSTANCE_SETUP:
+    import numpy as np
     import pandas as pd
     from lamindb.dev import FeatureManager
 
@@ -39,14 +40,127 @@ IPYTHON = getattr(builtins, "__IPYTHON__", False)
 TRANSFORM_TYPE_DEFAULT = TransformType.notebook if IPYTHON else TransformType.pipeline
 
 
-class Registry(models.Model):
-    """LaminDB's base Registry.
+class ValidationAware:
+    """Base class for validation methods."""
 
-    Is based on django.db.models.Model.
+    @classmethod
+    def inspect(
+        cls,
+        identifiers: ListLike,
+        field: StrField,
+        *,
+        case_sensitive: bool = False,
+        inspect_synonyms: bool = True,
+        return_df: bool = False,
+        logging: bool = True,
+        **kwargs,
+    ) -> Union["pd.DataFrame", Dict[str, List[str]]]:
+        """Inspect if a list of identifiers are mappable to existing values of a field.
 
-    Why does LaminDB call it `Registry` and not `Model`? The term "Registry" can't lead to
-    confusion with statistical, machine learning or biological models.
-    """
+        Args:
+            identifiers: `ListLike` Identifiers that will be checked against the
+                field.
+            field: `StrField` The field of identifiers.
+                    Examples are 'ontology_id' to map against the source ID
+                    or 'name' to map against the ontologies field names.
+            case_sensitive: Whether the identifier inspection is case sensitive.
+            inspect_synonyms: Whether to inspect synonyms.
+            return_df: Whether to return a Pandas DataFrame.
+
+        Returns:
+            - A Dictionary of "mapped" and "unmapped" identifiers
+            - If `return_df`: A DataFrame indexed by identifiers with a boolean `__mapped__`
+                column that indicates compliance with the identifiers.
+
+        See Also:
+            :meth:`~lamindb.dev.Registry.map_synonyms`
+                Standardize synonyms
+
+        Examples:
+            >>> import lnschema_bionty as lb
+            >>> lb.settings.species = "human"
+            >>> gene_synonyms = ["A1CF", "A1BG", "FANCD1", "FANCD20"]
+            >>> ln.save(lb.Gene.from_values(gene_synonyms, field="symbol"))
+            >>> lb.Gene.inspect(gene_symbols, field=lb.Gene.symbol)
+            🔶 The identifiers contain synonyms!
+            To increase mappability, standardize them via '.map_synonyms()'
+            ✅ 3 terms (75.0%) are mapped
+            🔶 1 terms (25.0%) are not mapped
+            {'mapped': ['A1CF', 'A1BG', 'FANCD20'], 'not_mapped': ['FANCD1']}
+        """
+        pass
+
+    @classmethod
+    def validate(cls, identifiers: ListLike, field: StrField, **kwargs) -> "np.ndarray[bool]":
+        """Validate identifiers against existing values of a string field.
+
+        Note this is strict validation, only asserts exact matches.
+
+        Args:
+            identifiers: `ListLike` Identifiers that will be validated against the field.
+            field: `StrField` The field of identifiers.
+                    Examples are 'ontology_id' to map against the source ID
+                    or 'name' to map against the ontologies field names.
+
+        Returns:
+            A vector of booleans indicating if each element is validated.
+        """
+        pass
+
+
+class SynonymsAware:
+    """Base class for synonyms methods."""
+
+    @classmethod
+    def map_synonyms(
+        cls,
+        synonyms: Iterable,
+        *,
+        return_mapper: bool = False,
+        case_sensitive: bool = False,
+        keep: Literal["first", "last", False] = "first",
+        synonyms_field: str = "synonyms",
+        field: Optional[str] = None,
+        **kwargs,
+    ) -> Union[List[str], Dict[str, str]]:
+        """Maps input synonyms to standardized names.
+
+        Args:
+            synonyms: `Iterable` Synonyms that will be standardized.
+            return_mapper: `bool = False` If `True`, returns `{input_synonym1:
+                standardized_name1}`.
+            case_sensitive: `bool = False` Whether the mapping is case sensitive.
+            species: `Optional[str]` Map only against this species related entries.
+            keep: `Literal["first", "last", False] = "first"` When a synonym maps to
+                multiple names, determines which duplicates to mark as
+                `pd.DataFrame.duplicated`
+
+                    - "first": returns the first mapped standardized name
+                    - "last": returns the last mapped standardized name
+                    - `False`: returns all mapped standardized name
+            synonyms_field: `str = "synonyms"` A field containing the concatenated synonyms.
+            field: `Optional[str]` The field representing the standardized names.
+
+        Returns:
+            If `return_mapper` is `False`: a list of standardized names. Otherwise,
+            a dictionary of mapped values with mappable synonyms as keys and
+            standardized names as values.
+
+        See Also:
+            :meth:`~lamindb.dev.Registry.add_synonym`
+                Add synonyms
+            :meth:`~lamindb.dev.Registry.remove_synonym`
+                Remove synonyms
+
+        Examples:
+            >>> import lnschema_bionty as lb
+            >>> lb.settings.species = "human"
+            >>> gene_synonyms = ["A1CF", "A1BG", "FANCD1", "FANCD20"]
+            >>> ln.save(lb.Gene.from_values(gene_synonyms, field="symbol"))
+            >>> standardized_names = lb.Gene.map_synonyms(gene_synonyms)
+            >>> standardized_names
+            ['A1CF', 'A1BG', 'BRCA2', 'FANCD20']
+        """
 
     def add_synonym(
         self,
@@ -92,6 +206,40 @@ class Registry(models.Model):
         """
         pass
 
+    def set_abbr(self, value: str):
+        """Set value for abbr field and add to synonyms.
+
+        See Also:
+            :meth:`~lamindb.dev.Registry.add_synonym`
+                Add synonyms
+
+        Examples:
+            >>> import lnschema_bionty as lb
+            >>> lb.ExperimentalFactor.from_bionty(name="single-cell RNA sequencing").save()
+            >>> scrna = lb.ExperimentalFactor.filter(name="single-cell RNA sequencing").one()
+            >>> scrna.abbr
+            None
+            >>> scrna.synonyms
+            'single-cell RNA-seq|single-cell transcriptome sequencing|scRNA-seq|single cell RNA sequencing'
+            >>> scrna.set_abbr("scRNA")
+            >>> scrna.abbr
+            'scRNA'
+            >>> scrna.synonyms
+            'scRNA|single-cell RNA-seq|single cell RNA sequencing|single-cell transcriptome sequencing|scRNA-seq'
+            >>> scrna.save()
+        """
+        pass
+
+
+class Registry(models.Model, ValidationAware, SynonymsAware):
+    """LaminDB's base Registry.
+
+    Is based on django.db.models.Model.
+
+    Why does LaminDB call it `Registry` and not `Model`? The term "Registry" can't lead to
+    confusion with statistical, machine learning or biological models.
+    """
+
     def describe(self):
         """Rich representation of a record with relationships.
 
@@ -131,30 +279,6 @@ class Registry(models.Model):
             >>> record = lb.Tissue.filter(name="respiratory tube").one()
             >>> record.view_parents()
             >>> tissue.view_parents(with_children=True)
-        """
-        pass
-
-    def set_abbr(self, value: str):
-        """Set value for abbr field and add to synonyms.
-
-        See Also:
-            :meth:`~lamindb.dev.Registry.add_synonym`
-                Add synonyms
-
-        Examples:
-            >>> import lnschema_bionty as lb
-            >>> lb.ExperimentalFactor.from_bionty(name="single-cell RNA sequencing").save()
-            >>> scrna = lb.ExperimentalFactor.filter(name="single-cell RNA sequencing").one()
-            >>> scrna.abbr
-            None
-            >>> scrna.synonyms
-            'single-cell RNA-seq|single-cell transcriptome sequencing|scRNA-seq|single cell RNA sequencing'
-            >>> scrna.set_abbr("scRNA")
-            >>> scrna.abbr
-            'scRNA'
-            >>> scrna.synonyms
-            'scRNA|single-cell RNA-seq|single cell RNA sequencing|single-cell transcriptome sequencing|scRNA-seq'
-            >>> scrna.save()
         """
         pass
 
@@ -232,53 +356,6 @@ class Registry(models.Model):
         pass
 
     @classmethod
-    def inspect(
-        cls,
-        identifiers: ListLike,
-        field: StrField,
-        *,
-        case_sensitive: bool = False,
-        inspect_synonyms: bool = True,
-        return_df: bool = False,
-        logging: bool = True,
-        **kwargs,
-    ) -> Union["pd.DataFrame", Dict[str, List[str]]]:
-        """Inspect if a list of identifiers are mappable to existing values of a field.
-
-        Args:
-            identifiers: `ListLike` Identifiers that will be checked against the
-                field.
-            field: `StrField` The field of identifiers.
-                    Examples are 'ontology_id' to map against the source ID
-                    or 'name' to map against the ontologies field names.
-            case_sensitive: Whether the identifier inspection is case sensitive.
-            inspect_synonyms: Whether to inspect synonyms.
-            return_df: Whether to return a Pandas DataFrame.
-
-        Returns:
-            - A Dictionary of "mapped" and "unmapped" identifiers
-            - If `return_df`: A DataFrame indexed by identifiers with a boolean `__mapped__`
-                column that indicates compliance with the identifiers.
-
-        See Also:
-            :meth:`~lamindb.dev.Registry.map_synonyms`
-                Standardize synonyms
-
-        Examples:
-            >>> import lnschema_bionty as lb
-            >>> lb.settings.species = "human"
-            >>> gene_synonyms = ["A1CF", "A1BG", "FANCD1", "FANCD20"]
-            >>> ln.save(lb.Gene.from_values(gene_synonyms, field="symbol"))
-            >>> lb.Gene.inspect(gene_symbols, field=lb.Gene.symbol)
-            🔶 The identifiers contain synonyms!
-            To increase mappability, standardize them via '.map_synonyms()'
-            ✅ 3 terms (75.0%) are mapped
-            🔶 1 terms (25.0%) are not mapped
-            {'mapped': ['A1CF', 'A1BG', 'FANCD20'], 'not_mapped': ['FANCD1']}
-        """
-        pass
-
-    @classmethod
     def lookup(cls, field: Optional[StrField] = None) -> NamedTuple:
         """Return an auto-complete object for a field.
 
@@ -305,57 +382,6 @@ class Registry(models.Model):
             Gene(id=SoZXq4Wor2vK, symbol=ADGB-DT, ensembl_gene_id=ENSG00000237468, ncbi_gene_ids=101928661, biotype=lncRNA, description=ADGB divergent transcript [Source:HGNC Symbol;Acc:HGNC:55654], synonyms=, updated_at=2023-07-19 18:31:16, species_id=uHJU, bionty_source_id=abZr, created_by_id=DzTjkKse) # noqa
         """
         pass
-
-    @classmethod
-    def map_synonyms(
-        cls,
-        synonyms: Iterable,
-        *,
-        return_mapper: bool = False,
-        case_sensitive: bool = False,
-        keep: Literal["first", "last", False] = "first",
-        synonyms_field: str = "synonyms",
-        field: Optional[str] = None,
-        **kwargs,
-    ) -> Union[List[str], Dict[str, str]]:
-        """Maps input synonyms to standardized names.
-
-        Args:
-            synonyms: `Iterable` Synonyms that will be standardized.
-            return_mapper: `bool = False` If `True`, returns `{input_synonym1:
-                standardized_name1}`.
-            case_sensitive: `bool = False` Whether the mapping is case sensitive.
-            species: `Optional[str]` Map only against this species related entries.
-            keep: `Literal["first", "last", False] = "first"` When a synonym maps to
-                multiple names, determines which duplicates to mark as
-                `pd.DataFrame.duplicated`
-
-                    - "first": returns the first mapped standardized name
-                    - "last": returns the last mapped standardized name
-                    - `False`: returns all mapped standardized name
-            synonyms_field: `str = "synonyms"` A field containing the concatenated synonyms.
-            field: `Optional[str]` The field representing the standardized names.
-
-        Returns:
-            If `return_mapper` is `False`: a list of standardized names. Otherwise,
-            a dictionary of mapped values with mappable synonyms as keys and
-            standardized names as values.
-
-        See Also:
-            :meth:`~lamindb.dev.Registry.add_synonym`
-                Add synonyms
-            :meth:`~lamindb.dev.Registry.remove_synonym`
-                Remove synonyms
-
-        Examples:
-            >>> import lnschema_bionty as lb
-            >>> lb.settings.species = "human"
-            >>> gene_synonyms = ["A1CF", "A1BG", "FANCD1", "FANCD20"]
-            >>> ln.save(lb.Gene.from_values(gene_synonyms, field="symbol"))
-            >>> standardized_names = lb.Gene.map_synonyms(gene_synonyms)
-            >>> standardized_names
-            ['A1CF', 'A1BG', 'BRCA2', 'FANCD20']
-        """
 
     @classmethod
     def filter(cls, **expressions) -> QuerySet:
@@ -1190,7 +1216,13 @@ class FeatureSet(Registry):
 
     @classmethod
     def from_values(  # type: ignore
-        cls, values: ListLike, field: Field = Feature.name, type: Optional[Union[Type, str]] = None, name: Optional[str] = None, modality: Optional[str] = None, **kwargs
+        cls,
+        values: ListLike,
+        field: Field = Feature.name,
+        type: Optional[Union[Type, str]] = None,
+        name: Optional[str] = None,
+        modality: Optional[str] = None,
+        **kwargs,
     ) -> Optional["FeatureSet"]:
         """Create feature set for validated features.
 
