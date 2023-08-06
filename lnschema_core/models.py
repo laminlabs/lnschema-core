@@ -1100,8 +1100,6 @@ class FeatureSet(Registry):
             a set upon instantiation. If you'd like to pass values, use
             :meth:`~lamindb.FeatureSet.from_values` or
             :meth:`~lamindb.FeatureSet.from_df`.
-        ref_field: `Optional[str] = "id"` The field providing the identifier to
-            hash.
         type: `Optional[Union[Type, str]] = None` The simple type. Defaults to
             `None` if reference Registry is :class:`~lamindb.Feature`, defaults to
             `"float"` otherwise.
@@ -1138,8 +1136,8 @@ class FeatureSet(Registry):
     """
     modality = models.ForeignKey(Modality, PROTECT, null=True, default=None)
     """The measurement modality, e.g., "RNA", "Protein", "Gene Module", "pathway" (:class:`~lamindb.Modality`)."""
-    ref_field = models.CharField(max_length=128, db_index=True)
-    """The registry/Registry field that provides identifiers including schema and Registry, e.g., `'bionty.Gene.ensemble_gene_id'`."""
+    registry = models.CharField(max_length=128, db_index=True)
+    """The registry that stores & validated the features `'bionty.Gene'`."""
     hash = models.CharField(max_length=20, default=None, db_index=True, null=True)
     """The hash of the set."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -1153,7 +1151,6 @@ class FeatureSet(Registry):
     def __init__(
         self,
         features: Iterable[Registry],
-        ref_field: Optional[str] = None,
         type: Optional[Union[Type, str]] = None,
         modality: Optional[str] = None,
         name: Optional[str] = None,
