@@ -67,7 +67,7 @@ class ValidationAware:
 
         Returns:
             - A Dictionary of "mapped" and "unmapped" values
-            - If `return_df`: A DataFrame indexed by values with a boolean `__mapped__`
+            - If `return_df`: A DataFrame indexed by values with a boolean `__validated__`
                 column that indicates compliance with the values.
 
         See Also:
