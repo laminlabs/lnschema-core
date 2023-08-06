@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+✨ Added validate | [257](https://github.com/laminlabs/lnschema-core/pull/257) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-06 |
 🚚 Rename `ref_field` to `registry` | [256](https://github.com/laminlabs/lnschema-core/pull/256) | [falexwolf](https://github.com/falexwolf) | 2023-08-06 |
 ♻️ Add `Data` base class for `File` & `Dataset` | [255](https://github.com/laminlabs/lnschema-core/pull/255) | [falexwolf](https://github.com/falexwolf) | 2023-08-05 |
 🚚 Rename ORM to Registry | [254](https://github.com/laminlabs/lnschema-core/pull/254) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-05 |
