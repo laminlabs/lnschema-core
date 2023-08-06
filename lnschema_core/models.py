@@ -1273,12 +1273,12 @@ class File(Registry, Data):
     """File registry: data batches.
 
     Args:
-        data: `Union[PathLike, DataLike]` A file path or a data
-            object (`DataFrame`, `AnnData`) to serialize. Can be a cloud path,
+        data: `Union[PathLike, DataLike]` A path or a data
+            object (`DataFrame`, `AnnData`). Can be a cloud path,
             e.g., `"s3://my-bucket/myfolder/myfile.fcs"`.
-        key: `Optional[str] = None` The desired storage key: a relative filepath
+        key: `Optional[str] = None` The target storage key: a relative filepath
             within the a storage location, e.g., `"myfolder/myfile.fcs"`. If
-            `None`, gets auto-populated for data in the cloud.
+            `None`, gets auto-populated if file is already in registered storage.
         description: `Optional[str] = None` A description.
         run: `Optional[Run] = None` The run that created the file. If `None`,
             gets auto-linked if you generated a run context with :meth:`~lamindb.track`.
@@ -1409,6 +1409,28 @@ class File(Registry, Data):
         *args,
         **kwargs,
     ):
+        pass
+
+    @property
+    def path(self) -> Union[Path, UPath]:
+        """Path in storage.
+
+        Examples:
+
+            File in cloud storage:
+
+            >>> ln.File("s3://lamindb-ci/lndb-storage/pbmc68k.h5ad").save()
+            >>> file = ln.File.filter(key="lndb-storage/pbmc68k.h5ad").one()
+            >>> file.path
+            S3Path('s3://lamindb-ci/lndb-storage/pbmc68k.h5ad')
+
+            File in local storage:
+
+            >>> ln.File("./myfile.csv", description="myfile").save()
+            >>> file = ln.File.filter(description="myfile").one()
+            >>> file.path
+            PosixPath('/home/runner/work/lamindb/lamindb/docs/guide/mydata/myfile.csv')
+        """
         pass
 
     @classmethod
@@ -1615,27 +1637,6 @@ class File(Registry, Data):
             ├── possorted_genome_bam.bam
             ├── filtered_feature_bc_matrix.h5
             └── raw_feature_bc_matrix.h5
-        """
-        pass
-
-    def path(self) -> Union[Path, UPath]:
-        """Path in storage.
-
-        Examples:
-
-            File in cloud storage:
-
-            >>> ln.File("s3://lamindb-ci/lndb-storage/pbmc68k.h5ad").save()
-            >>> file = ln.File.filter(key="lndb-storage/pbmc68k.h5ad").one()
-            >>> file.path()
-            S3Path('s3://lamindb-ci/lndb-storage/pbmc68k.h5ad')
-
-            File in local storage:
-
-            >>> ln.File("./myfile.csv", description="myfile").save()
-            >>> file = ln.File.filter(description="myfile").one()
-            >>> file.path()
-            PosixPath('/home/runner/work/lamindb/lamindb/docs/guide/mydata/myfile.csv')
         """
         pass
 
