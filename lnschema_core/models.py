@@ -56,7 +56,7 @@ class ValidationAware:
         """Inspect if a list of values are mappable to existing values of a field.
 
         Args:
-            values: `ListLike` Identifiers that will be checked against the
+            values: `ListLike` values that will be checked against the
                 field.
             field: `StrField` The field of values.
                     Examples are 'ontology_id' to map against the source ID
@@ -66,25 +66,24 @@ class ValidationAware:
             return_df: Whether to return a Pandas DataFrame.
 
         Returns:
-            - A Dictionary of "mapped" and "unmapped" values
+            - A Dictionary of "validated" and "not_validated" values
             - If `return_df`: A DataFrame indexed by values with a boolean `__validated__`
                 column that indicates compliance with the values.
 
         See Also:
-            :meth:`~lamindb.dev.Registry.map_synonyms`
-                Standardize synonyms
+            :meth:`~lamindb.dev.Registry.validate`
 
         Examples:
             >>> import lnschema_bionty as lb
             >>> lb.settings.species = "human"
-            >>> gene_synonyms = ["A1CF", "A1BG", "FANCD1", "FANCD20"]
-            >>> ln.save(lb.Gene.from_values(gene_synonyms, field="symbol"))
+            >>> ln.save(lb.Gene.from_values(["A1CF", "A1BG", "BRCA2"], field="symbol"))
+            >>> gene_symbols = ["A1CF", "A1BG", "FANCD1", "FANCD20"]
             >>> lb.Gene.inspect(gene_symbols, field=lb.Gene.symbol)
-            🔶 The values contain synonyms!
-            To increase mappability, standardize them via '.map_synonyms()'
-            ✅ 3 terms (75.0%) are mapped
-            🔶 1 terms (25.0%) are not mapped
-            {'mapped': ['A1CF', 'A1BG', 'FANCD20'], 'not_mapped': ['FANCD1']}
+            ✅ 2 terms (50.00%) are validated
+            🔶 2 terms (50.00%) are not validated
+                🟠 detected synonyms
+                to increase validated terms, standardize them via .map_synonyms()
+            {'validated': ['A1CF', 'A1BG'], 'not_validated': ['FANCD1', 'FANCD20']}
         """
         pass
 
@@ -95,13 +94,24 @@ class ValidationAware:
         Note this is strict validation, only asserts exact matches.
 
         Args:
-            values: `ListLike` Identifiers that will be validated against the field.
+            values: `ListLike` values that will be validated against the field.
             field: `StrField` The field of values.
                     Examples are 'ontology_id' to map against the source ID
                     or 'name' to map against the ontologies field names.
 
         Returns:
             A vector of booleans indicating if each element is validated.
+
+        See Also:
+            :meth:`~lamindb.dev.Registry.inspect`
+
+        Examples:
+            >>> import lnschema_bionty as lb
+            >>> lb.settings.species = "human"
+            >>> ln.save(lb.Gene.from_values(["A1CF", "A1BG", "BRCA2"], field="symbol"))
+            >>> gene_symbols = ["A1CF", "A1BG", "FANCD1", "FANCD20"]
+            >>> lb.Gene.validate(gene_symbols, field=lb.Gene.symbol)
+            array([ True,  True, False, False])
         """
         pass
 
@@ -153,8 +163,8 @@ class SynonymsAware:
         Examples:
             >>> import lnschema_bionty as lb
             >>> lb.settings.species = "human"
+            >>> ln.save(lb.Gene.from_values(["A1CF", "A1BG", "BRCA2"], field="symbol"))
             >>> gene_synonyms = ["A1CF", "A1BG", "FANCD1", "FANCD20"]
-            >>> ln.save(lb.Gene.from_values(gene_synonyms, field="symbol"))
             >>> standardized_names = lb.Gene.map_synonyms(gene_synonyms)
             >>> standardized_names
             ['A1CF', 'A1BG', 'BRCA2', 'FANCD20']
