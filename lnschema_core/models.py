@@ -1276,12 +1276,12 @@ class File(Registry, Data):
         data: `Union[PathLike, DataLike]` A path or a data
             object (`DataFrame`, `AnnData`). Can be a cloud path,
             e.g., `"s3://my-bucket/myfolder/myfile.fcs"`.
-        key: `Optional[str] = None` The target storage key: a relative filepath
-            within the a storage location, e.g., `"myfolder/myfile.fcs"`. If
+        key: `Optional[str] = None` The target storage key: a relative path
+            within a storage location, e.g., `"myfolder/myfile.fcs"`. If
             `None`, gets auto-populated if file is already in registered storage.
         description: `Optional[str] = None` A description.
         run: `Optional[Run] = None` The run that created the file. If `None`,
-            gets auto-linked if you generated a run context with :meth:`~lamindb.track`.
+            gets auto-linked if run context was generated with :meth:`~lamindb.track`.
 
     .. admonition:: Typical formats in storage & their API accessors
 
