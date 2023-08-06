@@ -91,7 +91,7 @@ class ValidationAware:
         pass
 
     @classmethod
-    def validate(cls, identifiers: ListLike, field: StrField, **kwargs) -> np.ndarray[bool]:
+    def validate(cls, identifiers: ListLike, field: StrField, **kwargs) -> "np.ndarray[bool]":
         """Validate identifiers against existing values of a string field.
 
         Note this is strict validation, only asserts exact matches.
