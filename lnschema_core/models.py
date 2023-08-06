@@ -71,7 +71,7 @@ class ValidationAware:
                 column that indicates compliance with the values.
 
         See Also:
-            :meth:`~lamindb.dev.Registry.validate`
+            :meth:`~lamindb.dev.ValidationAware.inspect`
 
         Examples:
             >>> import lnschema_bionty as lb
@@ -103,7 +103,7 @@ class ValidationAware:
             A vector of booleans indicating if each element is validated.
 
         See Also:
-            :meth:`~lamindb.dev.Registry.inspect`
+            :meth:`~lamindb.dev.ValidationAware.inspect`
 
         Examples:
             >>> import lnschema_bionty as lb
@@ -155,9 +155,9 @@ class SynonymsAware:
             standardized names as values.
 
         See Also:
-            :meth:`~lamindb.dev.Registry.add_synonym`
+            :meth:`~lamindb.dev.SynonymsAware.add_synonym`
                 Add synonyms
-            :meth:`~lamindb.dev.Registry.remove_synonym`
+            :meth:`~lamindb.dev.SynonymsAware.remove_synonym`
                 Remove synonyms
 
         Examples:
@@ -179,7 +179,7 @@ class SynonymsAware:
         """Add synonyms to a record.
 
         See Also:
-            :meth:`~lamindb.dev.Registry.remove_synonym`
+            :meth:`~lamindb.dev.SynonymsAware.remove_synonym`
                 Remove synonyms
 
         Examples:
@@ -199,7 +199,7 @@ class SynonymsAware:
         """Remove synonyms from a record.
 
         See Also:
-            :meth:`~lamindb.dev.Registry.add_synonym`
+            :meth:`~lamindb.dev.SynonymsAware.add_synonym`
                 Add synonyms
 
         Examples:
@@ -218,7 +218,7 @@ class SynonymsAware:
         """Set value for abbr field and add to synonyms.
 
         See Also:
-            :meth:`~lamindb.dev.Registry.add_synonym`
+            :meth:`~lamindb.dev.SynonymsAware.add_synonym`
                 Add synonyms
 
         Examples:
