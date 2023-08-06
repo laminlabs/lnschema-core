@@ -435,6 +435,23 @@ class Data:
         """Feature manager (:class:`~lamindb.dev.FeatureManager`)."""
         pass
 
+    def add_labels(
+        self,
+        records: Union[Registry, List[Registry], QuerySet],
+        feature: Optional[Union[str, Registry]] = None,
+    ) -> None:
+        """Add one or several labels and associate them with a feature."""
+        pass
+
+    def get_labels(
+        self,
+        feature: Optional[Union[str, Registry]] = None,
+        mute: bool = False,
+        flat_names: bool = False,
+    ) -> Union[QuerySet, Dict[str, QuerySet], List]:
+        """Get labels given a feature."""
+        pass
+
 
 # -------------------------------------------------------------------------------------
 # A note on required fields at the Registry level
