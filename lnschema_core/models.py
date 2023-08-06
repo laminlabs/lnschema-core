@@ -1413,7 +1413,7 @@ class File(Registry, Data):
 
     @property
     def path(self) -> Union[Path, UPath]:
-        """Path in storage.
+        """File path (`Path`, `UPath`).
 
         Examples:
 
