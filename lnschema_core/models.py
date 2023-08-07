@@ -276,10 +276,16 @@ class Registry(models.Model, ValidationAware, SynonymsAware):
         with_children: bool = False,
         distance: int = 5,
     ):
-        """View parents of a record in a graph.
+        """View parents in a graph.
+
+        There are two types of registries with a `parents` field:
+
+        - Ontological hierarchies: :class:`~lamindb.Label` (project & sub-project), :class:`~lnschema_bionty.CellType` (cell type & cell subtype), ...
+        - Procedural/temporal hierarchies: :class:`~lamindb.Transform` (preceding transform & successing transform), ...
 
         Notes:
             For more info, see tutorial: :doc:`/guide/data-lineage`.
+            For more info, see tutorial: :doc:`/tutorial1`.
 
         Examples:
             >>> import lnschema_bionty as lb
@@ -667,6 +673,10 @@ class Transform(Registry):
         >>> transform.save()
 
         Create a transform from a notebook:
+
+        View parents of a transform:
+
+        >>> transform.view_parents()
 
         >>> ln.track()
         ✅ Saved: Transform(id=1LCd8kco9lZUBg, name=Track data lineage / provenance, short_name=02-data-lineage, stem_id=1LCd8kco9lZU, version=0, type=notebook, updated_at=2023-07-10 18:37:19, created_by_id=DzTjkKse) # noqa
