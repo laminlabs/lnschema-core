@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-⬆️ Add InspectResult | [260](https://github.com/laminlabs/lnschema-core/pull/260) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-07 |
+⬆️ Add InspectResult | [260](https://github.com/laminlabs/lnschema-core/pull/260) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-07 | 0.44.3
 🚸 Turn path into property | [259](https://github.com/laminlabs/lnschema-core/pull/259) | [falexwolf](https://github.com/falexwolf) | 2023-08-06 | 0.44.2
 ✨ Added validate | [257](https://github.com/laminlabs/lnschema-core/pull/257) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-06 | 0.44.0
 🚚 Rename `ref_field` to `registry` | [256](https://github.com/laminlabs/lnschema-core/pull/256) | [falexwolf](https://github.com/falexwolf) | 2023-08-06 |
