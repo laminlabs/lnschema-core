@@ -33,6 +33,7 @@ _INSTANCE_SETUP = _check_instance_setup()
 if TYPE_CHECKING or _INSTANCE_SETUP:
     import numpy as np
     import pandas as pd
+    from lamin_utils._inspect import InspectResult
     from lamindb.dev import FeatureManager
 
 
@@ -49,10 +50,9 @@ class ValidationAware:
         values: ListLike,
         field: StrField,
         *,
-        return_df: bool = False,
         mute: bool = False,
         **kwargs,
-    ) -> Union["pd.DataFrame", Dict[str, List[str]]]:
+    ) -> "InspectResult":
         """Inspect if a list of values are mappable to existing values of a field.
 
         Args:
