@@ -274,7 +274,7 @@ class Registry(models.Model, ValidationAware, SynonymsAware):
         self,
         field: Optional[StrField] = None,
         with_children: bool = False,
-        distance: int = 100,
+        distance: int = 5,
     ):
         """View parents of a record in a graph.
 
