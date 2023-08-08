@@ -81,17 +81,20 @@ class ValidationAware:
             >>> lb.settings.species = "human"
             >>> ln.save(lb.Gene.from_values(["A1CF", "A1BG", "BRCA2"], field="symbol"))
             >>> gene_symbols = ["A1CF", "A1BG", "FANCD1", "FANCD20"]
-            >>> lb.Gene.inspect(gene_symbols, field=lb.Gene.symbol)
+            >>> result = lb.Gene.inspect(gene_symbols, field=lb.Gene.symbol)
             ✅ 2 terms (50.00%) are validated
             🔶 2 terms (50.00%) are not validated
                 🟠 detected synonyms
                 to increase validated terms, standardize them via .map_synonyms()
-            {'validated': ['A1CF', 'A1BG'], 'not_validated': ['FANCD1', 'FANCD20']}
+            >>> result.validated
+            ['A1CF', 'A1BG']
+            >>> result.non_validated
+            ['FANCD1', 'FANCD20']
         """
         pass
 
     @classmethod
-    def validate(cls, values: ListLike, field: StrField, **kwargs) -> "np.ndarray[bool]":
+    def validate(cls, values: ListLike, field: StrField, *, mute: bool = False, **kwargs) -> "np.ndarray":
         """Validate values against existing values of a string field.
 
         Note this is strict validation, only asserts exact matches.
@@ -101,6 +104,7 @@ class ValidationAware:
             field: The field of values.
                     Examples are `'ontology_id'` to map against the source ID
                     or `'name'` to map against the ontologies field names.
+            mute: Mute logging.
 
         Returns:
             A vector of booleans indicating if an element is validated.
@@ -114,6 +118,8 @@ class ValidationAware:
             >>> ln.save(lb.Gene.from_values(["A1CF", "A1BG", "BRCA2"], field="symbol"))
             >>> gene_symbols = ["A1CF", "A1BG", "FANCD1", "FANCD20"]
             >>> lb.Gene.validate(gene_symbols, field=lb.Gene.symbol)
+            ✅ 2 terms (50.00%) are validated
+            🔶 2 terms (50.00%) are not validated
             array([ True,  True, False, False])
         """
         pass
