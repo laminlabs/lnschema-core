@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+📝 Remove all duplicated type annotation from docs | [262](https://github.com/laminlabs/lnschema-core/pull/262) | [falexwolf](https://github.com/falexwolf) | 2023-08-08 |
 📝 Document all types | [261](https://github.com/laminlabs/lnschema-core/pull/261) | [falexwolf](https://github.com/falexwolf) | 2023-08-08 |
 ⬆️ Add InspectResult | [260](https://github.com/laminlabs/lnschema-core/pull/260) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-07 | 0.44.3
 🚸 Turn path into property | [259](https://github.com/laminlabs/lnschema-core/pull/259) | [falexwolf](https://github.com/falexwolf) | 2023-08-06 | 0.44.2
