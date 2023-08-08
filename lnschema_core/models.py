@@ -32,7 +32,7 @@ from lnschema_core.types import (
     TextField,
 )
 
-from .ids import base62_8, base62_12, base62_20
+from .ids import base62_8, base62_12, base62_18, base62_20
 from .types import TransformType
 from .users import current_user_id
 
@@ -1394,6 +1394,16 @@ class File(Registry, Data):
     """
     description = CharField(max_length=255, db_index=True, null=True, default=None)
     """A description."""
+    stem_id = CharField(max_length=18, default=base62_18, null=True, default=None, db_index=True)
+    """Stem of id, identifying the file up to version (default `None`)."""
+    version = CharField(max_length=10, null=True, default=None, db_index=True)
+    """Version (default `None`).
+
+    Use this together with `stem_id` to label different versions of a file.
+
+    Consider using `semantic versioning <https://semver.org>`__
+    with `Python versioning <https://peps.python.org/pep-0440/>`__.
+    """
     size = models.BigIntegerField(null=True, db_index=True)
     """Size in bytes.
 
