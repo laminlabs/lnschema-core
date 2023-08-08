@@ -1357,25 +1357,36 @@ class File(Registry, Data):
 
     Examples:
 
-        Track a file from a local filepath:
+        Create a file from a local filepath:
 
         >>> filepath = ln.dev.datasets.file_mini_csv()
         >>> filepath
         PosixPath('mini.csv')
         >>> file = ln.File(filepath)
-        💡 File will be copied to storage upon `save()` using storage key = WpfMHb5u3Jp8mzoTs3SH.csv
         >>> file
         File(id=WpfMHb5u3Jp8mzoTs3SH, suffix=.csv, size=11, hash=z1LdF2qN4cN0M2sXrcW8aw, hash_type=md5, storage_id=Zl2q0vQB, created_by_id=DzTjkKse)
         >>> file.save()
-        💡 storing file WpfMHb5u3Jp8mzoTs3SH with key .lamindb/WpfMHb5u3Jp8mzoTs3SH.csv
 
-        Track a file from a cloud storage (supports `s3://` and `gs://`):
+        Create a file from a cloud storage (supports `s3://` and `gs://`):
 
         >>> file = ln.File("s3://lamindb-ci/test-data/test.csv")
-        💡 File in storage ✓ using storage key = test-data/test.csv
         >>> file
         File(id=YDELGH3FqhtiZI7IMWnH, key=test-data/test.csv, suffix=.csv, size=329, hash=85-PotiFdQ2rpJvfLtOISA, hash_type=md5, storage_id=Z7zewD72, created_by_id=DzTjkKse)
         >>> file.save()
+
+        Make a new version of a file
+
+        >>> # unversioned file
+        >>> file = ln.File(df1)
+        >>> assert file.stem_id is None
+        >>> assert file.version is None
+
+        >>> # create new file from old file and version both
+        >>> new_file = ln.File(adata, make_new_version_of=file)
+        >>> assert new_file.stem_id == old_file.stem_id
+        >>> assert file.version == "1"
+        >>> assert new_file.version == "2"
+
     """
 
     id = CharField(max_length=20, primary_key=True)
