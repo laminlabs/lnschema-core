@@ -17,12 +17,20 @@ from typing import (  # noqa
 
 from django.db import models
 from django.db.models import CASCADE, PROTECT
-from django.db.models.query_utils import DeferredAttribute as Field
 from lamindb_setup import _check_instance_setup
 from upath import UPath
 
 from lnschema_core.mocks import AnnDataAccessor, BackedAccessor, QuerySet
-from lnschema_core.types import AnnDataLike, DataLike, ListLike, PathLike, StrField
+from lnschema_core.types import (
+    AnnDataLike,
+    CharField,
+    DataLike,
+    FieldAttr,
+    ListLike,
+    PathLike,
+    StrField,
+    TextField,
+)
 
 from .ids import base62_8, base62_12, base62_20
 from .types import TransformType
@@ -432,7 +440,7 @@ class Registry(models.Model, ValidationAware, SynonymsAware):
         return_queryset: bool = False,
         limit: Optional[int] = None,
         case_sensitive: bool = False,
-        synonyms_field: Optional[StrField] = "synonyms",
+        synonyms_field: Optional[StrField] = "synonyms",  # type: ignore
     ) -> Union["pd.DataFrame", "QuerySet"]:
         """Search the table.
 
@@ -505,7 +513,7 @@ class Data:
 # This goes against the Django convention, but goes with the SQLModel convention
 # (Optional fields can be null on the SQL level, non-optional fields cannot)
 #
-# Due to Django's convention where CharField has pre-configured (null=False, default=""), marking
+# Due to Django's convention where CharFieldAttr has pre-configured (null=False, default=""), marking
 # a required field necessitates passing `default=None`. Without the validator it would trigger
 # an error at the SQL-level, with it, it triggers it at instantiation
 
@@ -533,13 +541,13 @@ class User(Registry):
         User(id=DzTjkKse, handle=testuser1, email=testuser1@lamin.ai, name=Test User1, updated_at=2023-07-10 18:37:26)
     """
 
-    id = models.CharField(max_length=8, primary_key=True, default=None)
+    id = CharField(max_length=8, primary_key=True, default=None)
     """Universal id, valid across DB instances."""
-    handle = models.CharField(max_length=30, unique=True, db_index=True, default=None)
+    handle = CharField(max_length=30, unique=True, db_index=True, default=None)
     """Universal handle, valid across DB instances (required)."""
-    email = models.CharField(max_length=255, unique=True, db_index=True, default=None)
+    email = CharField(max_length=255, unique=True, db_index=True, default=None)
     """Email address (required)."""
-    name = models.CharField(max_length=255, db_index=True, null=True, default=None)
+    name = CharField(max_length=255, db_index=True, null=True, default=None)
     """Name (optional)."""  # has to match hub specification, where it's also optional
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
@@ -597,13 +605,13 @@ class Storage(Registry):
         PosixPath('/home/runner/work/lamindb-setup/lamindb-setup/docs/guide/storage_2')
     """
 
-    id = models.CharField(max_length=8, default=base62_8, db_index=True, primary_key=True)
+    id = CharField(max_length=8, default=base62_8, db_index=True, primary_key=True)
     """Universal id, valid across DB instances."""
-    root = models.CharField(max_length=255, db_index=True, default=None)
+    root = CharField(max_length=255, db_index=True, default=None)
     """Root path of storage, an s3 path, a local path, etc. (required)."""
-    type = models.CharField(max_length=30, db_index=True)
+    type = CharField(max_length=30, db_index=True)
     """Local vs. s3 vs. gcp etc."""
-    region = models.CharField(max_length=64, db_index=True, null=True, default=None)
+    region = CharField(max_length=64, db_index=True, null=True, default=None)
     """Cloud storage region, if applicable."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
@@ -682,16 +690,16 @@ class Transform(Registry):
         ✅ Saved: Transform(id=1LCd8kco9lZUBg, name=Track data lineage / provenance, short_name=02-data-lineage, stem_id=1LCd8kco9lZU, version=0, type=notebook, updated_at=2023-07-10 18:37:19, created_by_id=DzTjkKse) # noqa
     """
 
-    id = models.CharField(max_length=14, db_index=True, primary_key=True, default=None)
+    id = CharField(max_length=14, db_index=True, primary_key=True, default=None)
     """Universal id, composed of stem_id and version suffix."""
-    name = models.CharField(max_length=255, db_index=True, null=True, default=None)
+    name = CharField(max_length=255, db_index=True, null=True, default=None)
     """Transform name or title, a pipeline name, notebook title, etc..
     """
-    short_name = models.CharField(max_length=128, db_index=True, null=True, default=None)
+    short_name = CharField(max_length=128, db_index=True, null=True, default=None)
     """A short name (optional)."""
-    stem_id = models.CharField(max_length=12, default=base62_12, db_index=True)
+    stem_id = CharField(max_length=12, default=base62_12, db_index=True)
     """Stem of id, identifying the transform up to version (auto-managed)."""
-    version = models.CharField(max_length=10, default="0", db_index=True)
+    version = CharField(max_length=10, default="0", db_index=True)
     """Version, defaults to `"0"`.
 
     Use this to label different versions of the same pipeline, notebook, etc.
@@ -699,7 +707,7 @@ class Transform(Registry):
     Consider using `semantic versioning <https://semver.org>`__
     with `Python versioning <https://peps.python.org/pep-0440/>`__.
     """
-    type = models.CharField(
+    type = CharField(
         max_length=20,
         choices=TransformType.choices(),
         db_index=True,
@@ -711,7 +719,7 @@ class Transform(Registry):
 
     If run from the app, it defaults to `app`.
     """
-    reference = models.CharField(max_length=255, db_index=True, null=True, default=None)
+    reference = CharField(max_length=255, db_index=True, null=True, default=None)
     """Reference for the transform, e.g., a URL.
     """
     parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
@@ -804,7 +812,7 @@ class Run(Registry):
         Run(id=pHgVICV9DxBaV6BAuKJl, run_at=2023-07-10 18:37:19, transform_id=1LCd8kco9lZUBg, created_by_id=DzTjkKse)
     """
 
-    id = models.CharField(max_length=20, default=base62_20, primary_key=True)
+    id = CharField(max_length=20, default=base62_20, primary_key=True)
     """Universal id, valid across DB instances."""
     transform = models.ForeignKey(Transform, CASCADE, related_name="runs")
     """The transform :class:`~lamindb.Transform` that is being run."""
@@ -814,9 +822,9 @@ class Run(Registry):
     """Creator of record, a :class:`~lamindb.User`."""
     # input_files on File
     # output_files on File
-    reference = models.CharField(max_length=255, db_index=True, null=True, default=None)
+    reference = CharField(max_length=255, db_index=True, null=True, default=None)
     """A reference like a URL or external ID (such as from a workflow manager)."""
-    reference_type = models.CharField(max_length=255, db_index=True, null=True, default=None)
+    reference_type = CharField(max_length=255, db_index=True, null=True, default=None)
     """Type of reference, e.g., a workflow manager execution ID."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
@@ -912,11 +920,11 @@ class Label(Registry):
         File(id=MveGmGJImYY5qBwmr0j0, suffix=.csv, size=4, hash=CY9rzUYh03PK3k6DJie09g, hash_type=md5, updated_at=2023-07-19 13:47:59, storage_id=597Sgod0, created_by_id=DzTjkKse) # noqa
     """
 
-    id = models.CharField(max_length=8, default=base62_8, primary_key=True)
+    id = CharField(max_length=8, default=base62_8, primary_key=True)
     """A universal random id, valid across DB instances."""
-    name = models.CharField(max_length=255, db_index=True, unique=True, default=None)
+    name = CharField(max_length=255, db_index=True, unique=True, default=None)
     """Name or title of label (required)."""
-    description = models.TextField(null=True, default=None)
+    description = TextField(null=True, default=None)
     """A description (optional)."""
     parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
     """Parent labels, useful to hierarchically group labels (optional)."""
@@ -965,23 +973,23 @@ class Modality(Registry):
         description: `Optional[str]` A description.
     """
 
-    id = models.CharField(max_length=8, default=base62_8, primary_key=True)
+    id = CharField(max_length=8, default=base62_8, primary_key=True)
     """Universal id, valid across DB instances."""
-    name = models.CharField(max_length=256, db_index=True)
+    name = CharField(max_length=256, db_index=True)
     """Name of the modality (required)."""
-    ontology_id = models.CharField(max_length=32, db_index=True, null=True, default=None)
+    ontology_id = CharField(max_length=32, db_index=True, null=True, default=None)
     """Ontology ID of the modality."""
-    abbr = models.CharField(max_length=32, db_index=True, unique=True, null=True, default=None)
+    abbr = CharField(max_length=32, db_index=True, unique=True, null=True, default=None)
     """A unique abbreviation for the modality (optional)."""
-    synonyms = models.TextField(null=True, default=None)
+    synonyms = TextField(null=True, default=None)
     """Bar-separated (|) synonyms that correspond to this modality."""
-    description = models.TextField(null=True, default=None)
+    description = TextField(null=True, default=None)
     """Description."""
-    molecule = models.TextField(null=True, default=None, db_index=True)
+    molecule = TextField(null=True, default=None, db_index=True)
     """Molecular experimental factor, parsed from EFO."""
-    instrument = models.TextField(null=True, default=None, db_index=True)
+    instrument = TextField(null=True, default=None, db_index=True)
     """Instrument used to measure, parsed from EFO."""
-    measurement = models.TextField(null=True, default=None, db_index=True)
+    measurement = TextField(null=True, default=None, db_index=True)
     """Phenotypic experimental factor, parsed from EFO."""
     parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
     """Parents."""
@@ -1070,23 +1078,23 @@ class Feature(Registry):
 
     """
 
-    id = models.CharField(max_length=12, default=base62_12, primary_key=True)
+    id = CharField(max_length=12, default=base62_12, primary_key=True)
     """Universal id, valid across DB instances."""
-    name = models.CharField(max_length=255, db_index=True, default=None)
+    name = CharField(max_length=255, db_index=True, default=None)
     """Name of feature (required)."""
-    type = models.CharField(max_length=64, db_index=True, default=None)
+    type = CharField(max_length=64, db_index=True, default=None)
     """Simple type ("float", "int", "str", "category").
 
     If "category", consider managing categories with :class:`~lamindb.Label` or
     another Registry for managing labels.
     """
-    unit = models.CharField(max_length=30, db_index=True, null=True, default=None)
+    unit = CharField(max_length=30, db_index=True, null=True, default=None)
     """Unit of measure, ideally SI (`m`, `s`, `kg`, etc.) or 'normalized' etc. (optional)."""
-    description = models.TextField(db_index=True, null=True, default=None)
+    description = TextField(db_index=True, null=True, default=None)
     """A description."""
-    registries = models.CharField(max_length=128, db_index=True, default=None, null=True)
+    registries = CharField(max_length=128, db_index=True, default=None, null=True)
     """ORMs that provide values for labels, bar-separated (|) (optional)."""
-    synonyms = models.TextField(null=True, default=None)
+    synonyms = TextField(null=True, default=None)
     """Bar-separated (|) synonyms (optional)."""
     feature_sets = models.ManyToManyField("FeatureSet", related_name="features")
     """Feature sets linked to this feature."""
@@ -1184,22 +1192,22 @@ class FeatureSet(Registry):
         >>> file.feature_sets.add(feature_set)
     """
 
-    id = models.CharField(max_length=20, primary_key=True, default=None)
+    id = CharField(max_length=20, primary_key=True, default=None)
     """A universal id (hash of the set of feature values)."""
-    name = models.CharField(max_length=128, null=True, default=None)
+    name = CharField(max_length=128, null=True, default=None)
     """A name (optional)."""
     n = models.IntegerField()
     """Number of features in the set."""
-    type = models.CharField(max_length=64, null=True, default=None)
+    type = CharField(max_length=64, null=True, default=None)
     """Simple type, e.g., "str", "int". Is `None` for :class:`~lamindb.Feature` (optional).
 
     For :class:`~lamindb.Feature`, types are expected to be in-homogeneous and defined on a per-feature level.
     """
     modality = models.ForeignKey(Modality, PROTECT, null=True, default=None)
     """The measurement modality, e.g., "RNA", "Protein", "Gene Module", "pathway" (:class:`~lamindb.Modality`)."""
-    registry = models.CharField(max_length=128, db_index=True)
+    registry = CharField(max_length=128, db_index=True)
     """The registry that stores & validated the features `'bionty.Gene'`."""
-    hash = models.CharField(max_length=20, default=None, db_index=True, null=True)
+    hash = CharField(max_length=20, default=None, db_index=True, null=True)
     """The hash of the set."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
@@ -1236,7 +1244,7 @@ class FeatureSet(Registry):
     def from_values(  # type: ignore
         cls,
         values: ListLike,
-        field: Field = Feature.name,
+        field: FieldAttr = Feature.name,
         type: Optional[Union[Type, str]] = None,
         name: Optional[str] = None,
         modality: Optional[str] = None,
@@ -1246,7 +1254,7 @@ class FeatureSet(Registry):
 
         Args:
             values: ``ListLike`` A list of values, like feature names or ids.
-            field: ``Field = Feature.name`` The field of a reference Registry to
+            field: ``FieldAttr = Feature.name`` The field of a reference Registry to
                 map values.
             type: `Optional[Union[Type, str]] = None` The simple type. Defaults to
                 `None` if reference registry is :class:`~lamindb.Feature`, defaults to
@@ -1346,36 +1354,36 @@ class File(Registry, Data):
         >>> file.save()
     """
 
-    id = models.CharField(max_length=20, primary_key=True)
+    id = CharField(max_length=20, primary_key=True)
     """A universal random id (20-char base62 ~ UUID), valid across DB instances."""
     storage = models.ForeignKey(Storage, PROTECT, related_name="files")
     """Storage location (:class:`~lamindb.Storage`), e.g., an S3 bucket, local folder or network location."""
-    key = models.CharField(max_length=255, db_index=True, null=True, default=None)
+    key = CharField(max_length=255, db_index=True, null=True, default=None)
     """Storage key, the relative path within the storage location."""
-    suffix = models.CharField(max_length=30, db_index=True, null=True, default=None)
+    suffix = CharField(max_length=30, db_index=True, null=True, default=None)
     """File suffix.
 
     This is a file extension if the `file` is stored in a file format.
     It's `None` if the storage format doesn't have a canonical extension.
     """
-    accessor = models.CharField(max_length=64, db_index=True, null=True, default=None)
+    accessor = CharField(max_length=64, db_index=True, null=True, default=None)
     """Default backed or memory accessor, e.g., DataFrame, AnnData.
 
     Soon, also: SOMA, MuData, zarr.Group, tiledb.Array, etc.
     """
-    description = models.CharField(max_length=255, db_index=True, null=True, default=None)
+    description = CharField(max_length=255, db_index=True, null=True, default=None)
     """A description."""
     size = models.BigIntegerField(null=True, db_index=True)
     """Size in bytes.
 
     Examples: 1KB is 1e3 bytes, 1MB is 1e6, 1GB is 1e9, 1TB is 1e12 etc.
     """
-    hash = models.CharField(max_length=86, db_index=True, null=True, default=None)  # 86 base64 chars allow to store 64 bytes, 512 bits
+    hash = CharField(max_length=86, db_index=True, null=True, default=None)  # 86 base64 chars allow to store 64 bytes, 512 bits
     """Hash or pseudo-hash of file content.
 
     Useful to ascertain integrity and avoid duplication.
     """
-    hash_type = models.CharField(max_length=30, db_index=True, null=True, default=None)
+    hash_type = CharField(max_length=30, db_index=True, null=True, default=None)
     """Type of hash."""
     feature_sets = models.ManyToManyField(FeatureSet, related_name="files", through="FileFeatureSet")
     """The feature sets measured in the file (see :class:`~lamindb.FeatureSet`)."""
@@ -1447,7 +1455,7 @@ class File(Registry, Data):
     def from_df(
         cls,
         df: "pd.DataFrame",
-        columns_ref: Field = Feature.name,
+        columns_ref: FieldAttr = Feature.name,
         key: Optional[str] = None,
         description: Optional[str] = None,
         run: Optional[Run] = None,
@@ -1487,8 +1495,8 @@ class File(Registry, Data):
     def from_anndata(
         cls,
         adata: "AnnDataLike",
-        var_ref: Optional[Field],
-        obs_columns_ref: Optional[Field] = Feature.name,
+        var_ref: Optional[FieldAttr],
+        obs_columns_ref: Optional[FieldAttr] = Feature.name,
         key: Optional[str] = None,
         description: Optional[str] = None,
         run: Optional[Run] = None,
@@ -1712,7 +1720,7 @@ class File(Registry, Data):
 
         Args:
             storage: `Optional[bool] = None` Indicate whether you want to delete the
-            file in storage.
+                file in storage.
 
         Examples:
 
@@ -1793,13 +1801,13 @@ class Dataset(Registry, Data):
         💡 storing file uGQtiyepMdHOq3sZCFWV with key .lamindb/uGQtiyepMdHOq3sZCFWV.parquet
     """
 
-    id = models.CharField(max_length=20, default=base62_20, primary_key=True)
+    id = CharField(max_length=20, default=base62_20, primary_key=True)
     """Universal id, valid across DB instances."""
-    name = models.CharField(max_length=255, db_index=True, default=None)
+    name = CharField(max_length=255, db_index=True, default=None)
     """Name or title of dataset (required)."""
-    description = models.TextField(null=True, default=None)
+    description = TextField(null=True, default=None)
     """A description."""
-    hash = models.CharField(max_length=86, db_index=True, null=True, default=None)
+    hash = CharField(max_length=86, db_index=True, null=True, default=None)
     """Hash of dataset content. 86 base64 chars allow to store 64 bytes, 512 bits."""
     feature_sets = models.ManyToManyField("FeatureSet", related_name="datasets", through="DatasetFeatureSet")
     """The feature sets measured in this dataset (see :class:`~lamindb.FeatureSet`)."""
@@ -1847,7 +1855,7 @@ class LinkORM:
 class FileFeatureSet(Registry, LinkORM):
     file = models.ForeignKey(File, on_delete=models.CASCADE)
     feature_set = models.ForeignKey(FeatureSet, on_delete=models.CASCADE)
-    slot = models.CharField(max_length=40, null=True, default=None)
+    slot = CharField(max_length=40, null=True, default=None)
 
     class Meta:
         unique_together = ("file", "feature_set")
@@ -1856,7 +1864,7 @@ class FileFeatureSet(Registry, LinkORM):
 class DatasetFeatureSet(Registry, LinkORM):
     dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE)
     feature_set = models.ForeignKey(FeatureSet, on_delete=models.CASCADE)
-    slot = models.CharField(max_length=50, null=True, default=None)
+    slot = CharField(max_length=50, null=True, default=None)
 
     class Meta:
         unique_together = ("dataset", "feature_set")
@@ -1903,7 +1911,7 @@ ORM = Registry
 
 
 def deferred_attribute__repr__(self):
-    return f"Field({self.field.model.__name__}.{self.field.name})"
+    return f"FieldAttr({self.field.model.__name__}.{self.field.name})"
 
 
-Field.__repr__ = deferred_attribute__repr__
+FieldAttr.__repr__ = deferred_attribute__repr__  # type: ignore
