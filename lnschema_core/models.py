@@ -516,7 +516,7 @@ class Data:
 
 
 class User(Registry):
-    """User registry: humans and bots.
+    """Users: humans and bots.
 
     Is auto-managed. No need to create records.
 
@@ -1280,7 +1280,7 @@ class FeatureSet(Registry):
 
 
 class File(Registry, Data):
-    """File registry: data batches.
+    """Files: data batches.
 
     Args:
         data: `Union[PathLike, DataLike]` A path or a data
@@ -1735,7 +1735,7 @@ class File(Registry, Data):
 
 
 class Dataset(Registry, Data):
-    """Dataset registry: collections of data batches.
+    """Datasets: collections of data batches.
 
     .. warning::
 
