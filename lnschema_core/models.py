@@ -1319,6 +1319,9 @@ class File(Registry, Data):
             within a storage location, e.g., `"myfolder/myfile.fcs"`. If
             `None`, gets auto-populated if file is already in registered storage.
         description: `Optional[str] = None` A description.
+        version: `Optional[str] = None` A version string (consider semver).
+        make_new_version_of: `Optional[File] = None` A reference file for which
+            to create a new version.
         run: `Optional[Run] = None` The run that created the file. If `None`,
             gets auto-linked if run context was generated with :meth:`~lamindb.track`.
 
@@ -1354,25 +1357,36 @@ class File(Registry, Data):
 
     Examples:
 
-        Track a file from a local filepath:
+        Create a file from a local filepath:
 
         >>> filepath = ln.dev.datasets.file_mini_csv()
         >>> filepath
         PosixPath('mini.csv')
         >>> file = ln.File(filepath)
-        💡 File will be copied to storage upon `save()` using storage key = WpfMHb5u3Jp8mzoTs3SH.csv
         >>> file
         File(id=WpfMHb5u3Jp8mzoTs3SH, suffix=.csv, size=11, hash=z1LdF2qN4cN0M2sXrcW8aw, hash_type=md5, storage_id=Zl2q0vQB, created_by_id=DzTjkKse)
         >>> file.save()
-        💡 storing file WpfMHb5u3Jp8mzoTs3SH with key .lamindb/WpfMHb5u3Jp8mzoTs3SH.csv
 
-        Track a file from a cloud storage (supports `s3://` and `gs://`):
+        Create a file from a cloud storage (supports `s3://` and `gs://`):
 
         >>> file = ln.File("s3://lamindb-ci/test-data/test.csv")
-        💡 File in storage ✓ using storage key = test-data/test.csv
         >>> file
         File(id=YDELGH3FqhtiZI7IMWnH, key=test-data/test.csv, suffix=.csv, size=329, hash=85-PotiFdQ2rpJvfLtOISA, hash_type=md5, storage_id=Z7zewD72, created_by_id=DzTjkKse)
         >>> file.save()
+
+        Make a new version of a file
+
+        >>> # unversioned file
+        >>> file = ln.File(df1)
+        >>> assert file.stem_id is None
+        >>> assert file.version is None
+
+        >>> # create new file from old file and version both
+        >>> new_file = ln.File(adata, make_new_version_of=file)
+        >>> assert new_file.stem_id == old_file.stem_id
+        >>> assert file.version == "1"
+        >>> assert new_file.version == "2"
+
     """
 
     id = CharField(max_length=20, primary_key=True)
@@ -1394,6 +1408,16 @@ class File(Registry, Data):
     """
     description = CharField(max_length=255, db_index=True, null=True, default=None)
     """A description."""
+    stem_id = CharField(max_length=18, null=True, default=None, db_index=True)
+    """Stem of id, identifying the file up to version (default `None`)."""
+    version = CharField(max_length=10, null=True, default=None, db_index=True)
+    """Version (default `None`).
+
+    Use this together with `stem_id` to label different versions of a file.
+
+    Consider using `semantic versioning <https://semver.org>`__
+    with `Python versioning <https://peps.python.org/pep-0440/>`__.
+    """
     size = models.BigIntegerField(null=True, db_index=True)
     """Size in bytes.
 
@@ -1432,6 +1456,7 @@ class File(Registry, Data):
         data: Union[PathLike, DataLike],
         key: Optional[str] = None,
         description: Optional[str] = None,
+        make_new_version_of: Optional["File"] = None,
         run: Optional[Run] = None,
     ):
         ...
