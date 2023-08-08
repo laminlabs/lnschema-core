@@ -2,8 +2,8 @@ from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, TypeVar
 
-from django.db import models
-from django.db.models.query_utils import DeferredAttribute
+from django.db.models import CharField, TextField  # noqa
+from django.db.models.query_utils import DeferredAttribute as FieldAttr  # noqa
 from upath import UPath
 
 if TYPE_CHECKING:
@@ -11,31 +11,13 @@ if TYPE_CHECKING:
     import pandas as pd
 
 
-class FieldAttr(DeferredAttribute):
-    """Field attribute."""
-
-    pass
-
-
-class CharField(models.CharField):
-    """CharField."""
-
-    pass
-
-
-class TextField(models.TextField):
-    """TextField."""
-
-    pass
-
-
 PathLike = TypeVar("PathLike", str, Path, UPath)
 # statically typing the following is hard because these are all heavy
 # dependencies, even DataFrame is heavy & slow to import
 DataLike = Any
 AnnDataLike = Any
-ListLike = TypeVar("ListLike", "pd.Series", list, "np.array")
-StrField = TypeVar("StrField", str, CharField, TextField)
+ListLike = TypeVar("ListLike", list, "pd.Series", "np.array")
+StrField = TypeVar("StrField", str, FieldAttr)
 
 
 class ChoicesMixin:
