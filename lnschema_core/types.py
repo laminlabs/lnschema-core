@@ -3,18 +3,12 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, TypeVar
 
 from django.db import models
-from django.db.models.query_utils import DeferredAttribute
+from django.db.models.query_utils import DeferredAttribute as FieldAttr
 from upath import UPath
 
 if TYPE_CHECKING:
     import numpy as np
     import pandas as pd
-
-
-class FieldAttr(DeferredAttribute):
-    """Field attribute."""
-
-    pass
 
 
 class CharField(models.CharField):
