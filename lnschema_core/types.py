@@ -34,8 +34,8 @@ PathLike = TypeVar("PathLike", str, Path, UPath)
 # dependencies, even DataFrame is heavy & slow to import
 DataLike = Any
 AnnDataLike = Any
-ListLike = TypeVar("ListLike", "pd.Series", list, "np.array")
-StrField = TypeVar("StrField", str, CharField, TextField)
+ListLike = TypeVar("ListLike", list, "pd.Series", "np.array")
+StrField = TypeVar("StrField", str, FieldAttr)
 
 
 class ChoicesMixin:

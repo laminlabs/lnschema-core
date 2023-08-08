@@ -50,7 +50,7 @@ TRANSFORM_TYPE_DEFAULT = TransformType.notebook if IPYTHON else TransformType.pi
 
 
 class ValidationAware:
-    """Base class for validation methods."""
+    """Base class providing :class:`~lamindb.dev.Registry`-based validation."""
 
     @classmethod
     def inspect(
@@ -61,25 +61,20 @@ class ValidationAware:
         mute: bool = False,
         **kwargs,
     ) -> "InspectResult":
-        """Inspect if a list of values are mappable to existing values of a field.
+        """Inspect if values are mappable to a field.
+
+        Being mappable means that an exact match exists.
 
         Args:
-            values: `ListLike` values that will be checked against the
+            values: Values that will be checked against the
                 field.
-            field: `StrField` The field of values.
-                    Examples are 'ontology_id' to map against the source ID
-                    or 'name' to map against the ontologies field names.
-            case_sensitive: Whether the identifier inspection is case sensitive.
-            inspect_synonyms: Whether to inspect synonyms.
-            return_df: Whether to return a Pandas DataFrame.
-
-        Returns:
-            - A Dictionary of "validated" and "not_validated" values
-            - If `return_df`: A DataFrame indexed by values with a boolean `__validated__`
-                column that indicates compliance with the values.
+            field: The field of values. Examples are `'ontology_id'` to map
+                against the source ID or `'name'` to map against the ontologies
+                field names.
+            mute: Mute logging.
 
         See Also:
-            :meth:`~lamindb.dev.ValidationAware.inspect`
+            :meth:`~lamindb.dev.ValidationAware.validate`
 
         Examples:
             >>> import lnschema_bionty as lb
@@ -102,13 +97,13 @@ class ValidationAware:
         Note this is strict validation, only asserts exact matches.
 
         Args:
-            values: `ListLike` values that will be validated against the field.
-            field: `StrField` The field of values.
-                    Examples are 'ontology_id' to map against the source ID
-                    or 'name' to map against the ontologies field names.
+            values: Values that will be validated against the field.
+            field: The field of values.
+                    Examples are `'ontology_id'` to map against the source ID
+                    or `'name'` to map against the ontologies field names.
 
         Returns:
-            A vector of booleans indicating if each element is validated.
+            A vector of booleans indicating if an element is validated.
 
         See Also:
             :meth:`~lamindb.dev.ValidationAware.inspect`
@@ -142,20 +137,19 @@ class SynonymsAware:
         """Maps input synonyms to standardized names.
 
         Args:
-            synonyms: `Iterable` Synonyms that will be standardized.
-            return_mapper: `bool = False` If `True`, returns `{input_synonym1:
+            synonyms: Synonyms that will be standardized.
+            return_mapper: If `True`, returns `{input_synonym1:
                 standardized_name1}`.
-            case_sensitive: `bool = False` Whether the mapping is case sensitive.
-            species: `Optional[str]` Map only against this species related entries.
-            keep: `Literal["first", "last", False] = "first"` When a synonym maps to
+            case_sensitive: Whether the mapping is case sensitive.
+            keep: When a synonym maps to
                 multiple names, determines which duplicates to mark as
-                `pd.DataFrame.duplicated`
+                `pd.DataFrame.duplicated`:
 
-                    - "first": returns the first mapped standardized name
-                    - "last": returns the last mapped standardized name
+                    - `"first"`: returns the first mapped standardized name
+                    - `"last"`: returns the last mapped standardized name
                     - `False`: returns all mapped standardized name
-            synonyms_field: `str = "synonyms"` A field containing the concatenated synonyms.
-            field: `Optional[str]` The field representing the standardized names.
+            synonyms_field: A field containing the concatenated synonyms.
+            field: The field representing the standardized names.
 
         Returns:
             If `return_mapper` is `False`: a list of standardized names. Otherwise,
@@ -177,6 +171,7 @@ class SynonymsAware:
             >>> standardized_names
             ['A1CF', 'A1BG', 'BRCA2', 'FANCD20']
         """
+        pass
 
     def add_synonym(
         self,
@@ -185,6 +180,11 @@ class SynonymsAware:
         save: Optional[bool] = None,
     ):
         """Add synonyms to a record.
+
+        Args:
+            synonym
+            force
+            save
 
         See Also:
             :meth:`~lamindb.dev.SynonymsAware.remove_synonym`
@@ -206,6 +206,9 @@ class SynonymsAware:
     def remove_synonym(self, synonym: Union[str, ListLike]):
         """Remove synonyms from a record.
 
+        Args:
+            synonym: The synonym value.
+
         See Also:
             :meth:`~lamindb.dev.SynonymsAware.add_synonym`
                 Add synonyms
@@ -224,6 +227,9 @@ class SynonymsAware:
 
     def set_abbr(self, value: str):
         """Set value for abbr field and add to synonyms.
+
+        Args:
+            value: A value for an abbreviation.
 
         See Also:
             :meth:`~lamindb.dev.SynonymsAware.add_synonym`
@@ -248,9 +254,9 @@ class SynonymsAware:
 
 
 class Registry(models.Model, ValidationAware, SynonymsAware):
-    """LaminDB's base Registry.
+    """Registry base class.
 
-    Is based on django.db.models.Model.
+    Extends ``django.db.models.Model``.
 
     Why does LaminDB call it `Registry` and not `Model`? The term "Registry" can't lead to
     confusion with statistical, machine learning or biological models.
@@ -286,14 +292,19 @@ class Registry(models.Model, ValidationAware, SynonymsAware):
     ):
         """View parents in a graph.
 
+        Args:
+            field: Field to display on graph
+            with_children: Also show children.
+            distance: Maximum distance still shown.
+
         There are two types of registries with a `parents` field:
 
-        - Ontological hierarchies: :class:`~lamindb.Label` (project & sub-project), :class:`~lnschema_bionty.CellType` (cell type & cell subtype), ...
+        - Ontological hierarchies: :class:`~lamindb.Label` (project & sub-project), :class:`~lnschema_bionty.CellType` (cell type & subtype), ...
         - Procedural/temporal hierarchies: :class:`~lamindb.Transform` (preceding transform & successing transform), ...
 
-        Notes:
-            For more info, see tutorial: :doc:`/guide/data-lineage`.
-            For more info, see tutorial: :doc:`/tutorial1`.
+        See Also:
+            - :doc:`/guide/data-lineage`
+            - :doc:`/tutorial1`
 
         Examples:
             >>> import lnschema_bionty as lb
@@ -312,23 +323,22 @@ class Registry(models.Model, ValidationAware, SynonymsAware):
         violation of idempotency, and performance when creating records in bulk.
 
         Args:
-            values: `ListLike` A list of values for an identifier, e.g.
+            values: A list of values for an identifier, e.g.
                 `["name1", "name2"]`.
-            field: `StrField` An ``Registry`` field to look up, e.g., `lb.CellMarker.name`.
+            field: A `Registry` field to look up, e.g., `lb.CellMarker.name`.
             **kwargs: Additional conditions for creation of records, e.g., `species="human"`.
 
         Returns:
             A list of records.
 
-        For every `value` in a list-like of values and a given `Registry.field`,
-        this function performs:
+        For every `value` a `field`, this method does the following:
 
         1. It checks whether the value already exists in the database
-           (``Registry.filter(field=value)``). If so, it adds the queried record to
-           the returned list and skips step 2. Otherwise, proceed with 2.
-        2. If the ``Registry`` is from ``lnschema_bionty``, it checks whether there is an
-           exact match in the underlying ontology (``Bionty.inspect(value, field)``).
-           If so, it creates a record from Bionty and adds it to the returned list.
+           (`Registry.filter(field=value)`). If so, it adds the queried record to
+           the returned list and skips step 2.
+        2. If the `Registry` is from `lnschema_bionty`, it checks whether there is an
+           exact match in the underlying ontology (`Bionty.validate(value, field)`).
+           If so, it creates a record from the ontology and adds it to the returned list.
            Otherwise, it creates a record that populates a single field using `value`
            and adds the record to the returned list.
 
@@ -382,7 +392,7 @@ class Registry(models.Model, ValidationAware, SynonymsAware):
         """Return an auto-complete object for a field.
 
         Args:
-            field: `Optional[StrField] = None` The field to
+            field: The field to
                 look up the values for. Defaults to first string field.
 
         Returns:
@@ -407,7 +417,7 @@ class Registry(models.Model, ValidationAware, SynonymsAware):
 
     @classmethod
     def filter(cls, **expressions) -> QuerySet:
-        """Query records.
+        """Query records (see :doc:`guide/select`).
 
         Args:
             expressions: Fields and values passed as Django query expressions.
@@ -416,16 +426,12 @@ class Registry(models.Model, ValidationAware, SynonymsAware):
             A :class:`~lamindb.dev.QuerySet`.
 
         See Also:
-            `django queries <https://docs.djangoproject.com/en/4.2/topics/db/queries/>`__
-
-        Notes:
-            For more info, see tutorial: :doc:`/guide/select`.
+            - Guide: :doc:`guide/select`
+            - Django documentation: `Queries <https://docs.djangoproject.com/en/4.2/topics/db/queries/>`__
 
         Examples:
             >>> ln.Label(name="my label").save()
             >>> label = ln.Label.filter(name="my label").one()
-            >>> label
-            Label(id=TMn5Zuju, name=my label, updated_at=2023-07-19 18:24:49, created_by_id=DzTjkKse)
         """
         from lamindb._filter import filter
 
@@ -442,22 +448,28 @@ class Registry(models.Model, ValidationAware, SynonymsAware):
         case_sensitive: bool = False,
         synonyms_field: Optional[StrField] = "synonyms",  # type: ignore
     ) -> Union["pd.DataFrame", "QuerySet"]:
-        """Search the table.
+        """Search.
+
+        Makes reasonable choices of which fields to search.
+
+        For instance, for :class:`~lamindb.File`, searches `key` and
+        `description` fields.
 
         Args:
-            string: `str` The input string to match against the field ontology values.
-            field: `Optional[StrField] = None` The field against which the input string is matching.
-            return_queryset: `bool = False` Return search result as a sorted QuerySet.
-            limit: `Optional[int] = None` Maximum amount of top results to return.
-            case_sensitive: `bool = False` Whether the match is case sensitive.
-            synonyms_field: `Optional[StrField] = "synonyms"` Search synonyms if
-                column is available. If `None`, is ignored.
+            string: The input string to match against the field ontology values.
+            field: The field against which the input string is matching.
+            return_queryset: Return search result as a sorted QuerySet.
+            limit: Maximum amount of top results to return.
+            case_sensitive: Whether the match is case sensitive.
+            synonyms_field: Search synonyms if column is available. If `None`,
+                is ignored.
 
         Returns:
             A sorted `DataFrame` of search results with a score in column `__ratio__`.
-            If `return_queryset` is `True`, a sorted QuerySet.
+            If `return_queryset` is `True`, an ordered `QuerySet`.
 
         See Also:
+            :meth:`~lamindb.dev.Registry.filter`
             :meth:`~lamindb.dev.Registry.lookup`
 
         Examples:
@@ -488,7 +500,12 @@ class Data:
         records: Union[Registry, List[Registry], QuerySet],
         feature: Optional[Union[str, Registry]] = None,
     ) -> None:
-        """Add one or several labels and associate them with a feature."""
+        """Add one or several labels and associate them with a feature.
+
+        Args:
+            records: Label records to add.
+            feature: Feature under which to group the labels.
+        """
         pass
 
     def get_labels(
@@ -497,7 +514,13 @@ class Data:
         mute: bool = False,
         flat_names: bool = False,
     ) -> Union[QuerySet, Dict[str, QuerySet], List]:
-        """Get labels given a feature."""
+        """Get labels given a feature.
+
+        Args:
+            feature: Feature under which labels are grouped.
+            mute: Show no logging.
+            flat_names: Flatten list to names rather than returning records.
+        """
         pass
 
 
@@ -526,11 +549,9 @@ class Data:
 class User(Registry):
     """Users: humans and bots.
 
-    Is auto-managed. No need to create records.
-
-    All data in this table is synched from the cloud user account to ensure a
-    universal user identity, valid across DB instances and email & handle
-    changes.
+    All data in this registry is synced from the cloud user account to ensure a
+    persistent universal user identity, valid across DB instances and email,
+    name & handle changes. Hence, no need to manually create records.
 
     Examples:
 
@@ -1253,14 +1274,14 @@ class FeatureSet(Registry):
         """Create feature set for validated features.
 
         Args:
-            values: ``ListLike`` A list of values, like feature names or ids.
-            field: ``FieldAttr = Feature.name`` The field of a reference Registry to
+            values: A list of values, like feature names or ids.
+            field: The field of a reference Registry to
                 map values.
-            type: `Optional[Union[Type, str]] = None` The simple type. Defaults to
+            type: The simple type. Defaults to
                 `None` if reference registry is :class:`~lamindb.Feature`, defaults to
                 `"float"` otherwise.
-            modality: `Optional[str] = None` A name or id for :class:`~lamindb.Modality`.
-            name: `Optional[str] = None` A name.
+            name: A name.
+            modality: A name or id for :class:`~lamindb.Modality`.
             **kwargs: Can contain ``species`` or other context to interpret values.
 
         Examples:
@@ -1547,12 +1568,12 @@ class File(Registry, Data):
         """Create a list of file objects from a directory.
 
         Args:
-            path: `PathLike` Source path of folder.
-            key: `Optional[str]` Key for storage destination. If `None` and
+            path: Source path of folder.
+            key: Key for storage destination. If `None` and
                 directory is in a registered location, an inferred `key` will
                 reflect the relative position. If `None` and directory is outside
                 of a registered storage location, the inferred key defaults to `path.name`.
-            run: `Run` A `Run` object.
+            run: A `Run` object.
 
         Examples:
             >>> dir_path = ln.dev.datasets.generate_cell_ranger_files("sample_001", ln.settings.storage)
@@ -1576,9 +1597,9 @@ class File(Registry, Data):
         """Replace file content.
 
         Args:
-            data: ``Union[PathLike, DataLike]`` A file path or an in-memory data
+            data: A file path or an in-memory data
                 object (`DataFrame`, `AnnData`).
-            run: ``Optional[Run] = None`` The run that created the file gets
+            run: The run that created the file gets
                 auto-linked if ``ln.track()`` was called.
 
         Examples:
@@ -1719,7 +1740,7 @@ class File(Registry, Data):
         """Delete file, optionally from storage.
 
         Args:
-            storage: `Optional[bool] = None` Indicate whether you want to delete the
+            storage: Indicate whether you want to delete the
                 file in storage.
 
         Examples:
