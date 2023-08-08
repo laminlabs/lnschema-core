@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+📝 Updated validate sig | [264](https://github.com/laminlabs/lnschema-core/pull/264) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-08 |
 🚚 Add `stem_id` and `version` to File | [263](https://github.com/laminlabs/lnschema-core/pull/263) | [falexwolf](https://github.com/falexwolf) | 2023-08-08 |
 📝 Remove all duplicated type annotation from docs | [262](https://github.com/laminlabs/lnschema-core/pull/262) | [falexwolf](https://github.com/falexwolf) | 2023-08-08 |
 📝 Document all types | [261](https://github.com/laminlabs/lnschema-core/pull/261) | [falexwolf](https://github.com/falexwolf) | 2023-08-08 |
