@@ -2,25 +2,13 @@ from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, TypeVar
 
-from django.db import models
-from django.db.models.query_utils import DeferredAttribute as FieldAttr
+from django.db.models import CharField, TextField  # noqa
+from django.db.models.query_utils import DeferredAttribute as FieldAttr  # noqa
 from upath import UPath
 
 if TYPE_CHECKING:
     import numpy as np
     import pandas as pd
-
-
-class CharField(models.CharField):
-    """CharField."""
-
-    pass
-
-
-class TextField(models.TextField):
-    """TextField."""
-
-    pass
 
 
 PathLike = TypeVar("PathLike", str, Path, UPath)
