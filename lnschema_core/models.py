@@ -1422,7 +1422,7 @@ class File(Registry, Data):
     Consider using `semantic versioning <https://semver.org>`__
     with `Python versioning <https://peps.python.org/pep-0440/>`__.
     """
-    initial_version = models.ForeignKey("self", null=True, default=None)
+    initial_version = models.ForeignKey("self", PROTECT, null=True, default=None)
     """Initial version of this file, a :class:`~lamindb.File` object."""
     size = models.BigIntegerField(null=True, db_index=True)
     """Size in bytes.
