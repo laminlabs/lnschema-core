@@ -1414,8 +1414,6 @@ class File(Registry, Data):
     """
     description = CharField(max_length=255, db_index=True, null=True, default=None)
     """A description."""
-    stem_id = CharField(max_length=18, null=True, default=None, db_index=True)
-    """Stem of id, identifying the file up to version (default `None`)."""
     version = CharField(max_length=10, null=True, default=None, db_index=True)
     """Version (default `None`).
 
@@ -1424,6 +1422,8 @@ class File(Registry, Data):
     Consider using `semantic versioning <https://semver.org>`__
     with `Python versioning <https://peps.python.org/pep-0440/>`__.
     """
+    initial_version = models.ForeignKey("self", PROTECT, null=True, default=None)
+    """Initial version of this file, a :class:`~lamindb.File` object."""
     size = models.BigIntegerField(null=True, db_index=True)
     """Size in bytes.
 
