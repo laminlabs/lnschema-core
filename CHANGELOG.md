@@ -3,14 +3,14 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-🚚 Replace `stem_id` on File with `initial_version` | [265](https://github.com/laminlabs/lnschema-core/pull/265) | [falexwolf](https://github.com/falexwolf) | 2023-08-10 |
-📝 Updated validate sig | [264](https://github.com/laminlabs/lnschema-core/pull/264) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-08 |
-🚚 Add `stem_id` and `version` to File | [263](https://github.com/laminlabs/lnschema-core/pull/263) | [falexwolf](https://github.com/falexwolf) | 2023-08-08 |
+🚚 Replace `stem_id` on `File` with `initial_version` | [265](https://github.com/laminlabs/lnschema-core/pull/265) | [falexwolf](https://github.com/falexwolf) | 2023-08-10 | 0.45.0
+📝 Updated `validate()` signature | [264](https://github.com/laminlabs/lnschema-core/pull/264) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-08 |
+🚚 Add `stem_id` and `version` to `File` | [263](https://github.com/laminlabs/lnschema-core/pull/263) | [falexwolf](https://github.com/falexwolf) | 2023-08-08 |
 📝 Remove all duplicated type annotation from docs | [262](https://github.com/laminlabs/lnschema-core/pull/262) | [falexwolf](https://github.com/falexwolf) | 2023-08-08 |
 📝 Document all types | [261](https://github.com/laminlabs/lnschema-core/pull/261) | [falexwolf](https://github.com/falexwolf) | 2023-08-08 |
-⬆️ Add InspectResult | [260](https://github.com/laminlabs/lnschema-core/pull/260) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-07 | 0.44.3
-🚸 Turn path into property | [259](https://github.com/laminlabs/lnschema-core/pull/259) | [falexwolf](https://github.com/falexwolf) | 2023-08-06 | 0.44.2
-✨ Added validate | [257](https://github.com/laminlabs/lnschema-core/pull/257) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-06 | 0.44.0
+⬆️ Add `InspectResult` | [260](https://github.com/laminlabs/lnschema-core/pull/260) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-07 | 0.44.3
+🚸 Turn method `path()` into property `path` | [259](https://github.com/laminlabs/lnschema-core/pull/259) | [falexwolf](https://github.com/falexwolf) | 2023-08-06 | 0.44.2
+✨ Added `validate()` | [257](https://github.com/laminlabs/lnschema-core/pull/257) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-06 | 0.44.0
 🚚 Rename `ref_field` to `registry` | [256](https://github.com/laminlabs/lnschema-core/pull/256) | [falexwolf](https://github.com/falexwolf) | 2023-08-06 |
 ♻️ Add `Data` base class for `File` & `Dataset` | [255](https://github.com/laminlabs/lnschema-core/pull/255) | [falexwolf](https://github.com/falexwolf) | 2023-08-05 |
 🚚 Rename `ORM` to `Registry` | [254](https://github.com/laminlabs/lnschema-core/pull/254) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-05 |
