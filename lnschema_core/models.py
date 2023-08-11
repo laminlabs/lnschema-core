@@ -281,7 +281,7 @@ class ParentsAware:
         - Procedural/temporal hierarchies: :class:`~lamindb.Transform` (preceding transform & successing transform), ...
 
         See Also:
-            - :doc:`/guide/data-lineage`
+            - :doc:`docs:data-lineage`
             - :doc:`/tutorial1`
 
         Examples:
@@ -700,7 +700,7 @@ class Transform(Registry, ParentsAware):
             Executions of the transform.
 
     Notes:
-        For more info, see tutorial: :doc:`/guide/data-lineage`.
+        For more info, see tutorial: :doc:`docs:data-lineage`.
 
     Examples:
 
@@ -809,7 +809,7 @@ class Run(Registry):
             Transformations that runs execute.
 
     Notes:
-        See guide: :doc:`/guide/data-lineage`.
+        See guide: :doc:`docs:data-lineage`.
 
         Typically, a run has inputs and outputs:
 
