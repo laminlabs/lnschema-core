@@ -260,6 +260,8 @@ class SynonymsAware:
 
 
 class ParentsAware:
+    """Base class for hierarchical methods."""
+
     def view_parents(
         self,
         field: Optional[StrField] = None,
