@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+♻️ Add ParentsAware | [266](https://github.com/laminlabs/lnschema-core/pull/266) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-11 |
 🚚 Replace `stem_id` on `File` with `initial_version` | [265](https://github.com/laminlabs/lnschema-core/pull/265) | [falexwolf](https://github.com/falexwolf) | 2023-08-10 | 0.45.0
 📝 Updated `validate()` signature | [264](https://github.com/laminlabs/lnschema-core/pull/264) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-08 |
 🚚 Add `stem_id` and `version` to `File` | [263](https://github.com/laminlabs/lnschema-core/pull/263) | [falexwolf](https://github.com/falexwolf) | 2023-08-08 |
