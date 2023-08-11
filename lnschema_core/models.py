@@ -259,37 +259,7 @@ class SynonymsAware:
         pass
 
 
-class Registry(models.Model, ValidationAware, SynonymsAware):
-    """Registry base class.
-
-    Extends ``django.db.models.Model``.
-
-    Why does LaminDB call it `Registry` and not `Model`? The term "Registry" can't lead to
-    confusion with statistical, machine learning or biological models.
-    """
-
-    def describe(self):
-        """Rich representation of a record with relationships.
-
-        Examples:
-            >>> ln.File(ln.dev.datasets.file_jpg_paradisi05(), description="paradisi05").save()
-            >>> file = ln.File.filter(description="paradisi05").one()
-            >>> ln.save(ln.Label.from_values(["image", "benchmark", "example"], field="name"))
-            >>> labels = ln.Label.filter(name__in = ["image", "benchmark", "example"]).all()
-            >>> file.labels.set(labels)
-            >>> file.describe()
-            File(id=jb7BY5UJoQVGMUOKiLcn, key=None, suffix=.jpg, description=paradisi05, size=29358, hash=r4tnqmKI_SjrkdLzpuWp4g, hash_type=md5, created_at=2023-07-19 15:48:26.485889+00:00, updated_at=2023-07-19 16:43:17.792241+00:00) # noqa
-            ...
-            One/Many-to-One:
-                🔗 storage: Storage(id=Zl2q0vQB, root=/home/runner/work/lamindb/lamindb/docs/guide/mydata, type=local, updated_at=2023-07-19 14:18:21, created_by_id=DzTjkKse)
-                🔗 transform: None
-                🔗 run: None
-                🔗 created_by: User(id=DzTjkKse, handle=testuser1, email=testuser1@lamin.ai, name=Test User1, updated_at=2023-07-19 14:18:21)
-            Many-to-Many:
-                🔗 labels (3): ['benchmark', 'example', 'image']
-        """
-        pass
-
+class ParentsAware:
     def view_parents(
         self,
         field: Optional[StrField] = None,
@@ -318,6 +288,38 @@ class Registry(models.Model, ValidationAware, SynonymsAware):
             >>> record = lb.Tissue.filter(name="respiratory tube").one()
             >>> record.view_parents()
             >>> tissue.view_parents(with_children=True)
+        """
+        pass
+
+
+class Registry(models.Model, ValidationAware, SynonymsAware):
+    """Registry base class.
+
+    Extends ``django.db.models.Model``.
+
+    Why does LaminDB call it `Registry` and not `Model`? The term "Registry" can't lead to
+    confusion with statistical, machine learning or biological models.
+    """
+
+    def describe(self):
+        """Rich representation of a record with relationships.
+
+        Examples:
+            >>> ln.File(ln.dev.datasets.file_jpg_paradisi05(), description="paradisi05").save()
+            >>> file = ln.File.filter(description="paradisi05").one()
+            >>> ln.save(ln.Label.from_values(["image", "benchmark", "example"], field="name"))
+            >>> labels = ln.Label.filter(name__in = ["image", "benchmark", "example"]).all()
+            >>> file.labels.set(labels)
+            >>> file.describe()
+            File(id=jb7BY5UJoQVGMUOKiLcn, key=None, suffix=.jpg, description=paradisi05, size=29358, hash=r4tnqmKI_SjrkdLzpuWp4g, hash_type=md5, created_at=2023-07-19 15:48:26.485889+00:00, updated_at=2023-07-19 16:43:17.792241+00:00) # noqa
+            ...
+            One/Many-to-One:
+                🔗 storage: Storage(id=Zl2q0vQB, root=/home/runner/work/lamindb/lamindb/docs/guide/mydata, type=local, updated_at=2023-07-19 14:18:21, created_by_id=DzTjkKse)
+                🔗 transform: None
+                🔗 run: None
+                🔗 created_by: User(id=DzTjkKse, handle=testuser1, email=testuser1@lamin.ai, name=Test User1, updated_at=2023-07-19 14:18:21)
+            Many-to-Many:
+                🔗 labels (3): ['benchmark', 'example', 'image']
         """
         pass
 
@@ -671,7 +673,7 @@ class Storage(Registry):
         super(Storage, self).__init__(*args, **kwargs)
 
 
-class Transform(Registry):
+class Transform(Registry, ParentsAware):
     """Transforms of files & datasets.
 
     Pipelines, workflows, notebooks, app-based transformations.
@@ -880,7 +882,7 @@ class Run(Registry):
         super(Run, self).__init__(*args, **kwargs)
 
 
-class Label(Registry):
+class Label(Registry, ParentsAware):
     """Labels for files & datasets.
 
     Args:
@@ -985,7 +987,7 @@ class Label(Registry):
         pass
 
 
-class Modality(Registry):
+class Modality(Registry, ParentsAware):
     """Measurement types of features.
 
     .. note::
