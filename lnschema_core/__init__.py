@@ -18,6 +18,7 @@ if _INSTANCE_SETUP:
         File,
         Label,
         Modality,
+        ParentsAware,
         Registry,
         Run,
         Storage,
