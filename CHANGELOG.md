@@ -3,8 +3,8 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-💚 Fix import | [268](https://github.com/laminlabs/lnschema-core/pull/268) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-11 |
-🚚 Move describe to Data | [267](https://github.com/laminlabs/lnschema-core/pull/267) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-11 |
+💚 Fix import | [268](https://github.com/laminlabs/lnschema-core/pull/268) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-11 | 0.45.2
+🚚 Move describe to Data | [267](https://github.com/laminlabs/lnschema-core/pull/267) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-11 | 0.45.1
 ♻️ Add ParentsAware | [266](https://github.com/laminlabs/lnschema-core/pull/266) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-11 |
 🚚 Replace `stem_id` on `File` with `initial_version` | [265](https://github.com/laminlabs/lnschema-core/pull/265) | [falexwolf](https://github.com/falexwolf) | 2023-08-10 | 0.45.0
 📝 Updated `validate()` signature | [264](https://github.com/laminlabs/lnschema-core/pull/264) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-08 |
