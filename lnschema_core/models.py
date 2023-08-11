@@ -301,28 +301,6 @@ class Registry(models.Model, ValidationAware, SynonymsAware):
     confusion with statistical, machine learning or biological models.
     """
 
-    def describe(self):
-        """Rich representation of a record with relationships.
-
-        Examples:
-            >>> ln.File(ln.dev.datasets.file_jpg_paradisi05(), description="paradisi05").save()
-            >>> file = ln.File.filter(description="paradisi05").one()
-            >>> ln.save(ln.Label.from_values(["image", "benchmark", "example"], field="name"))
-            >>> labels = ln.Label.filter(name__in = ["image", "benchmark", "example"]).all()
-            >>> file.labels.set(labels)
-            >>> file.describe()
-            File(id=jb7BY5UJoQVGMUOKiLcn, key=None, suffix=.jpg, description=paradisi05, size=29358, hash=r4tnqmKI_SjrkdLzpuWp4g, hash_type=md5, created_at=2023-07-19 15:48:26.485889+00:00, updated_at=2023-07-19 16:43:17.792241+00:00) # noqa
-            ...
-            One/Many-to-One:
-                🔗 storage: Storage(id=Zl2q0vQB, root=/home/runner/work/lamindb/lamindb/docs/guide/mydata, type=local, updated_at=2023-07-19 14:18:21, created_by_id=DzTjkKse)
-                🔗 transform: None
-                🔗 run: None
-                🔗 created_by: User(id=DzTjkKse, handle=testuser1, email=testuser1@lamin.ai, name=Test User1, updated_at=2023-07-19 14:18:21)
-            Many-to-Many:
-                🔗 labels (3): ['benchmark', 'example', 'image']
-        """
-        pass
-
     @classmethod
     def from_values(cls, values: ListLike, field: StrField, **kwargs) -> List["Registry"]:
         """Parse values for an identifier (a name, an id, etc.) and create records.
@@ -528,6 +506,28 @@ class Data:
             feature: Feature under which labels are grouped.
             mute: Show no logging.
             flat_names: Flatten list to names rather than returning records.
+        """
+        pass
+
+    def describe(self):
+        """Rich representation of a record with relationships.
+
+        Examples:
+            >>> ln.File(ln.dev.datasets.file_jpg_paradisi05(), description="paradisi05").save()
+            >>> file = ln.File.filter(description="paradisi05").one()
+            >>> ln.save(ln.Label.from_values(["image", "benchmark", "example"], field="name"))
+            >>> labels = ln.Label.filter(name__in = ["image", "benchmark", "example"]).all()
+            >>> file.labels.set(labels)
+            >>> file.describe()
+            File(id=jb7BY5UJoQVGMUOKiLcn, key=None, suffix=.jpg, description=paradisi05, size=29358, hash=r4tnqmKI_SjrkdLzpuWp4g, hash_type=md5, created_at=2023-07-19 15:48:26.485889+00:00, updated_at=2023-07-19 16:43:17.792241+00:00) # noqa
+            ...
+            One/Many-to-One:
+                🔗 storage: Storage(id=Zl2q0vQB, root=/home/runner/work/lamindb/lamindb/docs/guide/mydata, type=local, updated_at=2023-07-19 14:18:21, created_by_id=DzTjkKse)
+                🔗 transform: None
+                🔗 run: None
+                🔗 created_by: User(id=DzTjkKse, handle=testuser1, email=testuser1@lamin.ai, name=Test User1, updated_at=2023-07-19 14:18:21)
+            Many-to-Many:
+                🔗 labels (3): ['benchmark', 'example', 'image']
         """
         pass
 
