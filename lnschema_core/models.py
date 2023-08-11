@@ -1329,11 +1329,10 @@ class File(Registry, Data):
             within a storage location, e.g., `"myfolder/myfile.fcs"`. If
             `None`, gets auto-populated if file is already in registered storage.
         description: `Optional[str] = None` A description.
-        version: `Optional[str] = None` A version string (consider semver).
-        make_new_version_of: `Optional[File] = None` A reference file for which
-            to create a new version.
+        version: `Optional[str] = None` A version string.
+        is_new_version_of: `Optional[File] = None` A reference file.
         run: `Optional[Run] = None` The run that created the file. If `None`,
-            gets auto-linked if run context was generated with :meth:`~lamindb.track`.
+            gets auto-linked if :meth:`~lamindb.track` created a run context.
 
     .. admonition:: Typical formats in storage & their API accessors
 
@@ -1392,7 +1391,7 @@ class File(Registry, Data):
         >>> assert file.version is None
 
         >>> # create new file from old file and version both
-        >>> new_file = ln.File(adata, make_new_version_of=file)
+        >>> new_file = ln.File(adata, is_new_version_of=file)
         >>> assert new_file.stem_id == old_file.stem_id
         >>> assert file.version == "1"
         >>> assert new_file.version == "2"
@@ -1466,7 +1465,7 @@ class File(Registry, Data):
         data: Union[PathLike, DataLike],
         key: Optional[str] = None,
         description: Optional[str] = None,
-        make_new_version_of: Optional["File"] = None,
+        is_new_version_of: Optional["File"] = None,
         run: Optional[Run] = None,
     ):
         ...
