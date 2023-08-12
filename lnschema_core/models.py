@@ -282,7 +282,7 @@ class ParentsAware:
 
         See Also:
             - :doc:`docs:data-lineage`
-            - :doc:`/tutorial1`
+            - :doc:`/tutorial`
 
         Examples:
             >>> import lnschema_bionty as lb
@@ -331,7 +331,7 @@ class Registry(models.Model, ValidationAware, SynonymsAware):
            and adds the record to the returned list.
 
         Notes:
-            For more info, see tutorial: :doc:`/biology/registries`.
+            For more info, see tutorial: :doc:`bio-registries`.
 
         Examples:
 
@@ -405,7 +405,7 @@ class Registry(models.Model, ValidationAware, SynonymsAware):
 
     @classmethod
     def filter(cls, **expressions) -> QuerySet:
-        """Query records (see :doc:`guide/select`).
+        """Query records (see :doc:`meta`).
 
         Args:
             expressions: Fields and values passed as Django query expressions.
@@ -414,7 +414,7 @@ class Registry(models.Model, ValidationAware, SynonymsAware):
             A :class:`~lamindb.dev.QuerySet`.
 
         See Also:
-            - Guide: :doc:`guide/select`
+            - Guide: :doc:`meta`
             - Django documentation: `Queries <https://docs.djangoproject.com/en/4.2/topics/db/queries/>`__
 
         Examples:
@@ -1362,7 +1362,7 @@ class File(Registry, Data):
             Bulk create file objects from a directory.
 
     Notes:
-        For more info, see tutorial: :doc:`/tutorial1`.
+        For more info, see tutorial: :doc:`/tutorial`.
 
     Examples:
 
@@ -1524,7 +1524,7 @@ class File(Registry, Data):
                 Track features.
 
         Notes:
-            For more info, see tutorial: :doc:`/tutorial1`.
+            For more info, see tutorial: :doc:`/tutorial`.
 
         Examples:
             >>> df = ln.dev.datasets.df_iris_in_meter_batch1()
@@ -1567,7 +1567,7 @@ class File(Registry, Data):
 
         Notes:
 
-            For more info, see tutorial: :doc:`/tutorial1`.
+            For more info, see tutorial: :doc:`/tutorial`.
 
         Examples:
             >>> import lnschema_bionty as lb
@@ -1656,7 +1656,7 @@ class File(Registry, Data):
         """Return a cloud-backed data object to stream.
 
         Notes:
-            For more info, see tutorial: :doc:`/guide/stream`.
+            For more info, see tutorial: :doc:`/data`.
 
         Examples:
 
@@ -1838,7 +1838,7 @@ class Dataset(Registry, Data):
         :class:`~lamindb.File`
 
     Notes:
-        For more info, see tutorial: :doc:`/tutorial1`.
+        For more info, see tutorial: :doc:`/tutorial`.
 
     Examples:
         >>> df = ln.dev.datasets.df_iris_in_meter_batch1()
