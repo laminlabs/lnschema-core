@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+📝 Fix docs | [269](https://github.com/laminlabs/lnschema-core/pull/269) | [falexwolf](https://github.com/falexwolf) | 2023-08-12 |
 💚 Fix import | [268](https://github.com/laminlabs/lnschema-core/pull/268) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-11 | 0.45.2
 🚚 Move describe to Data | [267](https://github.com/laminlabs/lnschema-core/pull/267) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-11 | 0.45.1
 ♻️ Add ParentsAware | [266](https://github.com/laminlabs/lnschema-core/pull/266) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-11 |
