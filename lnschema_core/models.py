@@ -335,40 +335,37 @@ class Registry(models.Model, ValidationAware, SynonymsAware):
 
         Examples:
 
-            Bulk create records:
+            Bulk create records from non-validated values:
 
             >>> labels = ln.Label.from_values(["benchmark", "prediction", "test"], field="name")
-            💬 Created 3 Label records with a single field name
+            🔶 did not validate 3 Label records for names: benchmark, prediction, test
             >>> labels
             [Label(id=mDahtPrz, name=benchmark, created_by_id=DzTjkKse),
             Label(id=2Sjmn9il, name=prediction, created_by_id=DzTjkKse),
             Label(id=gdxrHdTA, name=test, created_by_id=DzTjkKse)]
 
-            Bulk create records with shared kwargs:
-
-            >>> pipelines = ln.Transform.from_values(["Pipeline 1", "Pipeline 2"], field="name",
-            ...                                      type="pipeline", version="1")
-            💬 Created 2 Transform records with a single field name
-            >>> pipelines
-            [Transform(id=Ts8k7LSZNZhO1t, name=Pipeline 1, stem_id=Ts8k7LSZNZhO, version=1, type=pipeline, created_by_id=DzTjkKse),
-            Transform(id=m2UXSAqqttuuXP, name=Pipeline 2, stem_id=m2UXSAqqttuu, version=1, type=pipeline, created_by_id=DzTjkKse)]
-
-            Returns existing records:
-
+            Bulk create records from validated values (returns existing records):
             >>> ln.save(ln.Label.from_values(["benchmark", "prediction", "test"], field="name"))
             >>> labels = ln.Label.from_values(["benchmark", "prediction", "test"], field="name")
-            💬 Returned 3 existing Label DB records that matched name field
+            ✅ validated 3 Label records on name: benchmark, prediction, test
             >>> labels
             [Label(id=iV3DXy70, name=benchmark, updated_at=2023-07-19 16:07:50, created_by_id=DzTjkKse),
             Label(id=99aB57DI, name=prediction, updated_at=2023-07-19 16:07:50, created_by_id=DzTjkKse),
             Label(id=ueaGXwuL, name=test, updated_at=2023-07-19 16:07:50, created_by_id=DzTjkKse)]
 
+            Bulk create records with shared kwargs:
+
+            >>> pipelines = ln.Transform.from_values(["Pipeline 1", "Pipeline 2"], field="name",
+            ...                                      type="pipeline", version="1")
+            >>> pipelines
+            [Transform(id=Ts8k7LSZNZhO1t, name=Pipeline 1, stem_id=Ts8k7LSZNZhO, version=1, type=pipeline, created_by_id=DzTjkKse),
+            Transform(id=m2UXSAqqttuuXP, name=Pipeline 2, stem_id=m2UXSAqqttuu, version=1, type=pipeline, created_by_id=DzTjkKse)]
+
             Bulk create records from bionty:
 
             >>> import lnschema_bionty as lb
-            >>> records = lb.CellType.from_values(["T-cell", "B cell"], field="name")
-            💬 Created 1 CellType record from Bionty that matched name field (bionty_source_id=S2Yu)
-            💬 Created 1 CellType record from Bionty that matched synonyms (bionty_source_id=S2Yu)
+            >>> records = lb.CellType.from_values(["T cell", "B cell"], field="name")
+            ✅ validated 2 CellType records from Bionty on name: T cell, B cell
             >>> records
             [CellType(id=BxNjby0x, name=T cell, ontology_id=CL:0000084, synonyms=T-cell|T lymphocyte|T-lymphocyte, description=A Type Of Lymphocyte Whose Defining Characteristic Is The Expression Of A T Cell Receptor Complex., bionty_source_id=S2Yu, created_by_id=DzTjkKse), # noqa
             CellType(id=cx8VcggA, name=B cell, ontology_id=CL:0000236, synonyms=B lymphocyte|B-lymphocyte|B-cell, description=A Lymphocyte Of B Lineage That Is Capable Of B Cell Mediated Immunity., bionty_source_id=S2Yu, created_by_id=DzTjkKse)] # noqa
@@ -521,15 +518,17 @@ class Data:
             >>> labels = ln.Label.filter(name__in = ["image", "benchmark", "example"]).all()
             >>> file.labels.set(labels)
             >>> file.describe()
-            File(id=jb7BY5UJoQVGMUOKiLcn, key=None, suffix=.jpg, description=paradisi05, size=29358, hash=r4tnqmKI_SjrkdLzpuWp4g, hash_type=md5, created_at=2023-07-19 15:48:26.485889+00:00, updated_at=2023-07-19 16:43:17.792241+00:00) # noqa
+            💡 File(id=cAmveuycMnn9rQIvGQog, key=None, suffix=.jpg, accessor=None, description=paradisi05, version=None, size=29358, hash=r4tnqmKI_SjrkdLzpuWp4g, hash_type=md5, created_at=2023-08-13 17:37:59.102335+00:00, updated_at=2023-08-13 17:41:56.671032+00:00)  # noqa
             ...
-            One/Many-to-One:
-                🔗 storage: Storage(id=Zl2q0vQB, root=/home/runner/work/lamindb/lamindb/docs/guide/mydata, type=local, updated_at=2023-07-19 14:18:21, created_by_id=DzTjkKse)
-                🔗 transform: None
-                🔗 run: None
-                🔗 created_by: User(id=DzTjkKse, handle=testuser1, email=testuser1@lamin.ai, name=Test User1, updated_at=2023-07-19 14:18:21)
-            Many-to-Many:
-                🔗 labels (3): ['benchmark', 'example', 'image']
+            Provenance:
+                🗃️ storage: Storage(id='64dfpgsd', root='/Users/sunnysun/Documents/repos.nosync/test-test', type='local', updated_at=2023-08-13 17:31:02, created_by_id='DzTjkKse')  # noqa
+                📎 initial_version: None
+                🧩 transform: None
+                🚗 run: None
+                👤 created_by: User(id='DzTjkKse', handle='testuser1', email='testuser1@lamin.ai', name='Test User1', updated_at=2023-08-13 17:31:02)
+            Features:
+            🗺️ external:
+                🔗 tag (0, core.Label): ["image", "benchmark", "example"]
         """
         pass
 
@@ -713,12 +712,12 @@ class Transform(Registry, ParentsAware):
 
         Create a transform from a notebook:
 
+        >>> ln.track()
+        ✅ Saved: Transform(id=1LCd8kco9lZUBg, name=Track data lineage / provenance, short_name=02-data-lineage, stem_id=1LCd8kco9lZU, version=0, type=notebook, updated_at=2023-07-10 18:37:19, created_by_id=DzTjkKse) # noqa
+
         View parents of a transform:
 
         >>> transform.view_parents()
-
-        >>> ln.track()
-        ✅ Saved: Transform(id=1LCd8kco9lZUBg, name=Track data lineage / provenance, short_name=02-data-lineage, stem_id=1LCd8kco9lZU, version=0, type=notebook, updated_at=2023-07-10 18:37:19, created_by_id=DzTjkKse) # noqa
     """
 
     id = CharField(max_length=14, db_index=True, primary_key=True, default=None)
@@ -829,16 +828,16 @@ class Run(Registry):
         >>> transform
         Transform(id=JhiujsLlbTKLIt, name=Cell Ranger, stem_id=JhiujsLlbTKL, version=7.2.0, type=pipeline, created_by_id=DzTjkKse)
         >>> ln.track(transform)
-        💬 Loaded: Transform(id=ceHkZMaiHFdoB6, name=Cell Ranger, stem_id=ceHkZMaiHFdo, version=7.2.0, type=pipeline, updated_at=2023-07-10 18:37:19, created_by_id=DzTjkKse)
-        ✅ Saved: Run(id=RcpWIKC8cF74Pn3RUJ1W, run_at=2023-07-10 18:37:19, transform_id=ceHkZMaiHFdoB6, created_by_id=DzTjkKse)
+        💡 Loaded: Transform(id=ceHkZMaiHFdoB6, name=Cell Ranger, stem_id=ceHkZMaiHFdo, version=7.2.0, type=pipeline, updated_at=2023-07-10 18:37:19, created_by_id=DzTjkKse)
+        🌱 Saved: Run(id=RcpWIKC8cF74Pn3RUJ1W, run_at=2023-07-10 18:37:19, transform_id=ceHkZMaiHFdoB6, created_by_id=DzTjkKse)
         >>> ln.dev.context.run
         Run(id=RcpWIKC8cF74Pn3RUJ1W, run_at=2023-07-10 18:37:19, transform_id=ceHkZMaiHFdoB6, created_by_id=DzTjkKse)
 
         Track a notebook run:
 
         >>> ln.track()
-        ✅ Saved: Transform(id=1LCd8kco9lZUBg, name=Track data lineage / provenance, short_name=02-data-lineage, stem_id=1LCd8kco9lZU, version=0, type=notebook, updated_at=2023-07-10 18:37:19, created_by_id=DzTjkKse) # noqa
-        ✅ Saved: Run(id=pHgVICV9DxBaV6BAuKJl, run_at=2023-07-10 18:37:19, transform_id=1LCd8kco9lZUBg, created_by_id=DzTjkKse)
+        🌱 Saved: Transform(id=1LCd8kco9lZUBg, name=Track data lineage / provenance, short_name=02-data-lineage, stem_id=1LCd8kco9lZU, version=0, type=notebook, updated_at=2023-07-10 18:37:19, created_by_id=DzTjkKse) # noqa
+        🌱 Saved: Run(id=pHgVICV9DxBaV6BAuKJl, run_at=2023-07-10 18:37:19, transform_id=1LCd8kco9lZUBg, created_by_id=DzTjkKse)
         >>> ln.dev.context.run
         Run(id=pHgVICV9DxBaV6BAuKJl, run_at=2023-07-10 18:37:19, transform_id=1LCd8kco9lZUBg, created_by_id=DzTjkKse)
     """
@@ -1220,7 +1219,7 @@ class FeatureSet(Registry):
         >>> feature_set.save()
         >>> file = ln.File(adata, name="Mouse Lymph Node scRNA-seq")
         >>> file.save()
-        >>> file.feature_sets.add(feature_set)
+        >>> file.features.add_feature_st(feature_set, slot="var")
     """
 
     id = CharField(max_length=20, primary_key=True, default=None)
@@ -1385,14 +1384,17 @@ class File(Registry, Data):
 
         Make a new version of a file
 
-        >>> # unversioned file
+        >>> # non-versioned file
         >>> file = ln.File(df1)
-        >>> assert file.stem_id is None
-        >>> assert file.version is None
+        >>> file.save()
+        >>> file.initial_version
+        None
+        >>> file.version
+        None
 
         >>> # create new file from old file and version both
-        >>> new_file = ln.File(adata, is_new_version_of=file)
-        >>> assert new_file.stem_id == old_file.stem_id
+        >>> new_file = ln.File(df2, is_new_version_of=file)
+        >>> assert new_file.initial_version == file.initial_version
         >>> assert file.version == "1"
         >>> assert new_file.version == "2"
 
@@ -1536,13 +1538,14 @@ class File(Registry, Data):
             3        0.046       0.031        0.015       0.002                 0
             4        0.050       0.036        0.014       0.002                 0
             >>> file = ln.File.from_df(df, description="Iris flower dataset batch1")
-            💡 File will be copied to storage upon `save()` using storage key = kV3JQuBw4izvUdAkjO4p.parquet
-            💬 Created 5 Feature records with a single field name
+            🔶 did not validate 5 Feature records for names: sepal_length, sepal_width, petal_length, petal_width, iris_species_name
+            🔶 ignoring non-validated features: sepal_length,sepal_width,petal_length,petal_width,iris_species_name
+            🔶 no validated features, skip creating feature set
             >>> file
             File(id=kV3JQuBw4izvUdAkjO4p, suffix=.parquet, description=Iris flower dataset batch1, size=5334, hash=RraiKH9BAtAgS5jg7LWUiA, hash_type=md5, storage_id=Zl2q0vQB, created_by_id=DzTjkKse) # noqa
             >>> file.save()
-            💬 Created 2 Label records with a single field value
-            💡 storing file kV3JQuBw4izvUdAkjO4p with key .lamindb/kV3JQuBw4izvUdAkjO4p.parquet
+            🌱 saved 0 feature set for slot: []
+            🌱 storing file kV3JQuBw4izvUdAkjO4p with key '.lamindb/kV3JQuBw4izvUdAkjO4p.parquet'
         """
         pass
 
@@ -1572,7 +1575,7 @@ class File(Registry, Data):
         Examples:
             >>> import lnschema_bionty as lb
             lb.settings.species = "human"
-            ✅ Set species: Species(id=uHJU, name=human, taxon_id=9606, scientific_name=homo_sapiens, updated_at=2023-07-19 14:45:17, bionty_source_id=t317, created_by_id=DzTjkKse) # noqa
+            🌱 Set species: Species(id=uHJU, name=human, taxon_id=9606, scientific_name=homo_sapiens, updated_at=2023-07-19 14:45:17, bionty_source_id=t317, created_by_id=DzTjkKse) # noqa
             >>> adata = ln.dev.datasets.anndata_with_obs()
             >>> adata
             AnnData object with n_obs × n_vars = 40 × 100
@@ -1582,12 +1585,17 @@ class File(Registry, Data):
             >>> file = ln.File.from_anndata(adata,
             ...                             var_ref=lb.Gene.ensembl_gene_id,
             ...                             description="mini anndata with obs")
-            💡 File will be copied to storage upon `save()` using storage key = XcohavbmpLDhAnCrALVC.h5ad
-            💬 Using global setting species = human
-            💬 Created 99 Gene records from Bionty that matched ensembl_gene_id field (bionty_source_id=abZr)
-            💬 Created 4 Feature records with a single field name
+            💡 parsing feature names of X stored in slot 'var'
+            💡    using global setting species = human
+            ✅    validated 99 Gene records from Bionty on ensembl_gene_id: ENSG00000000003, ENSG00000000005, ENSG00000000419, ENSG00000000457, ...  # noqa
+            🌱    linked: FeatureSet(id='Fw0fQ0ZFJMa3Eyv51XLD', n=99, type='float', registry='bionty.Gene', hash='fHbDaAAmJse48vnUQh9C', created_by_id='DzTjkKse')  # noqa
+            💡 parsing feature names of slot 'obs'
+            🔶    did not validate 4 Feature records for names: cell_type, cell_type_id, tissue, disease
+            🔶    ignoring non-validated features: cell_type,cell_type_id,tissue,disease
+            🔶    no validated features, skip creating feature set
             >>> file.save()
-            💡 storing file XcohavbmpLDhAnCrALVC with key .lamindb/XcohavbmpLDhAnCrALVC.h5ad
+            🌱 saved 1 feature set for slot: ['var']
+            🌱 storing file XcohavbmpLDhAnCrALVC with key '.lamindb/XcohavbmpLDhAnCrALVC.h5ad'
         """
         pass
 
@@ -1615,7 +1623,7 @@ class File(Registry, Data):
             'sample_001'
             >>> files = ln.File.from_dir(dir_path)
             💡 using storage prefix = sample_001/
-            💬 → 15 files
+            💡 → 15 files
             >>> files[0]
             File(id=cbGk8IUFIERkTgjBQ2kb, key=sample_001/web_summary.html, suffix=.html, size=6, hash=n4HLxPQUWXUeKl-OLzq6ew, hash_type=md5, storage_id=Zl2q0vQB, created_by_id=DzTjkKse) # noqa
             >>> ln.save(files)
@@ -1853,7 +1861,7 @@ class Dataset(Registry, Data):
         >>> dataset
         Dataset(id=uGQtiyepMdHOq3sZCFWV, name=Iris flower dataset batch1, hash=c5WgMCRPca2iZ2pqC3KiKQ, file_id=uGQtiyepMdHOq3sZCFWV, created_by_id=DzTjkKse)
         >>> dataset.save()
-        💡 storing file uGQtiyepMdHOq3sZCFWV with key .lamindb/uGQtiyepMdHOq3sZCFWV.parquet
+        🌱 storing file uGQtiyepMdHOq3sZCFWV with key '.lamindb/uGQtiyepMdHOq3sZCFWV.parquet'
     """
 
     id = CharField(max_length=20, default=base62_20, primary_key=True)
