@@ -1821,32 +1821,44 @@ class Dataset(Registry, Data):
         name: `str` A name.
         description: `Optional[str] = None` A description.
 
-    Datasets are measurements of features (aka observations of variables).
-
-    1. A feature can be a “high-level” feature with meaning: a labelled
-       column in a DataFrame with an entry in :class:`~lamindb.Feature` or another Registry.
-       Examples: gene id, protein id, phenotype name, temperature,
-       concentration, treatment label, treatment id, etc.
-    2. In other cases, a feature might be a “low-level” feature without semantic
-       meaning. Examples: pixels, single letters in sequences, etc.
-
-    LaminDB typically stores datasets as one or multiple files (`.files`), either as
-
-    1. serialized `DataFrame` or `AnnData` objects (for high-level features)
-    2. a set of files of any type (for low-level features, e.g., a folder of
-       images or fastqs)
-
-    In simple cases, a single serialized DataFrame or AnnData object (`.file`)
-    is enough.
-
-    One might also store a dataset in a SQL table or view, but this is *not* yet
-    supported by LaminDB.
-
     See Also:
         :class:`~lamindb.File`
 
     Notes:
-        For more info, see tutorial: :doc:`/tutorial`.
+        See tutorial: :doc:`/tutorial`.
+
+        The `File` & `Dataset` registries both
+
+        - track data batches of arbitrary format & size
+
+        - can validate & link features (the measured dimensions in a data batch)
+
+        Typically,
+
+        - a file stores a single immutable batch of data
+
+        - a dataset stores a mutable collection of data batches
+
+        Examples:
+
+        - Blob-like immutable files (pdf, txt, csv, jpg, ...) or arrays (h5,
+          h5ad, ...) → :class:`~lamindb.File`
+
+        - Mutable streamable backends (DuckDB, zarr, TileDB, ...) →
+          :class:`~lamindb.Dataset` wrapping :class:`~lamindb.File`
+
+        - Collections of files → :class:`~lamindb.Dataset` wrapping
+          :class:`~lamindb.File`
+
+        - Datasets in BigQuery, Snowflake, Postgres, ... →
+          :class:`~lamindb.Dataset` (not yet implemented)
+
+        Hence, while
+
+        - files *always* have a one-to-one correspondence with a storage accessor
+
+        - datasets *can* reference a single file, multiple files or a dataset in
+          a warehouse like BigQuery or Snowflake
 
     Examples:
         >>> df = ln.dev.datasets.df_iris_in_meter_batch1()
