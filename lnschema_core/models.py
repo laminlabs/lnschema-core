@@ -17,6 +17,7 @@ from typing import (  # noqa
 
 from django.db import models
 from django.db.models import CASCADE, PROTECT
+from lamin_utils import logger
 from lamindb_setup import _check_instance_setup
 from upath import UPath
 
@@ -85,7 +86,7 @@ class ValidationAware:
             ✅ 2 terms (50.00%) are validated
             🔶 2 terms (50.00%) are not validated
                 🟠 detected synonyms
-                to increase validated terms, standardize them via .map_synonyms()
+                to increase validated terms, standardize them via .standardize()
             >>> result.validated
             ['A1CF', 'A1BG']
             >>> result.non_validated
@@ -129,9 +130,9 @@ class SynonymsAware:
     """Base class for synonyms methods."""
 
     @classmethod
-    def map_synonyms(
+    def standardize(
         cls,
-        synonyms: Iterable,
+        values: Iterable,
         *,
         return_mapper: bool = False,
         case_sensitive: bool = False,
@@ -143,7 +144,7 @@ class SynonymsAware:
         """Maps input synonyms to standardized names.
 
         Args:
-            synonyms: Synonyms that will be standardized.
+            values: Synonyms that will be standardized.
             return_mapper: If `True`, returns `{input_synonym1:
                 standardized_name1}`.
             case_sensitive: Whether the mapping is case sensitive.
@@ -173,11 +174,36 @@ class SynonymsAware:
             >>> lb.settings.species = "human"
             >>> ln.save(lb.Gene.from_values(["A1CF", "A1BG", "BRCA2"], field="symbol"))
             >>> gene_synonyms = ["A1CF", "A1BG", "FANCD1", "FANCD20"]
-            >>> standardized_names = lb.Gene.map_synonyms(gene_synonyms)
+            >>> standardized_names = lb.Gene.standardize(gene_synonyms)
             >>> standardized_names
             ['A1CF', 'A1BG', 'BRCA2', 'FANCD20']
         """
         pass
+
+    @classmethod
+    def map_synonyms(
+        cls,
+        synonyms: Iterable,
+        *,
+        return_mapper: bool = False,
+        case_sensitive: bool = False,
+        keep: Literal["first", "last", False] = "first",
+        synonyms_field: str = "synonyms",
+        field: Optional[str] = None,
+        **kwargs,
+    ) -> Union[List[str], Dict[str, str]]:
+        """{}"""
+        logger.warning("`map_synonyms()` is deprecated, use `.standardize()`!'")
+        return cls.standardize(
+            cls=cls,
+            values=synonyms,
+            return_mapper=return_mapper,
+            case_sensitive=case_sensitive,
+            keep=keep,
+            synonyms_field=synonyms_field,
+            field=field,
+            **kwargs,
+        )
 
     def add_synonym(
         self,
