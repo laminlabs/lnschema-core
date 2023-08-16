@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚚 Rename map_synonyms to standardize | [270](https://github.com/laminlabs/lnschema-core/pull/270) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-16 |
 📝 Refactored docs | [269](https://github.com/laminlabs/lnschema-core/pull/269) | [falexwolf](https://github.com/falexwolf) | 2023-08-12 | 0.45.3
 💚 Fix import | [268](https://github.com/laminlabs/lnschema-core/pull/268) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-11 | 0.45.2
 🚚 Move describe to Data | [267](https://github.com/laminlabs/lnschema-core/pull/267) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-11 | 0.45.1
