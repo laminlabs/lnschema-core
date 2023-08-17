@@ -1434,8 +1434,7 @@ class File(Registry, Data):
     suffix = CharField(max_length=30, db_index=True, null=True, default=None)
     """File suffix.
 
-    This is a file extension if the `file` is stored in a file format.
-    It's `None` if the storage format doesn't have a canonical extension.
+    This is either a file suffix (`".csv"`, `".h5ad"`, etc.) or the empty string "".
     """
     accessor = CharField(max_length=64, db_index=True, null=True, default=None)
     """Default backed or memory accessor, e.g., DataFrame, AnnData.
