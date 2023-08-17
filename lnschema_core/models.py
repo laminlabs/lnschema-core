@@ -195,7 +195,6 @@ class SynonymsAware:
         """{}"""
         logger.warning("`map_synonyms()` is deprecated, use `.standardize()`!'")
         return cls.standardize(
-            cls=cls,
             values=synonyms,
             return_mapper=return_mapper,
             case_sensitive=case_sensitive,
