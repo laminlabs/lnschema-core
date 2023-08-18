@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+📝 Updated signature of features.from_df | [273](https://github.com/laminlabs/lnschema-core/pull/273) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-18 |
 ✏️ Fix typo of map_synonyms backward compat | [271](https://github.com/laminlabs/lnschema-core/pull/271) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-17 |
 🚚 Rename map_synonyms to standardize | [270](https://github.com/laminlabs/lnschema-core/pull/270) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-16 |
 📝 Refactored docs | [269](https://github.com/laminlabs/lnschema-core/pull/269) | [falexwolf](https://github.com/falexwolf) | 2023-08-12 | 0.45.3
