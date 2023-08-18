@@ -1189,6 +1189,8 @@ class Feature(Registry):
     def from_df(
         cls,
         df: "pd.DataFrame",
+        name: Optional[str] = None,
+        **kwargs,
     ) -> List["Feature"]:
         """Create Feature records for columns."""
         pass
