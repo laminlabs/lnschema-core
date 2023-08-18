@@ -1186,12 +1186,7 @@ class Feature(Registry):
         pass
 
     @classmethod
-    def from_df(
-        cls,
-        df: "pd.DataFrame",
-        name: Optional[str] = None,
-        **kwargs,
-    ) -> List["Feature"]:
+    def from_df(cls, df: "pd.DataFrame") -> List["Feature"]:
         """Create Feature records for columns."""
         pass
 
@@ -1335,6 +1330,7 @@ class FeatureSet(Registry):
         cls,
         df: "pd.DataFrame",
         name: Optional[str] = None,
+        **kwargs,
     ) -> Optional["FeatureSet"]:
         """Create feature set for validated features."""
         pass
