@@ -1743,7 +1743,7 @@ class File(Registry, Data):
         """
         pass
 
-    def load(self, is_run_input: Optional[bool] = None, stream: bool = False) -> DataLike:
+    def load(self, is_run_input: Optional[bool] = None, stream: bool = False, **kwargs) -> DataLike:
         """Slabele and load to memory.
 
         Returns in-memory representation if possible, e.g., an `AnnData` object for an `h5ad` file.
