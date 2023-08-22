@@ -1376,11 +1376,11 @@ class File(Registry, Data):
         many small objects in what appears to be a "folder" in storage.
 
     See Also:
-        :meth:`lamindb.File.from_df`
+        :meth:`~lamindb.File.from_df`
             Create a file object from `DataFrame` and track features.
-        :meth:`lamindb.File.from_anndata`
+        :meth:`~lamindb.File.from_anndata`
             Create a file object from `AnnData` and track features.
-        :meth:`lamindb.File.from_dir`
+        :meth:`~lamindb.File.from_dir`
             Bulk create file objects from a directory.
 
     Notes:
@@ -1399,6 +1399,28 @@ class File(Registry, Data):
         >>> file = ln.File(temporary_filepath, key="images/paradisi05_image.jpg")
         💡 file will be copied to default storage upon `save()` with key 'images/paradisi05_image.jpg'
         >>> file.save()
+
+        .. dropdown:: Why does the API look this way?
+
+            It's inspired by APIs building on AWS S3.
+
+            Both boto3 and quilt select a bucket (akin to default storage in LaminDB) and define a target path through a `key` argument.
+
+            In `boto3 <https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/bucket/upload_file.html>`__::
+
+                # signature: S3.Bucket.upload_file(filepath, key)
+                import boto3
+                s3 = boto3.resource('s3')
+                bucket = s3.Bucket('mybucket')
+                bucket.upload_file('/tmp/hello.txt', 'hello.txt')
+
+            In `quilt3 <https://docs.quiltdata.com/api-reference/bucket>`__::
+
+                # signature: quilt3.Bucket.put_file(key, filepath)
+                import quilt3
+                bucket = quilt3.Bucket('mybucket')
+                bucket.put_file('hello.txt', '/tmp/hello.txt')
+
 
         Make a new version of a file:
 
