@@ -57,7 +57,7 @@ class ValidationMixin:
     def inspect(
         cls,
         values: ListLike,
-        field: StrField,
+        field: Optional[Union[str, StrField]] = None,
         *,
         mute: bool = False,
         **kwargs,
@@ -95,7 +95,14 @@ class ValidationMixin:
         pass
 
     @classmethod
-    def validate(cls, values: ListLike, field: StrField, *, mute: bool = False, **kwargs) -> "np.ndarray":
+    def validate(
+        cls,
+        values: ListLike,
+        field: Optional[Union[str, StrField]] = None,
+        *,
+        mute: bool = False,
+        **kwargs,
+    ) -> "np.ndarray":
         """Validate values against existing values of a string field.
 
         Note this is strict validation, only asserts exact matches.
@@ -129,6 +136,7 @@ class ValidationMixin:
     def standardize(
         cls,
         values: Iterable,
+        field: Optional[Union[str, StrField]] = None,
         *,
         return_mapper: bool = False,
         case_sensitive: bool = False,
@@ -136,7 +144,6 @@ class ValidationMixin:
         bionty_aware: bool = True,
         keep: Literal["first", "last", False] = "first",
         synonyms_field: str = "synonyms",
-        field: Optional[str] = None,
         **kwargs,
     ) -> Union[List[str], Dict[str, str]]:
         """Maps input synonyms to standardized names.
