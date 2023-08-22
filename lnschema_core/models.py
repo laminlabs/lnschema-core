@@ -1376,11 +1376,11 @@ class File(Registry, Data):
         many small objects in what appears to be a "folder" in storage.
 
     See Also:
-        :meth:`lamindb.File.from_df`
+        :meth:`~lamindb.File.from_df`
             Create a file object from `DataFrame` and track features.
-        :meth:`lamindb.File.from_anndata`
+        :meth:`~lamindb.File.from_anndata`
             Create a file object from `AnnData` and track features.
-        :meth:`lamindb.File.from_dir`
+        :meth:`~lamindb.File.from_dir`
             Bulk create file objects from a directory.
 
     Notes:
@@ -1388,33 +1388,45 @@ class File(Registry, Data):
 
     Examples:
 
-        Create a file from a local filepath:
-
-        >>> filepath = ln.dev.datasets.file_mini_csv()
-        >>> filepath
-        PosixPath('mini.csv')
-        >>> file = ln.File(filepath)
-        >>> file
-        File(id=WpfMHb5u3Jp8mzoTs3SH, suffix=.csv, size=11, hash=z1LdF2qN4cN0M2sXrcW8aw, hash_type=md5, storage_id=Zl2q0vQB, created_by_id=DzTjkKse)
-        >>> file.save()
-
         Create a file from a cloud storage (supports `s3://` and `gs://`):
 
         >>> file = ln.File("s3://lamindb-ci/test-data/test.csv")
-        >>> file
-        File(id=YDELGH3FqhtiZI7IMWnH, key=test-data/test.csv, suffix=.csv, size=329, hash=85-PotiFdQ2rpJvfLtOISA, hash_type=md5, storage_id=Z7zewD72, created_by_id=DzTjkKse)
+        >>> file.save()  # only metadata is saved
+
+        Create a file from a local temporary filepath using `key`:
+
+        >>> temporary_filepath = ln.dev.datasets.file_jpg_paradisi05()
+        >>> file = ln.File(temporary_filepath, key="images/paradisi05_image.jpg")
+        💡 file will be copied to default storage upon `save()` with key 'images/paradisi05_image.jpg'
         >>> file.save()
 
-        Make a new version of a file
+        .. dropdown:: Why does the API look this way?
 
-        >>> # non-versioned file
-        >>> file = ln.File(df1)
+            It's inspired by APIs building on AWS S3.
+
+            Both boto3 and quilt select a bucket (akin to default storage in LaminDB) and define a target path through a `key` argument.
+
+            In `boto3 <https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/bucket/upload_file.html>`__::
+
+                # signature: S3.Bucket.upload_file(filepath, key)
+                import boto3
+                s3 = boto3.resource('s3')
+                bucket = s3.Bucket('mybucket')
+                bucket.upload_file('/tmp/hello.txt', 'hello.txt')
+
+            In `quilt3 <https://docs.quiltdata.com/api-reference/bucket>`__::
+
+                # signature: quilt3.Bucket.put_file(key, filepath)
+                import quilt3
+                bucket = quilt3.Bucket('mybucket')
+                bucket.put_file('hello.txt', '/tmp/hello.txt')
+
+
+        Make a new version of a file:
+
+        >>> # a non-versioned file
+        >>> file = ln.File(df1, description="My dataframe")
         >>> file.save()
-        >>> file.initial_version
-        None
-        >>> file.version
-        None
-
         >>> # create new file from old file and version both
         >>> new_file = ln.File(df2, is_new_version_of=file)
         >>> assert new_file.initial_version == file.initial_version
@@ -1743,7 +1755,7 @@ class File(Registry, Data):
         """
         pass
 
-    def load(self, is_run_input: Optional[bool] = None, stream: bool = False) -> DataLike:
+    def load(self, is_run_input: Optional[bool] = None, stream: bool = False, **kwargs) -> DataLike:
         """Slabele and load to memory.
 
         Returns in-memory representation if possible, e.g., an `AnnData` object for an `h5ad` file.
