@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🎨 Enable default field for .inspect and .validate | [275](https://github.com/laminlabs/lnschema-core/pull/275) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-22 |
 🎨 Merge ValidationAware and SynonymsAware into ValidationMixin | [274](https://github.com/laminlabs/lnschema-core/pull/274) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-22 |
 📝 Updated signature of features.from_df | [273](https://github.com/laminlabs/lnschema-core/pull/273) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-18 |
 ✏️ Fix typo of map_synonyms backward compat | [271](https://github.com/laminlabs/lnschema-core/pull/271) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-17 |
