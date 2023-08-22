@@ -1360,7 +1360,7 @@ class File(Registry, Data):
         description: `Optional[str] = None` A description.
         version: `Optional[str] = None` A version string.
         is_new_version_of: `Optional[File] = None` A reference file.
-        run: `Optional[Run] = None` The run that created the file. If `None`,
+        run: `Optional[Run] = None` The run that creates the file. If `None`,
             gets auto-linked if :meth:`~lamindb.track` created a run context.
 
     .. admonition:: Typical formats in storage & their API accessors
@@ -1861,6 +1861,8 @@ class Dataset(Registry, Data):
         data: `DataLike` A data object (`DataFrame`, `AnnData`) to store.
         name: `str` A name.
         description: `Optional[str] = None` A description.
+        run: `Optional[Run] = None` The run that creates the dataset. If `None`,
+            gets auto-linked if :meth:`~lamindb.track` created a run context.
 
     See Also:
         :class:`~lamindb.File`
