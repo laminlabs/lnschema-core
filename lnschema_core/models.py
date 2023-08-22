@@ -527,7 +527,7 @@ class Data:
 
     def get_labels(
         self,
-        feature: Optional[Union[str, Registry]] = None,
+        feature: Union[str, Registry],
         mute: bool = False,
         flat_names: bool = False,
     ) -> Union[QuerySet, Dict[str, QuerySet], List]:
