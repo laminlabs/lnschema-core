@@ -1484,10 +1484,10 @@ class File(Registry, Data):
     """Type of hash."""
     feature_sets = models.ManyToManyField(FeatureSet, related_name="files", through="FileFeatureSet")
     """The feature sets measured in the file (see :class:`~lamindb.FeatureSet`)."""
-    transform = models.ForeignKey(Transform, PROTECT, related_name="files", null=True, default=None)
-    """:class:`~lamindb.Transform` whose run created the `file`."""
     labels = models.ManyToManyField(Label, through="FileLabel", related_name="files")
     """:class:`~lamindb.File` records in label."""
+    transform = models.ForeignKey(Transform, PROTECT, related_name="files", null=True, default=None)
+    """:class:`~lamindb.Transform` whose run created the `file`."""
     run = models.ForeignKey(Run, PROTECT, related_name="output_files", null=True, default=None)
     """:class:`~lamindb.Run` that created the `file`."""
     input_of = models.ManyToManyField(Run, related_name="input_files")
@@ -1928,7 +1928,13 @@ class Dataset(Registry, Data):
     feature_sets = models.ManyToManyField("FeatureSet", related_name="datasets", through="DatasetFeatureSet")
     """The feature sets measured in this dataset (see :class:`~lamindb.FeatureSet`)."""
     labels = models.ManyToManyField("Label", related_name="datasets")
-    """Categories of categorical features sampled in the dataset (see :class:`~lamindb.Feature`)."""
+    """Labels sampled in the dataset (see :class:`~lamindb.Feature`)."""
+    transform = models.ForeignKey(Transform, PROTECT, related_name="datasets", null=True, default=None)
+    """:class:`~lamindb.Transform` whose run created the dataset."""
+    run = models.ForeignKey(Run, PROTECT, related_name="output_datasets", null=True, default=None)
+    """:class:`~lamindb.Run` that created the `file`."""
+    input_of = models.ManyToManyField(Run, related_name="input_datasets")
+    """Runs that use this dataset as an input."""
     file = models.ForeignKey("File", on_delete=PROTECT, null=True, unique=True, related_name="datasets")
     """Storage of dataset as a one file."""
     files = models.ManyToManyField("File", related_name="datasets")
