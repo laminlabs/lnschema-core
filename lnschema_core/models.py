@@ -50,7 +50,7 @@ IPYTHON = getattr(builtins, "__IPYTHON__", False)
 TRANSFORM_TYPE_DEFAULT = TransformType.notebook if IPYTHON else TransformType.pipeline
 
 
-class ValidationAware:
+class ValidationMixin:
     """Base class providing :class:`~lamindb.dev.Registry`-based validation."""
 
     @classmethod
@@ -125,10 +125,6 @@ class ValidationAware:
         """
         pass
 
-
-class SynonymsAware:
-    """Base class for synonyms methods."""
-
     @classmethod
     def standardize(
         cls,
@@ -136,6 +132,8 @@ class SynonymsAware:
         *,
         return_mapper: bool = False,
         case_sensitive: bool = False,
+        mute: bool = False,
+        bionty_aware: bool = True,
         keep: Literal["first", "last", False] = "first",
         synonyms_field: str = "synonyms",
         field: Optional[str] = None,
@@ -319,7 +317,7 @@ class ParentsAware:
         pass
 
 
-class Registry(models.Model, ValidationAware, SynonymsAware):
+class Registry(models.Model, ValidationMixin):
     """Registry base class.
 
     Extends ``django.db.models.Model``.
