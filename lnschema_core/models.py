@@ -1360,7 +1360,7 @@ class File(Registry, Data):
         description: `Optional[str] = None` A description.
         version: `Optional[str] = None` A version string.
         is_new_version_of: `Optional[File] = None` A reference file.
-        run: `Optional[Run] = None` The run that created the file. If `None`,
+        run: `Optional[Run] = None` The run that creates the file. If `None`,
             gets auto-linked if :meth:`~lamindb.track` created a run context.
 
     .. admonition:: Typical formats in storage & their API accessors
@@ -1484,10 +1484,10 @@ class File(Registry, Data):
     """Type of hash."""
     feature_sets = models.ManyToManyField(FeatureSet, related_name="files", through="FileFeatureSet")
     """The feature sets measured in the file (see :class:`~lamindb.FeatureSet`)."""
-    transform = models.ForeignKey(Transform, PROTECT, related_name="files", null=True, default=None)
-    """:class:`~lamindb.Transform` whose run created the `file`."""
     labels = models.ManyToManyField(Label, through="FileLabel", related_name="files")
     """:class:`~lamindb.File` records in label."""
+    transform = models.ForeignKey(Transform, PROTECT, related_name="files", null=True, default=None)
+    """:class:`~lamindb.Transform` whose run created the `file`."""
     run = models.ForeignKey(Run, PROTECT, related_name="output_files", null=True, default=None)
     """:class:`~lamindb.Run` that created the `file`."""
     input_of = models.ManyToManyField(Run, related_name="input_files")
@@ -1861,6 +1861,8 @@ class Dataset(Registry, Data):
         data: `DataLike` A data object (`DataFrame`, `AnnData`) to store.
         name: `str` A name.
         description: `Optional[str] = None` A description.
+        run: `Optional[Run] = None` The run that creates the dataset. If `None`,
+            gets auto-linked if :meth:`~lamindb.track` created a run context.
 
     See Also:
         :class:`~lamindb.File`
@@ -1927,8 +1929,14 @@ class Dataset(Registry, Data):
     """Hash of dataset content. 86 base64 chars allow to store 64 bytes, 512 bits."""
     feature_sets = models.ManyToManyField("FeatureSet", related_name="datasets", through="DatasetFeatureSet")
     """The feature sets measured in this dataset (see :class:`~lamindb.FeatureSet`)."""
-    labels = models.ManyToManyField("Label", related_name="datasets")
-    """Categories of categorical features sampled in the dataset (see :class:`~lamindb.Feature`)."""
+    labels = models.ManyToManyField("Label", through="DatasetLabel", related_name="datasets")
+    """Labels sampled in the dataset (see :class:`~lamindb.Feature`)."""
+    transform = models.ForeignKey(Transform, PROTECT, related_name="datasets", null=True, default=None)
+    """:class:`~lamindb.Transform` whose run created the dataset."""
+    run = models.ForeignKey(Run, PROTECT, related_name="output_datasets", null=True, default=None)
+    """:class:`~lamindb.Run` that created the `file`."""
+    input_of = models.ManyToManyField(Run, related_name="input_datasets")
+    """Runs that use this dataset as an input."""
     file = models.ForeignKey("File", on_delete=PROTECT, null=True, unique=True, related_name="datasets")
     """Storage of dataset as a one file."""
     files = models.ManyToManyField("File", related_name="datasets")
@@ -1993,6 +2001,15 @@ class FileLabel(Registry, LinkORM):
 
     class Meta:
         unique_together = ("file", "label")
+
+
+class DatasetLabel(Registry, LinkORM):
+    dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE)
+    label = models.ForeignKey(Label, on_delete=models.CASCADE)
+    feature = models.ForeignKey(Feature, CASCADE, null=True, default=None)
+
+    class Meta:
+        unique_together = ("dataset", "label")
 
 
 # -------------------------------------------------------------------------------------
