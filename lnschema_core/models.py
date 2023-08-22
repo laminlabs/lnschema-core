@@ -1388,33 +1388,23 @@ class File(Registry, Data):
 
     Examples:
 
-        Create a file from a local filepath:
-
-        >>> filepath = ln.dev.datasets.file_mini_csv()
-        >>> filepath
-        PosixPath('mini.csv')
-        >>> file = ln.File(filepath)
-        >>> file
-        File(id=WpfMHb5u3Jp8mzoTs3SH, suffix=.csv, size=11, hash=z1LdF2qN4cN0M2sXrcW8aw, hash_type=md5, storage_id=Zl2q0vQB, created_by_id=DzTjkKse)
-        >>> file.save()
-
         Create a file from a cloud storage (supports `s3://` and `gs://`):
 
         >>> file = ln.File("s3://lamindb-ci/test-data/test.csv")
-        >>> file
-        File(id=YDELGH3FqhtiZI7IMWnH, key=test-data/test.csv, suffix=.csv, size=329, hash=85-PotiFdQ2rpJvfLtOISA, hash_type=md5, storage_id=Z7zewD72, created_by_id=DzTjkKse)
+        >>> file.save()  # only metadata is saved
+
+        Create a file from a local temporary filepath using `key`:
+
+        >>> temporary_filepath = ln.dev.datasets.file_jpg_paradisi05()
+        >>> file = ln.File(temporary_filepath, key="images/paradisi05_image.jpg")
+        💡 file will be copied to default storage upon `save()` with key 'images/paradisi05_image.jpg'
         >>> file.save()
 
-        Make a new version of a file
+        Make a new version of a file:
 
-        >>> # non-versioned file
-        >>> file = ln.File(df1)
+        >>> # a non-versioned file
+        >>> file = ln.File(df1, description="My dataframe")
         >>> file.save()
-        >>> file.initial_version
-        None
-        >>> file.version
-        None
-
         >>> # create new file from old file and version both
         >>> new_file = ln.File(df2, is_new_version_of=file)
         >>> assert new_file.initial_version == file.initial_version
