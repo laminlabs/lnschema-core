@@ -146,6 +146,8 @@ class ValidationMixin:
             return_mapper: If `True`, returns `{input_synonym1:
                 standardized_name1}`.
             case_sensitive: Whether the mapping is case sensitive.
+            mute: Mute logging.
+            bionty_aware: Whether to standardize from Bionty reference.
             keep: When a synonym maps to
                 multiple names, determines which duplicates to mark as
                 `pd.DataFrame.duplicated`:
