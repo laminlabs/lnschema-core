@@ -1929,7 +1929,7 @@ class Dataset(Registry, Data):
     """Hash of dataset content. 86 base64 chars allow to store 64 bytes, 512 bits."""
     feature_sets = models.ManyToManyField("FeatureSet", related_name="datasets", through="DatasetFeatureSet")
     """The feature sets measured in this dataset (see :class:`~lamindb.FeatureSet`)."""
-    labels = models.ManyToManyField("Label", related_name="datasets")
+    labels = models.ManyToManyField("Label", through="DatasetLabel", related_name="datasets")
     """Labels sampled in the dataset (see :class:`~lamindb.Feature`)."""
     transform = models.ForeignKey(Transform, PROTECT, related_name="datasets", null=True, default=None)
     """:class:`~lamindb.Transform` whose run created the dataset."""
@@ -2001,6 +2001,15 @@ class FileLabel(Registry, LinkORM):
 
     class Meta:
         unique_together = ("file", "label")
+
+
+class DatasetLabel(Registry, LinkORM):
+    dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE)
+    label = models.ForeignKey(Label, on_delete=models.CASCADE)
+    feature = models.ForeignKey(Feature, CASCADE, null=True, default=None)
+
+    class Meta:
+        unique_together = ("dataset", "label")
 
 
 # -------------------------------------------------------------------------------------
