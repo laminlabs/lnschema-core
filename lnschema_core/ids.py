@@ -82,6 +82,10 @@ def base62_12() -> str:
     return base62(12)
 
 
+def base62_14() -> str:
+    return base62(14)
+
+
 def base62_16() -> str:
     return base62(16)
 
