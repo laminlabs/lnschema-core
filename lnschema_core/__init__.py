@@ -1,7 +1,7 @@
 """LaminDB's core registries."""
 _schema_id = "yvzi"
 _name = "core"
-__version__ = "0.45.5"
+__version__ = "0.46.0"
 
 
 from lamindb_setup import _check_instance_setup
