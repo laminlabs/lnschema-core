@@ -59,6 +59,10 @@ class Migration(migrations.Migration):
             name="modality",
             field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, related_name="feature_sets", to="lnschema_core.modality"),
         ),
+        migrations.AlterUniqueTogether(
+            name="transform",
+            unique_together=set(),
+        ),
         migrations.RemoveField(
             model_name="transform",
             name="stem_id",

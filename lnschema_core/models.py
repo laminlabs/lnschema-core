@@ -797,9 +797,6 @@ class Transform(Registry, HasParents):
     created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_transforms")
     """Creator of record, a :class:`~lamindb.User`."""
 
-    class Meta:
-        unique_together = (("stem_id", "version"),)
-
     @overload
     def __init__(
         self,
