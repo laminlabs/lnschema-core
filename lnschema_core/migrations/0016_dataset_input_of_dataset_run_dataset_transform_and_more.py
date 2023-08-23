@@ -38,7 +38,7 @@ class Migration(migrations.Migration):
             options={
                 "unique_together": {("dataset", "label")},
             },
-            bases=(models.Model, lnschema_core.models.ValidationMixin, lnschema_core.models.LinkORM),
+            bases=(models.Model, lnschema_core.models.LinkORM),
         ),
         migrations.RemoveField(
             model_name="dataset",

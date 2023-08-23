@@ -50,7 +50,7 @@ IPYTHON = getattr(builtins, "__IPYTHON__", False)
 TRANSFORM_TYPE_DEFAULT = TransformType.notebook if IPYTHON else TransformType.pipeline
 
 
-class ValidationMixin:
+class CanValidate:
     """Base class providing :class:`~lamindb.dev.Registry`-based validation."""
 
     @classmethod
@@ -291,7 +291,7 @@ class ValidationMixin:
         pass
 
 
-class ParentsAware:
+class HasParents:
     """Base class for hierarchical methods."""
 
     def view_parents(
@@ -326,7 +326,7 @@ class ParentsAware:
         pass
 
 
-class Registry(models.Model, ValidationMixin):
+class Registry(models.Model):
     """Registry base class.
 
     Extends ``django.db.models.Model``.
@@ -587,7 +587,7 @@ class Data:
 # All of these are defined and tested within lamindb, in files starting with _{orm_name}.py
 
 
-class User(Registry):
+class User(Registry, CanValidate):
     """Users: humans and bots.
 
     All data in this registry is synced from the cloud user account to ensure a
@@ -706,7 +706,7 @@ class Storage(Registry):
         super(Storage, self).__init__(*args, **kwargs)
 
 
-class Transform(Registry, ParentsAware):
+class Transform(Registry, HasParents):
     """Transforms of files & datasets.
 
     Pipelines, workflows, notebooks, app-based transformations.
@@ -915,7 +915,7 @@ class Run(Registry):
         super(Run, self).__init__(*args, **kwargs)
 
 
-class Label(Registry, ParentsAware):
+class Label(Registry, HasParents, CanValidate):
     """Labels for files & datasets.
 
     Args:
@@ -1020,7 +1020,7 @@ class Label(Registry, ParentsAware):
         pass
 
 
-class Modality(Registry, ParentsAware):
+class Modality(Registry, HasParents, CanValidate):
     """Measurement types of features.
 
     .. note::
@@ -1092,7 +1092,7 @@ class Modality(Registry, ParentsAware):
         super(Modality, self).__init__(*args, **kwargs)
 
 
-class Feature(Registry):
+class Feature(Registry, CanValidate):
     """Dimensions of measurements in files & datasets.
 
     See Also:
