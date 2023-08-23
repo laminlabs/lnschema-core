@@ -1150,12 +1150,14 @@ class Feature(Registry, CanValidate):
     If "category", consider managing categories with :class:`~lamindb.Label` or
     another Registry for managing labels.
     """
+    modality = models.ForeignKey(Modality, PROTECT, null=True, default=None, related_name="features")
+    """The measurement modality, e.g., "RNA", "Protein", "Gene Module", "pathway" (:class:`~lamindb.Modality`)."""
     unit = CharField(max_length=30, db_index=True, null=True, default=None)
     """Unit of measure, ideally SI (`m`, `s`, `kg`, etc.) or 'normalized' etc. (optional)."""
     description = TextField(db_index=True, null=True, default=None)
     """A description."""
     registries = CharField(max_length=128, db_index=True, default=None, null=True)
-    """ORMs that provide values for labels, bar-separated (|) (optional)."""
+    """Registries that provide values for labels, bar-separated (|) (optional)."""
     synonyms = TextField(null=True, default=None)
     """Bar-separated (|) synonyms (optional)."""
     feature_sets = models.ManyToManyField("FeatureSet", related_name="features")
@@ -1262,10 +1264,10 @@ class FeatureSet(Registry):
 
     For :class:`~lamindb.Feature`, types are expected to be in-homogeneous and defined on a per-feature level.
     """
-    modality = models.ForeignKey(Modality, PROTECT, null=True, default=None)
+    modality = models.ForeignKey(Modality, PROTECT, null=True, default=None, related_name="feature_sets")
     """The measurement modality, e.g., "RNA", "Protein", "Gene Module", "pathway" (:class:`~lamindb.Modality`)."""
     registry = CharField(max_length=128, db_index=True)
-    """The registry that stores & validated the features `'bionty.Gene'`."""
+    """The registry that stores & validated the feature identifiers, e.g., `'core.Feature'` or `'bionty.Gene'`."""
     hash = CharField(max_length=20, default=None, db_index=True, null=True)
     """The hash of the set."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)

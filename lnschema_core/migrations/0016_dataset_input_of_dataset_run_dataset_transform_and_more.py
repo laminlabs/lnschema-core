@@ -49,4 +49,14 @@ class Migration(migrations.Migration):
             name="labels",
             field=models.ManyToManyField(related_name="datasets", through="lnschema_core.DatasetLabel", to="lnschema_core.label"),
         ),
+        migrations.AddField(
+            model_name="feature",
+            name="modality",
+            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, related_name="features", to="lnschema_core.modality"),
+        ),
+        migrations.AlterField(
+            model_name="featureset",
+            name="modality",
+            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, related_name="feature_sets", to="lnschema_core.modality"),
+        ),
     ]
