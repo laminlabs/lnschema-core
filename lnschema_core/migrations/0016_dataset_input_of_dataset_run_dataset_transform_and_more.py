@@ -77,5 +77,4 @@ class Migration(migrations.Migration):
             name="version",
             field=models.CharField(db_index=True, default=None, max_length=10, null=True),
         ),
-        migrations.RunSQL("UPDATE lnschema_core_transform SET version = NULL WHERE version = '0'"),
     ]
