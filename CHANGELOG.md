@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚚 Add `modality` to `Feature` | [278](https://github.com/laminlabs/lnschema-core/pull/278) | [falexwolf](https://github.com/falexwolf) | 2023-08-23 |
 ♻️ Use CanValidate & HasParents | [277](https://github.com/laminlabs/lnschema-core/pull/277) | [falexwolf](https://github.com/falexwolf) | 2023-08-23 |
 🚚 Add `transform`, `run` & `input_of` fields to dataset | [276](https://github.com/laminlabs/lnschema-core/pull/276) | [falexwolf](https://github.com/falexwolf) | 2023-08-22 |
 🎨 Enable default field for .inspect and .validate | [275](https://github.com/laminlabs/lnschema-core/pull/275) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-22 |
