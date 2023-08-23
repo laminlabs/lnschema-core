@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+♻️ Version transform | [279](https://github.com/laminlabs/lnschema-core/pull/279) | [falexwolf](https://github.com/falexwolf) | 2023-08-23 |
 🚚 from_anndata and from_df for Dataset | [280](https://github.com/laminlabs/lnschema-core/pull/280) | [falexwolf](https://github.com/falexwolf) | 2023-08-23 |
 🚚 Add `modality` to `Feature` | [278](https://github.com/laminlabs/lnschema-core/pull/278) | [falexwolf](https://github.com/falexwolf) | 2023-08-23 |
 ♻️ Use CanValidate & HasParents | [277](https://github.com/laminlabs/lnschema-core/pull/277) | [falexwolf](https://github.com/falexwolf) | 2023-08-23 |
