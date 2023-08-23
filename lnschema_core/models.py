@@ -709,20 +709,21 @@ class Storage(Registry):
 class Transform(Registry, HasParents):
     """Transforms of files & datasets.
 
-    Pipelines, workflows, notebooks, app-based transformations.
+    Pipelines, notebooks, app uploads.
 
     A pipeline is versioned software that transforms data.
     This can be anything from typical workflow tools (Nextflow, Snakemake,
     Prefect, Apache Airflow, etc.) to simple (versioned) scripts.
 
     Args:
-        name: `str` A name.
-        short_name: `Optional[str] = None` A description.
-        version: `Optional[str] = "0"` A :class:`~lamindb.Transform` record or its name.
+        name: `str` A name or title.
+        short_name: `Optional[str] = None` A short name or abbreviation.
+        version: `Optional[str] = None` A version.
         type: `Optional[TransformType] = None` Either `'notebook'`, `'pipeline'`
-            or `'app'`. If `None`, defaults to `'notebook'` within a notebook (IPython
-            environment), and to `'pipeline'` outside of it.
+            or `'app'`. If `None`, defaults to `'notebook'` within an IPython
+            environment and to `'pipeline'` outside of it.
         reference: `Optional[str] = None` A reference like a URL.
+        is_new_version_of: `Optional[File] = None` An old version of the transform.
 
     See Also:
         :meth:`lamindb.track`
@@ -759,16 +760,16 @@ class Transform(Registry, HasParents):
     """
     short_name = CharField(max_length=128, db_index=True, null=True, default=None)
     """A short name (optional)."""
-    stem_id = CharField(max_length=12, default=base62_12, db_index=True)
-    """Stem of id, identifying the transform up to version (auto-managed)."""
-    version = CharField(max_length=10, default="0", db_index=True)
-    """Version, defaults to `"0"`.
+    version = CharField(max_length=10, default=None, null=True, db_index=True)
+    """Version, defaults to `None`.
 
     Use this to label different versions of the same pipeline, notebook, etc.
 
     Consider using `semantic versioning <https://semver.org>`__
     with `Python versioning <https://peps.python.org/pep-0440/>`__.
     """
+    initial_version = models.ForeignKey("self", PROTECT, null=True, default=None)
+    """Initial version of this transform, a :class:`~lamindb.Transform` record."""
     type = CharField(
         max_length=20,
         choices=TransformType.choices(),
@@ -804,9 +805,10 @@ class Transform(Registry, HasParents):
         self,
         name: str,
         short_name: Optional[str] = None,
-        version: Optional[str] = "0",
+        version: Optional[str] = None,
         type: Optional[TransformType] = None,
         reference: Optional[str] = None,
+        is_new_version_of: Optional["Transform"] = None,
     ):
         ...
 

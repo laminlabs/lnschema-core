@@ -59,4 +59,19 @@ class Migration(migrations.Migration):
             name="modality",
             field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, related_name="feature_sets", to="lnschema_core.modality"),
         ),
+        migrations.RemoveField(
+            model_name="transform",
+            name="stem_id",
+        ),
+        migrations.AddField(
+            model_name="transform",
+            name="initial_version",
+            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, to="lnschema_core.transform"),
+        ),
+        migrations.AlterField(
+            model_name="transform",
+            name="version",
+            field=models.CharField(db_index=True, default=None, max_length=10, null=True),
+        ),
+        migrations.RunSQL("UPDATE lnschema_core_transform SET version = NULL WHERE version = '0'"),
     ]
