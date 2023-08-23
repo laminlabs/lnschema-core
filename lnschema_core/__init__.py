@@ -12,18 +12,17 @@ if _INSTANCE_SETUP:
     from . import ids, types
     from .models import ORM  # backward compat
     from .models import (  # type: ignore
+        CanValidate,
         Dataset,
         Feature,
         FeatureSet,
         File,
+        HasParents,
         Label,
         Modality,
-        ParentsAware,
         Registry,
         Run,
         Storage,
-        SynonymsAware,
         Transform,
         User,
-        ValidationAware,
     )

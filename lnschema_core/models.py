@@ -50,14 +50,14 @@ IPYTHON = getattr(builtins, "__IPYTHON__", False)
 TRANSFORM_TYPE_DEFAULT = TransformType.notebook if IPYTHON else TransformType.pipeline
 
 
-class ValidationAware:
+class CanValidate:
     """Base class providing :class:`~lamindb.dev.Registry`-based validation."""
 
     @classmethod
     def inspect(
         cls,
         values: ListLike,
-        field: StrField,
+        field: Optional[Union[str, StrField]] = None,
         *,
         mute: bool = False,
         **kwargs,
@@ -95,7 +95,14 @@ class ValidationAware:
         pass
 
     @classmethod
-    def validate(cls, values: ListLike, field: StrField, *, mute: bool = False, **kwargs) -> "np.ndarray":
+    def validate(
+        cls,
+        values: ListLike,
+        field: Optional[Union[str, StrField]] = None,
+        *,
+        mute: bool = False,
+        **kwargs,
+    ) -> "np.ndarray":
         """Validate values against existing values of a string field.
 
         Note this is strict validation, only asserts exact matches.
@@ -125,20 +132,18 @@ class ValidationAware:
         """
         pass
 
-
-class SynonymsAware:
-    """Base class for synonyms methods."""
-
     @classmethod
     def standardize(
         cls,
         values: Iterable,
+        field: Optional[Union[str, StrField]] = None,
         *,
         return_mapper: bool = False,
         case_sensitive: bool = False,
+        mute: bool = False,
+        bionty_aware: bool = True,
         keep: Literal["first", "last", False] = "first",
         synonyms_field: str = "synonyms",
-        field: Optional[str] = None,
         **kwargs,
     ) -> Union[List[str], Dict[str, str]]:
         """Maps input synonyms to standardized names.
@@ -148,6 +153,8 @@ class SynonymsAware:
             return_mapper: If `True`, returns `{input_synonym1:
                 standardized_name1}`.
             case_sensitive: Whether the mapping is case sensitive.
+            mute: Mute logging.
+            bionty_aware: Whether to standardize from Bionty reference.
             keep: When a synonym maps to
                 multiple names, determines which duplicates to mark as
                 `pd.DataFrame.duplicated`:
@@ -284,7 +291,7 @@ class SynonymsAware:
         pass
 
 
-class ParentsAware:
+class HasParents:
     """Base class for hierarchical methods."""
 
     def view_parents(
@@ -319,7 +326,7 @@ class ParentsAware:
         pass
 
 
-class Registry(models.Model, ValidationAware, SynonymsAware):
+class Registry(models.Model):
     """Registry base class.
 
     Extends ``django.db.models.Model``.
@@ -520,7 +527,7 @@ class Data:
 
     def get_labels(
         self,
-        feature: Optional[Union[str, Registry]] = None,
+        feature: Union[str, Registry],
         mute: bool = False,
         flat_names: bool = False,
     ) -> Union[QuerySet, Dict[str, QuerySet], List]:
@@ -580,7 +587,7 @@ class Data:
 # All of these are defined and tested within lamindb, in files starting with _{orm_name}.py
 
 
-class User(Registry):
+class User(Registry, CanValidate):
     """Users: humans and bots.
 
     All data in this registry is synced from the cloud user account to ensure a
@@ -662,7 +669,7 @@ class Storage(Registry):
 
     id = CharField(max_length=8, default=base62_8, db_index=True, primary_key=True)
     """Universal id, valid across DB instances."""
-    root = CharField(max_length=255, db_index=True, default=None)
+    root = CharField(max_length=255, db_index=True, unique=True, default=None)
     """Root path of storage, an s3 path, a local path, etc. (required)."""
     type = CharField(max_length=30, db_index=True)
     """Local vs. s3 vs. gcp etc."""
@@ -699,23 +706,24 @@ class Storage(Registry):
         super(Storage, self).__init__(*args, **kwargs)
 
 
-class Transform(Registry, ParentsAware):
+class Transform(Registry, HasParents):
     """Transforms of files & datasets.
 
-    Pipelines, workflows, notebooks, app-based transformations.
+    Pipelines, notebooks, app uploads.
 
     A pipeline is versioned software that transforms data.
     This can be anything from typical workflow tools (Nextflow, Snakemake,
     Prefect, Apache Airflow, etc.) to simple (versioned) scripts.
 
     Args:
-        name: `str` A name.
-        short_name: `Optional[str] = None` A description.
-        version: `Optional[str] = "0"` A :class:`~lamindb.Transform` record or its name.
+        name: `str` A name or title.
+        short_name: `Optional[str] = None` A short name or abbreviation.
+        version: `Optional[str] = None` A version.
         type: `Optional[TransformType] = None` Either `'notebook'`, `'pipeline'`
-            or `'app'`. If `None`, defaults to `'notebook'` within a notebook (IPython
-            environment), and to `'pipeline'` outside of it.
+            or `'app'`. If `None`, defaults to `'notebook'` within an IPython
+            environment and to `'pipeline'` outside of it.
         reference: `Optional[str] = None` A reference like a URL.
+        is_new_version_of: `Optional[File] = None` An old version of the transform.
 
     See Also:
         :meth:`lamindb.track`
@@ -752,16 +760,16 @@ class Transform(Registry, ParentsAware):
     """
     short_name = CharField(max_length=128, db_index=True, null=True, default=None)
     """A short name (optional)."""
-    stem_id = CharField(max_length=12, default=base62_12, db_index=True)
-    """Stem of id, identifying the transform up to version (auto-managed)."""
-    version = CharField(max_length=10, default="0", db_index=True)
-    """Version, defaults to `"0"`.
+    version = CharField(max_length=10, default=None, null=True, db_index=True)
+    """Version, defaults to `None`.
 
     Use this to label different versions of the same pipeline, notebook, etc.
 
     Consider using `semantic versioning <https://semver.org>`__
     with `Python versioning <https://peps.python.org/pep-0440/>`__.
     """
+    initial_version = models.ForeignKey("self", PROTECT, null=True, default=None)
+    """Initial version of this transform, a :class:`~lamindb.Transform` record."""
     type = CharField(
         max_length=20,
         choices=TransformType.choices(),
@@ -789,17 +797,15 @@ class Transform(Registry, ParentsAware):
     created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_transforms")
     """Creator of record, a :class:`~lamindb.User`."""
 
-    class Meta:
-        unique_together = (("stem_id", "version"),)
-
     @overload
     def __init__(
         self,
         name: str,
         short_name: Optional[str] = None,
-        version: Optional[str] = "0",
+        version: Optional[str] = None,
         type: Optional[TransformType] = None,
         reference: Optional[str] = None,
+        is_new_version_of: Optional["Transform"] = None,
     ):
         ...
 
@@ -908,7 +914,7 @@ class Run(Registry):
         super(Run, self).__init__(*args, **kwargs)
 
 
-class Label(Registry, ParentsAware):
+class Label(Registry, HasParents, CanValidate):
     """Labels for files & datasets.
 
     Args:
@@ -1013,7 +1019,7 @@ class Label(Registry, ParentsAware):
         pass
 
 
-class Modality(Registry, ParentsAware):
+class Modality(Registry, HasParents, CanValidate):
     """Measurement types of features.
 
     .. note::
@@ -1085,7 +1091,7 @@ class Modality(Registry, ParentsAware):
         super(Modality, self).__init__(*args, **kwargs)
 
 
-class Feature(Registry):
+class Feature(Registry, CanValidate):
     """Dimensions of measurements in files & datasets.
 
     See Also:
@@ -1143,12 +1149,14 @@ class Feature(Registry):
     If "category", consider managing categories with :class:`~lamindb.Label` or
     another Registry for managing labels.
     """
+    modality = models.ForeignKey(Modality, PROTECT, null=True, default=None, related_name="features")
+    """The measurement modality, e.g., "RNA", "Protein", "Gene Module", "pathway" (:class:`~lamindb.Modality`)."""
     unit = CharField(max_length=30, db_index=True, null=True, default=None)
     """Unit of measure, ideally SI (`m`, `s`, `kg`, etc.) or 'normalized' etc. (optional)."""
     description = TextField(db_index=True, null=True, default=None)
     """A description."""
     registries = CharField(max_length=128, db_index=True, default=None, null=True)
-    """ORMs that provide values for labels, bar-separated (|) (optional)."""
+    """Registries that provide values for labels, bar-separated (|) (optional)."""
     synonyms = TextField(null=True, default=None)
     """Bar-separated (|) synonyms (optional)."""
     feature_sets = models.ManyToManyField("FeatureSet", related_name="features")
@@ -1186,10 +1194,7 @@ class Feature(Registry):
         pass
 
     @classmethod
-    def from_df(
-        cls,
-        df: "pd.DataFrame",
-    ) -> List["Feature"]:
+    def from_df(cls, df: "pd.DataFrame") -> List["Feature"]:
         """Create Feature records for columns."""
         pass
 
@@ -1258,10 +1263,10 @@ class FeatureSet(Registry):
 
     For :class:`~lamindb.Feature`, types are expected to be in-homogeneous and defined on a per-feature level.
     """
-    modality = models.ForeignKey(Modality, PROTECT, null=True, default=None)
+    modality = models.ForeignKey(Modality, PROTECT, null=True, default=None, related_name="feature_sets")
     """The measurement modality, e.g., "RNA", "Protein", "Gene Module", "pathway" (:class:`~lamindb.Modality`)."""
     registry = CharField(max_length=128, db_index=True)
-    """The registry that stores & validated the features `'bionty.Gene'`."""
+    """The registry that stores & validated the feature identifiers, e.g., `'core.Feature'` or `'bionty.Gene'`."""
     hash = CharField(max_length=20, default=None, db_index=True, null=True)
     """The hash of the set."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -1329,11 +1334,7 @@ class FeatureSet(Registry):
         pass
 
     @classmethod
-    def from_df(
-        cls,
-        df: "pd.DataFrame",
-        name: Optional[str] = None,
-    ) -> Optional["FeatureSet"]:
+    def from_df(cls, df: "pd.DataFrame", field: FieldAttr = Feature.name, name: Optional[str] = None, modality: Optional[str] = None) -> Optional["FeatureSet"]:
         """Create feature set for validated features."""
         pass
 
@@ -1355,7 +1356,7 @@ class File(Registry, Data):
         description: `Optional[str] = None` A description.
         version: `Optional[str] = None` A version string.
         is_new_version_of: `Optional[File] = None` A reference file.
-        run: `Optional[Run] = None` The run that created the file. If `None`,
+        run: `Optional[Run] = None` The run that creates the file. If `None`,
             gets auto-linked if :meth:`~lamindb.track` created a run context.
 
     .. admonition:: Typical formats in storage & their API accessors
@@ -1378,11 +1379,11 @@ class File(Registry, Data):
         many small objects in what appears to be a "folder" in storage.
 
     See Also:
-        :meth:`lamindb.File.from_df`
+        :meth:`~lamindb.File.from_df`
             Create a file object from `DataFrame` and track features.
-        :meth:`lamindb.File.from_anndata`
+        :meth:`~lamindb.File.from_anndata`
             Create a file object from `AnnData` and track features.
-        :meth:`lamindb.File.from_dir`
+        :meth:`~lamindb.File.from_dir`
             Bulk create file objects from a directory.
 
     Notes:
@@ -1390,33 +1391,45 @@ class File(Registry, Data):
 
     Examples:
 
-        Create a file from a local filepath:
-
-        >>> filepath = ln.dev.datasets.file_mini_csv()
-        >>> filepath
-        PosixPath('mini.csv')
-        >>> file = ln.File(filepath)
-        >>> file
-        File(id=WpfMHb5u3Jp8mzoTs3SH, suffix=.csv, size=11, hash=z1LdF2qN4cN0M2sXrcW8aw, hash_type=md5, storage_id=Zl2q0vQB, created_by_id=DzTjkKse)
-        >>> file.save()
-
         Create a file from a cloud storage (supports `s3://` and `gs://`):
 
         >>> file = ln.File("s3://lamindb-ci/test-data/test.csv")
-        >>> file
-        File(id=YDELGH3FqhtiZI7IMWnH, key=test-data/test.csv, suffix=.csv, size=329, hash=85-PotiFdQ2rpJvfLtOISA, hash_type=md5, storage_id=Z7zewD72, created_by_id=DzTjkKse)
+        >>> file.save()  # only metadata is saved
+
+        Create a file from a local temporary filepath using `key`:
+
+        >>> temporary_filepath = ln.dev.datasets.file_jpg_paradisi05()
+        >>> file = ln.File(temporary_filepath, key="images/paradisi05_image.jpg")
+        💡 file will be copied to default storage upon `save()` with key 'images/paradisi05_image.jpg'
         >>> file.save()
 
-        Make a new version of a file
+        .. dropdown:: Why does the API look this way?
 
-        >>> # non-versioned file
-        >>> file = ln.File(df1)
+            It's inspired by APIs building on AWS S3.
+
+            Both boto3 and quilt select a bucket (akin to default storage in LaminDB) and define a target path through a `key` argument.
+
+            In `boto3 <https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/bucket/upload_file.html>`__::
+
+                # signature: S3.Bucket.upload_file(filepath, key)
+                import boto3
+                s3 = boto3.resource('s3')
+                bucket = s3.Bucket('mybucket')
+                bucket.upload_file('/tmp/hello.txt', 'hello.txt')
+
+            In `quilt3 <https://docs.quiltdata.com/api-reference/bucket>`__::
+
+                # signature: quilt3.Bucket.put_file(key, filepath)
+                import quilt3
+                bucket = quilt3.Bucket('mybucket')
+                bucket.put_file('hello.txt', '/tmp/hello.txt')
+
+
+        Make a new version of a file:
+
+        >>> # a non-versioned file
+        >>> file = ln.File(df1, description="My dataframe")
         >>> file.save()
-        >>> file.initial_version
-        None
-        >>> file.version
-        None
-
         >>> # create new file from old file and version both
         >>> new_file = ln.File(df2, is_new_version_of=file)
         >>> assert new_file.initial_version == file.initial_version
@@ -1469,10 +1482,10 @@ class File(Registry, Data):
     """Type of hash."""
     feature_sets = models.ManyToManyField(FeatureSet, related_name="files", through="FileFeatureSet")
     """The feature sets measured in the file (see :class:`~lamindb.FeatureSet`)."""
-    transform = models.ForeignKey(Transform, PROTECT, related_name="files", null=True, default=None)
-    """:class:`~lamindb.Transform` whose run created the `file`."""
     labels = models.ManyToManyField(Label, through="FileLabel", related_name="files")
     """:class:`~lamindb.File` records in label."""
+    transform = models.ForeignKey(Transform, PROTECT, related_name="files", null=True, default=None)
+    """:class:`~lamindb.Transform` whose run created the `file`."""
     run = models.ForeignKey(Run, PROTECT, related_name="output_files", null=True, default=None)
     """:class:`~lamindb.Run` that created the `file`."""
     input_of = models.ManyToManyField(Run, related_name="input_files")
@@ -1580,7 +1593,6 @@ class File(Registry, Data):
         cls,
         adata: "AnnDataLike",
         var_ref: Optional[FieldAttr],
-        obs_columns_ref: Optional[FieldAttr] = Feature.name,
         key: Optional[str] = None,
         description: Optional[str] = None,
         run: Optional[Run] = None,
@@ -1600,28 +1612,14 @@ class File(Registry, Data):
 
         Examples:
             >>> import lnschema_bionty as lb
-            lb.settings.species = "human"
-            🌱 Set species: Species(id=uHJU, name=human, taxon_id=9606, scientific_name=homo_sapiens, updated_at=2023-07-19 14:45:17, bionty_source_id=t317, created_by_id=DzTjkKse) # noqa
+            >>> lb.settings.species = "human"
             >>> adata = ln.dev.datasets.anndata_with_obs()
-            >>> adata
-            AnnData object with n_obs × n_vars = 40 × 100
-                obs: 'cell_type', 'cell_type_id', 'tissue', 'disease'
             >>> adata.var_names[:2]
             Index(['ENSG00000000003', 'ENSG00000000005'], dtype='object')
             >>> file = ln.File.from_anndata(adata,
             ...                             var_ref=lb.Gene.ensembl_gene_id,
             ...                             description="mini anndata with obs")
-            💡 parsing feature names of X stored in slot 'var'
-            💡    using global setting species = human
-            ✅    validated 99 Gene records from Bionty on ensembl_gene_id: ENSG00000000003, ENSG00000000005, ENSG00000000419, ENSG00000000457, ...  # noqa
-            🌱    linked: FeatureSet(id='Fw0fQ0ZFJMa3Eyv51XLD', n=99, type='float', registry='bionty.Gene', hash='fHbDaAAmJse48vnUQh9C', created_by_id='DzTjkKse')  # noqa
-            💡 parsing feature names of slot 'obs'
-            🔶    did not validate 4 Feature records for names: cell_type, cell_type_id, tissue, disease
-            🔶    ignoring non-validated features: cell_type,cell_type_id,tissue,disease
-            🔶    no validated features, skip creating feature set
             >>> file.save()
-            🌱 saved 1 feature set for slot: ['var']
-            🌱 storing file XcohavbmpLDhAnCrALVC with key '.lamindb/XcohavbmpLDhAnCrALVC.h5ad'
         """
         pass
 
@@ -1747,7 +1745,7 @@ class File(Registry, Data):
         """
         pass
 
-    def load(self, is_run_input: Optional[bool] = None, stream: bool = False) -> DataLike:
+    def load(self, is_run_input: Optional[bool] = None, stream: bool = False, **kwargs) -> DataLike:
         """Slabele and load to memory.
 
         Returns in-memory representation if possible, e.g., an `AnnData` object for an `h5ad` file.
@@ -1846,6 +1844,8 @@ class Dataset(Registry, Data):
         data: `DataLike` A data object (`DataFrame`, `AnnData`) to store.
         name: `str` A name.
         description: `Optional[str] = None` A description.
+        run: `Optional[Run] = None` The run that creates the dataset. If `None`,
+            gets auto-linked if :meth:`~lamindb.track` created a run context.
 
     See Also:
         :class:`~lamindb.File`
@@ -1912,8 +1912,14 @@ class Dataset(Registry, Data):
     """Hash of dataset content. 86 base64 chars allow to store 64 bytes, 512 bits."""
     feature_sets = models.ManyToManyField("FeatureSet", related_name="datasets", through="DatasetFeatureSet")
     """The feature sets measured in this dataset (see :class:`~lamindb.FeatureSet`)."""
-    labels = models.ManyToManyField("Label", related_name="datasets")
-    """Categories of categorical features sampled in the dataset (see :class:`~lamindb.Feature`)."""
+    labels = models.ManyToManyField("Label", through="DatasetLabel", related_name="datasets")
+    """Labels sampled in the dataset (see :class:`~lamindb.Feature`)."""
+    transform = models.ForeignKey(Transform, PROTECT, related_name="datasets", null=True, default=None)
+    """:class:`~lamindb.Transform` whose run created the dataset."""
+    run = models.ForeignKey(Run, PROTECT, related_name="output_datasets", null=True, default=None)
+    """:class:`~lamindb.Run` that created the `file`."""
+    input_of = models.ManyToManyField(Run, related_name="input_datasets")
+    """Runs that use this dataset as an input."""
     file = models.ForeignKey("File", on_delete=PROTECT, null=True, unique=True, related_name="datasets")
     """Storage of dataset as a one file."""
     files = models.ManyToManyField("File", related_name="datasets")
@@ -1948,6 +1954,68 @@ class Dataset(Registry, Data):
     ):
         pass
 
+    @classmethod
+    def from_df(
+        cls,
+        df: "pd.DataFrame",
+        columns_ref: FieldAttr = Feature.name,
+        name: Optional[str] = None,
+        description: Optional[str] = None,
+        run: Optional[Run] = None,
+    ) -> "Dataset":
+        """Create from ``DataFrame``, link column names as features.
+
+        See Also:
+            :meth:`lamindb.Dataset`
+                Track datasets.
+            :class:`lamindb.Feature`
+                Track features.
+
+        Notes:
+            For more info, see tutorial: :doc:`/tutorial`.
+
+        Examples:
+            >>> df = ln.dev.datasets.df_iris_in_meter_batch1()
+            >>> df.head()
+              sepal_length sepal_width petal_length petal_width iris_species_code
+            0        0.051       0.035        0.014       0.002                 0
+            1        0.049       0.030        0.014       0.002                 0
+            2        0.047       0.032        0.013       0.002                 0
+            3        0.046       0.031        0.015       0.002                 0
+            4        0.050       0.036        0.014       0.002                 0
+            >>> dataset = ln.Dataset.from_df(df, description="Iris flower dataset batch1")
+        """
+        pass
+
+    @classmethod
+    def from_anndata(
+        cls,
+        adata: "AnnDataLike",
+        var_ref: Optional[FieldAttr],
+        name: Optional[str] = None,
+        description: Optional[str] = None,
+        run: Optional[Run] = None,
+    ) -> "Dataset":
+        """Create from ``AnnData`` or ``.h5ad`` file, link ``var_names`` and ``obs.columns`` as features.
+
+        See Also:
+
+            :class:`lamindb.File`
+                Track files.
+            :class:`lamindb.Feature`
+                Track features.
+
+        Examples:
+            >>> import lnschema_bionty as lb
+            >>> lb.settings.species = "human"
+            >>> adata = ln.dev.datasets.anndata_with_obs()
+            >>> adata.var_names[:2]
+            Index(['ENSG00000000003', 'ENSG00000000005'], dtype='object')
+            >>> dataset = ln.Dataset.from_anndata(adata, var_ref=lb.Gene.ensembl_gene_id, name="mini anndata with obs")
+            >>> dataset.save()
+        """
+        pass
+
 
 class LinkORM:
     pass
@@ -1978,6 +2046,15 @@ class FileLabel(Registry, LinkORM):
 
     class Meta:
         unique_together = ("file", "label")
+
+
+class DatasetLabel(Registry, LinkORM):
+    dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE)
+    label = models.ForeignKey(Label, on_delete=models.CASCADE)
+    feature = models.ForeignKey(Feature, CASCADE, null=True, default=None)
+
+    class Meta:
+        unique_together = ("dataset", "label")
 
 
 # -------------------------------------------------------------------------------------

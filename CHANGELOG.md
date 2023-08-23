@@ -3,6 +3,14 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+♻️ Version transform | [279](https://github.com/laminlabs/lnschema-core/pull/279) | [falexwolf](https://github.com/falexwolf) | 2023-08-23 |
+🚚 from_anndata and from_df for Dataset | [280](https://github.com/laminlabs/lnschema-core/pull/280) | [falexwolf](https://github.com/falexwolf) | 2023-08-23 |
+🚚 Add `modality` to `Feature` | [278](https://github.com/laminlabs/lnschema-core/pull/278) | [falexwolf](https://github.com/falexwolf) | 2023-08-23 |
+♻️ Use CanValidate & HasParents | [277](https://github.com/laminlabs/lnschema-core/pull/277) | [falexwolf](https://github.com/falexwolf) | 2023-08-23 |
+🚚 Add `transform`, `run` & `input_of` fields to dataset | [276](https://github.com/laminlabs/lnschema-core/pull/276) | [falexwolf](https://github.com/falexwolf) | 2023-08-22 |
+🎨 Enable default field for .inspect and .validate | [275](https://github.com/laminlabs/lnschema-core/pull/275) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-22 |
+🎨 Merge ValidationAware and SynonymsAware into ValidationMixin | [274](https://github.com/laminlabs/lnschema-core/pull/274) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-22 |
+📝 Updated signature of features.from_df | [273](https://github.com/laminlabs/lnschema-core/pull/273) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-18 |
 ✏️ Fix typo of map_synonyms backward compat | [271](https://github.com/laminlabs/lnschema-core/pull/271) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-17 |
 🚚 Rename map_synonyms to standardize | [270](https://github.com/laminlabs/lnschema-core/pull/270) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-16 |
 📝 Refactored docs | [269](https://github.com/laminlabs/lnschema-core/pull/269) | [falexwolf](https://github.com/falexwolf) | 2023-08-12 | 0.45.3
