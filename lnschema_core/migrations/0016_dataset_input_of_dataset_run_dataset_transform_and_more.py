@@ -82,4 +82,10 @@ class Migration(migrations.Migration):
             name="root",
             field=models.CharField(db_index=True, default=None, max_length=255, unique=True),
         ),
+        migrations.RunSQL("UPDATE lnschema_core_file SET suffix = '' WHERE suffix IS NULL"),
+        migrations.AlterField(
+            model_name="file",
+            name="suffix",
+            field=models.CharField(db_index=True, default=None, max_length=30),
+        ),
     ]

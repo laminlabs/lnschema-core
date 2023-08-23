@@ -1444,8 +1444,10 @@ class File(Registry, Data):
     """Storage location (:class:`~lamindb.Storage`), e.g., an S3 bucket, local folder or network location."""
     key = CharField(max_length=255, db_index=True, null=True, default=None)
     """Storage key, the relative path within the storage location."""
-    suffix = CharField(max_length=30, db_index=True, null=True, default=None)
-    """File suffix.
+    suffix = CharField(max_length=30, db_index=True, default=None)
+    # Initially, we thought about having this be nullable to indicate folders
+    # But, for instance, .zarr is stored in a folder that ends with a .zarr suffix
+    """Path suffix or empty string if no canonical suffix exists.
 
     This is either a file suffix (`".csv"`, `".h5ad"`, etc.) or the empty string "".
     """
