@@ -1335,12 +1335,7 @@ class FeatureSet(Registry):
         pass
 
     @classmethod
-    def from_df(
-        cls,
-        df: "pd.DataFrame",
-        name: Optional[str] = None,
-        **kwargs,
-    ) -> Optional["FeatureSet"]:
+    def from_df(cls, df: "pd.DataFrame", field: FieldAttr = Feature.name, name: Optional[str] = None, modality: Optional[str] = None) -> Optional["FeatureSet"]:
         """Create feature set for validated features."""
         pass
 
