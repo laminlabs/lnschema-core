@@ -1334,12 +1334,7 @@ class FeatureSet(Registry):
         pass
 
     @classmethod
-    def from_df(
-        cls,
-        df: "pd.DataFrame",
-        name: Optional[str] = None,
-        **kwargs,
-    ) -> Optional["FeatureSet"]:
+    def from_df(cls, df: "pd.DataFrame", field: FieldAttr = Feature.name, name: Optional[str] = None, modality: Optional[str] = None) -> Optional["FeatureSet"]:
         """Create feature set for validated features."""
         pass
 
@@ -1596,7 +1591,6 @@ class File(Registry, Data):
         cls,
         adata: "AnnDataLike",
         var_ref: Optional[FieldAttr],
-        obs_columns_ref: Optional[FieldAttr] = Feature.name,
         key: Optional[str] = None,
         description: Optional[str] = None,
         run: Optional[Run] = None,
@@ -1616,28 +1610,14 @@ class File(Registry, Data):
 
         Examples:
             >>> import lnschema_bionty as lb
-            lb.settings.species = "human"
-            🌱 Set species: Species(id=uHJU, name=human, taxon_id=9606, scientific_name=homo_sapiens, updated_at=2023-07-19 14:45:17, bionty_source_id=t317, created_by_id=DzTjkKse) # noqa
+            >>> lb.settings.species = "human"
             >>> adata = ln.dev.datasets.anndata_with_obs()
-            >>> adata
-            AnnData object with n_obs × n_vars = 40 × 100
-                obs: 'cell_type', 'cell_type_id', 'tissue', 'disease'
             >>> adata.var_names[:2]
             Index(['ENSG00000000003', 'ENSG00000000005'], dtype='object')
             >>> file = ln.File.from_anndata(adata,
             ...                             var_ref=lb.Gene.ensembl_gene_id,
             ...                             description="mini anndata with obs")
-            💡 parsing feature names of X stored in slot 'var'
-            💡    using global setting species = human
-            ✅    validated 99 Gene records from Bionty on ensembl_gene_id: ENSG00000000003, ENSG00000000005, ENSG00000000419, ENSG00000000457, ...  # noqa
-            🌱    linked: FeatureSet(id='Fw0fQ0ZFJMa3Eyv51XLD', n=99, type='float', registry='bionty.Gene', hash='fHbDaAAmJse48vnUQh9C', created_by_id='DzTjkKse')  # noqa
-            💡 parsing feature names of slot 'obs'
-            🔶    did not validate 4 Feature records for names: cell_type, cell_type_id, tissue, disease
-            🔶    ignoring non-validated features: cell_type,cell_type_id,tissue,disease
-            🔶    no validated features, skip creating feature set
             >>> file.save()
-            🌱 saved 1 feature set for slot: ['var']
-            🌱 storing file XcohavbmpLDhAnCrALVC with key '.lamindb/XcohavbmpLDhAnCrALVC.h5ad'
         """
         pass
 
@@ -1970,6 +1950,68 @@ class Dataset(Registry, Data):
         *args,
         **kwargs,
     ):
+        pass
+
+    @classmethod
+    def from_df(
+        cls,
+        df: "pd.DataFrame",
+        columns_ref: FieldAttr = Feature.name,
+        name: Optional[str] = None,
+        description: Optional[str] = None,
+        run: Optional[Run] = None,
+    ) -> "Dataset":
+        """Create from ``DataFrame``, link column names as features.
+
+        See Also:
+            :meth:`lamindb.Dataset`
+                Track datasets.
+            :class:`lamindb.Feature`
+                Track features.
+
+        Notes:
+            For more info, see tutorial: :doc:`/tutorial`.
+
+        Examples:
+            >>> df = ln.dev.datasets.df_iris_in_meter_batch1()
+            >>> df.head()
+              sepal_length sepal_width petal_length petal_width iris_species_code
+            0        0.051       0.035        0.014       0.002                 0
+            1        0.049       0.030        0.014       0.002                 0
+            2        0.047       0.032        0.013       0.002                 0
+            3        0.046       0.031        0.015       0.002                 0
+            4        0.050       0.036        0.014       0.002                 0
+            >>> dataset = ln.Dataset.from_df(df, description="Iris flower dataset batch1")
+        """
+        pass
+
+    @classmethod
+    def from_anndata(
+        cls,
+        adata: "AnnDataLike",
+        var_ref: Optional[FieldAttr],
+        name: Optional[str] = None,
+        description: Optional[str] = None,
+        run: Optional[Run] = None,
+    ) -> "Dataset":
+        """Create from ``AnnData`` or ``.h5ad`` file, link ``var_names`` and ``obs.columns`` as features.
+
+        See Also:
+
+            :class:`lamindb.File`
+                Track files.
+            :class:`lamindb.Feature`
+                Track features.
+
+        Examples:
+            >>> import lnschema_bionty as lb
+            >>> lb.settings.species = "human"
+            >>> adata = ln.dev.datasets.anndata_with_obs()
+            >>> adata.var_names[:2]
+            Index(['ENSG00000000003', 'ENSG00000000005'], dtype='object')
+            >>> dataset = ln.Dataset.from_anndata(adata, var_ref=lb.Gene.ensembl_gene_id, name="mini anndata with obs")
+            >>> dataset.save()
+        """
         pass
 
 
