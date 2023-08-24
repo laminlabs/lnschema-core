@@ -75,7 +75,7 @@ class CanValidate:
             mute: Mute logging.
 
         See Also:
-            :meth:`~lamindb.dev.ValidationAware.validate`
+            :meth:`~lamindb.dev.CanValidate.validate`
 
         Examples:
             >>> import lnschema_bionty as lb
@@ -118,7 +118,7 @@ class CanValidate:
             A vector of booleans indicating if an element is validated.
 
         See Also:
-            :meth:`~lamindb.dev.ValidationAware.inspect`
+            :meth:`~lamindb.dev.CanValidate.inspect`
 
         Examples:
             >>> import lnschema_bionty as lb
@@ -171,9 +171,9 @@ class CanValidate:
             standardized names as values.
 
         See Also:
-            :meth:`~lamindb.dev.SynonymsAware.add_synonym`
+            :meth:`~lamindb.dev.CanValidate.add_synonym`
                 Add synonyms
-            :meth:`~lamindb.dev.SynonymsAware.remove_synonym`
+            :meth:`~lamindb.dev.CanValidate.remove_synonym`
                 Remove synonyms
 
         Examples:
@@ -225,7 +225,7 @@ class CanValidate:
             save
 
         See Also:
-            :meth:`~lamindb.dev.SynonymsAware.remove_synonym`
+            :meth:`~lamindb.dev.CanValidate.remove_synonym`
                 Remove synonyms
 
         Examples:
@@ -248,7 +248,7 @@ class CanValidate:
             synonym: The synonym value.
 
         See Also:
-            :meth:`~lamindb.dev.SynonymsAware.add_synonym`
+            :meth:`~lamindb.dev.CanValidate.add_synonym`
                 Add synonyms
 
         Examples:
@@ -270,7 +270,7 @@ class CanValidate:
             value: A value for an abbreviation.
 
         See Also:
-            :meth:`~lamindb.dev.SynonymsAware.add_synonym`
+            :meth:`~lamindb.dev.CanValidate.add_synonym`
                 Add synonyms
 
         Examples:
@@ -1334,7 +1334,13 @@ class FeatureSet(Registry):
         pass
 
     @classmethod
-    def from_df(cls, df: "pd.DataFrame", field: FieldAttr = Feature.name, name: Optional[str] = None, modality: Optional[str] = None) -> Optional["FeatureSet"]:
+    def from_df(
+        cls,
+        df: "pd.DataFrame",
+        field: FieldAttr = Feature.name,
+        name: Optional[str] = None,
+        modality: Optional[str] = None,
+    ) -> Optional["FeatureSet"]:
         """Create feature set for validated features."""
         pass
 
