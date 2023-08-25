@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-📝 Fix docs | [283](https://github.com/laminlabs/lnschema-core/pull/283) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-24 |
+📝 Fix docs | [283](https://github.com/laminlabs/lnschema-core/pull/283) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-24 | 0.46.1
 🚚 Make suffix non-nullable | [272](https://github.com/laminlabs/lnschema-core/pull/272) | [falexwolf](https://github.com/falexwolf) | 2023-08-23 | 0.46.0
 🎨 Make storage root unique | [282](https://github.com/laminlabs/lnschema-core/pull/282) | [falexwolf](https://github.com/falexwolf) | 2023-08-23 |
 ♻️ Version transform | [279](https://github.com/laminlabs/lnschema-core/pull/279) | [falexwolf](https://github.com/falexwolf) | 2023-08-23 |
