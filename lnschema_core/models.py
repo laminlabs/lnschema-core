@@ -920,8 +920,6 @@ class Label(Registry, HasParents, CanValidate):
     Args:
         name: `str` A name.
         description: `str` A description.
-        feature: `Optional[Union["Feature", str]]` A :class:`~lamindb.Feature`
-            record or its name.
 
     A label can be used to annotate a file or dataset as a whole: "Project 1",
     "curated", or "Iris flower".
