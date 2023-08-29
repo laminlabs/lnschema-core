@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-🎨 Added include_foregin_keys for _repr_ | [284](https://github.com/laminlabs/lnschema-core/pull/284) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-29 |
+🎨 Added include_foregin_keys for _repr_ | [284](https://github.com/laminlabs/lnschema-core/pull/284) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-29 | 0.46.2
 📝 Fix docs | [283](https://github.com/laminlabs/lnschema-core/pull/283) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-24 | 0.46.1
 🚚 Make suffix non-nullable | [272](https://github.com/laminlabs/lnschema-core/pull/272) | [falexwolf](https://github.com/falexwolf) | 2023-08-23 | 0.46.0
 🎨 Make storage root unique | [282](https://github.com/laminlabs/lnschema-core/pull/282) | [falexwolf](https://github.com/falexwolf) | 2023-08-23 |
