@@ -313,7 +313,7 @@ class HasParents:
         - Procedural/temporal hierarchies: :class:`~lamindb.Transform` (preceding transform & successing transform), ...
 
         See Also:
-            - :doc:`docs:data-lineage`
+            - :doc:`docs:data-flow`
             - :doc:`/tutorial`
 
         Examples:
@@ -732,7 +732,7 @@ class Transform(Registry, HasParents):
             Executions of the transform.
 
     Notes:
-        For more info, see tutorial: :doc:`docs:data-lineage`.
+        For more info, see tutorial: :doc:`docs:data-flow`.
 
     Examples:
 
@@ -746,7 +746,7 @@ class Transform(Registry, HasParents):
         Create a transform from a notebook:
 
         >>> ln.track()
-        🌱 Saved: Transform(id=1LCd8kco9lZUBg, name=Track data lineage / provenance, short_name=02-data-lineage, stem_id=1LCd8kco9lZU, version=0, type=notebook, updated_at=2023-07-10 18:37:19, created_by_id=DzTjkKse) # noqa
+        🌱 Saved: Transform(id=1LCd8kco9lZUBg, name=Track data flow / provenance, short_name=02-data-flow, stem_id=1LCd8kco9lZU, version=0, type=notebook, updated_at=2023-07-10 18:37:19, created_by_id=DzTjkKse) # noqa
 
         View parents of a transform:
 
@@ -786,7 +786,7 @@ class Transform(Registry, HasParents):
     """Reference for the transform, e.g., a URL.
     """
     parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
-    """Parent transforms (predecessors) in data lineage.
+    """Parent transforms (predecessors) in data flow.
 
     These are auto-populated whenever a transform loads a file as run input.
     """
@@ -839,7 +839,7 @@ class Run(Registry):
             Transformations that runs execute.
 
     Notes:
-        See guide: :doc:`docs:data-lineage`.
+        See guide: :doc:`docs:data-flow`.
 
         Typically, a run has inputs and outputs:
 
@@ -867,7 +867,7 @@ class Run(Registry):
         Track a notebook run:
 
         >>> ln.track()
-        🌱 Saved: Transform(id=1LCd8kco9lZUBg, name=Track data lineage / provenance, short_name=02-data-lineage, stem_id=1LCd8kco9lZU, version=0, type=notebook, updated_at=2023-07-10 18:37:19, created_by_id=DzTjkKse) # noqa
+        🌱 Saved: Transform(id=1LCd8kco9lZUBg, name=Track data flow / provenance, short_name=02-data-flow, stem_id=1LCd8kco9lZU, version=0, type=notebook, updated_at=2023-07-10 18:37:19, created_by_id=DzTjkKse) # noqa
         🌱 Saved: Run(id=pHgVICV9DxBaV6BAuKJl, run_at=2023-07-10 18:37:19, transform_id=1LCd8kco9lZUBg, created_by_id=DzTjkKse)
         >>> ln.dev.context.run
         Run(id=pHgVICV9DxBaV6BAuKJl, run_at=2023-07-10 18:37:19, transform_id=1LCd8kco9lZUBg, created_by_id=DzTjkKse)
