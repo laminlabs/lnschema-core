@@ -736,17 +736,14 @@ class Transform(Registry, HasParents):
 
     Examples:
 
-        Create a transform form a pipeline:
+        Create a transform for a pipeline:
 
         >>> transform = ln.Transform(name="Cell Ranger", version="7.2.0", type="pipeline")
-        >>> transform
-        Transform(id=JhiujsLlbTKLIt, name=Cell Ranger, stem_id=JhiujsLlbTKL, version=7.2.0, type=pipeline, created_by_id=DzTjkKse)
         >>> transform.save()
 
         Create a transform from a notebook:
 
         >>> ln.track()
-        🌱 Saved: Transform(id=1LCd8kco9lZUBg, name=Track data flow / provenance, short_name=02-data-flow, stem_id=1LCd8kco9lZU, version=0, type=notebook, updated_at=2023-07-10 18:37:19, created_by_id=DzTjkKse) # noqa
 
         View parents of a transform:
 
@@ -947,25 +944,18 @@ class Label(Registry, HasParents, CanValidate):
 
         Create a new label:
 
-        >>> label = ln.Label(name="ML output")
-        >>> label.save()
-        >>> label
-        Label(id=gelGp2P6, name=ML output, created_by_id=DzTjkKse)
+        >>> ln.Label(name="ML output").save()
 
-        Label a file:
+        Label a file without associating it to a feature:
 
         >>> label = ln.Label.filter(name="ML output").one()
-        >>> label
-        Label(id=gelGp2P6, name=ML output, created_by_id=DzTjkKse)
         >>> file = ln.File("./myfile.csv")
         >>> file.save()
-        >>> file
-        File(id=MveGmGJImYY5qBwmr0j0, suffix=.csv, size=4, hash=CY9rzUYh03PK3k6DJie09g, hash_type=md5, updated_at=2023-07-19 13:47:59, storage_id=597Sgod0, created_by_id=DzTjkKse) # noqa
         >>> file.labels.add(label)
         >>> file.labels.list("name")
         ['ML output']
 
-        Group labels:
+        Organize labels in a label ontology:
 
         >>> ln.Label(name="Project 1").save()
         >>> project1 = ln.Label.filter(name="Project 1").one()
@@ -976,7 +966,6 @@ class Label(Registry, HasParents, CanValidate):
         Query by label:
 
         >>> ln.File.filter(labels=project).first()
-        File(id=MveGmGJImYY5qBwmr0j0, suffix=.csv, size=4, hash=CY9rzUYh03PK3k6DJie09g, hash_type=md5, updated_at=2023-07-19 13:47:59, storage_id=597Sgod0, created_by_id=DzTjkKse) # noqa
     """
 
     id = CharField(max_length=8, default=base62_8, primary_key=True)
@@ -1404,7 +1393,6 @@ class File(Registry, Data):
 
         >>> temporary_filepath = ln.dev.datasets.file_jpg_paradisi05()
         >>> file = ln.File(temporary_filepath, key="images/paradisi05_image.jpg")
-        💡 file will be copied to default storage upon `save()` with key 'images/paradisi05_image.jpg'
         >>> file.save()
 
         .. dropdown:: Why does the API look this way?
@@ -1559,6 +1547,7 @@ class File(Registry, Data):
         key: Optional[str] = None,
         description: Optional[str] = None,
         run: Optional[Run] = None,
+        modality: Optional[Modality] = None,
     ) -> "File":
         """Create from ``DataFrame``, link column names as features.
 
@@ -1581,14 +1570,7 @@ class File(Registry, Data):
             3        0.046       0.031        0.015       0.002                 0
             4        0.050       0.036        0.014       0.002                 0
             >>> file = ln.File.from_df(df, description="Iris flower dataset batch1")
-            🔶 did not validate 5 Feature records for names: sepal_length, sepal_width, petal_length, petal_width, iris_species_name
-            🔶 ignoring non-validated features: sepal_length,sepal_width,petal_length,petal_width,iris_species_name
-            🔶 no validated features, skip creating feature set
-            >>> file
-            File(id=kV3JQuBw4izvUdAkjO4p, suffix=.parquet, description=Iris flower dataset batch1, size=5334, hash=RraiKH9BAtAgS5jg7LWUiA, hash_type=md5, storage_id=Zl2q0vQB, created_by_id=DzTjkKse) # noqa
             >>> file.save()
-            🌱 saved 0 feature set for slot: []
-            🌱 storing file kV3JQuBw4izvUdAkjO4p with key '.lamindb/kV3JQuBw4izvUdAkjO4p.parquet'
         """
         pass
 
@@ -1600,6 +1582,7 @@ class File(Registry, Data):
         key: Optional[str] = None,
         description: Optional[str] = None,
         run: Optional[Run] = None,
+        modality: Optional[Modality] = None,
     ) -> "File":
         """Create from ``AnnData`` or ``.h5ad`` file, link ``var_names`` and ``obs.columns`` as features.
 
@@ -1647,13 +1630,7 @@ class File(Registry, Data):
 
         Examples:
             >>> dir_path = ln.dev.datasets.generate_cell_ranger_files("sample_001", ln.settings.storage)
-            >>> dir_path.name
-            'sample_001'
             >>> files = ln.File.from_dir(dir_path)
-            💡 using storage prefix = sample_001/
-            💡 → 15 files
-            >>> files[0]
-            File(id=cbGk8IUFIERkTgjBQ2kb, key=sample_001/web_summary.html, suffix=.html, size=6, hash=n4HLxPQUWXUeKl-OLzq6ew, hash_type=md5, storage_id=Zl2q0vQB, created_by_id=DzTjkKse) # noqa
             >>> ln.save(files)
         """
         pass
@@ -1689,7 +1666,7 @@ class File(Registry, Data):
         pass
 
     def backed(self, is_run_input: Optional[bool] = None) -> Union["AnnDataAccessor", "BackedAccessor"]:
-        """Return a cloud-backed data object to stream.
+        """Return a cloud-backed data object.
 
         Notes:
             For more info, see tutorial: :doc:`/data`.
@@ -1701,12 +1678,6 @@ class File(Registry, Data):
             >>> file = ln.File.filter(key="lndb-storage/pbmc68k.h5ad").one()
             >>> file.backed()
             AnnData object with n_obs × n_vars = 70 × 765 backed at 's3://lamindb-ci/lndb-storage/pbmc68k.h5ad'
-                obs: ['cell_type', 'index', 'louvain', 'n_genes', 'percent_mito']
-                obsm: ['X_pca', 'X_umap']
-                obsp: ['connectivities', 'distances']
-                uns: ['louvain', 'louvain_colors', 'neighbors', 'pca']
-                var: ['highly_variable', 'index', 'n_counts']
-                varm: ['PCs']
         """
         pass
 
@@ -1758,7 +1729,8 @@ class File(Registry, Data):
 
             Load as a `DataFrame`:
 
-            >>> ln.File.from_df(ln.dev.datasets.df_iris_in_meter_batch1(), description="iris").save()
+            >>> df = ln.dev.datasets.df_iris_in_meter_batch1()
+            >>> ln.File.from_df(df, description="iris").save()
             >>> file = ln.File.filter(description="iris").one()
             >>> file.load().head()
             sepal_length sepal_width petal_length petal_width iris_species_code
@@ -1774,12 +1746,6 @@ class File(Registry, Data):
             >>> file = ln.File.filter(key="lndb-storage/pbmc68k.h5ad").one()
             >>> file.load()
             AnnData object with n_obs × n_vars = 70 × 765
-                obs: 'cell_type', 'n_genes', 'percent_mito', 'louvain'
-                var: 'n_counts', 'highly_variable'
-                uns: 'louvain', 'louvain_colors', 'neighbors', 'pca'
-                obsm: 'X_pca', 'X_umap'
-                varm: 'PCs'
-                obsp: 'connectivities', 'distances'
 
             Fall back to :meth:`~lamindb.File.stage` if no in-memory representation is configured:
 
@@ -1797,8 +1763,9 @@ class File(Registry, Data):
 
         Examples:
 
-            Sync file from cloud and returns the local path of the cache:
+            Sync file from cloud and return the local path of the cache:
 
+            >>> ln.settings.storage = "s3://lamindb-ci"
             >>> ln.File("s3://lamindb-ci/lndb-storage/pbmc68k.h5ad").save()
             >>> file = ln.File.filter(key="lndb-storage/pbmc68k.h5ad").one()
             >>> file.stage()
@@ -1826,9 +1793,7 @@ class File(Registry, Data):
 
         Examples:
             >>> file = ln.File("./myfile.csv", key="myfile.csv")
-            💡 File will be copied to storage upon `save()` using storage key = myfile.csv
             >>> file.save()
-            💡 storing file 2fO9kSKVXFXYoLccExOY with key myfile.csv
         """
         pass
 
@@ -1966,6 +1931,7 @@ class Dataset(Registry, Data):
         name: Optional[str] = None,
         description: Optional[str] = None,
         run: Optional[Run] = None,
+        modality: Optional[Modality] = None,
     ) -> "Dataset":
         """Create from ``DataFrame``, link column names as features.
 
@@ -1999,6 +1965,7 @@ class Dataset(Registry, Data):
         name: Optional[str] = None,
         description: Optional[str] = None,
         run: Optional[Run] = None,
+        modality: Optional[Modality] = None,
     ) -> "Dataset":
         """Create from ``AnnData`` or ``.h5ad`` file, link ``var_names`` and ``obs.columns`` as features.
 
@@ -2015,7 +1982,7 @@ class Dataset(Registry, Data):
             >>> adata = ln.dev.datasets.anndata_with_obs()
             >>> adata.var_names[:2]
             Index(['ENSG00000000003', 'ENSG00000000005'], dtype='object')
-            >>> dataset = ln.Dataset.from_anndata(adata, field=lb.Gene.ensembl_gene_id, name="mini anndata with obs")
+            >>> dataset = ln.Dataset.from_anndata(adata, name="My dataset", field=lb.Gene.ensembl_gene_id)
             >>> dataset.save()
         """
         pass
