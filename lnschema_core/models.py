@@ -1305,7 +1305,7 @@ class FeatureSet(Registry):
         field: FieldAttr = Feature.name,
         type: Optional[Union[Type, str]] = None,
         name: Optional[str] = None,
-        modality: Optional[str] = None,
+        modality: Optional[Modality] = None,
         **kwargs,
     ) -> Optional["FeatureSet"]:
         """Create feature set for validated features.
@@ -1337,7 +1337,7 @@ class FeatureSet(Registry):
         df: "pd.DataFrame",
         field: FieldAttr = Feature.name,
         name: Optional[str] = None,
-        modality: Optional[str] = None,
+        modality: Optional[Modality] = None,
     ) -> Optional["FeatureSet"]:
         """Create feature set for validated features."""
         pass
