@@ -515,7 +515,7 @@ class Data:
     def add_labels(
         self,
         records: Union[Registry, List[Registry], QuerySet],
-        feature: Optional[Union[str, Registry]] = None,
+        feature: "Feature",
     ) -> None:
         """Add one or several labels and associate them with a feature.
 
@@ -527,7 +527,7 @@ class Data:
 
     def get_labels(
         self,
-        feature: Union[str, Registry],
+        feature: "Feature",
         mute: bool = False,
         flat_names: bool = False,
     ) -> Union[QuerySet, Dict[str, QuerySet], List]:
