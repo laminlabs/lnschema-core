@@ -515,7 +515,7 @@ class Data:
     def add_labels(
         self,
         records: Union[Registry, List[Registry], QuerySet],
-        feature: Optional[Union[str, Registry]] = None,
+        feature: "Feature",
     ) -> None:
         """Add one or several labels and associate them with a feature.
 
@@ -527,7 +527,7 @@ class Data:
 
     def get_labels(
         self,
-        feature: Union[str, Registry],
+        feature: "Feature",
         mute: bool = False,
         flat_names: bool = False,
     ) -> Union[QuerySet, Dict[str, QuerySet], List]:
@@ -1865,10 +1865,7 @@ class Dataset(Registry, Data):
         3        0.046       0.031        0.015       0.002                 0
         4        0.050       0.036        0.014       0.002                 0
         >>> dataset = ln.Dataset(df, name="Iris flower dataset batch1")
-        >>> dataset
-        Dataset(id=uGQtiyepMdHOq3sZCFWV, name=Iris flower dataset batch1, hash=c5WgMCRPca2iZ2pqC3KiKQ, file_id=uGQtiyepMdHOq3sZCFWV, created_by_id=DzTjkKse)
         >>> dataset.save()
-        🌱 storing file uGQtiyepMdHOq3sZCFWV with key '.lamindb/uGQtiyepMdHOq3sZCFWV.parquet'
     """
 
     id = CharField(max_length=20, default=base62_20, primary_key=True)
