@@ -1555,7 +1555,7 @@ class File(Registry, Data):
     def from_df(
         cls,
         df: "pd.DataFrame",
-        columns_ref: FieldAttr = Feature.name,
+        field: FieldAttr = Feature.name,
         key: Optional[str] = None,
         description: Optional[str] = None,
         run: Optional[Run] = None,
@@ -1962,7 +1962,7 @@ class Dataset(Registry, Data):
     def from_df(
         cls,
         df: "pd.DataFrame",
-        columns_ref: FieldAttr = Feature.name,
+        field: FieldAttr = Feature.name,
         name: Optional[str] = None,
         description: Optional[str] = None,
         run: Optional[Run] = None,
