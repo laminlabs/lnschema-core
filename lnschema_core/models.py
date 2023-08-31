@@ -1555,7 +1555,7 @@ class File(Registry, Data):
     def from_df(
         cls,
         df: "pd.DataFrame",
-        columns_ref: FieldAttr = Feature.name,
+        field: FieldAttr = Feature.name,
         key: Optional[str] = None,
         description: Optional[str] = None,
         run: Optional[Run] = None,
@@ -1581,14 +1581,7 @@ class File(Registry, Data):
             3        0.046       0.031        0.015       0.002                 0
             4        0.050       0.036        0.014       0.002                 0
             >>> file = ln.File.from_df(df, description="Iris flower dataset batch1")
-            🔶 did not validate 5 Feature records for names: sepal_length, sepal_width, petal_length, petal_width, iris_species_name
-            🔶 ignoring non-validated features: sepal_length,sepal_width,petal_length,petal_width,iris_species_name
-            🔶 no validated features, skip creating feature set
-            >>> file
-            File(id=kV3JQuBw4izvUdAkjO4p, suffix=.parquet, description=Iris flower dataset batch1, size=5334, hash=RraiKH9BAtAgS5jg7LWUiA, hash_type=md5, storage_id=Zl2q0vQB, created_by_id=DzTjkKse) # noqa
             >>> file.save()
-            🌱 saved 0 feature set for slot: []
-            🌱 storing file kV3JQuBw4izvUdAkjO4p with key '.lamindb/kV3JQuBw4izvUdAkjO4p.parquet'
         """
         pass
 
@@ -1596,7 +1589,7 @@ class File(Registry, Data):
     def from_anndata(
         cls,
         adata: "AnnDataLike",
-        var_ref: Optional[FieldAttr],
+        field: Optional[FieldAttr],
         key: Optional[str] = None,
         description: Optional[str] = None,
         run: Optional[Run] = None,
@@ -1621,7 +1614,7 @@ class File(Registry, Data):
             >>> adata.var_names[:2]
             Index(['ENSG00000000003', 'ENSG00000000005'], dtype='object')
             >>> file = ln.File.from_anndata(adata,
-            ...                             var_ref=lb.Gene.ensembl_gene_id,
+            ...                             field=lb.Gene.ensembl_gene_id,
             ...                             description="mini anndata with obs")
             >>> file.save()
         """
@@ -1647,13 +1640,7 @@ class File(Registry, Data):
 
         Examples:
             >>> dir_path = ln.dev.datasets.generate_cell_ranger_files("sample_001", ln.settings.storage)
-            >>> dir_path.name
-            'sample_001'
             >>> files = ln.File.from_dir(dir_path)
-            💡 using storage prefix = sample_001/
-            💡 → 15 files
-            >>> files[0]
-            File(id=cbGk8IUFIERkTgjBQ2kb, key=sample_001/web_summary.html, suffix=.html, size=6, hash=n4HLxPQUWXUeKl-OLzq6ew, hash_type=md5, storage_id=Zl2q0vQB, created_by_id=DzTjkKse) # noqa
             >>> ln.save(files)
         """
         pass
@@ -1701,12 +1688,6 @@ class File(Registry, Data):
             >>> file = ln.File.filter(key="lndb-storage/pbmc68k.h5ad").one()
             >>> file.backed()
             AnnData object with n_obs × n_vars = 70 × 765 backed at 's3://lamindb-ci/lndb-storage/pbmc68k.h5ad'
-                obs: ['cell_type', 'index', 'louvain', 'n_genes', 'percent_mito']
-                obsm: ['X_pca', 'X_umap']
-                obsp: ['connectivities', 'distances']
-                uns: ['louvain', 'louvain_colors', 'neighbors', 'pca']
-                var: ['highly_variable', 'index', 'n_counts']
-                varm: ['PCs']
         """
         pass
 
@@ -1774,12 +1755,6 @@ class File(Registry, Data):
             >>> file = ln.File.filter(key="lndb-storage/pbmc68k.h5ad").one()
             >>> file.load()
             AnnData object with n_obs × n_vars = 70 × 765
-                obs: 'cell_type', 'n_genes', 'percent_mito', 'louvain'
-                var: 'n_counts', 'highly_variable'
-                uns: 'louvain', 'louvain_colors', 'neighbors', 'pca'
-                obsm: 'X_pca', 'X_umap'
-                varm: 'PCs'
-                obsp: 'connectivities', 'distances'
 
             Fall back to :meth:`~lamindb.File.stage` if no in-memory representation is configured:
 
@@ -1826,9 +1801,7 @@ class File(Registry, Data):
 
         Examples:
             >>> file = ln.File("./myfile.csv", key="myfile.csv")
-            💡 File will be copied to storage upon `save()` using storage key = myfile.csv
             >>> file.save()
-            💡 storing file 2fO9kSKVXFXYoLccExOY with key myfile.csv
         """
         pass
 
@@ -1900,10 +1873,7 @@ class Dataset(Registry, Data):
         3        0.046       0.031        0.015       0.002                 0
         4        0.050       0.036        0.014       0.002                 0
         >>> dataset = ln.Dataset(df, name="Iris flower dataset batch1")
-        >>> dataset
-        Dataset(id=uGQtiyepMdHOq3sZCFWV, name=Iris flower dataset batch1, hash=c5WgMCRPca2iZ2pqC3KiKQ, file_id=uGQtiyepMdHOq3sZCFWV, created_by_id=DzTjkKse)
         >>> dataset.save()
-        🌱 storing file uGQtiyepMdHOq3sZCFWV with key '.lamindb/uGQtiyepMdHOq3sZCFWV.parquet'
     """
 
     id = CharField(max_length=20, default=base62_20, primary_key=True)
@@ -1962,7 +1932,7 @@ class Dataset(Registry, Data):
     def from_df(
         cls,
         df: "pd.DataFrame",
-        columns_ref: FieldAttr = Feature.name,
+        field: FieldAttr = Feature.name,
         name: Optional[str] = None,
         description: Optional[str] = None,
         run: Optional[Run] = None,
@@ -1995,7 +1965,7 @@ class Dataset(Registry, Data):
     def from_anndata(
         cls,
         adata: "AnnDataLike",
-        var_ref: Optional[FieldAttr],
+        field: Optional[FieldAttr],
         name: Optional[str] = None,
         description: Optional[str] = None,
         run: Optional[Run] = None,
@@ -2015,7 +1985,7 @@ class Dataset(Registry, Data):
             >>> adata = ln.dev.datasets.anndata_with_obs()
             >>> adata.var_names[:2]
             Index(['ENSG00000000003', 'ENSG00000000005'], dtype='object')
-            >>> dataset = ln.Dataset.from_anndata(adata, var_ref=lb.Gene.ensembl_gene_id, name="mini anndata with obs")
+            >>> dataset = ln.Dataset.from_anndata(adata, field=lb.Gene.ensembl_gene_id, name="mini anndata with obs")
             >>> dataset.save()
         """
         pass
