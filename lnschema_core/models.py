@@ -1596,7 +1596,7 @@ class File(Registry, Data):
     def from_anndata(
         cls,
         adata: "AnnDataLike",
-        var_ref: Optional[FieldAttr],
+        field: Optional[FieldAttr],
         key: Optional[str] = None,
         description: Optional[str] = None,
         run: Optional[Run] = None,
@@ -1621,7 +1621,7 @@ class File(Registry, Data):
             >>> adata.var_names[:2]
             Index(['ENSG00000000003', 'ENSG00000000005'], dtype='object')
             >>> file = ln.File.from_anndata(adata,
-            ...                             var_ref=lb.Gene.ensembl_gene_id,
+            ...                             field=lb.Gene.ensembl_gene_id,
             ...                             description="mini anndata with obs")
             >>> file.save()
         """
@@ -1995,7 +1995,7 @@ class Dataset(Registry, Data):
     def from_anndata(
         cls,
         adata: "AnnDataLike",
-        var_ref: Optional[FieldAttr],
+        field: Optional[FieldAttr],
         name: Optional[str] = None,
         description: Optional[str] = None,
         run: Optional[Run] = None,
@@ -2015,7 +2015,7 @@ class Dataset(Registry, Data):
             >>> adata = ln.dev.datasets.anndata_with_obs()
             >>> adata.var_names[:2]
             Index(['ENSG00000000003', 'ENSG00000000005'], dtype='object')
-            >>> dataset = ln.Dataset.from_anndata(adata, var_ref=lb.Gene.ensembl_gene_id, name="mini anndata with obs")
+            >>> dataset = ln.Dataset.from_anndata(adata, field=lb.Gene.ensembl_gene_id, name="mini anndata with obs")
             >>> dataset.save()
         """
         pass
