@@ -825,9 +825,9 @@ class Run(Registry):
     """Runs of transforms.
 
     Args:
-        reference: `str` A name.
-        reference_type: `str` A description.
         transform: `Transform` A :class:`~lamindb.Transform` record or its name.
+        reference: `str` For instance, an external ID or a download URL.
+        reference_type: `str` For instance, `redun_id`, `nextflow_id` or `url`.
 
     See Also:
         :meth:`lamindb.track`
@@ -849,25 +849,19 @@ class Run(Registry):
 
     Examples:
 
-        Track a pipeline run:
-
         >>> ln.Transform(name="Cell Ranger", version="7.2.0", type="pipeline").save()
         >>> transform = ln.Transform.filter(name="Cell Ranger", version="7.2.0").one()
-        >>> transform
-        Transform(id=JhiujsLlbTKLIt, name=Cell Ranger, stem_id=JhiujsLlbTKL, version=7.2.0, type=pipeline, created_by_id=DzTjkKse)
+        >>> run = ln.Run(transform)
+
+        Create a global run context:
+
         >>> ln.track(transform)
-        💡 Loaded: Transform(id=ceHkZMaiHFdoB6, name=Cell Ranger, stem_id=ceHkZMaiHFdo, version=7.2.0, type=pipeline, updated_at=2023-07-10 18:37:19, created_by_id=DzTjkKse)
-        🌱 Saved: Run(id=RcpWIKC8cF74Pn3RUJ1W, run_at=2023-07-10 18:37:19, transform_id=ceHkZMaiHFdoB6, created_by_id=DzTjkKse)
-        >>> ln.dev.context.run
-        Run(id=RcpWIKC8cF74Pn3RUJ1W, run_at=2023-07-10 18:37:19, transform_id=ceHkZMaiHFdoB6, created_by_id=DzTjkKse)
+        >>> ln.dev.run_context.run  # global available run
 
         Track a notebook run:
 
-        >>> ln.track()
-        🌱 Saved: Transform(id=1LCd8kco9lZUBg, name=Track data flow / provenance, short_name=02-data-flow, stem_id=1LCd8kco9lZU, version=0, type=notebook, updated_at=2023-07-10 18:37:19, created_by_id=DzTjkKse) # noqa
-        🌱 Saved: Run(id=pHgVICV9DxBaV6BAuKJl, run_at=2023-07-10 18:37:19, transform_id=1LCd8kco9lZUBg, created_by_id=DzTjkKse)
+        >>> ln.track()  # Jupyter notebook metadata is automatically parsed
         >>> ln.dev.context.run
-        Run(id=pHgVICV9DxBaV6BAuKJl, run_at=2023-07-10 18:37:19, transform_id=1LCd8kco9lZUBg, created_by_id=DzTjkKse)
     """
 
     id = CharField(max_length=20, default=base62_20, primary_key=True)
