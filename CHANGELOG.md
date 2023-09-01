@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+📝 Fix Run docs | [288](https://github.com/laminlabs/lnschema-core/pull/288) | [falexwolf](https://github.com/falexwolf) | 2023-09-01 |
 🚚 Add modality to from_df and from_anndata | [285](https://github.com/laminlabs/lnschema-core/pull/285) | [falexwolf](https://github.com/falexwolf) | 2023-08-31 | 0.46.4
 ♻️ Type features | [287](https://github.com/laminlabs/lnschema-core/pull/287) | [falexwolf](https://github.com/falexwolf) | 2023-08-31 |
 🎨 Added include_foregin_keys for _repr_ | [284](https://github.com/laminlabs/lnschema-core/pull/284) | [sunnyosun](https://github.com/sunnyosun) | 2023-08-29 | 0.46.2
