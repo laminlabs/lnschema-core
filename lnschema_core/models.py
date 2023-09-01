@@ -541,26 +541,15 @@ class Data:
         pass
 
     def describe(self):
-        """Rich representation of a record with relationships.
+        """Describe relations of data record.
 
         Examples:
             >>> ln.File(ln.dev.datasets.file_jpg_paradisi05(), description="paradisi05").save()
             >>> file = ln.File.filter(description="paradisi05").one()
             >>> ln.save(ln.Label.from_values(["image", "benchmark", "example"], field="name"))
-            >>> labels = ln.Label.filter(name__in = ["image", "benchmark", "example"]).all()
+            >>> labels = ln.Label.filter(name__in=["image", "benchmark", "example"]).all()
             >>> file.labels.set(labels)
             >>> file.describe()
-            💡 File(id=cAmveuycMnn9rQIvGQog, key=None, suffix=.jpg, accessor=None, description=paradisi05, version=None, size=29358, hash=r4tnqmKI_SjrkdLzpuWp4g, hash_type=md5, created_at=2023-08-13 17:37:59.102335+00:00, updated_at=2023-08-13 17:41:56.671032+00:00)  # noqa
-            ...
-            Provenance:
-                🗃️ storage: Storage(id='64dfpgsd', root='/Users/sunnysun/Documents/repos.nosync/test-test', type='local', updated_at=2023-08-13 17:31:02, created_by_id='DzTjkKse')  # noqa
-                📎 initial_version: None
-                🧩 transform: None
-                🚗 run: None
-                👤 created_by: User(id='DzTjkKse', handle='testuser1', email='testuser1@lamin.ai', name='Test User1', updated_at=2023-08-13 17:31:02)
-            Features:
-            🗺️ external:
-                🔗 tag (0, core.Label): ["image", "benchmark", "example"]
         """
         pass
 
