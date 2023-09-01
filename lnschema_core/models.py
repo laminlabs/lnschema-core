@@ -814,9 +814,9 @@ class Run(Registry):
     """Runs of transforms.
 
     Args:
-        transform: `Transform` A :class:`~lamindb.Transform` record or its name.
-        reference: `str` For instance, an external ID or a download URL.
-        reference_type: `str` For instance, `redun_id`, `nextflow_id` or `url`.
+        transform: `Transform` A :class:`~lamindb.Transform` record.
+        reference: `Optional[str] = None` For instance, an external ID or a download URL.
+        reference_type: `Optional[str] = None` For instance, `redun_id`, `nextflow_id` or `url`.
 
     See Also:
         :meth:`lamindb.track`
@@ -873,9 +873,9 @@ class Run(Registry):
     @overload
     def __init__(
         self,
-        reference: str,
-        reference_type: str,
         transform: Transform,
+        reference: Optional[str] = None,
+        reference_type: Optional[str] = None,
     ):
         ...
 
