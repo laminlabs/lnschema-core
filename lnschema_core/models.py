@@ -786,27 +786,21 @@ class Run(Registry):
     """Runs of transforms.
 
     Args:
-        transform: `Transform` A :class:`~lamindb.Transform` record or its name.
-        reference: `str` For instance, an external ID or a download URL.
-        reference_type: `str` For instance, `redun_id`, `nextflow_id` or `url`.
+        transform: `Transform` A :class:`~lamindb.Transform` record.
+        reference: `Optional[str] = None` For instance, an external ID or a download URL.
+        reference_type: `Optional[str] = None` For instance, `redun_id`, `nextflow_id` or `url`.
 
     See Also:
-        :meth:`lamindb.track`
-            Track global Transform & Run for a notebook or pipeline.
-        :class:`~lamindb.Transform`
-            Transformations that runs execute.
+        :meth:`~lamindb.track`
+            Track global run & transform records for a notebook or pipeline.
 
     Notes:
         See guide: :doc:`docs:data-flow`.
 
-        Typically, a run has inputs and outputs:
+        Typically, a run has inputs (`run.inputs`) and outputs (`run.outputs`):
 
-            - References to outputs are stored in :class:`~lamindb.File` in the `run` field.
-              This is possible as every given file has a unique run that created it. Any
-              given `Run` can output multiple `files`: `run.outputs`.
-            - References to inputs are stored in the :class:`~lamindb.File` in the
-              `input_of` field. Any `file` might serve as an input for multiple `runs`.
-              Similarly, any `run` might have many `files` as inputs: `run.inputs`.
+            - References to outputs are also stored in the `run` field of :class:`~lamindb.File` and :class:`~lamindb.Dataset`.
+            - References to inputs are also stored in the `input_of` field of :class:`~lamindb.File` and :class:`~lamindb.Dataset`.
 
     Examples:
 
@@ -845,9 +839,9 @@ class Run(Registry):
     @overload
     def __init__(
         self,
-        reference: str,
-        reference_type: str,
         transform: Transform,
+        reference: Optional[str] = None,
+        reference_type: Optional[str] = None,
     ):
         ...
 
