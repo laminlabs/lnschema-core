@@ -1292,22 +1292,19 @@ class FeatureSet(Registry):
 
 
 class File(Registry, Data):
-    """Files: data batches.
+    """Files: immutable data batches.
 
     Args:
-        data: `Union[PathLike, DataLike]` A path or a data
-            object (`DataFrame`, `AnnData`). Can be a cloud path,
-            e.g., `"s3://my-bucket/myfolder/myfile.fcs"`.
-        key: `Optional[str] = None` The target storage key: a relative path
-            within a storage location, e.g., `"myfolder/myfile.fcs"`. If
-            `None`, gets auto-populated if file is already in registered storage.
+        data: `Union[PathLike, DataLike]` A path or data
+            object (`DataFrame`, `AnnData`).
+        key: `Optional[str] = None` A relative path within default storage,
+            e.g., `"myfolder/myfile.fcs"`.
         description: `Optional[str] = None` A description.
         version: `Optional[str] = None` A version string.
         is_new_version_of: `Optional[File] = None` A reference file.
-        run: `Optional[Run] = None` The run that creates the file. If `None`,
-            gets auto-linked if :meth:`~lamindb.track` created a run context.
+        run: `Optional[Run] = None` The run that creates the file.
 
-    .. admonition:: Typical formats in storage & their API accessors
+    .. dropdown:: Typical storage formats & their API accessors
 
         Listed are typical values for :attr:`~lamindb.File.suffix` & :attr:`~lamindb.File.accessor`.
 
@@ -1322,11 +1319,9 @@ class File(Registry, Data):
         LaminDB makes some default choices (e.g., serialize a `DataFrame` as a
         `.parquet` file).
 
-    Note:
-        In some cases, e.g. for zarr-based storage, a `File` object is stored as
-        many small objects in what appears to be a "folder" in storage.
-
     See Also:
+        :class:`~lamindb.Dataset`
+            Mutable collections of data batches.
         :meth:`~lamindb.File.from_df`
             Create a file object from `DataFrame` and track features.
         :meth:`~lamindb.File.from_anndata`
@@ -1754,22 +1749,13 @@ class File(Registry, Data):
 
 
 class Dataset(Registry, Data):
-    """Datasets: collections of data batches.
-
-    .. warning::
-
-        The `Dataset` registry builds on all other registries and might change
-        in the future.
-
-        What's not going to change is that a dataset can both be stored in a
-        single file and sharded across several files.
+    """Datasets: mutable collections of data batches.
 
     Args:
         data: `DataLike` A data object (`DataFrame`, `AnnData`) to store.
         name: `str` A name.
         description: `Optional[str] = None` A description.
-        run: `Optional[Run] = None` The run that creates the dataset. If `None`,
-            gets auto-linked if :meth:`~lamindb.track` created a run context.
+        run: `Optional[Run] = None` The run that creates the dataset.
 
     See Also:
         :class:`~lamindb.File`
