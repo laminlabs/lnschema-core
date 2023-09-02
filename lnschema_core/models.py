@@ -1626,7 +1626,7 @@ class File(Registry, Data):
         pass
 
     @classmethod
-    def tree(
+    def view_tree(
         cls,
         path: Optional[PathLike] = None,
         *,
@@ -1640,7 +1640,7 @@ class File(Registry, Data):
             >>> dir_path = ln.dev.datasets.generate_cell_ranger_files("sample_001", ln.settings.storage)
             >>> dir_path.name
             'sample_001'
-            >>> ln.File.tree(dir_path)
+            >>> ln.File.view_tree(dir_path)
             3 subdirectories, 15 files
             sample_001
             ├── web_summary.html
