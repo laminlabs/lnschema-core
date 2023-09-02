@@ -684,7 +684,7 @@ class Transform(Registry, HasParents):
             or `'app'`. If `None`, defaults to `'notebook'` within an IPython
             environment and to `'pipeline'` outside of it.
         reference: `Optional[str] = None` A reference like a URL.
-        is_new_version_of: `Optional[File] = None` An old version of the transform.
+        is_new_version_of: `Optional[Transform] = None` An old version of the transform.
 
     See Also:
         :meth:`lamindb.track`
@@ -712,16 +712,16 @@ class Transform(Registry, HasParents):
     """
 
     id = CharField(max_length=14, db_index=True, primary_key=True, default=None)
-    """Universal id, composed of stem_id and version suffix."""
+    """Universal id."""
     name = CharField(max_length=255, db_index=True, null=True, default=None)
     """Transform name or title, a pipeline name, notebook title, etc..
     """
     short_name = CharField(max_length=128, db_index=True, null=True, default=None)
     """A short name (optional)."""
     version = CharField(max_length=10, default=None, null=True, db_index=True)
-    """Version, defaults to `None`.
+    """Version (default `None`).
 
-    Use this to label different versions of the same pipeline, notebook, etc.
+    Use this to label different versions of a transform.
 
     Consider using `semantic versioning <https://semver.org>`__
     with `Python versioning <https://peps.python.org/pep-0440/>`__.
@@ -1295,7 +1295,7 @@ class File(Registry, Data):
             e.g., `"myfolder/myfile.fcs"`.
         description: `Optional[str] = None` A description.
         version: `Optional[str] = None` A version string.
-        is_new_version_of: `Optional[File] = None` A reference file.
+        is_new_version_of: `Optional[File] = None` An old version of the file.
         run: `Optional[Run] = None` The run that creates the file.
 
     .. dropdown:: Typical storage formats & their API accessors
@@ -1397,7 +1397,7 @@ class File(Registry, Data):
     version = CharField(max_length=10, null=True, default=None, db_index=True)
     """Version (default `None`).
 
-    Use this together with `stem_id` to label different versions of a file.
+    Use this together with `initial_version` to label different versions of a file.
 
     Consider using `semantic versioning <https://semver.org>`__
     with `Python versioning <https://peps.python.org/pep-0440/>`__.
@@ -1749,6 +1749,8 @@ class Dataset(Registry, Data):
         data: `DataLike` A data object (`DataFrame`, `AnnData`) to store.
         name: `str` A name.
         description: `Optional[str] = None` A description.
+        version: `Optional[str] = None` A version string.
+        is_new_version_of: `Optional[Dataset] = None` An old version of the dataset.
         run: `Optional[Run] = None` The run that creates the dataset.
 
     See Also:
@@ -1791,6 +1793,9 @@ class Dataset(Registry, Data):
           a warehouse like BigQuery or Snowflake
 
     Examples:
+
+        Create a dataset from a DataFrame:
+
         >>> df = ln.dev.datasets.df_iris_in_meter_batch1()
         >>> df.head()
           sepal_length sepal_width petal_length petal_width iris_species_code
@@ -1801,6 +1806,22 @@ class Dataset(Registry, Data):
         4        0.050       0.036        0.014       0.002                 0
         >>> dataset = ln.Dataset(df, name="Iris flower dataset batch1")
         >>> dataset.save()
+
+        Create a dataset from a collection of :class:`~lamindb.File` objects:
+
+        >>> dataset = ln.Dataset([file1, file2], name="My dataset")
+        >>> dataset.save()
+
+        Make a new version of a dataset:
+
+        >>> # a non-versioned dataset
+        >>> dataset = ln.Dataset(df1, description="My dataframe")
+        >>> dataset.save()
+        >>> # create new dataset from old dataset and version both
+        >>> new_dataset = ln.File(df2, is_new_version_of=dataset)
+        >>> assert new_dataset.initial_version == dataset.initial_version
+        >>> assert dataset.version == "1"
+        >>> assert new_dataset.version == "2"
     """
 
     id = CharField(max_length=20, default=base62_20, primary_key=True)
@@ -1809,6 +1830,14 @@ class Dataset(Registry, Data):
     """Name or title of dataset (required)."""
     description = TextField(null=True, default=None)
     """A description."""
+    version = CharField(max_length=10, null=True, default=None, db_index=True)
+    """Version (default `None`).
+
+    Use this together with `initial_version` to label different versions of a dataset.
+
+    Consider using `semantic versioning <https://semver.org>`__
+    with `Python versioning <https://peps.python.org/pep-0440/>`__.
+    """
     hash = CharField(max_length=86, db_index=True, null=True, default=None)
     """Hash of dataset content. 86 base64 chars allow to store 64 bytes, 512 bits."""
     feature_sets = models.ManyToManyField("FeatureSet", related_name="datasets", through="DatasetFeatureSet")
@@ -1825,6 +1854,8 @@ class Dataset(Registry, Data):
     """Storage of dataset as a one file."""
     files = models.ManyToManyField("File", related_name="datasets")
     """Storage of dataset as multiple file."""
+    initial_version = models.ForeignKey("self", PROTECT, null=True, default=None)
+    """Initial version of this dataset, a :class:`~lamindb.Dataset` object."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
