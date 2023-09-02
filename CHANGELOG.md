@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-🚚 Version dataset | [291](https://github.com/laminlabs/lnschema-core/pull/291) | [falexwolf](https://github.com/falexwolf) | 2023-09-02 |
+🚚 Version dataset | [291](https://github.com/laminlabs/lnschema-core/pull/291) | [falexwolf](https://github.com/falexwolf) | 2023-09-02 | 0.47.0
 📝 Fix run signature | [289](https://github.com/laminlabs/lnschema-core/pull/289) | [falexwolf](https://github.com/falexwolf) | 2023-09-02 |
 📝 Prettify field sorting, improve File & Dataset docstring | [290](https://github.com/laminlabs/lnschema-core/pull/290) | [falexwolf](https://github.com/falexwolf) | 2023-09-02 |
 📝 Fix Run docs | [288](https://github.com/laminlabs/lnschema-core/pull/288) | [falexwolf](https://github.com/falexwolf) | 2023-09-01 | 0.46.5
