@@ -747,7 +747,7 @@ class Transform(Registry, HasParents):
     These are auto-populated whenever a transform loads a file as run input.
     """
     initial_version = models.ForeignKey("self", PROTECT, null=True, default=None)
-    """Initial version of this transform, a :class:`~lamindb.Transform` record."""
+    """Initial version of the transform, a :class:`~lamindb.Transform` record."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
@@ -1377,7 +1377,7 @@ class File(Registry, Data):
     id = CharField(max_length=20, primary_key=True)
     """A universal random id (20-char base62 ~ UUID), valid across DB instances."""
     storage = models.ForeignKey(Storage, PROTECT, related_name="files")
-    """Storage location (:class:`~lamindb.Storage`), e.g., an S3 bucket, local folder or network location."""
+    """Storage location (:class:`~lamindb.Storage`), e.g., an S3 or GCP bucket or a local directory."""
     key = CharField(max_length=255, db_index=True, null=True, default=None)
     """Storage key, the relative path within the storage location."""
     suffix = CharField(max_length=30, db_index=True, default=None)
@@ -1415,17 +1415,17 @@ class File(Registry, Data):
     hash_type = CharField(max_length=30, db_index=True, null=True, default=None)
     """Type of hash."""
     feature_sets = models.ManyToManyField(FeatureSet, related_name="files", through="FileFeatureSet")
-    """The feature sets measured in the file (see :class:`~lamindb.FeatureSet`)."""
+    """The feature sets measured in the file (:class:`~lamindb.FeatureSet`)."""
     labels = models.ManyToManyField(Label, through="FileLabel", related_name="files")
-    """:class:`~lamindb.File` records in label."""
+    """The labels measured in the file (:class:`~lamindb.Label`)."""
     transform = models.ForeignKey(Transform, PROTECT, related_name="files", null=True, default=None)
-    """:class:`~lamindb.Transform` whose run created the `file`."""
+    """:class:`~lamindb.Transform` whose run created the file."""
     run = models.ForeignKey(Run, PROTECT, related_name="output_files", null=True, default=None)
-    """:class:`~lamindb.Run` that created the `file`."""
+    """:class:`~lamindb.Run` that created the file."""
     input_of = models.ManyToManyField(Run, related_name="input_files")
     """Runs that use this file as an input."""
     initial_version = models.ForeignKey("self", PROTECT, null=True, default=None)
-    """Initial version of this file, a :class:`~lamindb.File` object."""
+    """Initial version of the file, a :class:`~lamindb.File` object."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
@@ -1493,7 +1493,7 @@ class File(Registry, Data):
         run: Optional[Run] = None,
         modality: Optional[Modality] = None,
     ) -> "File":
-        """Create from ``DataFrame``, link column names as features.
+        """Create from ``DataFrame``, validate & link features.
 
         See Also:
             :meth:`lamindb.Dataset`
@@ -1528,7 +1528,7 @@ class File(Registry, Data):
         run: Optional[Run] = None,
         modality: Optional[Modality] = None,
     ) -> "File":
-        """Create from ``AnnData`` or ``.h5ad`` file, link ``var_names`` and ``obs.columns`` as features.
+        """Create from ``AnnDataLike``, validate & link features.
 
         See Also:
 
@@ -1855,7 +1855,7 @@ class Dataset(Registry, Data):
     files = models.ManyToManyField("File", related_name="datasets")
     """Storage of dataset as multiple file."""
     initial_version = models.ForeignKey("self", PROTECT, null=True, default=None)
-    """Initial version of this dataset, a :class:`~lamindb.Dataset` object."""
+    """Initial version of the dataset, a :class:`~lamindb.Dataset` object."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
@@ -1896,12 +1896,12 @@ class Dataset(Registry, Data):
         run: Optional[Run] = None,
         modality: Optional[Modality] = None,
     ) -> "Dataset":
-        """Create from ``DataFrame``, link column names as features.
+        """Create from ``DataFrame``, validate & link features.
 
         See Also:
-            :meth:`lamindb.Dataset`
-                Track datasets.
-            :class:`lamindb.Feature`
+            :class:`~lamindb.File`
+                Track files.
+            :class:`~lamindb.Feature`
                 Track features.
 
         Notes:
@@ -1930,13 +1930,13 @@ class Dataset(Registry, Data):
         run: Optional[Run] = None,
         modality: Optional[Modality] = None,
     ) -> "Dataset":
-        """Create from ``AnnData`` or ``.h5ad`` file, link ``var_names`` and ``obs.columns`` as features.
+        """Create from ``AnnDataLike``, validate & link features.
 
         See Also:
 
-            :class:`lamindb.File`
+            :class:`~lamindb.File`
                 Track files.
-            :class:`lamindb.Feature`
+            :class:`~lamindb.Feature`
                 Track features.
 
         Examples:
