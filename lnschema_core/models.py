@@ -337,10 +337,7 @@ class Registry(models.Model):
 
     @classmethod
     def from_values(cls, values: ListLike, field: StrField, **kwargs) -> List["Registry"]:
-        """Parse values for an identifier (a name, an id, etc.) and create records.
-
-        This method helps avoid problems around duplication of entries,
-        violation of idempotency, and performance when creating records in bulk.
+        """Parse values for an identifier (a name, an id, etc.) and load corresponding records.
 
         Args:
             values: A list of values for an identifier, e.g.
@@ -351,56 +348,33 @@ class Registry(models.Model):
         Returns:
             A list of records.
 
-        For every `value` a `field`, this method does the following:
-
-        1. It checks whether the value already exists in the database
-           (`Registry.filter(field=value)`). If so, it adds the queried record to
-           the returned list and skips step 2.
-        2. If the `Registry` is from `lnschema_bionty`, it checks whether there is an
-           exact match in the underlying ontology (`Bionty.validate(value, field)`).
-           If so, it creates a record from the ontology and adds it to the returned list.
-           Otherwise, it creates a record that populates a single field using `value`
-           and adds the record to the returned list.
-
         Notes:
             For more info, see tutorial: :doc:`bio-registries`.
 
         Examples:
 
-            Bulk create records from non-validated values:
+            Bulk create from non-validated values will log warnings & returns empty list:
 
             >>> labels = ln.Label.from_values(["benchmark", "prediction", "test"], field="name")
-            🔶 did not validate 3 Label records for names: benchmark, prediction, test
-            >>> labels
-            [Label(id=mDahtPrz, name=benchmark, created_by_id=DzTjkKse),
-            Label(id=2Sjmn9il, name=prediction, created_by_id=DzTjkKse),
-            Label(id=gdxrHdTA, name=test, created_by_id=DzTjkKse)]
+            >>> assert len(labels) == 0
 
-            Bulk create records from validated values (returns existing records):
-            >>> ln.save(ln.Label.from_values(["benchmark", "prediction", "test"], field="name"))
+            Bulk create records from validated values returns the corresponding existing records:
+
+            >>> ln.save([ln.Label(name=name) for name in ["benchmark", "prediction", "test"]])
             >>> labels = ln.Label.from_values(["benchmark", "prediction", "test"], field="name")
-            ✅ validated 3 Label records on name: benchmark, prediction, test
-            >>> labels
-            [Label(id=iV3DXy70, name=benchmark, updated_at=2023-07-19 16:07:50, created_by_id=DzTjkKse),
-            Label(id=99aB57DI, name=prediction, updated_at=2023-07-19 16:07:50, created_by_id=DzTjkKse),
-            Label(id=ueaGXwuL, name=test, updated_at=2023-07-19 16:07:50, created_by_id=DzTjkKse)]
+            >>> assert len(labels) == 3
 
             Bulk create records with shared kwargs:
 
             >>> pipelines = ln.Transform.from_values(["Pipeline 1", "Pipeline 2"], field="name",
             ...                                      type="pipeline", version="1")
             >>> pipelines
-            [Transform(id=Ts8k7LSZNZhO1t, name=Pipeline 1, stem_id=Ts8k7LSZNZhO, version=1, type=pipeline, created_by_id=DzTjkKse),
-            Transform(id=m2UXSAqqttuuXP, name=Pipeline 2, stem_id=m2UXSAqqttuu, version=1, type=pipeline, created_by_id=DzTjkKse)]
 
             Bulk create records from bionty:
 
             >>> import lnschema_bionty as lb
             >>> records = lb.CellType.from_values(["T cell", "B cell"], field="name")
-            ✅ validated 2 CellType records from Bionty on name: T cell, B cell
             >>> records
-            [CellType(id=BxNjby0x, name=T cell, ontology_id=CL:0000084, synonyms=T-cell|T lymphocyte|T-lymphocyte, description=A Type Of Lymphocyte Whose Defining Characteristic Is The Expression Of A T Cell Receptor Complex., bionty_source_id=S2Yu, created_by_id=DzTjkKse), # noqa
-            CellType(id=cx8VcggA, name=B cell, ontology_id=CL:0000236, synonyms=B lymphocyte|B-lymphocyte|B-cell, description=A Lymphocyte Of B Lineage That Is Capable Of B Cell Mediated Immunity., bionty_source_id=S2Yu, created_by_id=DzTjkKse)] # noqa
         """
         pass
 
@@ -425,10 +399,8 @@ class Registry(models.Model):
             >>> lb.Gene.from_bionty(symbol="ADGB-DT").save()
             >>> lookup = lb.Gene.lookup()
             >>> lookup.adgb_dt
-            Gene(id=SoZXq4Wor2vK, symbol=ADGB-DT, ensembl_gene_id=ENSG00000237468, ncbi_gene_ids=101928661, biotype=lncRNA, description=ADGB divergent transcript [Source:HGNC Symbol;Acc:HGNC:55654], synonyms=, updated_at=2023-07-19 18:31:16, species_id=uHJU, bionty_source_id=abZr, created_by_id=DzTjkKse) # noqa
             >>> lookup_dict = lookup.dict()
             >>> lookup_dict['ADGB-DT']
-            Gene(id=SoZXq4Wor2vK, symbol=ADGB-DT, ensembl_gene_id=ENSG00000237468, ncbi_gene_ids=101928661, biotype=lncRNA, description=ADGB divergent transcript [Source:HGNC Symbol;Acc:HGNC:55654], synonyms=, updated_at=2023-07-19 18:31:16, species_id=uHJU, bionty_source_id=abZr, created_by_id=DzTjkKse) # noqa
         """
         pass
 
@@ -754,8 +726,6 @@ class Transform(Registry, HasParents):
     Consider using `semantic versioning <https://semver.org>`__
     with `Python versioning <https://peps.python.org/pep-0440/>`__.
     """
-    initial_version = models.ForeignKey("self", PROTECT, null=True, default=None)
-    """Initial version of this transform, a :class:`~lamindb.Transform` record."""
     type = CharField(
         max_length=20,
         choices=TransformType.choices(),
@@ -776,6 +746,8 @@ class Transform(Registry, HasParents):
 
     These are auto-populated whenever a transform loads a file as run input.
     """
+    initial_version = models.ForeignKey("self", PROTECT, null=True, default=None)
+    """Initial version of this transform, a :class:`~lamindb.Transform` record."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
@@ -1441,8 +1413,6 @@ class File(Registry, Data):
     Consider using `semantic versioning <https://semver.org>`__
     with `Python versioning <https://peps.python.org/pep-0440/>`__.
     """
-    initial_version = models.ForeignKey("self", PROTECT, null=True, default=None)
-    """Initial version of this file, a :class:`~lamindb.File` object."""
     size = models.BigIntegerField(null=True, db_index=True)
     """Size in bytes.
 
@@ -1465,6 +1435,8 @@ class File(Registry, Data):
     """:class:`~lamindb.Run` that created the `file`."""
     input_of = models.ManyToManyField(Run, related_name="input_files")
     """Runs that use this file as an input."""
+    initial_version = models.ForeignKey("self", PROTECT, null=True, default=None)
+    """Initial version of this file, a :class:`~lamindb.File` object."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
