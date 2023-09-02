@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+📝 Prettify field sorting, improve File & Dataset docstring | [290](https://github.com/laminlabs/lnschema-core/pull/290) | [falexwolf](https://github.com/falexwolf) | 2023-09-02 |
 📝 Fix Run docs | [288](https://github.com/laminlabs/lnschema-core/pull/288) | [falexwolf](https://github.com/falexwolf) | 2023-09-01 | 0.46.5
 🚚 Add modality to from_df and from_anndata | [285](https://github.com/laminlabs/lnschema-core/pull/285) | [falexwolf](https://github.com/falexwolf) | 2023-08-31 | 0.46.4
 ♻️ Type features | [287](https://github.com/laminlabs/lnschema-core/pull/287) | [falexwolf](https://github.com/falexwolf) | 2023-08-31 |
