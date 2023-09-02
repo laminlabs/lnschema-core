@@ -1854,6 +1854,8 @@ class Dataset(Registry, Data):
     """Storage of dataset as a one file."""
     files = models.ManyToManyField("File", related_name="datasets")
     """Storage of dataset as multiple file."""
+    initial_version = models.ForeignKey("self", PROTECT, null=True, default=None)
+    """Initial version of this dataset, a :class:`~lamindb.Dataset` object."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
