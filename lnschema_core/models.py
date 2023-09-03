@@ -1033,8 +1033,8 @@ class Feature(Registry, CanValidate):
     See Also:
         :meth:`~lamindb.Feature.from_df`
             Create feature records from DataFrame.
-        :attr:`lamindb.File.features`
-            Manage feature annotations of files.
+        :attr:`~lamindb.Data.features`
+            Manage feature annotations of files & datasets.
         :meth:`lamindb.Label`
             Labels for files & datasets.
 
@@ -1300,7 +1300,7 @@ class File(Registry, Data):
 
     .. dropdown:: Typical storage formats & their API accessors
 
-        Listed are typical values for :attr:`~lamindb.File.suffix` & :attr:`~lamindb.File.accessor`.
+        Listed are typical values for the `suffix` & `accessor` fields.
 
         - Table: `.csv`, `.tsv`, `.parquet`, `.ipc` ⟷ `DataFrame`, `pyarrow.Table`
         - Annotated matrix: `.h5ad`, `.h5mu`, `.zrad` ⟷ `AnnData`, `MuData`
