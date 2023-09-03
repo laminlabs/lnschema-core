@@ -1033,7 +1033,7 @@ class Feature(Registry, CanValidate):
     See Also:
         :meth:`~lamindb.Feature.from_df`
             Create feature records from DataFrame.
-        :attr:`~lamindb.Data.features`
+        :attr:`~lamindb.Data.dev.features`
             Manage feature annotations of files & datasets.
         :meth:`lamindb.Label`
             Labels for files & datasets.
