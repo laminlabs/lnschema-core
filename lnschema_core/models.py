@@ -336,7 +336,7 @@ class Registry(models.Model):
     """
 
     @classmethod
-    def from_values(cls, values: ListLike, field: StrField, **kwargs) -> List["Registry"]:
+    def from_values(cls, values: ListLike, field: Optional[StrField] = None, **kwargs) -> List["Registry"]:
         """Parse values for an identifier (a name, an id, etc.) and load corresponding records.
 
         Args:
