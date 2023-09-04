@@ -432,8 +432,8 @@ class Registry(models.Model):
         string: str,
         *,
         field: Optional[StrField] = None,
+        limit: Optional[int] = 20,
         return_queryset: bool = False,
-        limit: Optional[int] = None,
         case_sensitive: bool = False,
         synonyms_field: Optional[StrField] = "synonyms",  # type: ignore
     ) -> Union["pd.DataFrame", "QuerySet"]:
@@ -447,8 +447,8 @@ class Registry(models.Model):
         Args:
             string: The input string to match against the field ontology values.
             field: The field against which the input string is matching.
-            return_queryset: Return search result as a sorted QuerySet.
             limit: Maximum amount of top results to return.
+            return_queryset: Return search result as a sorted QuerySet.
             case_sensitive: Whether the match is case sensitive.
             synonyms_field: Search synonyms if column is available. If `None`,
                 is ignored.
