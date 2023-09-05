@@ -1376,26 +1376,29 @@ class File(Registry, Data):
 
     id = CharField(max_length=20, primary_key=True)
     """A universal random id (20-char base62 ~ UUID), valid across DB instances."""
-    storage = models.ForeignKey(Storage, PROTECT, related_name="files")
-    """Storage location (:class:`~lamindb.Storage`), e.g., an S3 or GCP bucket or a local directory."""
+    storage = models.ForeignKey(Storage, PROTECT, related_name="files", null=True)
+    """Storage location (:class:`~lamindb.Storage`), e.g., an S3 or GCP bucket or a local directory (required, nullable).
+
+    Can be none if file is not stored internally but merely an external reference.
+    """
     key = CharField(max_length=255, db_index=True, null=True, default=None)
-    """Storage key, the relative path within the storage location."""
+    """Storage key, the relative path within the storage location (default `None`, nullable)."""
     suffix = CharField(max_length=30, db_index=True, default=None)
     # Initially, we thought about having this be nullable to indicate folders
     # But, for instance, .zarr is stored in a folder that ends with a .zarr suffix
-    """Path suffix or empty string if no canonical suffix exists.
+    """Path suffix or empty string if no canonical suffix exists (required, not nullable).
 
     This is either a file suffix (`".csv"`, `".h5ad"`, etc.) or the empty string "".
     """
     accessor = CharField(max_length=64, db_index=True, null=True, default=None)
-    """Default backed or memory accessor, e.g., DataFrame, AnnData.
+    """Default backed or memory accessor, e.g., DataFrame, AnnData (default `None`, nullable).
 
     Soon, also: SOMA, MuData, zarr.Group, tiledb.Array, etc.
     """
     description = CharField(max_length=255, db_index=True, null=True, default=None)
-    """A description."""
+    """A description (default `None`, nullable)."""
     version = CharField(max_length=10, null=True, default=None, db_index=True)
-    """Version (default `None`).
+    """Version (default `None`, nullable).
 
     Use this together with `initial_version` to label different versions of a file.
 
@@ -1403,17 +1406,17 @@ class File(Registry, Data):
     with `Python versioning <https://peps.python.org/pep-0440/>`__.
     """
     size = models.BigIntegerField(null=True, db_index=True)
-    """Size in bytes.
+    """Size in bytes (nullable).
 
     Examples: 1KB is 1e3 bytes, 1MB is 1e6, 1GB is 1e9, 1TB is 1e12 etc.
     """
     hash = CharField(max_length=86, db_index=True, null=True, default=None)  # 86 base64 chars allow to store 64 bytes, 512 bits
-    """Hash or pseudo-hash of file content.
+    """Hash or pseudo-hash of file content (nullable).
 
     Useful to ascertain integrity and avoid duplication.
     """
     hash_type = CharField(max_length=30, db_index=True, null=True, default=None)
-    """Type of hash."""
+    """Type of hash (nullable)."""
     feature_sets = models.ManyToManyField(FeatureSet, related_name="files", through="FileFeatureSet")
     """The feature sets measured in the file (:class:`~lamindb.FeatureSet`)."""
     labels = models.ManyToManyField(Label, through="FileLabel", related_name="files")
