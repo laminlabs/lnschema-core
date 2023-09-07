@@ -491,14 +491,17 @@ class Data:
 
     def add_labels(
         self,
-        records: Union[Registry, List[Registry], QuerySet],
+        records: Union[Registry, List[Registry], QuerySet, Iterable],
         feature: "Feature",
+        *,
+        field: Optional[StrField] = None,
     ) -> None:
         """Add one or several labels and associate them with a feature.
 
         Args:
             records: Label records to add.
             feature: Feature under which to group the labels.
+            field: Field to parse iterable with from_values.
         """
         pass
 
@@ -866,7 +869,7 @@ class Run(Registry):
 
 
 class ULabel(Registry, HasParents, CanValidate):
-    """Universal labels for files & datasets.
+    """Universal untyped labels for files & datasets.
 
     Args:
         name: `str` A name.
