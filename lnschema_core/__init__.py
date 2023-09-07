@@ -18,11 +18,11 @@ if _INSTANCE_SETUP:
         FeatureSet,
         File,
         HasParents,
-        Label,
         Modality,
         Registry,
         Run,
         Storage,
         Transform,
+        ULabel,
         User,
     )

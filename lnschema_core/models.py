@@ -309,7 +309,7 @@ class HasParents:
 
         There are two types of registries with a `parents` field:
 
-        - Ontological hierarchies: :class:`~lamindb.Label` (project & sub-project), :class:`~lnschema_bionty.CellType` (cell type & subtype), ...
+        - Ontological hierarchies: :class:`~lamindb.ULabel` (project & sub-project), :class:`~lnschema_bionty.CellType` (cell type & subtype), ...
         - Procedural/temporal hierarchies: :class:`~lamindb.Transform` (preceding transform & successing transform), ...
 
         See Also:
@@ -355,14 +355,14 @@ class Registry(models.Model):
 
             Bulk create from non-validated values will log warnings & returns empty list:
 
-            >>> labels = ln.Label.from_values(["benchmark", "prediction", "test"], field="name")
-            >>> assert len(labels) == 0
+            >>> ulabels = ln.ULabel.from_values(["benchmark", "prediction", "test"], field="name")
+            >>> assert len(ulabels) == 0
 
             Bulk create records from validated values returns the corresponding existing records:
 
-            >>> ln.save([ln.Label(name=name) for name in ["benchmark", "prediction", "test"]])
-            >>> labels = ln.Label.from_values(["benchmark", "prediction", "test"], field="name")
-            >>> assert len(labels) == 3
+            >>> ln.save([ln.ULabel(name=name) for name in ["benchmark", "prediction", "test"]])
+            >>> ulabels = ln.ULabel.from_values(["benchmark", "prediction", "test"], field="name")
+            >>> assert len(ulabels) == 3
 
             Bulk create records with shared kwargs:
 
@@ -419,8 +419,8 @@ class Registry(models.Model):
             - Django documentation: `Queries <https://docs.djangoproject.com/en/4.2/topics/db/queries/>`__
 
         Examples:
-            >>> ln.Label(name="my label").save()
-            >>> label = ln.Label.filter(name="my label").one()
+            >>> ln.ULabel(name="my ulabel").save()
+            >>> ulabel = ln.ULabel.filter(name="my ulabel").one()
         """
         from lamindb._filter import filter
 
@@ -462,13 +462,13 @@ class Registry(models.Model):
             :meth:`~lamindb.dev.Registry.lookup`
 
         Examples:
-            >>> ln.save(ln.Label.from_values(["Label1", "Label2", "Label3"], field="name"))
-            >>> ln.Label.search("Label2")
+            >>> ln.save(ln.ULabel.from_values(["ULabel1", "ULabel2", "ULabel3"], field="name"))
+            >>> ln.ULabel.search("ULabel2")
                         id   __ratio__
             name
-            Label2  o3FY3c5n  100.000000
-            Label1  CcFPLmpq   75.000000
-            Label3  Qi3c4utq   75.000000
+            ULabel2  o3FY3c5n  100.000000
+            ULabel1  CcFPLmpq   75.000000
+            ULabel3  Qi3c4utq   75.000000
         """
         pass
 
@@ -518,9 +518,9 @@ class Data:
         Examples:
             >>> ln.File(ln.dev.datasets.file_jpg_paradisi05(), description="paradisi05").save()
             >>> file = ln.File.filter(description="paradisi05").one()
-            >>> ln.save(ln.Label.from_values(["image", "benchmark", "example"], field="name"))
-            >>> labels = ln.Label.filter(name__in=["image", "benchmark", "example"]).all()
-            >>> file.labels.set(labels)
+            >>> ln.save(ln.ULabel.from_values(["image", "benchmark", "example"], field="name"))
+            >>> ulabels = ln.ULabel.filter(name__in=["image", "benchmark", "example"]).all()
+            >>> file.ulabels.set(ulabels)
             >>> file.describe()
         """
         pass
@@ -860,19 +860,19 @@ class Run(Registry):
         super(Run, self).__init__(*args, **kwargs)
 
 
-class Label(Registry, HasParents, CanValidate):
-    """Labels for files & datasets.
+class ULabel(Registry, HasParents, CanValidate):
+    """Universal labels for files & datasets.
 
     Args:
         name: `str` A name.
         description: `str` A description.
 
-    A label can be used to annotate a file or dataset as a whole: "Project 1",
+    A ulabel can be used to annotate a file or dataset as a whole: "Project 1",
     "curated", or "Iris flower".
 
-    In some cases, a label is measured only within a part of a file or dataset.
+    In some cases, a ulabel is measured only within a part of a file or dataset.
     Then, a :class:`~lamindb.Feature` qualifies the measurement and slot for the
-    label measurements (typically, a column name). For instance, the dataset
+    ulabel measurements (typically, a column name). For instance, the dataset
     might contain measurements across 2 species of the Iris flower: "setosa" &
     "versicolor".
 
@@ -891,45 +891,45 @@ class Label(Registry, HasParents, CanValidate):
 
     Examples:
 
-        Create a new label:
+        Create a new ulabel:
 
-        >>> ln.Label(name="ML output").save()
+        >>> ln.ULabel(name="ML output").save()
 
         Label a file without associating it to a feature:
 
-        >>> label = ln.Label.filter(name="ML output").one()
+        >>> ulabel = ln.ULabel.filter(name="ML output").one()
         >>> file = ln.File("./myfile.csv")
         >>> file.save()
-        >>> file.labels.add(label)
-        >>> file.labels.list("name")
+        >>> file.ulabels.add(ulabel)
+        >>> file.ulabels.list("name")
         ['ML output']
 
-        Organize labels in a label ontology:
+        Organize ulabels in a ulabel ontology:
 
-        >>> ln.Label(name="Project 1").save()
-        >>> project1 = ln.Label.filter(name="Project 1").one()
-        >>> ln.Label(name="is_project").save()
-        >>> is_project = ln.Label.filter(name="is_project").one()
+        >>> ln.ULabel(name="Project 1").save()
+        >>> project1 = ln.ULabel.filter(name="Project 1").one()
+        >>> ln.ULabel(name="is_project").save()
+        >>> is_project = ln.ULabel.filter(name="is_project").one()
         >>> project1.parents.add(is_project)
 
-        Query by label:
+        Query by ulabel:
 
-        >>> ln.File.filter(labels=project).first()
+        >>> ln.File.filter(ulabels=project).first()
     """
 
     id = CharField(max_length=8, default=base62_8, primary_key=True)
     """A universal random id, valid across DB instances."""
     name = CharField(max_length=255, db_index=True, unique=True, default=None)
-    """Name or title of label (required)."""
+    """Name or title of ulabel (required)."""
     description = TextField(null=True, default=None)
     """A description (optional)."""
     parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
-    """Parent labels, useful to hierarchically group labels (optional)."""
+    """Parent ulabels, useful to hierarchically group ulabels (optional)."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
-    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_labels")
+    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_ulabels")
     """Creator of record, a :class:`~lamindb.User`."""
 
     @overload
@@ -1035,8 +1035,8 @@ class Feature(Registry, CanValidate):
             Create feature records from DataFrame.
         :attr:`~lamindb.dev.Data.features`
             Manage feature annotations of files & datasets.
-        :meth:`lamindb.Label`
-            Labels for files & datasets.
+        :meth:`lamindb.ULabel`
+            ULabels for files & datasets.
 
     Args:
         name: `str` Name of the feature, typically, a column name.
@@ -1082,7 +1082,7 @@ class Feature(Registry, CanValidate):
     type = CharField(max_length=64, db_index=True, default=None)
     """Simple type ("float", "int", "str", "category").
 
-    If "category", consider managing categories with :class:`~lamindb.Label` or
+    If "category", consider managing categories with :class:`~lamindb.ULabel` or
     another Registry for managing labels.
     """
     modality = models.ForeignKey(Modality, PROTECT, null=True, default=None, related_name="features")
@@ -1416,8 +1416,8 @@ class File(Registry, Data):
     """Type of hash."""
     feature_sets = models.ManyToManyField(FeatureSet, related_name="files", through="FileFeatureSet")
     """The feature sets measured in the file (:class:`~lamindb.FeatureSet`)."""
-    labels = models.ManyToManyField(Label, through="FileLabel", related_name="files")
-    """The labels measured in the file (:class:`~lamindb.Label`)."""
+    ulabels = models.ManyToManyField(ULabel, through="FileULabel", related_name="files")
+    """The ulabels measured in the file (:class:`~lamindb.ULabel`)."""
     transform = models.ForeignKey(Transform, PROTECT, related_name="files", null=True, default=None)
     """:class:`~lamindb.Transform` whose run created the file."""
     run = models.ForeignKey(Run, PROTECT, related_name="output_files", null=True, default=None)
@@ -1665,7 +1665,7 @@ class File(Registry, Data):
         pass
 
     def load(self, is_run_input: Optional[bool] = None, stream: bool = False, **kwargs) -> DataLike:
-        """Slabele and load to memory.
+        """Stage and load to memory.
 
         Returns in-memory representation if possible, e.g., an `AnnData` object for an `h5ad` file.
 
@@ -1842,8 +1842,8 @@ class Dataset(Registry, Data):
     """Hash of dataset content. 86 base64 chars allow to store 64 bytes, 512 bits."""
     feature_sets = models.ManyToManyField("FeatureSet", related_name="datasets", through="DatasetFeatureSet")
     """The feature sets measured in this dataset (see :class:`~lamindb.FeatureSet`)."""
-    labels = models.ManyToManyField("Label", through="DatasetLabel", related_name="datasets")
-    """Labels sampled in the dataset (see :class:`~lamindb.Feature`)."""
+    ulabels = models.ManyToManyField("ULabel", through="DatasetULabel", related_name="datasets")
+    """ULabels sampled in the dataset (see :class:`~lamindb.Feature`)."""
     transform = models.ForeignKey(Transform, PROTECT, related_name="datasets", null=True, default=None)
     """:class:`~lamindb.Transform` whose run created the dataset."""
     run = models.ForeignKey(Run, PROTECT, related_name="output_datasets", null=True, default=None)
@@ -1973,22 +1973,22 @@ class DatasetFeatureSet(Registry, LinkORM):
         unique_together = ("dataset", "feature_set")
 
 
-class FileLabel(Registry, LinkORM):
+class FileULabel(Registry, LinkORM):
     file = models.ForeignKey(File, on_delete=models.CASCADE)
-    label = models.ForeignKey(Label, on_delete=models.CASCADE)
+    ulabel = models.ForeignKey(ULabel, on_delete=models.CASCADE)
     feature = models.ForeignKey(Feature, CASCADE, null=True, default=None)
 
     class Meta:
-        unique_together = ("file", "label")
+        unique_together = ("file", "ulabel")
 
 
-class DatasetLabel(Registry, LinkORM):
+class DatasetULabel(Registry, LinkORM):
     dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE)
-    label = models.ForeignKey(Label, on_delete=models.CASCADE)
+    ulabel = models.ForeignKey(ULabel, on_delete=models.CASCADE)
     feature = models.ForeignKey(Feature, CASCADE, null=True, default=None)
 
     class Meta:
-        unique_together = ("dataset", "label")
+        unique_together = ("dataset", "ulabel")
 
 
 # -------------------------------------------------------------------------------------
