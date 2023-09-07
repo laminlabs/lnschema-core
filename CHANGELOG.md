@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚚 Rename `Label` to `ULabel` | [295](https://github.com/laminlabs/lnschema-core/pull/295) | [sunnyosun](https://github.com/sunnyosun) | 2023-09-07 |
 🎨 Make field optional for from_values | [293](https://github.com/laminlabs/lnschema-core/pull/293) | [sunnyosun](https://github.com/sunnyosun) | 2023-09-04 |
 ⬆️ Switch to WRatio and default to limit=20 for search | [292](https://github.com/laminlabs/lnschema-core/pull/292) | [sunnyosun](https://github.com/sunnyosun) | 2023-09-04 | 0.47.4
 🚚 Version dataset | [291](https://github.com/laminlabs/lnschema-core/pull/291) | [falexwolf](https://github.com/falexwolf) | 2023-09-02 | 0.47.0
