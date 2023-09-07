@@ -43,7 +43,7 @@ if TYPE_CHECKING or _INSTANCE_SETUP:
     import numpy as np
     import pandas as pd
     from lamin_utils._inspect import InspectResult
-    from lamindb.dev import FeatureManager
+    from lamindb.dev import FeatureManager, LabelManager
 
 
 IPYTHON = getattr(builtins, "__IPYTHON__", False)
@@ -482,6 +482,11 @@ class Data:
     @property
     def features(self) -> "FeatureManager":
         """Feature manager (:class:`~lamindb.dev.FeatureManager`)."""
+        pass
+
+    @property
+    def labels(self) -> "LabelManager":
+        """Label manager (:class:`~lamindb.dev.LabelManager`)."""
         pass
 
     def add_labels(
