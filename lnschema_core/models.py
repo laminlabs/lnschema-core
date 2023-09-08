@@ -869,7 +869,7 @@ class Run(Registry):
 
 
 class ULabel(Registry, HasParents, CanValidate):
-    """Universal untyped labels for files & datasets.
+    """Universal data labels.
 
     Args:
         name: `str` A name.
@@ -1036,7 +1036,7 @@ class Modality(Registry, HasParents, CanValidate):
 
 
 class Feature(Registry, CanValidate):
-    """Dimensions of measurements in files & datasets.
+    """Dimensions of measurement.
 
     See Also:
         :meth:`~lamindb.Feature.from_df`
@@ -1048,17 +1048,21 @@ class Feature(Registry, CanValidate):
 
     Args:
         name: `str` Name of the feature, typically, a column name.
-        type: `str` Simple type ("float", "int", "str", "category").
+        type: `str` Simple type (`"number"`, `"category"`, `"str"`, `"datetime"`).
         unit: `Optional[str] = None` Unit of measure, ideally SI (`"m"`, `"s"`, `"kg"`, etc.) or `"normalized"` etc.
         description: `Optional[str] = None` A description.
         synonyms: `Optional[str] = None` Bar-separated synonyms.
 
     .. note::
 
-        *Features* and *labels* are two ways of using entities to structure & categorize data:
+        *Features* and *labels* denote two ways for using entities to organize data:
 
-        1. a feature qualifies *which entity* is measured as part of a *joint* measurement
-        2. a label *is* a measured value of an entity
+        1. A feature qualifies *which entity* is measured (e.g., is a vector of categories)
+        2. A label *is* a measured value of an entity (a category)
+
+        If re-shaping data introduced ambiguity, ask yourself what the joint measurement was:
+        a feature qualifies variables in a joint measurement. 
+        You might be looking at a label if data was re-shaped from there.
 
     Notes:
 
