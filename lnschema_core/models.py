@@ -379,7 +379,7 @@ class Registry(models.Model):
         pass
 
     @classmethod
-    def lookup(cls, field: Optional[StrField] = None) -> NamedTuple:
+    def lookup(cls, field: Optional[StrField] = None, return_field: Optional[StrField] = None) -> NamedTuple:
         """Return an auto-complete object for a field.
 
         Args:
