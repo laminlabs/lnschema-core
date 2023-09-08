@@ -1061,7 +1061,7 @@ class Feature(Registry, CanValidate):
         2. A label *is* a measured value of an entity (a category)
 
         If re-shaping data introduced ambiguity, ask yourself what the joint measurement was:
-        a feature qualifies variables in a joint measurement. 
+        a feature qualifies variables in a joint measurement.
         You might be looking at a label if data was re-shaped from there.
 
     Notes:
