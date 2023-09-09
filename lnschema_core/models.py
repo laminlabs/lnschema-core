@@ -875,14 +875,19 @@ class ULabel(Registry, HasParents, CanValidate):
         name: `str` A name.
         description: `str` A description.
 
-    A `ULabel` record is the easiest way to annotate a file or dataset with a label: "Project 1",
-    "curated", or "Iris flower".
+    A `ULabel` record provides the easiest way to annotate a file or dataset
+    with a label: `"My project"`, `"curated"`, or `"Batch X"`:
 
-    In some cases, a ulabel is measured only within a part of a file or dataset.
-    Then, a :class:`~lamindb.Feature` qualifies the measurement and slot for the
-    ulabel measurements (typically, a column name). For instance, the dataset
-    might contain measurements across 2 species of the Iris flower: "setosa" &
-    "versicolor".
+        >>> my_project = ULabel(name="My project")
+        >>> my_project.save()
+        >>> dataset.ulabels.add(my_project)
+
+    In some cases, a label is measured *within* a file or dataset a feature (a
+    :class:`~lamindb.Feature` record) denotes the column name in which the label
+    is stored. For instance, the dataset might contain measurements across 2
+    species of the Iris flower: `"setosa"` & `"versicolor"`.
+
+    See :doc:`tutorial1` to learn more.
 
     .. note::
 
@@ -899,28 +904,28 @@ class ULabel(Registry, HasParents, CanValidate):
 
     Examples:
 
-        Create a new ulabel:
+        Create a new label:
 
-        >>> ln.ULabel(name="ML output").save()
+        >>> my_project = ln.ULabel(name="My project")
+        >>> my_project.save()
 
         Label a file without associating it to a feature:
 
-        >>> ulabel = ln.ULabel.filter(name="ML output").one()
+        >>> ulabel = ln.ULabel.filter(name="My project").one()
         >>> file = ln.File("./myfile.csv")
         >>> file.save()
         >>> file.ulabels.add(ulabel)
         >>> file.ulabels.list("name")
-        ['ML output']
+        ['My project']
 
-        Organize ulabels in a ulabel ontology:
+        Organize labels in a hierarchy:
 
-        >>> ln.ULabel(name="Project 1").save()
-        >>> project1 = ln.ULabel.filter(name="Project 1").one()
-        >>> ln.ULabel(name="is_project").save()
-        >>> is_project = ln.ULabel.filter(name="is_project").one()
-        >>> project1.parents.add(is_project)
+        >>> ulabels = ln.ULabel.lookup()  # create a lookup
+        >>> is_project = ln.ULabel(name="is_project")  # create a super-category `is_project`
+        >>> is_project.save()
+        >>> ulabels.my_project.parents.add(is_project)
 
-        Query by ulabel:
+        Query by `ULabel`:
 
         >>> ln.File.filter(ulabels=project).first()
     """
