@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🔥 Remove `add_labels` & `get_labels` & improve documentation of `ULabel` | [297](https://github.com/laminlabs/lnschema-core/pull/297) | [falexwolf](https://github.com/falexwolf) | 2023-09-09 |
 🎨 Added return_field to lookup | [296](https://github.com/laminlabs/lnschema-core/pull/296) | [sunnyosun](https://github.com/sunnyosun) | 2023-09-08 |
 🚚 Rename `Label` to `ULabel` | [295](https://github.com/laminlabs/lnschema-core/pull/295) | [sunnyosun](https://github.com/sunnyosun) | 2023-09-07 |
 🎨 Make field optional for from_values | [293](https://github.com/laminlabs/lnschema-core/pull/293) | [sunnyosun](https://github.com/sunnyosun) | 2023-09-04 |
