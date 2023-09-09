@@ -489,37 +489,6 @@ class Data:
         """Label manager (:class:`~lamindb.dev.LabelManager`)."""
         pass
 
-    def add_labels(
-        self,
-        records: Union[Registry, List[Registry], QuerySet, Iterable],
-        feature: "Feature",
-        *,
-        field: Optional[StrField] = None,
-    ) -> None:
-        """Add one or several labels and associate them with a feature.
-
-        Args:
-            records: Label records to add.
-            feature: Feature under which to group the labels.
-            field: Field to parse iterable with from_values.
-        """
-        pass
-
-    def get_labels(
-        self,
-        feature: "Feature",
-        mute: bool = False,
-        flat_names: bool = False,
-    ) -> Union[QuerySet, Dict[str, QuerySet], List]:
-        """Get labels given a feature.
-
-        Args:
-            feature: Feature under which labels are grouped.
-            mute: Show no logging.
-            flat_names: Flatten list to names rather than returning records.
-        """
-        pass
-
     def describe(self):
         """Describe relations of data record.
 
@@ -869,20 +838,25 @@ class Run(Registry):
 
 
 class ULabel(Registry, HasParents, CanValidate):
-    """Universal data labels.
+    """Universal label ontology.
 
     Args:
         name: `str` A name.
         description: `str` A description.
 
-    A ulabel can be used to annotate a file or dataset as a whole: "Project 1",
-    "curated", or "Iris flower".
+    A `ULabel` record provides the easiest way to annotate a file or dataset
+    with a label: `"My project"`, `"curated"`, or `"Batch X"`:
 
-    In some cases, a ulabel is measured only within a part of a file or dataset.
-    Then, a :class:`~lamindb.Feature` qualifies the measurement and slot for the
-    ulabel measurements (typically, a column name). For instance, the dataset
-    might contain measurements across 2 species of the Iris flower: "setosa" &
-    "versicolor".
+        >>> my_project = ULabel(name="My project")
+        >>> my_project.save()
+        >>> dataset.ulabels.add(my_project)
+
+    In some cases, a label is measured *within* a file or dataset a feature (a
+    :class:`~lamindb.Feature` record) denotes the column name in which the label
+    is stored. For instance, the dataset might contain measurements across 2
+    species of the Iris flower: `"setosa"` & `"versicolor"`.
+
+    See :doc:`tutorial1` to learn more.
 
     .. note::
 
@@ -899,28 +873,28 @@ class ULabel(Registry, HasParents, CanValidate):
 
     Examples:
 
-        Create a new ulabel:
+        Create a new label:
 
-        >>> ln.ULabel(name="ML output").save()
+        >>> my_project = ln.ULabel(name="My project")
+        >>> my_project.save()
 
         Label a file without associating it to a feature:
 
-        >>> ulabel = ln.ULabel.filter(name="ML output").one()
+        >>> ulabel = ln.ULabel.filter(name="My project").one()
         >>> file = ln.File("./myfile.csv")
         >>> file.save()
         >>> file.ulabels.add(ulabel)
         >>> file.ulabels.list("name")
-        ['ML output']
+        ['My project']
 
-        Organize ulabels in a ulabel ontology:
+        Organize labels in a hierarchy:
 
-        >>> ln.ULabel(name="Project 1").save()
-        >>> project1 = ln.ULabel.filter(name="Project 1").one()
-        >>> ln.ULabel(name="is_project").save()
-        >>> is_project = ln.ULabel.filter(name="is_project").one()
-        >>> project1.parents.add(is_project)
+        >>> ulabels = ln.ULabel.lookup()  # create a lookup
+        >>> is_project = ln.ULabel(name="is_project")  # create a super-category `is_project`
+        >>> is_project.save()
+        >>> ulabels.my_project.parents.add(is_project)
 
-        Query by ulabel:
+        Query by `ULabel`:
 
         >>> ln.File.filter(ulabels=project).first()
     """
@@ -932,7 +906,7 @@ class ULabel(Registry, HasParents, CanValidate):
     description = TextField(null=True, default=None)
     """A description (optional)."""
     parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
-    """Parent ulabels, useful to hierarchically group ulabels (optional)."""
+    """Parent labels, useful to hierarchically group labels (optional)."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
