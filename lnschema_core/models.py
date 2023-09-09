@@ -869,13 +869,13 @@ class Run(Registry):
 
 
 class ULabel(Registry, HasParents, CanValidate):
-    """Universal data labels.
+    """Universal label ontology.
 
     Args:
         name: `str` A name.
         description: `str` A description.
 
-    A ulabel can be used to annotate a file or dataset as a whole: "Project 1",
+    A `ULabel` record is the easiest way to annotate a file or dataset with a label: "Project 1",
     "curated", or "Iris flower".
 
     In some cases, a ulabel is measured only within a part of a file or dataset.
