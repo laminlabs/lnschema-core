@@ -489,37 +489,6 @@ class Data:
         """Label manager (:class:`~lamindb.dev.LabelManager`)."""
         pass
 
-    def add_labels(
-        self,
-        records: Union[Registry, List[Registry], QuerySet, Iterable],
-        feature: "Feature",
-        *,
-        field: Optional[StrField] = None,
-    ) -> None:
-        """Add one or several labels and associate them with a feature.
-
-        Args:
-            records: Label records to add.
-            feature: Feature under which to group the labels.
-            field: Field to parse iterable with from_values.
-        """
-        pass
-
-    def get_labels(
-        self,
-        feature: "Feature",
-        mute: bool = False,
-        flat_names: bool = False,
-    ) -> Union[QuerySet, Dict[str, QuerySet], List]:
-        """Get labels given a feature.
-
-        Args:
-            feature: Feature under which labels are grouped.
-            mute: Show no logging.
-            flat_names: Flatten list to names rather than returning records.
-        """
-        pass
-
     def describe(self):
         """Describe relations of data record.
 
@@ -937,7 +906,7 @@ class ULabel(Registry, HasParents, CanValidate):
     description = TextField(null=True, default=None)
     """A description (optional)."""
     parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
-    """Parent ulabels, useful to hierarchically group ulabels (optional)."""
+    """Parent labels, useful to hierarchically group labels (optional)."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
