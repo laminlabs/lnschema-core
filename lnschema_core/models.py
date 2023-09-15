@@ -742,6 +742,7 @@ class Transform(Registry, HasParents):
         version: Optional[str] = None,
         type: Optional[TransformType] = None,
         reference: Optional[str] = None,
+        reference_type: Optional[str] = None,
         is_new_version_of: Optional["Transform"] = None,
     ):
         ...
@@ -924,7 +925,9 @@ class ULabel(Registry, HasParents, CanValidate):
     def __init__(
         self,
         name: str,
-        description: str,
+        description: Optional[str] = None,
+        reference: Optional[str] = None,
+        reference_type: Optional[str] = None,
     ):
         ...
 
@@ -1865,6 +1868,8 @@ class Dataset(Registry, Data):
         data: Any,
         name: str,
         description: Optional[str] = None,
+        reference: Optional[str] = None,
+        reference_type: Optional[str] = None,
     ):
         ...
 
@@ -1891,6 +1896,8 @@ class Dataset(Registry, Data):
         description: Optional[str] = None,
         run: Optional[Run] = None,
         modality: Optional[Modality] = None,
+        reference: Optional[str] = None,
+        reference_type: Optional[str] = None,
     ) -> "Dataset":
         """Create from ``DataFrame``, validate & link features.
 
@@ -1925,6 +1932,8 @@ class Dataset(Registry, Data):
         description: Optional[str] = None,
         run: Optional[Run] = None,
         modality: Optional[Modality] = None,
+        reference: Optional[str] = None,
+        reference_type: Optional[str] = None,
     ) -> "Dataset":
         """Create from ``AnnDataLike``, validate & link features.
 
