@@ -718,6 +718,8 @@ class Transform(Registry, HasParents):
     reference = CharField(max_length=255, db_index=True, null=True, default=None)
     """Reference for the transform, e.g., a URL.
     """
+    reference_type = CharField(max_length=255, db_index=True, null=True, default=None)
+    """Type of reference, e.g., github link."""
     parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
     """Parent transforms (predecessors) in data flow.
 
@@ -740,6 +742,7 @@ class Transform(Registry, HasParents):
         version: Optional[str] = None,
         type: Optional[TransformType] = None,
         reference: Optional[str] = None,
+        reference_type: Optional[str] = None,
         is_new_version_of: Optional["Transform"] = None,
     ):
         ...
@@ -905,6 +908,10 @@ class ULabel(Registry, HasParents, CanValidate):
     """Name or title of ulabel (required)."""
     description = TextField(null=True, default=None)
     """A description (optional)."""
+    reference = CharField(max_length=255, db_index=True, null=True, default=None)
+    """A reference like URL or external ID."""
+    reference_type = CharField(max_length=255, db_index=True, null=True, default=None)
+    """Type of reference, e.g., donor_id from Vendor X."""
     parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
     """Parent labels, useful to hierarchically group labels (optional)."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -918,7 +925,9 @@ class ULabel(Registry, HasParents, CanValidate):
     def __init__(
         self,
         name: str,
-        description: str,
+        description: Optional[str] = None,
+        reference: Optional[str] = None,
+        reference_type: Optional[str] = None,
     ):
         ...
 
@@ -1826,6 +1835,10 @@ class Dataset(Registry, Data):
     """
     hash = CharField(max_length=86, db_index=True, null=True, default=None)
     """Hash of dataset content. 86 base64 chars allow to store 64 bytes, 512 bits."""
+    reference = CharField(max_length=255, db_index=True, null=True, default=None)
+    """A reference like URL or external ID."""
+    reference_type = CharField(max_length=255, db_index=True, null=True, default=None)
+    """Type of reference, e.g., cellxgene Census dataset_id."""
     feature_sets = models.ManyToManyField("FeatureSet", related_name="datasets", through="DatasetFeatureSet")
     """The feature sets measured in this dataset (see :class:`~lamindb.FeatureSet`)."""
     ulabels = models.ManyToManyField("ULabel", through="DatasetULabel", related_name="datasets")
@@ -1855,6 +1868,8 @@ class Dataset(Registry, Data):
         data: Any,
         name: str,
         description: Optional[str] = None,
+        reference: Optional[str] = None,
+        reference_type: Optional[str] = None,
     ):
         ...
 
@@ -1881,6 +1896,8 @@ class Dataset(Registry, Data):
         description: Optional[str] = None,
         run: Optional[Run] = None,
         modality: Optional[Modality] = None,
+        reference: Optional[str] = None,
+        reference_type: Optional[str] = None,
     ) -> "Dataset":
         """Create from ``DataFrame``, validate & link features.
 
@@ -1915,6 +1932,8 @@ class Dataset(Registry, Data):
         description: Optional[str] = None,
         run: Optional[Run] = None,
         modality: Optional[Modality] = None,
+        reference: Optional[str] = None,
+        reference_type: Optional[str] = None,
     ) -> "Dataset":
         """Create from ``AnnDataLike``, validate & link features.
 
