@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+✨ Add `reference` and `reference_type` to `Dataset`, `ULabel` | [298](https://github.com/laminlabs/lnschema-core/pull/298) | [sunnyosun](https://github.com/sunnyosun) | 2023-09-15 |
 🔥 Remove `add_labels` & `get_labels` & improve documentation of `ULabel` | [297](https://github.com/laminlabs/lnschema-core/pull/297) | [falexwolf](https://github.com/falexwolf) | 2023-09-09 |
 🎨 Added return_field to lookup | [296](https://github.com/laminlabs/lnschema-core/pull/296) | [sunnyosun](https://github.com/sunnyosun) | 2023-09-08 |
 🚚 Rename `Label` to `ULabel` | [295](https://github.com/laminlabs/lnschema-core/pull/295) | [sunnyosun](https://github.com/sunnyosun) | 2023-09-07 |
