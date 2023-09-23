@@ -1955,6 +1955,21 @@ class Dataset(Registry, Data):
         """
         pass
 
+    def load(self, is_run_input: Optional[bool] = None, **kwargs) -> DataLike:
+        """Stage and load to memory.
+
+        Returns in-memory representation if possible, e.g., a concatenated `DataFrame` or `AnnData` object.
+        """
+        pass
+
+    def backed(self, is_run_input: Optional[bool] = None) -> Union["AnnDataAccessor", "BackedAccessor"]:
+        """Return a cloud-backed data object.
+
+        Notes:
+            For more info, see tutorial: :doc:`/data`.
+        """
+        pass
+
 
 class LinkORM:
     pass
