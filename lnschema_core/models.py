@@ -1955,6 +1955,45 @@ class Dataset(Registry, Data):
         """
         pass
 
+    def load(self, is_run_input: Optional[bool] = None, **kwargs) -> DataLike:
+        """Stage and load to memory.
+
+        Returns in-memory representation if possible, e.g., a concatenated `DataFrame` or `AnnData` object.
+        """
+        pass
+
+    def backed(self, is_run_input: Optional[bool] = None) -> Union["AnnDataAccessor", "BackedAccessor"]:
+        """Return a cloud-backed data object.
+
+        Notes:
+            For more info, see tutorial: :doc:`/data`.
+        """
+        pass
+
+    def delete(self, storage: Optional[bool] = None) -> None:
+        """Delete file, optionally from storage.
+
+        Args:
+            storage: Indicate whether you want to delete the
+                file in storage.
+
+        Examples:
+
+            For any `File` object `file`, call:
+
+            >>> file.delete()
+        """
+        pass
+
+    def save(self, *args, **kwargs) -> None:
+        """Save the file to database & storage.
+
+        Examples:
+            >>> file = ln.File("./myfile.csv", key="myfile.csv")
+            >>> file.save()
+        """
+        pass
+
 
 class LinkORM:
     pass
