@@ -1970,6 +1970,30 @@ class Dataset(Registry, Data):
         """
         pass
 
+    def delete(self, storage: Optional[bool] = None) -> None:
+        """Delete file, optionally from storage.
+
+        Args:
+            storage: Indicate whether you want to delete the
+                file in storage.
+
+        Examples:
+
+            For any `File` object `file`, call:
+
+            >>> file.delete()
+        """
+        pass
+
+    def save(self, *args, **kwargs) -> None:
+        """Save the file to database & storage.
+
+        Examples:
+            >>> file = ln.File("./myfile.csv", key="myfile.csv")
+            >>> file.save()
+        """
+        pass
+
 
 class LinkORM:
     pass
