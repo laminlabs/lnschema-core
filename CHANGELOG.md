@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🎨 Add a `members` property to `FeatureSet` | [300](https://github.com/laminlabs/lnschema-core/pull/300) | [falexwolf](https://github.com/falexwolf) | 2023-09-27 |
 📝 Document dataset methods | [299](https://github.com/laminlabs/lnschema-core/pull/299) | [falexwolf](https://github.com/falexwolf) | 2023-09-23 | 0.48.3
 ✨ Add `reference` and `reference_type` to `Dataset`, `ULabel` | [298](https://github.com/laminlabs/lnschema-core/pull/298) | [sunnyosun](https://github.com/sunnyosun) | 2023-09-15 |
 🔥 Remove `add_labels` & `get_labels` & improve documentation of `ULabel` | [297](https://github.com/laminlabs/lnschema-core/pull/297) | [falexwolf](https://github.com/falexwolf) | 2023-09-09 |
