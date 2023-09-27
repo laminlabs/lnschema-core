@@ -1279,6 +1279,11 @@ class FeatureSet(Registry):
         """Save."""
         pass
 
+    @property
+    def members(self) -> "QuerySet":
+        """A queryset for the individual records of the set."""
+        pass
+
 
 class File(Registry, Data):
     """Files: immutable data batches.
