@@ -1286,7 +1286,7 @@ class FeatureSet(Registry):
 
 
 class File(Registry, Data):
-    """Files: immutable data batches.
+    """Files: data batches.
 
     Args:
         data: `Union[PathLike, DataLike]` A path or data
@@ -1743,7 +1743,7 @@ class File(Registry, Data):
 
 
 class Dataset(Registry, Data):
-    """Datasets: mutable collections of data batches.
+    """Datasets: collections of data batches.
 
     Args:
         data: `DataLike` A data object (`DataFrame`, `AnnData`) to store.
@@ -1767,9 +1767,9 @@ class Dataset(Registry, Data):
 
         Typically,
 
-        - a file stores a single immutable batch of data
+        - a file stores a single batch of data
 
-        - a dataset stores a mutable collection of data batches
+        - a dataset stores a collection of data batches
 
         Examples:
 
@@ -1777,10 +1777,9 @@ class Dataset(Registry, Data):
           h5ad, ...) → :class:`~lamindb.File`
 
         - Mutable streamable backends (DuckDB, zarr, TileDB, ...) →
-          :class:`~lamindb.Dataset` wrapping :class:`~lamindb.File`
+          :class:`~lamindb.Dataset`
 
-        - Collections of files → :class:`~lamindb.Dataset` wrapping
-          :class:`~lamindb.File`
+        - Collections of files → :class:`~lamindb.Dataset`
 
         - Datasets in BigQuery, Snowflake, Postgres, ... →
           :class:`~lamindb.Dataset` (not yet implemented)
