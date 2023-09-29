@@ -1959,7 +1959,7 @@ class Dataset(Registry, Data):
         """
         pass
 
-    def load(self, is_run_input: Optional[bool] = None, **kwargs) -> DataLike:
+    def load(self, join: Literal["inner", "outer"] = "outer", is_run_input: Optional[bool] = None, **kwargs) -> DataLike:
         """Stage and load to memory.
 
         Returns in-memory representation if possible, e.g., a concatenated `DataFrame` or `AnnData` object.
