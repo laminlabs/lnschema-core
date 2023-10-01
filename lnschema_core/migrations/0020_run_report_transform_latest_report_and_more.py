@@ -30,4 +30,9 @@ class Migration(migrations.Migration):
             name="transform",
             field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, related_name="output_files", to="lnschema_core.transform"),
         ),
+        migrations.AddField(
+            model_name="run",
+            name="is_consecutive",
+            field=models.BooleanField(default=None, null=True),
+        ),
     ]

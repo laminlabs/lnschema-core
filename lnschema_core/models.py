@@ -813,6 +813,8 @@ class Run(Registry):
     """Creator of record, a :class:`~lamindb.User`."""
     report = models.ForeignKey("File", PROTECT, default=None, null=True, related_name="report_of")
     """Report of run, e.g., an html file."""
+    is_consecutive = models.BooleanField(null=True, default=None)
+    """Indicates whether code was consecutively executed. Is relevant for notebooks."""
     # input_files on File
     # output_files on File
     reference = CharField(max_length=255, db_index=True, null=True, default=None)
