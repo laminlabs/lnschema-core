@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-✨ Track storage of notebooks | [301](https://github.com/laminlabs/lnschema-core/pull/301) | [falexwolf](https://github.com/falexwolf) | 2023-10-01 |
+✨ Track storage of notebooks | [301](https://github.com/laminlabs/lnschema-core/pull/301) | [falexwolf](https://github.com/falexwolf) | 2023-10-01 | 0.49.0
 🎨 Add a `members` property to `FeatureSet` | [300](https://github.com/laminlabs/lnschema-core/pull/300) | [falexwolf](https://github.com/falexwolf) | 2023-09-27 | 0.48.4
 📝 Document dataset methods | [299](https://github.com/laminlabs/lnschema-core/pull/299) | [falexwolf](https://github.com/falexwolf) | 2023-09-23 | 0.48.3
 ✨ Add `reference` and `reference_type` to `Dataset`, `ULabel` | [298](https://github.com/laminlabs/lnschema-core/pull/298) | [sunnyosun](https://github.com/sunnyosun) | 2023-09-15 |
