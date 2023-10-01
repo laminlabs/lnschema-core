@@ -711,10 +711,14 @@ class Transform(Registry, HasParents):
     )
     """Transform type.
 
-    Defaults to `notebook` if run from ipython and to `pipeline` if run from python.
+    Defaults to `"notebook"` if run from ipython and to `"pipeline"` if run from python.
 
-    If run from the app, it defaults to `app`.
+    If run from LaminHub, it defaults to `app`.
     """
+    latest_report = models.ForeignKey("File", PROTECT, default=None, null=True, related_name="latest_report_of")
+    """Latest run report."""
+    source_file = models.ForeignKey("File", PROTECT, default=None, null=True, related_name="source_of")
+    """Source of the transform if stored as file within LaminDB."""
     reference = CharField(max_length=255, db_index=True, null=True, default=None)
     """Reference for the transform, e.g., a URL.
     """
@@ -807,6 +811,10 @@ class Run(Registry):
     """Time of run execution."""
     created_by = models.ForeignKey(User, CASCADE, default=current_user_id, related_name="created_runs")
     """Creator of record, a :class:`~lamindb.User`."""
+    report = models.ForeignKey("File", PROTECT, default=None, null=True, related_name="report_of")
+    """Report of run, e.g., an html file."""
+    is_consecutive = models.BooleanField(null=True, default=None)
+    """Indicates whether code was consecutively executed. Is relevant for notebooks."""
     # input_files on File
     # output_files on File
     reference = CharField(max_length=255, db_index=True, null=True, default=None)
@@ -1418,7 +1426,7 @@ class File(Registry, Data):
     """The feature sets measured in the file (:class:`~lamindb.FeatureSet`)."""
     ulabels = models.ManyToManyField(ULabel, through="FileULabel", related_name="files")
     """The ulabels measured in the file (:class:`~lamindb.ULabel`)."""
-    transform = models.ForeignKey(Transform, PROTECT, related_name="files", null=True, default=None)
+    transform = models.ForeignKey(Transform, PROTECT, related_name="output_files", null=True, default=None)
     """:class:`~lamindb.Transform` whose run created the file."""
     run = models.ForeignKey(Run, PROTECT, related_name="output_files", null=True, default=None)
     """:class:`~lamindb.Run` that created the file."""
