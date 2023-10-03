@@ -876,7 +876,7 @@ class ULabel(Registry, HasParents, CanValidate):
     is stored. For instance, the dataset might contain measurements across 2
     species of the Iris flower: `"setosa"` & `"versicolor"`.
 
-    See :doc:`tutorial1` to learn more.
+    See :doc:`tutorial2` to learn more.
 
     .. note::
 
