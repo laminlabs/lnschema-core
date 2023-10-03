@@ -652,6 +652,26 @@ class Storage(Registry):
     ):
         super(Storage, self).__init__(*args, **kwargs)
 
+    @property
+    def path(self) -> Union[Path, UPath]:
+        """Bucket or folder path (`Path`, `UPath`).
+
+        Examples:
+
+            Cloud storage bucket:
+
+            >>> ln.Storage("s3://my-bucket").save()
+
+            Directory/folder in cloud storage:
+
+            >>> ln.Storage("s3://my-bucket/my-directory").save()
+
+            Local directory/folder:
+
+            >>> ln.Storage("./my-directory").save()
+        """
+        pass
+
 
 class Transform(Registry, HasParents):
     """Transforms of files & datasets.
@@ -820,6 +840,8 @@ class Run(Registry):
     """Time of run execution."""
     created_by = models.ForeignKey(User, CASCADE, default=current_user_id, related_name="created_runs")
     """Creator of record, a :class:`~lamindb.User`."""
+    # we don't want to make below a OneToOne because there could be the same trivial report
+    # generated for many different runs
     report = models.ForeignKey("File", PROTECT, default=None, null=True, related_name="report_of")
     """Report of run, e.g., an html file."""
     is_consecutive = models.BooleanField(null=True, default=None)
@@ -1870,10 +1892,12 @@ class Dataset(Registry, Data):
     """:class:`~lamindb.Run` that created the `file`."""
     input_of = models.ManyToManyField(Run, related_name="input_datasets")
     """Runs that use this dataset as an input."""
-    file = models.ForeignKey("File", on_delete=PROTECT, null=True, unique=True, related_name="datasets")
+    file = models.OneToOneField("File", on_delete=PROTECT, null=True, unique=True, related_name="dataset")
     """Storage of dataset as a one file."""
     files = models.ManyToManyField("File", related_name="datasets")
     """Storage of dataset as multiple file."""
+    storage = models.OneToOneField(Storage, on_delete=PROTECT, null=True, unique=True, related_name="dataset")
+    """Storage of dataset as mere paths handled by a key value store or file system."""
     initial_version = models.ForeignKey("self", PROTECT, null=True, default=None)
     """Initial version of the dataset, a :class:`~lamindb.Dataset` object."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -1906,6 +1930,28 @@ class Dataset(Registry, Data):
         *args,
         **kwargs,
     ):
+        pass
+
+    @property
+    def path(self) -> Optional[Union[Path, UPath]]:
+        """None or bucket or folder path (`Path`, `UPath`).
+
+        Only relevant for datasets that merely reference to a bucket or folder.
+
+        Examples:
+
+            Cloud storage bucket:
+
+            >>> ln.Storage("s3://my-bucket").save()
+
+            Directory/folder in cloud storage:
+
+            >>> ln.Storage("s3://my-bucket/my-directory").save()
+
+            Local directory/folder:
+
+            >>> ln.Storage("./my-directory").save()
+        """
         pass
 
     @classmethod
