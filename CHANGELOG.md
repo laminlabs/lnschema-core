@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-🎨 Add path properties & storage field on Dataset | [303](https://github.com/laminlabs/lnschema-core/pull/303) | [falexwolf](https://github.com/falexwolf) | 2023-10-04 |
+🎨 Add path properties & storage field on Dataset | [303](https://github.com/laminlabs/lnschema-core/pull/303) | [falexwolf](https://github.com/falexwolf) | 2023-10-04 | 0.50.0
 🚚 Rename notebook series | [302](https://github.com/laminlabs/lnschema-core/pull/302) | [sunnyosun](https://github.com/sunnyosun) | 2023-10-03 |
 ✨ Track storage of notebooks | [301](https://github.com/laminlabs/lnschema-core/pull/301) | [falexwolf](https://github.com/falexwolf) | 2023-10-01 | 0.49.0
 🎨 Add a `members` property to `FeatureSet` | [300](https://github.com/laminlabs/lnschema-core/pull/300) | [falexwolf](https://github.com/falexwolf) | 2023-09-27 | 0.48.4
