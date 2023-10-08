@@ -550,7 +550,7 @@ class User(Registry, CanValidate):
         User(id=DzTjkKse, handle=testuser1, email=testuser1@lamin.ai, name=Test User1, updated_at=2023-07-10 18:37:26)
     """
 
-    id = CharField(max_length=8, primary_key=True, default=None)
+    uid = CharField(unique=True, db_index=True, max_length=8, default=None)
     """Universal id, valid across DB instances."""
     handle = CharField(max_length=30, unique=True, db_index=True, default=None)
     """Universal handle, valid across DB instances (required)."""
@@ -614,7 +614,7 @@ class Storage(Registry):
         PosixPath('/home/runner/work/lamindb-setup/lamindb-setup/docs/guide/storage_2')
     """
 
-    id = CharField(max_length=8, default=base62_8, db_index=True, primary_key=True)
+    uid = CharField(unique=True, max_length=8, default=base62_8, db_index=True)
     """Universal id, valid across DB instances."""
     root = CharField(max_length=255, db_index=True, unique=True, default=None)
     """Root path of storage, an s3 path, a local path, etc. (required)."""
@@ -717,7 +717,7 @@ class Transform(Registry, HasParents):
         >>> transform.view_parents()
     """
 
-    id = CharField(max_length=14, db_index=True, primary_key=True, default=None)
+    uid = CharField(unique=True, db_index=True, max_length=14, default=None)
     """Universal id."""
     name = CharField(max_length=255, db_index=True, null=True, default=None)
     """Transform name or title, a pipeline name, notebook title, etc..
@@ -832,7 +832,7 @@ class Run(Registry):
         >>> ln.dev.context.run
     """
 
-    id = CharField(max_length=20, default=base62_20, primary_key=True)
+    uid = CharField(unique=True, db_index=True, max_length=20, default=base62_20)
     """Universal id, valid across DB instances."""
     transform = models.ForeignKey(Transform, CASCADE, related_name="runs")
     """The transform :class:`~lamindb.Transform` that is being run."""
@@ -941,7 +941,7 @@ class ULabel(Registry, HasParents, CanValidate):
         >>> ln.File.filter(ulabels=project).first()
     """
 
-    id = CharField(max_length=8, default=base62_8, primary_key=True)
+    uid = CharField(unique=True, db_index=True, max_length=8, default=base62_8)
     """A universal random id, valid across DB instances."""
     name = CharField(max_length=255, db_index=True, unique=True, default=None)
     """Name or title of ulabel (required)."""
@@ -1000,7 +1000,7 @@ class Modality(Registry, HasParents, CanValidate):
         description: `Optional[str]` A description.
     """
 
-    id = CharField(max_length=8, default=base62_8, primary_key=True)
+    uid = CharField(unique=True, db_index=True, max_length=8, default=base62_8)
     """Universal id, valid across DB instances."""
     name = CharField(max_length=256, db_index=True)
     """Name of the modality (required)."""
@@ -1109,7 +1109,7 @@ class Feature(Registry, CanValidate):
 
     """
 
-    id = CharField(max_length=12, default=base62_12, primary_key=True)
+    uid = CharField(unique=True, db_index=True, max_length=12, default=base62_12)
     """Universal id, valid across DB instances."""
     name = CharField(max_length=255, db_index=True, default=None)
     """Name of feature (required)."""
@@ -1222,7 +1222,7 @@ class FeatureSet(Registry):
         >>> file.features.add_feature_st(feature_set, slot="var")
     """
 
-    id = CharField(max_length=20, primary_key=True, default=None)
+    uid = CharField(unique=True, db_index=True, max_length=20, default=None)
     """A universal id (hash of the set of feature values)."""
     name = CharField(max_length=128, null=True, default=None)
     """A name (optional)."""
@@ -1413,7 +1413,7 @@ class File(Registry, Data):
 
     """
 
-    id = CharField(max_length=20, primary_key=True)
+    uid = CharField(unique=True, db_index=True, max_length=20)
     """A universal random id (20-char base62 ~ UUID), valid across DB instances."""
     storage = models.ForeignKey(Storage, PROTECT, related_name="files")
     """Storage location (:class:`~lamindb.Storage`), e.g., an S3 or GCP bucket or a local directory."""
@@ -1862,7 +1862,7 @@ class Dataset(Registry, Data):
         >>> assert new_dataset.version == "2"
     """
 
-    id = CharField(max_length=20, default=base62_20, primary_key=True)
+    uid = CharField(unique=True, db_index=True, max_length=20, default=base62_20)
     """Universal id, valid across DB instances."""
     name = CharField(max_length=255, db_index=True, default=None)
     """Name or title of dataset (required)."""
