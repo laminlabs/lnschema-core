@@ -550,6 +550,8 @@ class User(Registry, CanValidate):
         User(id=DzTjkKse, handle=testuser1, email=testuser1@lamin.ai, name=Test User1, updated_at=2023-07-10 18:37:26)
     """
 
+    id = models.AutoField(primary_key=True)
+    """Internal id, valid only in one DB instance."""
     uid = CharField(unique=True, db_index=True, max_length=8, default=None)
     """Universal id, valid across DB instances."""
     handle = CharField(max_length=30, unique=True, db_index=True, default=None)
@@ -614,6 +616,8 @@ class Storage(Registry):
         PosixPath('/home/runner/work/lamindb-setup/lamindb-setup/docs/guide/storage_2')
     """
 
+    id = models.AutoField(primary_key=True)
+    """Internal id, valid only in one DB instance."""
     uid = CharField(unique=True, max_length=8, default=base62_8, db_index=True)
     """Universal id, valid across DB instances."""
     root = CharField(max_length=255, db_index=True, unique=True, default=None)
@@ -717,6 +721,8 @@ class Transform(Registry, HasParents):
         >>> transform.view_parents()
     """
 
+    id = models.AutoField(primary_key=True)
+    """Internal id, valid only in one DB instance."""
     uid = CharField(unique=True, db_index=True, max_length=14, default=None)
     """Universal id."""
     name = CharField(max_length=255, db_index=True, null=True, default=None)
@@ -832,6 +838,8 @@ class Run(Registry):
         >>> ln.dev.context.run
     """
 
+    id = models.BigAutoField(primary_key=True)
+    """Internal id, valid only in one DB instance."""
     uid = CharField(unique=True, db_index=True, max_length=20, default=base62_20)
     """Universal id, valid across DB instances."""
     transform = models.ForeignKey(Transform, CASCADE, related_name="runs")
@@ -941,6 +949,8 @@ class ULabel(Registry, HasParents, CanValidate):
         >>> ln.File.filter(ulabels=project).first()
     """
 
+    id = models.AutoField(primary_key=True)
+    """Internal id, valid only in one DB instance."""
     uid = CharField(unique=True, db_index=True, max_length=8, default=base62_8)
     """A universal random id, valid across DB instances."""
     name = CharField(max_length=255, db_index=True, unique=True, default=None)
@@ -1000,6 +1010,8 @@ class Modality(Registry, HasParents, CanValidate):
         description: `Optional[str]` A description.
     """
 
+    id = models.AutoField(primary_key=True)
+    """Internal id, valid only in one DB instance."""
     uid = CharField(unique=True, db_index=True, max_length=8, default=base62_8)
     """Universal id, valid across DB instances."""
     name = CharField(max_length=256, db_index=True)
@@ -1109,6 +1121,8 @@ class Feature(Registry, CanValidate):
 
     """
 
+    id = models.AutoField(primary_key=True)
+    """Internal id, valid only in one DB instance."""
     uid = CharField(unique=True, db_index=True, max_length=12, default=base62_12)
     """Universal id, valid across DB instances."""
     name = CharField(max_length=255, db_index=True, default=None)
@@ -1222,6 +1236,8 @@ class FeatureSet(Registry):
         >>> file.features.add_feature_st(feature_set, slot="var")
     """
 
+    id = models.AutoField(primary_key=True)
+    """Internal id, valid only in one DB instance."""
     uid = CharField(unique=True, db_index=True, max_length=20, default=None)
     """A universal id (hash of the set of feature values)."""
     name = CharField(max_length=128, null=True, default=None)
@@ -1413,6 +1429,8 @@ class File(Registry, Data):
 
     """
 
+    id = models.AutoField(primary_key=True)
+    """Internal id, valid only in one DB instance."""
     uid = CharField(unique=True, db_index=True, max_length=20)
     """A universal random id (20-char base62 ~ UUID), valid across DB instances."""
     storage = models.ForeignKey(Storage, PROTECT, related_name="files")
@@ -1862,6 +1880,8 @@ class Dataset(Registry, Data):
         >>> assert new_dataset.version == "2"
     """
 
+    id = models.AutoField(primary_key=True)
+    """Internal id, valid only in one DB instance."""
     uid = CharField(unique=True, db_index=True, max_length=20, default=base62_20)
     """Universal id, valid across DB instances."""
     name = CharField(max_length=255, db_index=True, default=None)
@@ -2069,6 +2089,7 @@ class LinkORM:
 
 
 class FileFeatureSet(Registry, LinkORM):
+    id = models.BigAutoField(primary_key=True)
     file = models.ForeignKey(File, on_delete=models.CASCADE)
     feature_set = models.ForeignKey(FeatureSet, on_delete=models.CASCADE)
     slot = CharField(max_length=40, null=True, default=None)
@@ -2078,6 +2099,7 @@ class FileFeatureSet(Registry, LinkORM):
 
 
 class DatasetFeatureSet(Registry, LinkORM):
+    id = models.BigAutoField(primary_key=True)
     dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE)
     feature_set = models.ForeignKey(FeatureSet, on_delete=models.CASCADE)
     slot = CharField(max_length=50, null=True, default=None)
@@ -2087,6 +2109,7 @@ class DatasetFeatureSet(Registry, LinkORM):
 
 
 class FileULabel(Registry, LinkORM):
+    id = models.BigAutoField(primary_key=True)
     file = models.ForeignKey(File, on_delete=models.CASCADE)
     ulabel = models.ForeignKey(ULabel, on_delete=models.CASCADE)
     feature = models.ForeignKey(Feature, CASCADE, null=True, default=None)
@@ -2096,6 +2119,7 @@ class FileULabel(Registry, LinkORM):
 
 
 class DatasetULabel(Registry, LinkORM):
+    id = models.BigAutoField(primary_key=True)
     dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE)
     ulabel = models.ForeignKey(ULabel, on_delete=models.CASCADE)
     feature = models.ForeignKey(Feature, CASCADE, null=True, default=None)
@@ -2132,8 +2156,7 @@ def __repr__(self: Registry, include_foreign_keys: bool = True) -> str:
 Registry.__repr__ = __repr__  # type: ignore
 Registry.__str__ = __repr__  # type: ignore
 
-# backward compat
-ORM = Registry
+ORM = Registry  # backward compat
 
 
 def deferred_attribute__repr__(self):
