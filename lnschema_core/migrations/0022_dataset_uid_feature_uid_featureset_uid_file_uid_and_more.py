@@ -211,7 +211,7 @@ def create_new_ids(apps, schema_editor):
     global ID_MAPPER
 
     for model_name in CORE_MODELS.keys():
-        print(f"populating new ids for {model_name}")
+        print(f"creating new id column for {model_name}")
         model_class = apps.get_model("lnschema_core", model_name)
         new_id = 1
         for record in model_class.objects.all().iterator(chunk_size=50):
@@ -287,8 +287,10 @@ for model_name in CORE_MODELS.keys():
 
 def populate_tmp_ids(apps, schema_editor):
     for model_name in CORE_MODELS.keys():
+        print(f"populating new id column for {model_name}")
         model_metadata = SchemaMetadata.get_models()["core"][model_name]
         for record in model_metadata.model.objects.all():
+            print(record)
             for foreign_key_field in model_metadata.relations.many_to_one:
                 int_id = ID_MAPPER[getattr(record, f"{foreign_key_field}")]
                 setattr(record, f"{foreign_key_field}_tmp", int_id)
