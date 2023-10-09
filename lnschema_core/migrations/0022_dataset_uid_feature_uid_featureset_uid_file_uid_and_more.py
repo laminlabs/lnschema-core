@@ -288,19 +288,7 @@ for model_name in CORE_MODELS.keys():
     Migration.operations += add_a_new_column_foreign_keys(model_name=model_name)
 
 
-# def populate_tmp_ids(apps, schema_editor):
-#     for model_name in CORE_MODELS.keys():
-#         print(f"populating new id column for {model_name}")
-#         model_metadata = SchemaMetadata.get_models()["core"][model_name]
-#         for record in model_metadata.model.objects.all():
-#             print(record)
-#             for foreign_key_field in model_metadata.relations.many_to_one:
-#                 int_id = ID_MAPPER[getattr(record, f"{foreign_key_field}")]
-#                 setattr(record, f"{foreign_key_field}_tmp", int_id)
-#             record.save()
-
-
-def populate_tmp_ids(model_name):
+def populate_new_column_foreign_keys(model_name):
     print(f"populate tmp foreign key column for {model_name}")
     model_metadata = SchemaMetadata.get_models()["core"][model_name]
     migrations_list = []
@@ -308,16 +296,19 @@ def populate_tmp_ids(model_name):
         related_model = model_metadata.model._meta.get_field(foreign_key_name).related_model
         table = model_metadata.model._meta.db_table
         related_table = related_model._meta.db_table
-        command = f"UPDATE TABLE {table} SET {foreign_key_name}_id_tmp=(SELECT id FROM {related_table} WHERE {table}.{foreign_key_name}_id={related_table}.uid"
+        # command = f"UPDATE {table} SET {foreign_key_name}_id_tmp=(SELECT id FROM {related_table} WHERE {table}.{foreign_key_name}_id={related_table}.uid)"
+        command = (
+            f"UPDATE {table} SET {table}.{foreign_key_name}_id_tmp={related_table}.id FROM {table} INNER JOIN {related_table} ON"
+            f" {table}.{foreign_key_name}_id={related_table}.uid"
+        )
         print(command)
         migrations_list.append(migrations.RunSQL(command))
     return migrations_list
 
 
 # populate temporary fields
-# Migration.operations += [migrations.RunPython(populate_tmp_ids, reverse_code=migrations.RunPython.noop)]
-# for model_name in CORE_MODELS.keys():
-#     Migration.operations += populate_tmp_ids(model_name=model_name)
+for model_name in CORE_MODELS.keys():
+    Migration.operations += populate_new_column_foreign_keys(model_name=model_name)
 
 
 # Migration.operations += [
