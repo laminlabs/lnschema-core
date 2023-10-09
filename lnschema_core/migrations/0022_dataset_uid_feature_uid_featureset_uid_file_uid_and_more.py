@@ -8,7 +8,7 @@ from django.db import migrations, models
 from lamindb_setup import settings as _settings
 from lamindb_setup._init_instance import get_schema_module_name
 
-import lnschema_core.ids
+import lnschema_core.ids  # noqa
 from lnschema_core.models import LinkORM
 
 
@@ -268,6 +268,7 @@ for model_name, big in CORE_MODELS.items():
 
 
 def add_a_new_column_foreign_keys(model_name):
+    print(f"creating tmp foreign key column for {model_name}")
     model_metadata = SchemaMetadata.get_models()["core"][model_name]
     # for each many_to_many, loop through foreign keys
     # for many_to_many_field in model_metadata.relations.many_to_many:
@@ -276,7 +277,9 @@ def add_a_new_column_foreign_keys(model_name):
     migrations_list = []
     # fields_metadata = model_metadata.fields_metadata
     for foreign_key_name in model_metadata.relations.many_to_one:
-        migrations_list.append(migrations.RunSQL(f"ALTER TABLE {model_metadata.model._meta.db_table} ADD {foreign_key_name}_tmp int"))
+        command = f"ALTER TABLE {model_metadata.model._meta.db_table} ADD {foreign_key_name}_id_tmp int"
+        print(command)
+        migrations_list.append(migrations.RunSQL(command))
     return migrations_list
 
 
@@ -285,100 +288,116 @@ for model_name in CORE_MODELS.keys():
     Migration.operations += add_a_new_column_foreign_keys(model_name=model_name)
 
 
-def populate_tmp_ids(apps, schema_editor):
-    for model_name in CORE_MODELS.keys():
-        print(f"populating new id column for {model_name}")
-        model_metadata = SchemaMetadata.get_models()["core"][model_name]
-        for record in model_metadata.model.objects.all():
-            print(record)
-            for foreign_key_field in model_metadata.relations.many_to_one:
-                int_id = ID_MAPPER[getattr(record, f"{foreign_key_field}")]
-                setattr(record, f"{foreign_key_field}_tmp", int_id)
-            record.save()
+# def populate_tmp_ids(apps, schema_editor):
+#     for model_name in CORE_MODELS.keys():
+#         print(f"populating new id column for {model_name}")
+#         model_metadata = SchemaMetadata.get_models()["core"][model_name]
+#         for record in model_metadata.model.objects.all():
+#             print(record)
+#             for foreign_key_field in model_metadata.relations.many_to_one:
+#                 int_id = ID_MAPPER[getattr(record, f"{foreign_key_field}")]
+#                 setattr(record, f"{foreign_key_field}_tmp", int_id)
+#             record.save()
+
+
+def populate_tmp_ids(model_name):
+    print(f"populate tmp foreign key column for {model_name}")
+    model_metadata = SchemaMetadata.get_models()["core"][model_name]
+    migrations_list = []
+    for foreign_key_name in model_metadata.relations.many_to_one:
+        related_model = model_metadata.model._meta.get_field(foreign_key_name).related_model
+        table = model_metadata.model._meta.db_table
+        related_table = related_model._meta.db_table
+        command = f"UPDATE TABLE {table} SET {foreign_key_name}_id_tmp=(SELECT id FROM {related_table} WHERE {table}.{foreign_key_name}_id={related_table}.uid"
+        print(command)
+        migrations_list.append(migrations.RunSQL(command))
+    return migrations_list
 
 
 # populate temporary fields
-Migration.operations += [migrations.RunPython(populate_tmp_ids, reverse_code=migrations.RunPython.noop)]
+# Migration.operations += [migrations.RunPython(populate_tmp_ids, reverse_code=migrations.RunPython.noop)]
+# for model_name in CORE_MODELS.keys():
+#     Migration.operations += populate_tmp_ids(model_name=model_name)
 
 
-Migration.operations += [
-    migrations.AlterField(
-        model_name="dataset",
-        name="uid",
-        field=models.CharField(db_index=True, default=lnschema_core.ids.base62_20, max_length=20, unique=True),
-    ),
-    migrations.AlterField(
-        model_name="datasetfeatureset",
-        name="id",
-        field=models.BigAutoField(primary_key=True, serialize=False),
-    ),
-    migrations.AlterField(
-        model_name="datasetulabel",
-        name="id",
-        field=models.BigAutoField(primary_key=True, serialize=False),
-    ),
-    migrations.AlterField(
-        model_name="feature",
-        name="uid",
-        field=models.CharField(db_index=True, default=lnschema_core.ids.base62_12, max_length=12, unique=True),
-    ),
-    migrations.AlterField(
-        model_name="featureset",
-        name="uid",
-        field=models.CharField(db_index=True, default=None, max_length=20, unique=True),
-    ),
-    migrations.AlterField(
-        model_name="file",
-        name="uid",
-        field=models.CharField(db_index=True, max_length=20, unique=True),
-    ),
-    migrations.AlterField(
-        model_name="filefeatureset",
-        name="id",
-        field=models.BigAutoField(primary_key=True, serialize=False),
-    ),
-    migrations.AlterField(
-        model_name="fileulabel",
-        name="id",
-        field=models.BigAutoField(primary_key=True, serialize=False),
-    ),
-    migrations.AlterField(
-        model_name="modality",
-        name="uid",
-        field=models.CharField(db_index=True, default=lnschema_core.ids.base62_8, max_length=8, unique=True),
-    ),
-    migrations.AlterField(
-        model_name="run",
-        name="uid",
-        field=models.CharField(db_index=True, default=lnschema_core.ids.base62_20, max_length=20, unique=True),
-    ),
-    migrations.AlterField(
-        model_name="storage",
-        name="uid",
-        field=models.CharField(db_index=True, default=lnschema_core.ids.base62_8, max_length=8, unique=True),
-    ),
-    migrations.AlterField(
-        model_name="transform",
-        name="uid",
-        field=models.CharField(db_index=True, default=None, max_length=14, unique=True),
-    ),
-    migrations.AlterField(
-        model_name="ulabel",
-        name="uid",
-        field=models.CharField(db_index=True, default=lnschema_core.ids.base62_8, max_length=8, unique=True),
-    ),
-    migrations.AlterField(
-        model_name="user",
-        name="uid",
-        field=models.CharField(db_index=True, default=None, max_length=8, unique=True),
-    ),
-]
+# Migration.operations += [
+#     migrations.AlterField(
+#         model_name="dataset",
+#         name="uid",
+#         field=models.CharField(db_index=True, default=lnschema_core.ids.base62_20, max_length=20, unique=True),
+#     ),
+#     migrations.AlterField(
+#         model_name="datasetfeatureset",
+#         name="id",
+#         field=models.BigAutoField(primary_key=True, serialize=False),
+#     ),
+#     migrations.AlterField(
+#         model_name="datasetulabel",
+#         name="id",
+#         field=models.BigAutoField(primary_key=True, serialize=False),
+#     ),
+#     migrations.AlterField(
+#         model_name="feature",
+#         name="uid",
+#         field=models.CharField(db_index=True, default=lnschema_core.ids.base62_12, max_length=12, unique=True),
+#     ),
+#     migrations.AlterField(
+#         model_name="featureset",
+#         name="uid",
+#         field=models.CharField(db_index=True, default=None, max_length=20, unique=True),
+#     ),
+#     migrations.AlterField(
+#         model_name="file",
+#         name="uid",
+#         field=models.CharField(db_index=True, max_length=20, unique=True),
+#     ),
+#     migrations.AlterField(
+#         model_name="filefeatureset",
+#         name="id",
+#         field=models.BigAutoField(primary_key=True, serialize=False),
+#     ),
+#     migrations.AlterField(
+#         model_name="fileulabel",
+#         name="id",
+#         field=models.BigAutoField(primary_key=True, serialize=False),
+#     ),
+#     migrations.AlterField(
+#         model_name="modality",
+#         name="uid",
+#         field=models.CharField(db_index=True, default=lnschema_core.ids.base62_8, max_length=8, unique=True),
+#     ),
+#     migrations.AlterField(
+#         model_name="run",
+#         name="uid",
+#         field=models.CharField(db_index=True, default=lnschema_core.ids.base62_20, max_length=20, unique=True),
+#     ),
+#     migrations.AlterField(
+#         model_name="storage",
+#         name="uid",
+#         field=models.CharField(db_index=True, default=lnschema_core.ids.base62_8, max_length=8, unique=True),
+#     ),
+#     migrations.AlterField(
+#         model_name="transform",
+#         name="uid",
+#         field=models.CharField(db_index=True, default=None, max_length=14, unique=True),
+#     ),
+#     migrations.AlterField(
+#         model_name="ulabel",
+#         name="uid",
+#         field=models.CharField(db_index=True, default=lnschema_core.ids.base62_8, max_length=8, unique=True),
+#     ),
+#     migrations.AlterField(
+#         model_name="user",
+#         name="uid",
+#         field=models.CharField(db_index=True, default=None, max_length=8, unique=True),
+#     ),
+# ]
 
-for model_name, big in CORE_MODELS.items():
-    Migration.operations.append(
-        migrations.AlterField(
-            model_name=model_name,
-            name="id",
-            field=models.BigAutoField(primary_key=True, serialize=False) if big else models.AutoField(primary_key=True, serialize=False),
-        ),
-    )
+# for model_name, big in CORE_MODELS.items():
+#     Migration.operations.append(
+#         migrations.AlterField(
+#             model_name=model_name,
+#             name="id",
+#             field=models.BigAutoField(primary_key=True, serialize=False) if big else models.AutoField(primary_key=True, serialize=False),
+#         ),
+#     )
