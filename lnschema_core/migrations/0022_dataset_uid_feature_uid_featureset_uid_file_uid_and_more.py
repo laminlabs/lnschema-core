@@ -269,7 +269,7 @@ for model_name, big in CORE_MODELS.items():
     )
 
 
-def add_a_new_column_foreign_keys(model_name):
+def add_a_tmp_column_foreign_keys(model_name):
     print(f"creating tmp foreign key column for {model_name}")
     model_metadata = SchemaMetadata.get_models()["core"][model_name]
     # for each many_to_many, loop through foreign keys
@@ -287,10 +287,10 @@ def add_a_new_column_foreign_keys(model_name):
 
 # add temporary ID fields
 for model_name in CORE_MODELS.keys():
-    Migration.operations += add_a_new_column_foreign_keys(model_name=model_name)
+    Migration.operations += add_a_tmp_column_foreign_keys(model_name=model_name)
 
 
-def populate_new_column_foreign_keys(model_name):
+def populate_tmp_column_foreign_keys(model_name):
     print(f"populate tmp foreign key column for {model_name}")
     model_metadata = SchemaMetadata.get_models()["core"][model_name]
     migrations_list = []
@@ -310,7 +310,7 @@ def populate_new_column_foreign_keys(model_name):
 
 # populate temporary fields
 for model_name in CORE_MODELS.keys():
-    Migration.operations += populate_new_column_foreign_keys(model_name=model_name)
+    Migration.operations += populate_tmp_column_foreign_keys(model_name=model_name)
 
 
 def delete_old_foreign_keys(model_name):
@@ -416,27 +416,12 @@ for model_name, big in CORE_MODELS.items():
     )
 
 
-# # re-create foreign keys
-# def delete_old_foreign_keys(model_name):
-#     print(f"creating new foreign key column for {model_name}")
-#     model_metadata = SchemaMetadata.get_models()["core"][model_name]
-#     # for each many_to_many, loop through foreign keys
-#     # for many_to_many_field in model_metadata.relations.many_to_many:
-#     #     add_a_new_column_foreign_keys(many_to_many_field.model)
-#     # for each foreign_key, add a new column with _tmp suffix
-#     migrations_list = []
-#     for foreign_key_name in model_metadata.relations.many_to_one:
-#         migrations_list.append(migrations.AddField(model_name, foreign_key_name, field=models.ForeignKey()))
-#     return migrations_list
-
-
+# add foreign keys back
 Migration.operations += [
     migrations.AddField(
         model_name="dataset",
         name="created_by",
-        field=models.ForeignKey(
-            default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.PROTECT, related_name="created_datasets", to="lnschema_core.user"
-        ),
+        field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, related_name="created_datasets", to="lnschema_core.user"),
     ),
     migrations.AddField(
         model_name="dataset",
@@ -461,9 +446,7 @@ Migration.operations += [
     migrations.AddField(
         model_name="feature",
         name="created_by",
-        field=models.ForeignKey(
-            default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.PROTECT, related_name="created_features", to="lnschema_core.user"
-        ),
+        field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, related_name="created_features", to="lnschema_core.user"),
     ),
     migrations.AddField(
         model_name="feature",
@@ -473,9 +456,7 @@ Migration.operations += [
     migrations.AddField(
         model_name="featureset",
         name="created_by",
-        field=models.ForeignKey(
-            default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.PROTECT, related_name="created_feature_sets", to="lnschema_core.user"
-        ),
+        field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, related_name="created_feature_sets", to="lnschema_core.user"),
     ),
     migrations.AddField(
         model_name="featureset",
@@ -485,9 +466,7 @@ Migration.operations += [
     migrations.AddField(
         model_name="file",
         name="created_by",
-        field=models.ForeignKey(
-            default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.PROTECT, related_name="created_files", to="lnschema_core.user"
-        ),
+        field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, related_name="created_files", to="lnschema_core.user"),
     ),
     migrations.AddField(
         model_name="file",
@@ -502,7 +481,7 @@ Migration.operations += [
     migrations.AddField(
         model_name="file",
         name="storage",
-        field=models.ForeignKey(default=None, on_delete=django.db.models.deletion.PROTECT, related_name="files", to="lnschema_core.storage"),
+        field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, related_name="files", to="lnschema_core.storage"),
         preserve_default=False,
     ),
     migrations.AddField(
@@ -513,14 +492,12 @@ Migration.operations += [
     migrations.AddField(
         model_name="modality",
         name="created_by",
-        field=models.ForeignKey(
-            default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.PROTECT, related_name="created_modalities", to="lnschema_core.user"
-        ),
+        field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, related_name="created_modalities", to="lnschema_core.user"),
     ),
     migrations.AddField(
         model_name="run",
         name="created_by",
-        field=models.ForeignKey(default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.CASCADE, related_name="created_runs", to="lnschema_core.user"),
+        field=models.ForeignKey(default=None, on_delete=django.db.models.deletion.CASCADE, related_name="created_runs", to="lnschema_core.user"),
     ),
     migrations.AddField(
         model_name="run",
@@ -530,22 +507,18 @@ Migration.operations += [
     migrations.AddField(
         model_name="run",
         name="transform",
-        field=models.ForeignKey(default=None, on_delete=django.db.models.deletion.CASCADE, related_name="runs", to="lnschema_core.transform"),
+        field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.CASCADE, related_name="runs", to="lnschema_core.transform"),
         preserve_default=False,
     ),
     migrations.AddField(
         model_name="storage",
         name="created_by",
-        field=models.ForeignKey(
-            default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.PROTECT, related_name="created_storages", to="lnschema_core.user"
-        ),
+        field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, related_name="created_storages", to="lnschema_core.user"),
     ),
     migrations.AddField(
         model_name="transform",
         name="created_by",
-        field=models.ForeignKey(
-            default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.PROTECT, related_name="created_transforms", to="lnschema_core.user"
-        ),
+        field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, related_name="created_transforms", to="lnschema_core.user"),
     ),
     migrations.AddField(
         model_name="transform",
@@ -563,6 +536,96 @@ Migration.operations += [
         field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, related_name="source_of", to="lnschema_core.file"),
     ),
     migrations.AddField(
+        model_name="ulabel",
+        name="created_by",
+        field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, related_name="created_ulabels", to="lnschema_core.user"),
+    ),
+]
+
+
+def populate_new_column_foreign_keys(model_name):
+    print(f"populate new foreign key column for {model_name}")
+    model_metadata = SchemaMetadata.get_models()["core"][model_name]
+    migrations_list = []
+    for foreign_key_name in model_metadata.relations.many_to_one:
+        table = model_metadata.model._meta.db_table
+        command = f"UPDATE {table} SET {foreign_key_name}_id={foreign_key_name}_id_tmp"
+        migrations_list.append(migrations.RunSQL(command))
+    return migrations_list
+
+
+# populate temporary fields
+for model_name in CORE_MODELS.keys():
+    Migration.operations += populate_new_column_foreign_keys(model_name=model_name)
+
+
+# fix defaults for foreign keys and nullability
+Migration.operations += [
+    migrations.AlterField(
+        model_name="dataset",
+        name="created_by",
+        field=models.ForeignKey(
+            default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.PROTECT, related_name="created_datasets", to="lnschema_core.user"
+        ),
+    ),
+    migrations.AlterField(
+        model_name="feature",
+        name="created_by",
+        field=models.ForeignKey(
+            default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.PROTECT, related_name="created_features", to="lnschema_core.user"
+        ),
+    ),
+    migrations.AlterField(
+        model_name="featureset",
+        name="created_by",
+        field=models.ForeignKey(
+            default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.PROTECT, related_name="created_feature_sets", to="lnschema_core.user"
+        ),
+    ),
+    migrations.AlterField(
+        model_name="file",
+        name="created_by",
+        field=models.ForeignKey(
+            default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.PROTECT, related_name="created_files", to="lnschema_core.user"
+        ),
+    ),
+    migrations.AlterField(
+        model_name="file",
+        name="storage",
+        field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name="files", to="lnschema_core.storage"),
+    ),
+    migrations.AlterField(
+        model_name="modality",
+        name="created_by",
+        field=models.ForeignKey(
+            default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.PROTECT, related_name="created_modalities", to="lnschema_core.user"
+        ),
+    ),
+    migrations.AlterField(
+        model_name="run",
+        name="created_by",
+        field=models.ForeignKey(default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.CASCADE, related_name="created_runs", to="lnschema_core.user"),
+    ),
+    migrations.AlterField(
+        model_name="run",
+        name="transform",
+        field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="runs", to="lnschema_core.transform"),
+    ),
+    migrations.AlterField(
+        model_name="storage",
+        name="created_by",
+        field=models.ForeignKey(
+            default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.PROTECT, related_name="created_storages", to="lnschema_core.user"
+        ),
+    ),
+    migrations.AlterField(
+        model_name="transform",
+        name="created_by",
+        field=models.ForeignKey(
+            default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.PROTECT, related_name="created_transforms", to="lnschema_core.user"
+        ),
+    ),
+    migrations.AlterField(
         model_name="ulabel",
         name="created_by",
         field=models.ForeignKey(
