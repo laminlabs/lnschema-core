@@ -301,20 +301,20 @@ for model_name in CORE_MODELS.keys():
     Migration.operations += populate_tmp_column_foreign_keys(model_name=model_name)
 
 
-def delete_old_foreign_keys(model_name):
-    print(f"deleting old foreign key columns for {model_name}")
-    model_metadata = SchemaMetadata.get_models()["core"][model_name]
-    # for each many_to_many, loop through foreign keys
-    # for many_to_many_field in model_metadata.relations.many_to_many:
-    #     add_a_new_column_foreign_keys(many_to_many_field.model)
-    # for each foreign_key, add a new column with _tmp suffix
-    migrations_list = []
-    for foreign_key_name in model_metadata.relations.many_to_one:
-        if not (model_name == "File" and foreign_key_name == "storage"):
-            migrations_list.append(migrations.RemoveField(model_name, foreign_key_name))
-    return migrations_list
+# def delete_old_foreign_keys(model_name):
+#     # print(f"deleting old foreign key columns for {model_name}")
+#     model_metadata = SchemaMetadata.get_models()["core"][model_name]
+#     # for each many_to_many, loop through foreign keys
+#     # for many_to_many_field in model_metadata.relations.many_to_many:
+#     #     add_a_new_column_foreign_keys(many_to_many_field.model)
+#     # for each foreign_key, add a new column with _tmp suffix
+#     migrations_list = []
+#     for foreign_key_name in model_metadata.relations.many_to_one:
+#         if not (model_name == "File" and foreign_key_name == "storage"):
+#             migrations_list.append(migrations.RemoveField(model_name, foreign_key_name))
+#     return migrations_list
 
 
-# delete old foreign keys
-for model_name in CORE_MODELS.keys():
-    Migration.operations += delete_old_foreign_keys(model_name=model_name)
+# # delete old foreign keys
+# for model_name in CORE_MODELS.keys():
+#     Migration.operations += delete_old_foreign_keys(model_name=model_name)
