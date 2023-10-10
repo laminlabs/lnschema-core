@@ -28,6 +28,7 @@ dev = [
     "pytest>=6.0",
     "pytest-cov",
     "nbproject-test",
+    "pandas",
 ]
 
 [tool.black]

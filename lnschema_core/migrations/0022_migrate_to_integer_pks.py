@@ -8,6 +8,7 @@ import pandas as pd
 from django.db import migrations, models
 
 import lnschema_core.ids  # noqa
+import lnschema_core.models as lnschema_core_models
 
 CORE_MODELS = {
     "Dataset": False,
@@ -96,7 +97,7 @@ def add_a_tmp_column_foreign_keys(orm):
 
 # add temporary ID fields
 for model_name in CORE_MODELS.keys():
-    registry = getattr("lnschema_core", model_name)
+    registry = getattr(lnschema_core_models, model_name)
     Migration.operations += add_a_tmp_column_foreign_keys(registry)
 
 
@@ -117,7 +118,7 @@ def populate_tmp_column_foreign_keys(orm):
 
 # populate temporary fields
 for model_name in CORE_MODELS.keys():
-    registry = getattr("lnschema_core", model_name)
+    registry = getattr(lnschema_core_models, model_name)
     Migration.operations += populate_tmp_column_foreign_keys(registry)
 
 
@@ -288,9 +289,9 @@ Migration.operations += [
 
 # export data to parquet files
 for model_name in CORE_MODELS.keys():
-    registry = getattr("lnschema_core", model_name)
+    registry = getattr(lnschema_core_models, model_name)
     table_name = registry._meta.db_table
-    df = pd.read_sql_table(table_name, ln_setup.settings.db)
+    df = pd.read_sql_table(table_name, ln_setup.settings.instance.db)
     directory = Path("./lamin_db_export/{ln_setup.settings.identifier}/")
     directory.mkdir(parents=True, exist_ok=True)
     df.to_parquet(directory / table_name)
