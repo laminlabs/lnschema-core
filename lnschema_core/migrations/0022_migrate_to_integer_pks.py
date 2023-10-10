@@ -292,6 +292,6 @@ for model_name in CORE_MODELS.keys():
     registry = getattr(lnschema_core_models, model_name)
     table_name = registry._meta.db_table
     df = pd.read_sql_table(table_name, ln_setup.settings.instance.db)
-    directory = Path("./lamin_db_export/{ln_setup.settings.identifier}/")
+    directory = Path(f"./lamindb_export/{ln_setup.settings.identifier}/")
     directory.mkdir(parents=True, exist_ok=True)
     df.to_parquet(directory / table_name)
