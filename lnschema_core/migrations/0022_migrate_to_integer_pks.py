@@ -5,7 +5,7 @@ from pathlib import Path
 import django.db.models.deletion
 import lamindb_setup as ln_setup
 import pandas as pd
-from django.db import migrations, models
+from django.db import connection, migrations, models
 
 import lnschema_core.ids  # noqa
 import lnschema_core.models as lnschema_core_models
@@ -25,8 +25,6 @@ CORE_MODELS = {
 
 
 def create_new_ids(apps, schema_editor):
-    global ID_MAPPER
-
     for model_name in CORE_MODELS.keys():
         # print(f"creating new id column for {model_name}")
         model_class = apps.get_model("lnschema_core", model_name)
@@ -82,23 +80,26 @@ for model_name, big in CORE_MODELS.items():
     )
 
 
-def add_a_tmp_column_foreign_keys(orm):
-    migrations_list = []
+def add_a_tmp_column_foreign_keys_orm(orm):
     foreign_key_names = [field.name for field in orm._meta.fields if isinstance(field, (models.ForeignKey, models.OneToOneField))]
     for foreign_key_name in foreign_key_names:
         command = f"ALTER TABLE {orm._meta.db_table} ADD {foreign_key_name}_id_tmp int"
-        migrations_list.append(migrations.RunSQL(command))
-    many_to_many_names = [field.name for field in orm._meta.fields if isinstance(field, (models.ManyToManyField))]
+        with connection.cursor() as cursor:
+            cursor.execute(command)
+    many_to_many_names = [field.name for field in orm._meta.many_to_many]
     for many_to_many_name in many_to_many_names:
-        link_orm = getattr(registry, many_to_many_name).through
-        migrations_list += add_a_tmp_column_foreign_keys(link_orm)
-    return migrations_list
+        link_orm = getattr(orm, many_to_many_name).through
+        add_a_tmp_column_foreign_keys_orm(link_orm)
+
+
+def add_a_tmp_column_foreign_keys(apps, schema_editor):
+    for model_name in CORE_MODELS.keys():
+        registry = getattr(lnschema_core_models, model_name)
+        add_a_tmp_column_foreign_keys_orm(registry)
 
 
 # add temporary ID fields
-for model_name in CORE_MODELS.keys():
-    registry = getattr(lnschema_core_models, model_name)
-    Migration.operations += add_a_tmp_column_foreign_keys(registry)
+Migration.operations.append(migrations.RunPython(add_a_tmp_column_foreign_keys, reverse_code=migrations.RunPython.noop))
 
 
 def populate_tmp_column_foreign_keys(orm):
@@ -107,12 +108,13 @@ def populate_tmp_column_foreign_keys(orm):
     for foreign_key_name in foreign_key_names:
         related_table = orm._meta.get_field(foreign_key_name).related_model._meta.db_table
         table = orm._meta.db_table
-        command = f"UPDATE {table} SET {foreign_key_name}_id_tmp=(SELECT id FROM {related_table} WHERE {table}.{foreign_key_name}_id={related_table}.uid)"
+        # need to use an alias below, otherwise self-referential foreign keys will be omitted
+        command = f"UPDATE {table} SET {foreign_key_name}_id_tmp=(SELECT id FROM {related_table} b WHERE {table}.{foreign_key_name}_id=b.uid)"
         migrations_list.append(migrations.RunSQL(command))
-    many_to_many_names = [field.name for field in orm._meta.fields if isinstance(field, (models.ManyToManyField))]
+    many_to_many_names = [field.name for field in orm._meta.many_to_many]
     for many_to_many_name in many_to_many_names:
-        link_orm = getattr(registry, many_to_many_name).through
-        migrations_list += add_a_tmp_column_foreign_keys(link_orm)
+        link_orm = getattr(orm, many_to_many_name).through
+        migrations_list += populate_tmp_column_foreign_keys(link_orm)
     return migrations_list
 
 
@@ -120,6 +122,31 @@ def populate_tmp_column_foreign_keys(orm):
 for model_name in CORE_MODELS.keys():
     registry = getattr(lnschema_core_models, model_name)
     Migration.operations += populate_tmp_column_foreign_keys(registry)
+
+
+def export_registry(registry, directory):
+    table_name = registry._meta.db_table
+    df = pd.read_sql_table(table_name, ln_setup.settings.instance.db)
+    df.to_parquet(directory / f"{table_name}.parquet")
+
+
+def export_db(apps, schema_editor):
+    # export data to parquet files
+    directory = Path(f"./lamindb_export/{ln_setup.settings.instance.identifier}/")
+    directory.mkdir(parents=True, exist_ok=True)
+    print(f"\n\nexporting data to parquet files in {directory}\n")
+    for model_name in CORE_MODELS.keys():
+        registry = getattr(lnschema_core_models, model_name)
+        export_registry(registry, directory)
+        many_to_many_names = [field.name for field in registry._meta.many_to_many]
+        for many_to_many_name in many_to_many_names:
+            print(many_to_many_name)
+            link_orm = getattr(registry, many_to_many_name).through
+            export_registry(link_orm, directory)
+
+
+# fill in new id values in entity tables
+Migration.operations.append(migrations.RunPython(export_db, reverse_code=migrations.RunPython.noop))
 
 
 # all what follows below is not running through for reasons that I (Alex) don't understand
@@ -285,13 +312,3 @@ Migration.operations += [
         ),
     ),
 ]
-
-
-# export data to parquet files
-for model_name in CORE_MODELS.keys():
-    registry = getattr(lnschema_core_models, model_name)
-    table_name = registry._meta.db_table
-    df = pd.read_sql_table(table_name, ln_setup.settings.instance.db)
-    directory = Path(f"./lamindb_export/{ln_setup.settings.instance.identifier}/")
-    directory.mkdir(parents=True, exist_ok=True)
-    df.to_parquet(directory / table_name / ".parquet")
