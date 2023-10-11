@@ -1906,7 +1906,7 @@ class Dataset(Registry, Data):
     """The feature sets measured in this dataset (see :class:`~lamindb.FeatureSet`)."""
     ulabels = models.ManyToManyField("ULabel", through="DatasetULabel", related_name="datasets")
     """ULabels sampled in the dataset (see :class:`~lamindb.Feature`)."""
-    transform = models.ForeignKey(Transform, PROTECT, related_name="datasets", null=True, default=None)
+    transform = models.ForeignKey(Transform, PROTECT, related_name="output_datasets", null=True, default=None)
     """:class:`~lamindb.Transform` whose run created the dataset."""
     run = models.ForeignKey(Run, PROTECT, related_name="output_datasets", null=True, default=None)
     """:class:`~lamindb.Run` that created the `file`."""

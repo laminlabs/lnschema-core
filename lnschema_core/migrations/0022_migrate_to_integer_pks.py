@@ -40,7 +40,13 @@ class Migration(migrations.Migration):
         ("lnschema_core", "0021_dataset_storage_alter_dataset_file"),
     ]
 
-    operations = []  # type: ignore
+    operations = [
+        migrations.AlterField(
+            model_name="dataset",
+            name="transform",
+            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, related_name="output_datasets", to="lnschema_core.transform"),
+        ),
+    ]
 
 
 # repurpose old primary key
