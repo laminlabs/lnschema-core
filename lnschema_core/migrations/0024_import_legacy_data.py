@@ -26,14 +26,20 @@ def import_registry(registry, directory):
 
     table_name = registry._meta.db_table
     df = pd.read_parquet(directory / f"{table_name}.parquet")
-    df.to_sql(table_name, ln_setup.settings.instance.db)
+    old_foreign_key_columns = [column for column in df.columns if column.endswith("_old")]
+    for column in old_foreign_key_columns:
+        df.drop(column, axis=1, inplace=True)
+    df.to_sql(table_name, ln_setup.settings.instance.db, if_exists="append", index=False)
 
 
 def import_db(apps, schema_editor):
     # import data from parquet files
     directory = Path(f"./lamindb_export/{ln_setup.settings.instance.identifier}/")
     if directory.exists():
-        print(f"\n\nimporting data to parquet files in {directory}\n")
+        response = input(f"\n\nHave you re-initialized your instance and are ready to import data from the parquet files: {directory}? (y/n)\n")
+        if response != "y":
+            print("Please remove the parquet files or move them to another location")
+            raise SystemExit
         for model_name in CORE_MODELS.keys():
             registry = getattr(lnschema_core.models, model_name)
             import_registry(registry, directory)
@@ -45,7 +51,7 @@ def import_db(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("lnschema_core", "0001_initial_squashed_0022_migrate_to_integer_pks"),
+        ("lnschema_core", "0001_initial_squashed_0023"),
     ]
 
     operations = [migrations.RunPython(import_db, reverse_code=migrations.RunPython.noop)]

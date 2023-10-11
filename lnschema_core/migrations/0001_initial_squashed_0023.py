@@ -33,6 +33,7 @@ class Migration(migrations.Migration):
         ("lnschema_core", "0020_run_report_transform_latest_report_and_more"),
         ("lnschema_core", "0021_dataset_storage_alter_dataset_file"),
         ("lnschema_core", "0022_migrate_to_integer_pks"),
+        ("lnschema_core", "0023_export_legacy_data"),
     ]
 
     dependencies = []  # type: ignore
