@@ -4,8 +4,11 @@ user_id_cache = {}
 def current_user_id() -> int:
     from lamindb_setup import settings
 
-    if settings.instance.id not in user_id_cache:
-        from lnschema_core.models import User
+    from lnschema_core.models import User
 
-        user_id_cache[settings.instance.id] = User.objects.get(uid=settings.user.id).id
-    return user_id_cache[settings.instance.id]
+    if settings._instance_exists:
+        if settings.instance.identifier not in user_id_cache:
+            user_id_cache[settings.instance.identifier] = User.objects.get(uid=settings.user.uid).id
+        return user_id_cache[settings.instance.identifier]
+    else:
+        return User.objects.get(uid=settings.user.uid).id
