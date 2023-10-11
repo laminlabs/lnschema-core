@@ -1242,7 +1242,7 @@ class FeatureSet(Registry):
     """A universal id (hash of the set of feature values)."""
     name = CharField(max_length=128, null=True, default=None)
     """A name (optional)."""
-    n = models.IntegerField()
+    number = models.IntegerField()
     """Number of features in the set."""
     type = CharField(max_length=64, null=True, default=None)
     """Simple type, e.g., "str", "int". Is `None` for :class:`~lamindb.Feature` (optional).

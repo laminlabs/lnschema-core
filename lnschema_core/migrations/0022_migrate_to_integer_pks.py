@@ -146,7 +146,6 @@ def export_db(apps, schema_editor):
         export_registry(registry, directory)
         many_to_many_names = [field.name for field in registry._meta.many_to_many]
         for many_to_many_name in many_to_many_names:
-            print(many_to_many_name)
             link_orm = getattr(registry, many_to_many_name).through
             export_registry(link_orm, directory)
 
@@ -156,7 +155,7 @@ Migration.operations.append(migrations.RunPython(export_db, reverse_code=migrati
 
 
 # all what follows below is not running through for reasons that I (Alex) don't understand
-# we'll keep it here to keep Django happy
+# we'll keep it here to theoretically ascertain migration integrity
 
 # turn previous primary keys into regular char fields
 Migration.operations += [
