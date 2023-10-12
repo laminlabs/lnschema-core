@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+import lamindb_setup
 import lamindb_setup as ln_setup
 from django.db import migrations
 
@@ -38,7 +39,7 @@ def import_db(apps, schema_editor):
     if directory.exists():
         response = input(f"\n\nHave you re-initialized your instance and are ready to import data from the parquet files: {directory}? (y/n)\n")
         if response != "y":
-            print("Please remove the parquet files or move them to another location")
+            print("Please re-initialize your instance using the same account, instance name, schema, db & storage settings; you can see them using: lamin info")
             raise SystemExit
         for model_name in CORE_MODELS.keys():
             registry = getattr(lnschema_core.models, model_name)
@@ -55,3 +56,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [migrations.RunPython(import_db, reverse_code=migrations.RunPython.noop)]
+
+
+schemas = lamindb_setup.settings.instance.schema
+if "bionty" in schemas:
+    Migration.dependencies.append(("lnschema_bionty", "0016_export_legacy_data"))
+if "lamin1" in schemas:
+    Migration.dependencies.append(("lnschema_lamin1", "0012_export_legacy_data"))
