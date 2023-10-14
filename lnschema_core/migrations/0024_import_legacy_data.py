@@ -37,9 +37,15 @@ def import_db(apps, schema_editor):
     # import data from parquet files
     directory = Path(f"./lamindb_export/{ln_setup.settings.instance.identifier}/")
     if directory.exists():
-        response = input(f"\n\nHave you re-initialized your instance and are ready to import data from the parquet files: {directory}? (y/n)\n")
+        response = input(
+            "\n\nHave you deleted or archived your old instance (sqlite file or postgres database) and re-initialized your instance? Only if so, proceed to import data from"
+            f" the parquet files: {directory}? Otherwise hit 'n' and see instructions. (y/n)\n"
+        )
         if response != "y":
-            print("Please re-initialize your instance using the same account, instance name, schema, db & storage settings; you can see them using: lamin info")
+            print(
+                "Please delete or archive your current database (sqlite file or postgres database) and re-initialize your instance using lamin init and the same account,"
+                " instance name, schema, db & storage settings; you can see them using: lamin info"
+            )
             raise SystemExit
         for model_name in CORE_MODELS.keys():
             registry = getattr(lnschema_core.models, model_name)

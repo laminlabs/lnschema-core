@@ -21,7 +21,10 @@ CORE_MODELS = {
 
 
 def create_new_ids(apps, schema_editor):
-    response = input("\nDo you want to migrate your instance to integer primary keys? This involves a data export and is more cumbersome than a regular migration. (y/n)")
+    response = input(
+        "\nDo you want to migrate your instance to integer primary keys? You will need to re-initialize your instance with `lamin init` after a data export. This is more"
+        " cumbersome than a regular migration. (y/n)"
+    )
     if response != "y":
         raise SystemExit
     for model_name in CORE_MODELS.keys():
