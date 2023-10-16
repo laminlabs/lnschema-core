@@ -2145,7 +2145,7 @@ def format_field_value(value: Union[datetime, str, Any]) -> Any:
 
 
 def __repr__(self: Registry, include_foreign_keys: bool = True) -> str:
-    field_names = [field.name for field in self._meta.fields if (not isinstance(field, models.ForeignKey) and field.name != "created_at")]
+    field_names = [field.name for field in self._meta.fields if (not isinstance(field, models.ForeignKey) and field.name != "created_at" and field.name != "id")]
     if include_foreign_keys:
         field_names += [f"{field.name}_id" for field in self._meta.fields if isinstance(field, models.ForeignKey)]
     fields_str = {k: format_field_value(getattr(self, k)) for k in field_names if hasattr(self, k)}
