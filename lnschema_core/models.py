@@ -79,7 +79,7 @@ class CanValidate:
 
         Examples:
             >>> import lnschema_bionty as lb
-            >>> lb.settings.species = "human"
+            >>> lb.settings.organism = "human"
             >>> ln.save(lb.Gene.from_values(["A1CF", "A1BG", "BRCA2"], field="symbol"))
             >>> gene_symbols = ["A1CF", "A1BG", "FANCD1", "FANCD20"]
             >>> result = lb.Gene.inspect(gene_symbols, field=lb.Gene.symbol)
@@ -122,7 +122,7 @@ class CanValidate:
 
         Examples:
             >>> import lnschema_bionty as lb
-            >>> lb.settings.species = "human"
+            >>> lb.settings.organism = "human"
             >>> ln.save(lb.Gene.from_values(["A1CF", "A1BG", "BRCA2"], field="symbol"))
             >>> gene_symbols = ["A1CF", "A1BG", "FANCD1", "FANCD20"]
             >>> lb.Gene.validate(gene_symbols, field=lb.Gene.symbol)
@@ -178,7 +178,7 @@ class CanValidate:
 
         Examples:
             >>> import lnschema_bionty as lb
-            >>> lb.settings.species = "human"
+            >>> lb.settings.organism = "human"
             >>> ln.save(lb.Gene.from_values(["A1CF", "A1BG", "BRCA2"], field="symbol"))
             >>> gene_synonyms = ["A1CF", "A1BG", "FANCD1", "FANCD20"]
             >>> standardized_names = lb.Gene.standardize(gene_synonyms)
@@ -343,7 +343,7 @@ class Registry(models.Model):
             values: A list of values for an identifier, e.g.
                 `["name1", "name2"]`.
             field: A `Registry` field to look up, e.g., `lb.CellMarker.name`.
-            **kwargs: Additional conditions for creation of records, e.g., `species="human"`.
+            **kwargs: Additional conditions for creation of records, e.g., `organism="human"`.
 
         Returns:
             A list of records.
@@ -395,7 +395,7 @@ class Registry(models.Model):
 
         Examples:
             >>> import lnschema_bionty as lb
-            >>> lb.settings.species = "human"
+            >>> lb.settings.organism = "human"
             >>> lb.Gene.from_bionty(symbol="ADGB-DT").save()
             >>> lookup = lb.Gene.lookup()
             >>> lookup.adgb_dt
@@ -904,7 +904,7 @@ class ULabel(Registry, HasParents, CanValidate):
     In some cases, a label is measured *within* a file or dataset a feature (a
     :class:`~lamindb.Feature` record) denotes the column name in which the label
     is stored. For instance, the dataset might contain measurements across 2
-    species of the Iris flower: `"setosa"` & `"versicolor"`.
+    organism of the Iris flower: `"setosa"` & `"versicolor"`.
 
     See :doc:`tutorial2` to learn more.
 
@@ -1228,7 +1228,7 @@ class FeatureSet(Registry):
         >>> ln.FeatureSet(features)
 
         >>> import lnschema_bionty as bt
-        >>> reference = bt.Gene(species="mouse")
+        >>> reference = bt.Gene(organism="mouse")
         >>> feature_set = ln.FeatureSet.from_values(adata.var["ensemble_id"], Gene.ensembl_gene_id)
         >>> feature_set.save()
         >>> file = ln.File(adata, name="Mouse Lymph Node scRNA-seq")
@@ -1307,7 +1307,7 @@ class FeatureSet(Registry):
                 `"float"` otherwise.
             name: A name.
             modality: A name or id for :class:`~lamindb.Modality`.
-            **kwargs: Can contain ``species`` or other context to interpret values.
+            **kwargs: Can contain ``organism`` or other context to interpret values.
 
         Examples:
 
@@ -1564,7 +1564,7 @@ class File(Registry, Data):
         Examples:
             >>> df = ln.dev.datasets.df_iris_in_meter_batch1()
             >>> df.head()
-              sepal_length sepal_width petal_length petal_width iris_species_code
+              sepal_length sepal_width petal_length petal_width iris_organism_code
             0        0.051       0.035        0.014       0.002                 0
             1        0.049       0.030        0.014       0.002                 0
             2        0.047       0.032        0.013       0.002                 0
@@ -1600,7 +1600,7 @@ class File(Registry, Data):
 
         Examples:
             >>> import lnschema_bionty as lb
-            >>> lb.settings.species = "human"
+            >>> lb.settings.organism = "human"
             >>> adata = ln.dev.datasets.anndata_with_obs()
             >>> adata.var_names[:2]
             Index(['ENSG00000000003', 'ENSG00000000005'], dtype='object')
@@ -1734,7 +1734,7 @@ class File(Registry, Data):
             >>> ln.File.from_df(df, description="iris").save()
             >>> file = ln.File.filter(description="iris").one()
             >>> file.load().head()
-            sepal_length sepal_width petal_length petal_width iris_species_code
+            sepal_length sepal_width petal_length petal_width iris_organism_code
             0        0.051       0.035        0.014       0.002                 0
             1        0.049       0.030        0.014       0.002                 0
             2        0.047       0.032        0.013       0.002                 0
@@ -1854,7 +1854,7 @@ class Dataset(Registry, Data):
 
         >>> df = ln.dev.datasets.df_iris_in_meter_batch1()
         >>> df.head()
-          sepal_length sepal_width petal_length petal_width iris_species_code
+          sepal_length sepal_width petal_length petal_width iris_organism_code
         0        0.051       0.035        0.014       0.002                 0
         1        0.049       0.030        0.014       0.002                 0
         2        0.047       0.032        0.013       0.002                 0
@@ -2002,7 +2002,7 @@ class Dataset(Registry, Data):
         Examples:
             >>> df = ln.dev.datasets.df_iris_in_meter_batch1()
             >>> df.head()
-              sepal_length sepal_width petal_length petal_width iris_species_code
+              sepal_length sepal_width petal_length petal_width iris_organism_code
             0        0.051       0.035        0.014       0.002                 0
             1        0.049       0.030        0.014       0.002                 0
             2        0.047       0.032        0.013       0.002                 0
@@ -2035,7 +2035,7 @@ class Dataset(Registry, Data):
 
         Examples:
             >>> import lnschema_bionty as lb
-            >>> lb.settings.species = "human"
+            >>> lb.settings.organism = "human"
             >>> adata = ln.dev.datasets.anndata_with_obs()
             >>> adata.var_names[:2]
             Index(['ENSG00000000003', 'ENSG00000000005'], dtype='object')
@@ -2044,7 +2044,12 @@ class Dataset(Registry, Data):
         """
         pass
 
-    def load(self, join: Literal["inner", "outer"] = "outer", is_run_input: Optional[bool] = None, **kwargs) -> DataLike:
+    def load(
+        self,
+        join: Literal["inner", "outer"] = "outer",
+        is_run_input: Optional[bool] = None,
+        **kwargs,
+    ) -> DataLike:
         """Stage and load to memory.
 
         Returns in-memory representation if possible, e.g., a concatenated `DataFrame` or `AnnData` object.
