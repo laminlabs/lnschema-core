@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚚 Remove field email from user | [306](https://github.com/laminlabs/lnschema-core/pull/306) | [falexwolf](https://github.com/falexwolf) | 2023-10-19 |
 🚚 Rename `Species` to `Organism` | [305](https://github.com/laminlabs/lnschema-core/pull/305) | [sunnyosun](https://github.com/sunnyosun) | 2023-10-19 |
 🚚 Migrate to integer primary keys | [304](https://github.com/laminlabs/lnschema-core/pull/304) | [falexwolf](https://github.com/falexwolf) | 2023-10-13 | 0.51.0
 🎨 Add path properties & storage field on Dataset | [303](https://github.com/laminlabs/lnschema-core/pull/303) | [falexwolf](https://github.com/falexwolf) | 2023-10-04 | 0.50.0
