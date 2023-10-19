@@ -547,7 +547,7 @@ class User(Registry, CanValidate):
 
         >>> user = ln.User.filter(handle="testuser1").one()
         >>> user
-        User(id=DzTjkKse, handle=testuser1, email=testuser1@lamin.ai, name=Test User1, updated_at=2023-07-10 18:37:26)
+        User(id=DzTjkKse, handle=testuser1, name=Test User1, updated_at=2023-07-10 18:37:26)
     """
 
     id = models.AutoField(primary_key=True)
@@ -556,8 +556,6 @@ class User(Registry, CanValidate):
     """Universal id, valid across DB instances."""
     handle = CharField(max_length=30, unique=True, db_index=True, default=None)
     """Universal handle, valid across DB instances (required)."""
-    email = CharField(max_length=255, unique=True, db_index=True, default=None)
-    """Email address (required)."""
     name = CharField(max_length=255, db_index=True, null=True, default=None)
     """Name (optional)."""  # has to match hub specification, where it's also optional
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
