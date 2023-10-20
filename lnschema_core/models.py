@@ -337,7 +337,7 @@ class Registry(models.Model):
 
     @classmethod
     def from_values(cls, values: ListLike, field: Optional[StrField] = None, **kwargs) -> List["Registry"]:
-        """Parse values for an identifier (a name, an id, etc.) and load corresponding records.
+        """Bulk create validated records by parsing values for an identifier (a name, an id, etc.).
 
         Args:
             values: A list of values for an identifier, e.g.
@@ -346,7 +346,7 @@ class Registry(models.Model):
             **kwargs: Additional conditions for creation of records, e.g., `organism="human"`.
 
         Returns:
-            A list of records.
+            A list of validated records. For bionty registries, also returns knowledge-coupled records.
 
         Notes:
             For more info, see tutorial: :doc:`bio-registries`.
@@ -454,7 +454,7 @@ class Registry(models.Model):
                 is ignored.
 
         Returns:
-            A sorted `DataFrame` of search results with a score in column `__ratio__`.
+            A sorted `DataFrame` of search results with a score in column `score`.
             If `return_queryset` is `True`, an ordered `QuerySet`.
 
         See Also:
@@ -464,11 +464,11 @@ class Registry(models.Model):
         Examples:
             >>> ln.save(ln.ULabel.from_values(["ULabel1", "ULabel2", "ULabel3"], field="name"))
             >>> ln.ULabel.search("ULabel2")
-                        id   __ratio__
+                        uid    score
             name
-            ULabel2  o3FY3c5n  100.000000
-            ULabel1  CcFPLmpq   75.000000
-            ULabel3  Qi3c4utq   75.000000
+            ULabel2  o3FY3c5n  100.0
+            ULabel1  CcFPLmpq   75.0
+            ULabel3  Qi3c4utq   75.0
         """
         pass
 
