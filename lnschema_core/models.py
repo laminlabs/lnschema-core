@@ -1547,8 +1547,21 @@ class File(Registry, Data):
         description: Optional[str] = None,
         run: Optional[Run] = None,
         modality: Optional[Modality] = None,
+        version: Optional[str] = None,
+        is_new_version_of: Optional["File"] = None,
     ) -> "File":
         """Create from ``DataFrame``, validate & link features.
+
+        Args:
+            df: A `DataFrame` object.
+            field: The registry field to validate & annotate features.
+            key: A relative path within default storage,
+                e.g., `"myfolder/myfile.fcs"`.
+            description: A description.
+            modality: The modality of the features.
+            version: A version string.
+            is_new_version_of: An old version of the file.
+            run: The run that creates the file.
 
         See Also:
             :meth:`lamindb.Dataset`
@@ -1582,8 +1595,21 @@ class File(Registry, Data):
         description: Optional[str] = None,
         run: Optional[Run] = None,
         modality: Optional[Modality] = None,
+        version: Optional[str] = None,
+        is_new_version_of: Optional["File"] = None,
     ) -> "File":
         """Create from ``AnnDataLike``, validate & link features.
+
+        Args:
+            adata: An `AnnData` object or path to it.
+            field: The registry field to validate & annotate features.
+            key: A relative path within default storage,
+                e.g., `"myfolder/myfile.fcs"`.
+            description: A description.
+            modality: The modality of the features.
+            version: A version string.
+            is_new_version_of: An old version of the file.
+            run: The run that creates the file.
 
         See Also:
 
@@ -1985,8 +2011,20 @@ class Dataset(Registry, Data):
         modality: Optional[Modality] = None,
         reference: Optional[str] = None,
         reference_type: Optional[str] = None,
+        version: Optional[str] = None,
+        is_new_version_of: Optional["File"] = None,
     ) -> "Dataset":
         """Create from ``DataFrame``, validate & link features.
+
+        Args:
+            df: A `DataFrame` object.
+            field: The registry field to validate & annotate features.
+            name: A name.
+            description: A description.
+            version: A version string.
+            is_new_version_of: An old version of the dataset.
+            modality: The modality of the features.
+            run: The run that creates the dataset.
 
         See Also:
             :class:`~lamindb.File`
@@ -2021,8 +2059,20 @@ class Dataset(Registry, Data):
         modality: Optional[Modality] = None,
         reference: Optional[str] = None,
         reference_type: Optional[str] = None,
+        version: Optional[str] = None,
+        is_new_version_of: Optional["File"] = None,
     ) -> "Dataset":
         """Create from ``AnnDataLike``, validate & link features.
+
+        Args:
+            adata: An `AnnData` object.
+            field: The registry field to validate & annotate features.
+            name: A name.
+            description: A description.
+            version: A version string.
+            is_new_version_of: An old version of the dataset.
+            modality: The modality of the features.
+            run: The run that creates the dataset.
 
         See Also:
 
