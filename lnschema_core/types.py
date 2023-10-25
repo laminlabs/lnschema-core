@@ -2,7 +2,7 @@ from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, TypeVar
 
-from django.db.models import CharField, TextField  # noqa
+from django.db.models import CharField, IntegerChoices, TextField  # noqa
 from django.db.models.query_utils import DeferredAttribute as FieldAttr  # noqa
 from upath import UPath
 
@@ -39,3 +39,9 @@ class TransformType(ChoicesMixin, Enum):
     notebook = "notebook"
     app = "app"
     api = "api"
+
+
+class VisibilityChoice(IntegerChoices):
+    default = 0
+    hidden = 1
+    trash = 2

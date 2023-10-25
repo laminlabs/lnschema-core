@@ -1481,6 +1481,8 @@ class File(Registry, Data):
     """Runs that use this file as an input."""
     initial_version = models.ForeignKey("self", PROTECT, null=True, default=None)
     """Initial version of the file, a :class:`~lamindb.File` object."""
+    visibility = models.SmallIntegerField(db_index=True, default=0)
+    """Visibility of the record."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
@@ -1946,6 +1948,8 @@ class Dataset(Registry, Data):
     """Storage of dataset as mere paths handled by a key value store or file system."""
     initial_version = models.ForeignKey("self", PROTECT, null=True, default=None)
     """Initial version of the dataset, a :class:`~lamindb.Dataset` object."""
+    visibility = models.SmallIntegerField(db_index=True, default=0)
+    """Visibility of the record."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
