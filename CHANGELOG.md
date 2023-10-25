@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+✨ Enable passing filter expressions to lookup and search | [308](https://github.com/laminlabs/lnschema-core/pull/308) | [sunnyosun](https://github.com/sunnyosun) | 2023-10-25 |
 🚚 Remove field email from user | [306](https://github.com/laminlabs/lnschema-core/pull/306) | [falexwolf](https://github.com/falexwolf) | 2023-10-19 | 0.52.0
 🚚 Rename `Species` to `Organism` | [305](https://github.com/laminlabs/lnschema-core/pull/305) | [sunnyosun](https://github.com/sunnyosun) | 2023-10-19 |
 🚚 Migrate to integer primary keys | [304](https://github.com/laminlabs/lnschema-core/pull/304) | [falexwolf](https://github.com/falexwolf) | 2023-10-13 | 0.51.0

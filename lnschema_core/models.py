@@ -380,7 +380,12 @@ class Registry(models.Model):
         pass
 
     @classmethod
-    def lookup(cls, field: Optional[StrField] = None, return_field: Optional[StrField] = None) -> NamedTuple:
+    def lookup(
+        cls,
+        field: Optional[StrField] = None,
+        return_field: Optional[StrField] = None,
+        **expressions,
+    ) -> NamedTuple:
         """Return an auto-complete object for a field.
 
         Args:
@@ -437,6 +442,7 @@ class Registry(models.Model):
         return_queryset: bool = False,
         case_sensitive: bool = False,
         synonyms_field: Optional[StrField] = "synonyms",  # type: ignore
+        **expressions,
     ) -> Union["pd.DataFrame", "QuerySet"]:
         """Search.
 
