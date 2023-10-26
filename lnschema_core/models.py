@@ -1489,7 +1489,7 @@ class File(Registry, Data):
     initial_version = models.ForeignKey("self", PROTECT, null=True, default=None)
     """Initial version of the file, a :class:`~lamindb.File` object."""
     visibility = models.SmallIntegerField(db_index=True, choices=VisibilityChoice, default=0)
-    """Visibility of the record, {0: "default", 1: "transferred", "2": "hidden", "3": "trash"}."""
+    """Visibility of record,  0-default, 1-hidden, 2-trash."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
@@ -1968,7 +1968,7 @@ class Dataset(Registry, Data):
     initial_version = models.ForeignKey("self", PROTECT, null=True, default=None)
     """Initial version of the dataset, a :class:`~lamindb.Dataset` object."""
     visibility = models.SmallIntegerField(db_index=True, choices=VisibilityChoice, default=0)
-    """Visibility of the record, {0: "default", 1: "transferred", "2": "hidden", "3": "trash"}."""
+    """Visibility of record,  0-default, 1-hidden, 2-trash."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
