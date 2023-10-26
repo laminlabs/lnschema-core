@@ -1807,10 +1807,11 @@ class File(Registry, Data):
         """
         pass
 
-    def delete(self, storage: Optional[bool] = None) -> None:
+    def delete(self, permanent: Optional[bool] = None, storage: Optional[bool] = None) -> None:
         """Delete file, optionally from storage.
 
         Args:
+            permanent: Whether to permanently delete the file record (skips trash).
             storage: Indicate whether you want to delete the
                 file in storage.
 
@@ -2134,12 +2135,12 @@ class Dataset(Registry, Data):
         """
         pass
 
-    def delete(self, storage: Optional[bool] = None) -> None:
-        """Delete file, optionally from storage.
+    def delete(self, permanent: Optional[bool] = None, storage: Optional[bool] = None) -> None:
+        """Delete dataset.
 
         Args:
-            storage: Indicate whether you want to delete the
-                file in storage.
+            permanent: Whether to permanently delete the dataset record (skips trash).
+            storage: Indicate whether you want to delete the linked file in storage.
 
         Examples:
 
