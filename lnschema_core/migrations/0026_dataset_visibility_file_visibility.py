@@ -12,11 +12,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="dataset",
             name="visibility",
-            field=models.SmallIntegerField(choices=[0, 1, 2], db_index=True, default=0),
+            field=models.SmallIntegerField(choices=[0, 1, 2, 3], db_index=True, default=0),
         ),
         migrations.AddField(
             model_name="file",
             name="visibility",
-            field=models.SmallIntegerField(choices=[0, 1, 2], db_index=True, default=0),
+            field=models.SmallIntegerField(choices=[0, 1, 2, 3], db_index=True, default=0),
         ),
     ]
