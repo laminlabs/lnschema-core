@@ -43,6 +43,5 @@ class TransformType(ChoicesMixin, Enum):
 
 class VisibilityChoice(IntegerChoices):
     default = 0
-    transferred = 1
-    hidden = 2
-    trash = 3
+    hidden = 1
+    trash = 2
