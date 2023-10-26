@@ -31,6 +31,7 @@ from lnschema_core.types import (
     PathLike,
     StrField,
     TextField,
+    VisibilityChoice,
 )
 
 from .ids import base62_8, base62_12, base62_20
@@ -1487,6 +1488,8 @@ class File(Registry, Data):
     """Runs that use this file as an input."""
     initial_version = models.ForeignKey("self", PROTECT, null=True, default=None)
     """Initial version of the file, a :class:`~lamindb.File` object."""
+    visibility = models.SmallIntegerField(db_index=True, choices=VisibilityChoice, default=0)
+    """Visibility of record,  0-default, 1-hidden, 2-trash."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
@@ -1804,10 +1807,11 @@ class File(Registry, Data):
         """
         pass
 
-    def delete(self, storage: Optional[bool] = None) -> None:
+    def delete(self, permanent: Optional[bool] = None, storage: Optional[bool] = None) -> None:
         """Delete file, optionally from storage.
 
         Args:
+            permanent: Whether to permanently delete the file record (skips trash).
             storage: Indicate whether you want to delete the
                 file in storage.
 
@@ -1823,8 +1827,19 @@ class File(Registry, Data):
         """Save the file to database & storage.
 
         Examples:
-            >>> file = ln.File("./myfile.csv", key="myfile.csv")
+            >>> file = ln.File("./myfile.csv", description="myfile")
             >>> file.save()
+        """
+        pass
+
+    def restore(self) -> None:
+        """Restore file from trash.
+
+        Examples:
+
+            For any `File` object `file`, call:
+
+            >>> file.restore()
         """
         pass
 
@@ -1952,6 +1967,8 @@ class Dataset(Registry, Data):
     """Storage of dataset as mere paths handled by a key value store or file system."""
     initial_version = models.ForeignKey("self", PROTECT, null=True, default=None)
     """Initial version of the dataset, a :class:`~lamindb.Dataset` object."""
+    visibility = models.SmallIntegerField(db_index=True, choices=VisibilityChoice, default=0)
+    """Visibility of record,  0-default, 1-hidden, 2-trash."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
@@ -2118,27 +2135,38 @@ class Dataset(Registry, Data):
         """
         pass
 
-    def delete(self, storage: Optional[bool] = None) -> None:
-        """Delete file, optionally from storage.
+    def delete(self, permanent: Optional[bool] = None, storage: Optional[bool] = None) -> None:
+        """Delete dataset.
 
         Args:
-            storage: Indicate whether you want to delete the
-                file in storage.
+            permanent: Whether to permanently delete the dataset record (skips trash).
+            storage: Indicate whether you want to delete the linked file in storage.
 
         Examples:
 
-            For any `File` object `file`, call:
+            For any `Dataset` object `dataset`, call:
 
-            >>> file.delete()
+            >>> dataset.delete()
         """
         pass
 
     def save(self, *args, **kwargs) -> None:
-        """Save the file to database & storage.
+        """Save the dataset and underlying file to database & storage.
 
         Examples:
-            >>> file = ln.File("./myfile.csv", key="myfile.csv")
-            >>> file.save()
+            >>> dataset = ln.Dataset("./myfile.csv", name="myfile")
+            >>> dataset.save()
+        """
+        pass
+
+    def restore(self) -> None:
+        """Restore dataset record from trash.
+
+        Examples:
+
+            For any `Dataset` object `dataset`, call:
+
+            >>> dataset.restore()
         """
         pass
 
