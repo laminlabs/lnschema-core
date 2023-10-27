@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚚 Add key_is_virtual field to File | [310](https://github.com/laminlabs/lnschema-core/pull/310) | [falexwolf](https://github.com/falexwolf) | 2023-10-27 |
 ♻️ Create using method | [309](https://github.com/laminlabs/lnschema-core/pull/309) | [falexwolf](https://github.com/falexwolf) | 2023-10-27 |
 ✨ Add `visibility` to `File` and `Dataset` | [307](https://github.com/laminlabs/lnschema-core/pull/307) | [sunnyosun](https://github.com/sunnyosun) | 2023-10-26 |
 ✨ Enable passing filter expressions to lookup and search | [308](https://github.com/laminlabs/lnschema-core/pull/308) | [sunnyosun](https://github.com/sunnyosun) | 2023-10-25 |
