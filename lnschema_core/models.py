@@ -1502,7 +1502,9 @@ class File(Registry, Data):
     initial_version = models.ForeignKey("self", PROTECT, null=True, default=None)
     """Initial version of the file, a :class:`~lamindb.File` object."""
     visibility = models.SmallIntegerField(db_index=True, choices=VisibilityChoice, default=0)
-    """Visibility of record,  0-default, 1-hidden, 2-trash."""
+    """Visibility of file record in queries & searches (0 default, 1 hidden, 2 trash)."""
+    key_is_virtual = models.BooleanField()
+    """Indicates whether `key` is virtual or part of an actual file path."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
