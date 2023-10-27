@@ -479,6 +479,18 @@ class Registry(models.Model):
         """
         pass
 
+    @classmethod
+    def using(
+        cls,
+        instance: str,
+    ) -> QuerySet:
+        """Use another LaminDB instance.
+
+        Args:
+            instance: An instance identifier of form "account_handle/instance_name".
+        """
+        pass
+
     def save(self, *args, **kwargs) -> None:
         """Save.
 
