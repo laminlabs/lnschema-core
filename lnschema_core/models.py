@@ -1502,7 +1502,9 @@ class File(Registry, Data):
     initial_version = models.ForeignKey("self", PROTECT, null=True, default=None)
     """Initial version of the file, a :class:`~lamindb.File` object."""
     visibility = models.SmallIntegerField(db_index=True, choices=VisibilityChoice, default=0)
-    """Visibility of record,  0-default, 1-hidden, 2-trash."""
+    """Visibility of file record in queries & searches (0 default, 1 hidden, 2 trash)."""
+    key_is_virtual = models.BooleanField()
+    """Indicates whether `key` is virtual or part of an actual file path."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
@@ -1821,12 +1823,15 @@ class File(Registry, Data):
         pass
 
     def delete(self, permanent: Optional[bool] = None, storage: Optional[bool] = None) -> None:
-        """Delete file, optionally from storage.
+        """Put file in trash.
+
+        Putting a file into the trash means setting its `visibility` field to 2.
+
+        FAQ: :doc:`docs:faq/storage`
 
         Args:
-            permanent: Whether to permanently delete the file record (skips trash).
-            storage: Indicate whether you want to delete the
-                file in storage.
+            permanent: Permanently delete the file (skips trash).
+            storage: Indicate whether you want to delete the file in storage.
 
         Examples:
 
