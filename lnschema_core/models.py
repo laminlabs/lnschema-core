@@ -384,13 +384,12 @@ class Registry(models.Model):
         cls,
         field: Optional[StrField] = None,
         return_field: Optional[StrField] = None,
-        **expressions,
     ) -> NamedTuple:
         """Return an auto-complete object for a field.
 
         Args:
-            field: The field to
-                look up the values for. Defaults to first string field.
+            field: The field to look up the values for. Defaults to first string field.
+            return_field: The field to return. If `None`, returns the whole record.
 
         Returns:
             A `NamedTuple` of lookup information of the field values with a
@@ -407,6 +406,9 @@ class Registry(models.Model):
             >>> lookup.adgb_dt
             >>> lookup_dict = lookup.dict()
             >>> lookup_dict['ADGB-DT']
+            >>> lookup_by_ensembl_id = lb.Gene.lookup(field="ensembl_gene_id")
+            >>> genes.ensg00000002745
+            >>> lookup_return_symbols = lb.Gene.lookup(field="ensembl_gene_id", return_field="symbol")
         """
         pass
 
@@ -442,7 +444,6 @@ class Registry(models.Model):
         return_queryset: bool = False,
         case_sensitive: bool = False,
         synonyms_field: Optional[StrField] = "synonyms",  # type: ignore
-        **expressions,
     ) -> Union["pd.DataFrame", "QuerySet"]:
         """Search.
 
