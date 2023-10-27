@@ -1823,12 +1823,15 @@ class File(Registry, Data):
         pass
 
     def delete(self, permanent: Optional[bool] = None, storage: Optional[bool] = None) -> None:
-        """Delete file, optionally from storage.
+        """Put file in trash.
+
+        Putting a file into the trash means setting its `visibility` field to 2.
+
+        FAQ: :doc:`docs:faq/storage`
 
         Args:
-            permanent: Whether to permanently delete the file record (skips trash).
-            storage: Indicate whether you want to delete the
-                file in storage.
+            permanent: Permanently delete the file (skips trash).
+            storage: Indicate whether you want to delete the file in storage.
 
         Examples:
 
