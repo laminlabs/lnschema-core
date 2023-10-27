@@ -413,7 +413,7 @@ class Registry(models.Model):
         pass
 
     @classmethod
-    def filter(cls, **expressions) -> QuerySet:
+    def filter(cls, **expressions) -> "QuerySet":
         """Query records (see :doc:`meta`).
 
         Args:
@@ -484,8 +484,8 @@ class Registry(models.Model):
     def using(
         cls,
         instance: str,
-    ) -> QuerySet:
-        """Use another LaminDB instance.
+    ) -> "QuerySet":
+        """Use a non-default LaminDB instance.
 
         Args:
             instance: An instance identifier of form "account_handle/instance_name".
