@@ -2242,7 +2242,7 @@ class DatasetULabel(Registry, LinkORM):
 
 def format_field_value(value: Union[datetime, str, Any]) -> Any:
     if isinstance(value, datetime):
-        return value.strftime("%Y-%m-%d %H:%M:%S")
+        return value.strftime("%Y-%m-%d %H:%M:%S %Z")
     elif isinstance(value, str):
         return f"'{value}'"
     else:
