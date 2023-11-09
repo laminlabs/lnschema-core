@@ -1866,8 +1866,10 @@ class Dataset(Registry, Data):
     """Datasets: collections of data batches.
 
     Args:
-        data: `DataLike` A data object (`DataFrame`, `AnnData`) to store.
+        data: `DataLike` An array (`DataFrame`, `AnnData`), a directory, or a list of `File` objects.
         name: `str` A name.
+        meta: `Optional[DataLike]` An array (`DataFrame`, `AnnData`) or a `File`
+            object that defines metadata for a directory of objects.
         description: `Optional[str] = None` A description.
         version: `Optional[str] = None` A version string.
         is_new_version_of: `Optional[Dataset] = None` An old version of the dataset.
@@ -1882,13 +1884,11 @@ class Dataset(Registry, Data):
         The `File` & `Dataset` registries both
 
         - track data batches of arbitrary format & size
-
         - can validate & link features (the measured dimensions in a data batch)
 
         Typically,
 
         - a file stores a single batch of data
-
         - a dataset stores a collection of data batches
 
         Examples:
@@ -1929,6 +1929,11 @@ class Dataset(Registry, Data):
         Create a dataset from a collection of :class:`~lamindb.File` objects:
 
         >>> dataset = ln.Dataset([file1, file2], name="My dataset")
+        >>> dataset.save()
+
+        Create a dataset from a directory of objects:
+
+        >>> dataset = ln.Dataset("s3://my-bucket/my-images/", name="My dataset", meta="s3://my-bucket/meta.parquet")
         >>> dataset.save()
 
         Make a new version of a dataset:
