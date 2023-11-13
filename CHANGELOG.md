@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🔥 Remove `Modality` | [312](https://github.com/laminlabs/lnschema-core/pull/312) | [sunnyosun](https://github.com/sunnyosun) | 2023-11-13 |
 ✏️ Fix VisibilityChoice | [311](https://github.com/laminlabs/lnschema-core/pull/311) | [sunnyosun](https://github.com/sunnyosun) | 2023-11-13 |
 🚚 Add key_is_virtual field to File | [310](https://github.com/laminlabs/lnschema-core/pull/310) | [falexwolf](https://github.com/falexwolf) | 2023-10-27 | 0.54.0
 ♻️ Create using method | [309](https://github.com/laminlabs/lnschema-core/pull/309) | [falexwolf](https://github.com/falexwolf) | 2023-10-27 |
