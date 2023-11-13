@@ -1344,6 +1344,7 @@ class FeatureSet(Registry):
         field: FieldAttr = Feature.name,
         name: Optional[str] = None,
         modality: Optional[Modality] = None,
+        **kwargs,
     ) -> Optional["FeatureSet"]:
         """Create feature set for validated features."""
         pass
@@ -1501,7 +1502,7 @@ class File(Registry, Data):
     """Runs that use this file as an input."""
     initial_version = models.ForeignKey("self", PROTECT, null=True, default=None)
     """Initial version of the file, a :class:`~lamindb.File` object."""
-    visibility = models.SmallIntegerField(db_index=True, choices=VisibilityChoice, default=0)
+    visibility = models.SmallIntegerField(db_index=True, choices=VisibilityChoice.choices, default=0)
     """Visibility of file record in queries & searches (0 default, 1 hidden, 2 trash)."""
     key_is_virtual = models.BooleanField()
     """Indicates whether `key` is virtual or part of an actual file path."""
@@ -1573,6 +1574,7 @@ class File(Registry, Data):
         modality: Optional[Modality] = None,
         version: Optional[str] = None,
         is_new_version_of: Optional["File"] = None,
+        **kwargs,
     ) -> "File":
         """Create from ``DataFrame``, validate & link features.
 
@@ -1621,6 +1623,7 @@ class File(Registry, Data):
         modality: Optional[Modality] = None,
         version: Optional[str] = None,
         is_new_version_of: Optional["File"] = None,
+        **kwargs,
     ) -> "File":
         """Create from ``AnnDataLike``, validate & link features.
 
@@ -1990,7 +1993,7 @@ class Dataset(Registry, Data):
     """Storage of dataset as mere paths handled by a key value store or file system."""
     initial_version = models.ForeignKey("self", PROTECT, null=True, default=None)
     """Initial version of the dataset, a :class:`~lamindb.Dataset` object."""
-    visibility = models.SmallIntegerField(db_index=True, choices=VisibilityChoice, default=0)
+    visibility = models.SmallIntegerField(db_index=True, choices=VisibilityChoice.choices, default=0)
     """Visibility of record,  0-default, 1-hidden, 2-trash."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
@@ -2059,6 +2062,7 @@ class Dataset(Registry, Data):
         reference_type: Optional[str] = None,
         version: Optional[str] = None,
         is_new_version_of: Optional["File"] = None,
+        **kwargs,
     ) -> "Dataset":
         """Create from ``DataFrame``, validate & link features.
 
@@ -2107,6 +2111,7 @@ class Dataset(Registry, Data):
         reference_type: Optional[str] = None,
         version: Optional[str] = None,
         is_new_version_of: Optional["File"] = None,
+        **kwargs,
     ) -> "Dataset":
         """Create from ``AnnDataLike``, validate & link features.
 
