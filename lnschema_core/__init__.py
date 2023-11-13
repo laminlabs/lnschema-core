@@ -2,7 +2,7 @@
 
 _schema_id = "yvzi"
 _name = "core"
-__version__ = "0.55.0"
+__version__ = "0.56.0"
 
 
 from lamindb_setup import _check_instance_setup
