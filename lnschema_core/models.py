@@ -1013,80 +1013,6 @@ class ULabel(Registry, HasParents, CanValidate):
         pass
 
 
-class Modality(Registry, HasParents, CanValidate):
-    """Measurement types of features.
-
-    .. note::
-
-        This will soon borrow readout-related records from the experimental factor
-        ontology, see :class:`~lnschema_bionty.ExperimentalFactor`.
-
-    Args:
-        name: `str` A name.
-        ontology_id: `Optional[str]` A public ontology ID.
-        abbr: `Optional[str]` An abbreviation.
-        description: `Optional[str]` A description.
-    """
-
-    id = models.AutoField(primary_key=True)
-    """Internal id, valid only in one DB instance."""
-    uid = CharField(unique=True, db_index=True, max_length=8, default=base62_8)
-    """Universal id, valid across DB instances."""
-    name = CharField(max_length=256, db_index=True)
-    """Name of the modality (required)."""
-    ontology_id = CharField(max_length=32, db_index=True, null=True, default=None)
-    """Ontology ID of the modality."""
-    abbr = CharField(max_length=32, db_index=True, unique=True, null=True, default=None)
-    """A unique abbreviation for the modality (optional)."""
-    synonyms = TextField(null=True, default=None)
-    """Bar-separated (|) synonyms that correspond to this modality."""
-    description = TextField(null=True, default=None)
-    """Description."""
-    molecule = TextField(null=True, default=None, db_index=True)
-    """Molecular experimental factor, parsed from EFO."""
-    instrument = TextField(null=True, default=None, db_index=True)
-    """Instrument used to measure, parsed from EFO."""
-    measurement = TextField(null=True, default=None, db_index=True)
-    """Phenotypic experimental factor, parsed from EFO."""
-    parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
-    """Parents."""
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    """Time of creation of record."""
-    updated_at = models.DateTimeField(auto_now=True, db_index=True)
-    """Time of last update to record."""
-    created_by = models.ForeignKey(
-        User,
-        models.PROTECT,
-        default=current_user_id,
-        related_name="created_modalities",
-    )
-    """Creator of record, a :class:`~lamindb.User`."""
-
-    @overload
-    def __init__(
-        self,
-        name: str,
-        ontology_id: str,
-        abbr: Optional[str],
-        description: Optional[str],
-    ):
-        ...
-
-    @overload
-    def __init__(
-        self,
-        *db_args,
-    ):
-        ...
-
-    def __init__(
-        self,
-        *args,
-        **kwargs,
-    ):
-        super(Modality, self).__init__(*args, **kwargs)
-
-
 class Feature(Registry, CanValidate):
     """Dimensions of measurement.
 
@@ -1151,8 +1077,6 @@ class Feature(Registry, CanValidate):
     If "category", consider managing categories with :class:`~lamindb.ULabel` or
     another Registry for managing labels.
     """
-    modality = models.ForeignKey(Modality, PROTECT, null=True, default=None, related_name="features")
-    """The measurement modality, e.g., "RNA", "Protein", "Gene Module", "pathway" (:class:`~lamindb.Modality`)."""
     unit = CharField(max_length=30, db_index=True, null=True, default=None)
     """Unit of measure, ideally SI (`m`, `s`, `kg`, etc.) or 'normalized' etc. (optional)."""
     description = TextField(db_index=True, null=True, default=None)
@@ -1213,8 +1137,6 @@ class FeatureSet(Registry):
             Create from values.
         :meth:`~lamindb.FeatureSet.from_df`
             Create from dataframe columns.
-        :class:`~lamindb.Modality`
-            Type of measurement.
 
     Note:
 
@@ -1234,7 +1156,6 @@ class FeatureSet(Registry):
         type: `Optional[Union[Type, str]] = None` The simple type. Defaults to
             `None` if reference Registry is :class:`~lamindb.Feature`, defaults to
             `"float"` otherwise.
-        modality: `Optional[str] = None` A name or id for :class:`~lamindb.Modality`.
         name: `Optional[str] = None` A name.
 
     Examples:
@@ -1267,8 +1188,6 @@ class FeatureSet(Registry):
 
     For :class:`~lamindb.Feature`, types are expected to be in-homogeneous and defined on a per-feature level.
     """
-    modality = models.ForeignKey(Modality, PROTECT, null=True, default=None, related_name="feature_sets")
-    """The measurement modality, e.g., "RNA", "Protein", "Gene Module", "pathway" (:class:`~lamindb.Modality`)."""
     registry = CharField(max_length=128, db_index=True)
     """The registry that stores & validated the feature identifiers, e.g., `'core.Feature'` or `'bionty.Gene'`."""
     hash = CharField(max_length=20, default=None, db_index=True, null=True)
@@ -1285,7 +1204,6 @@ class FeatureSet(Registry):
         self,
         features: Iterable[Registry],
         type: Optional[Union[Type, str]] = None,
-        modality: Optional[str] = None,
         name: Optional[str] = None,
     ):
         ...
@@ -1311,7 +1229,6 @@ class FeatureSet(Registry):
         field: FieldAttr = Feature.name,
         type: Optional[Union[Type, str]] = None,
         name: Optional[str] = None,
-        modality: Optional[Modality] = None,
         **kwargs,
     ) -> Optional["FeatureSet"]:
         """Create feature set for validated features.
@@ -1324,7 +1241,6 @@ class FeatureSet(Registry):
                 `None` if reference registry is :class:`~lamindb.Feature`, defaults to
                 `"float"` otherwise.
             name: A name.
-            modality: A name or id for :class:`~lamindb.Modality`.
             **kwargs: Can contain ``organism`` or other context to interpret values.
 
         Examples:
@@ -1343,7 +1259,6 @@ class FeatureSet(Registry):
         df: "pd.DataFrame",
         field: FieldAttr = Feature.name,
         name: Optional[str] = None,
-        modality: Optional[Modality] = None,
         **kwargs,
     ) -> Optional["FeatureSet"]:
         """Create feature set for validated features."""
@@ -1571,7 +1486,6 @@ class File(Registry, Data):
         key: Optional[str] = None,
         description: Optional[str] = None,
         run: Optional[Run] = None,
-        modality: Optional[Modality] = None,
         version: Optional[str] = None,
         is_new_version_of: Optional["File"] = None,
         **kwargs,
@@ -1584,7 +1498,6 @@ class File(Registry, Data):
             key: A relative path within default storage,
                 e.g., `"myfolder/myfile.fcs"`.
             description: A description.
-            modality: The modality of the features.
             version: A version string.
             is_new_version_of: An old version of the file.
             run: The run that creates the file.
@@ -1620,7 +1533,6 @@ class File(Registry, Data):
         key: Optional[str] = None,
         description: Optional[str] = None,
         run: Optional[Run] = None,
-        modality: Optional[Modality] = None,
         version: Optional[str] = None,
         is_new_version_of: Optional["File"] = None,
         **kwargs,
@@ -1633,7 +1545,6 @@ class File(Registry, Data):
             key: A relative path within default storage,
                 e.g., `"myfolder/myfile.fcs"`.
             description: A description.
-            modality: The modality of the features.
             version: A version string.
             is_new_version_of: An old version of the file.
             run: The run that creates the file.
@@ -2057,7 +1968,6 @@ class Dataset(Registry, Data):
         name: Optional[str] = None,
         description: Optional[str] = None,
         run: Optional[Run] = None,
-        modality: Optional[Modality] = None,
         reference: Optional[str] = None,
         reference_type: Optional[str] = None,
         version: Optional[str] = None,
@@ -2073,7 +1983,6 @@ class Dataset(Registry, Data):
             description: A description.
             version: A version string.
             is_new_version_of: An old version of the dataset.
-            modality: The modality of the features.
             run: The run that creates the dataset.
 
         See Also:
@@ -2106,7 +2015,6 @@ class Dataset(Registry, Data):
         name: Optional[str] = None,
         description: Optional[str] = None,
         run: Optional[Run] = None,
-        modality: Optional[Modality] = None,
         reference: Optional[str] = None,
         reference_type: Optional[str] = None,
         version: Optional[str] = None,
@@ -2122,7 +2030,6 @@ class Dataset(Registry, Data):
             description: A description.
             version: A version string.
             is_new_version_of: An old version of the dataset.
-            modality: The modality of the features.
             run: The run that creates the dataset.
 
         See Also:

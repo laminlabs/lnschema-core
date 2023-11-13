@@ -22,8 +22,9 @@ CORE_MODELS = {
 
 def create_new_ids(apps, schema_editor):
     response = input(
-        "\nDo you want to migrate your instance to integer primary keys? You will need to re-initialize your instance with `lamin init` after a data export. This is more"
-        " cumbersome than a regular migration. (y/n)"
+        "\nDo you want to migrate your instance to integer primary keys? You will need"
+        " to re-initialize your instance with `lamin init` after a data export. This is"
+        " more cumbersome than a regular migration. (y/n)"
     )
     if response != "y":
         raise SystemExit
@@ -45,7 +46,13 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="dataset",
             name="transform",
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, related_name="output_datasets", to="lnschema_core.transform"),
+            field=models.ForeignKey(
+                default=None,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="output_datasets",
+                to="lnschema_core.transform",
+            ),
         ),
     ]
 
@@ -67,7 +74,7 @@ for model_name, big in CORE_MODELS.items():
         migrations.AddField(
             model_name=model_name,
             name="id",
-            field=models.BigIntegerField(editable=False, null=True) if big else models.IntegerField(editable=False, null=True),
+            field=(models.BigIntegerField(editable=False, null=True) if big else models.IntegerField(editable=False, null=True)),
             preserve_default=False,
         )
     )
@@ -81,7 +88,7 @@ for model_name, big in CORE_MODELS.items():
         migrations.AlterField(
             model_name=model_name,
             name="id",
-            field=models.BigIntegerField(editable=False, unique=True) if big else models.IntegerField(editable=False, unique=True),
+            field=(models.BigIntegerField(editable=False, unique=True) if big else models.IntegerField(editable=False, unique=True)),
             preserve_default=False,
         )
     )
@@ -128,7 +135,10 @@ def populate_tmp_column_foreign_keys(orm):
 
 # populate temporary fields
 for model_name in CORE_MODELS.keys():
-    registry = getattr(lnschema_core.models, model_name)
+    try:
+        registry = getattr(lnschema_core.models, model_name)
+    except AttributeError:
+        continue
     Migration.operations += populate_tmp_column_foreign_keys(registry)
 
 

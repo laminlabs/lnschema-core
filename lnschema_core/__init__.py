@@ -19,7 +19,6 @@ if _INSTANCE_SETUP:
         FeatureSet,
         File,
         HasParents,
-        Modality,
         Registry,
         Run,
         Storage,
