@@ -555,11 +555,12 @@ class Data:
 
 
 class User(Registry, CanValidate):
-    """Users: humans and bots.
+    """Users.
 
-    All data in this registry is synced from the cloud user account to ensure a
-    persistent universal user identity, valid across DB instances and email,
-    name & handle changes. Hence, no need to manually create records.
+    All data in this registry is synced from lamin.ai to ensure a universal user
+    identity, valid across DB instances and user metadata changes.
+
+    There is no need to manually create records.
 
     Examples:
 
@@ -608,9 +609,11 @@ class User(Registry, CanValidate):
 
 
 class Storage(Registry):
-    """Storage locations: S3/GCP buckets or local directories.
+    """Storage locations.
 
-    Is auto-managed, no need to create objects.
+    Is auto-managed, no need to create records.
+
+    Can be local or remote directories or entire S3/GCP buckets.
 
     See Also:
         :attr:`~lamindb.dev.Settings.storage`
@@ -626,12 +629,9 @@ class Storage(Registry):
         >>> ln.settings.storage
         PosixPath('/home/runner/work/lamindb/lamindb/docs/guide/mydata')
 
-        Set a new default storage (currently doesn't support SQLite instances):
+        Dynamically change the default storage:
 
-        >>> ln.load("my-postgres-db")
         >>> ln.settings.storage = "./storage_2" # or a cloud bucket
-        >>> ln.settings.storage
-        PosixPath('/home/runner/work/lamindb-setup/lamindb-setup/docs/guide/storage_2')
     """
 
     id = models.AutoField(primary_key=True)
@@ -766,7 +766,7 @@ class Transform(Registry, HasParents):
 
     Defaults to `"notebook"` if run from ipython and to `"pipeline"` if run from python.
 
-    If run from LaminHub, it defaults to `app`.
+    If run from the UI, it defaults to `app`.
     """
     latest_report = models.ForeignKey("File", PROTECT, default=None, null=True, related_name="latest_report_of")
     """Latest run report."""
