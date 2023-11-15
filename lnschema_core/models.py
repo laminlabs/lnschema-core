@@ -911,6 +911,9 @@ class ULabel(Registry, HasParents, CanValidate):
     Args:
         name: `str` A name.
         description: `str` A description.
+        reference: `Optional[str] = None` For instance, an external ID or a URL.
+        reference_type: `Optional[str] = None` For instance, `"url"`.
+
 
     A `ULabel` record provides the easiest way to annotate a file or dataset
     with a label: `"My project"`, `"curated"`, or `"Batch X"`:
@@ -1583,6 +1586,12 @@ class File(Registry, Data):
     ) -> List["File"]:
         """Create a list of file objects from a directory.
 
+        .. note::
+
+            If you have a high number of files (several 100k) and don't want to
+            track them individually, consider creating a :class:`~lamindb.Dataset` via
+            ``Dataset(path, meta=metadata)`` for them. See, e.g., :doc:`docs:rxrx`.
+
         Args:
             path: Source path of folder.
             key: Key for storage destination. If `None` and
@@ -1782,12 +1791,15 @@ class Dataset(Registry, Data):
     Args:
         data: `DataLike` An array (`DataFrame`, `AnnData`), a directory, or a list of `File` objects.
         name: `str` A name.
-        meta: `Optional[DataLike]` An array (`DataFrame`, `AnnData`) or a `File`
-            object that defines metadata for a directory of objects.
         description: `Optional[str] = None` A description.
         version: `Optional[str] = None` A version string.
         is_new_version_of: `Optional[Dataset] = None` An old version of the dataset.
         run: `Optional[Run] = None` The run that creates the dataset.
+        meta: `Optional[DataLike]` An array (`DataFrame`, `AnnData`) or a `File`
+            object that defines metadata for a directory of objects.
+        reference: `Optional[str] = None` For instance, an external ID or a URL.
+        reference_type: `Optional[str] = None` For instance, `"url"`.
+
 
     See Also:
         :class:`~lamindb.File`
@@ -1800,30 +1812,19 @@ class Dataset(Registry, Data):
         - track data batches of arbitrary format & size
         - can validate & link features (the measured dimensions in a data batch)
 
-        Typically,
+        Often, a file stores a single batch of data and a dataset stores a collection of data batches:
 
-        - a file stores a single batch of data
-        - a dataset stores a collection of data batches
+        - Files always have a one-to-one correspondence with a storage accessor.
+        - Datasets can reference multiple objects or an array store.
 
         Examples:
 
-        - Blob-like immutable files (pdf, txt, csv, jpg, ...) or arrays (h5,
-          h5ad, ...) → :class:`~lamindb.File`
-
-        - Mutable streamable backends (DuckDB, zarr, TileDB, ...) →
-          :class:`~lamindb.Dataset`
-
-        - Collections of files → :class:`~lamindb.Dataset`
-
-        - Datasets in BigQuery, Snowflake, Postgres, ... →
-          :class:`~lamindb.Dataset` (not yet implemented)
-
-        Hence, while
-
-        - files *always* have a one-to-one correspondence with a storage accessor
-
-        - datasets *can* reference a single file, multiple files or a dataset in
-          a warehouse like BigQuery or Snowflake
+        - Store a blob-like file (pdf, txt, csv, jpg, ...) as a :class:`~lamindb.File`.
+        - Store a queryable array (parquet, HDF5, h5ad, DuckDB, zarr, TileDB, ...) as a
+          :class:`~lamindb.Dataset` or :class:`~lamindb.File`, depending on your use case.
+        - Store collections of files with :class:`~lamindb.Dataset`
+        - Once implemented, datasets in BigQuery, Snowflake, Postgres, ... would
+          be stored in :class:`~lamindb.Dataset`.
 
     Examples:
 
@@ -1845,9 +1846,17 @@ class Dataset(Registry, Data):
         >>> dataset = ln.Dataset([file1, file2], name="My dataset")
         >>> dataset.save()
 
-        Create a dataset from a directory of objects:
+        If you don't have 100k files or more in a directory, create ``File``
+        records via :class:`~lamindb.File.from_dir` (e.g., here :doc:`docs:tutorial`):
 
-        >>> dataset = ln.Dataset("s3://my-bucket/my-images/", name="My dataset", meta="s3://my-bucket/meta.parquet")
+        >>> files = ln.File.from_dir("./my_dir")
+        >>> dataset = ln.Dataset([file1, file2], name="My dataset")
+        >>> dataset.save()
+
+        If you have more than 100k files, consider creating a dataset directly from the
+        directory without creating File records (e.g., here :doc:`docs:rxrx`):
+
+        >>> dataset = ln.Dataset("s3://my-bucket/my-images/", name="My dataset", meta=df)
         >>> dataset.save()
 
         Make a new version of a dataset:
@@ -1918,9 +1927,13 @@ class Dataset(Registry, Data):
         self,
         data: Any,
         name: str,
+        version: str,
         description: Optional[str] = None,
+        meta: Optional[Any] = None,
         reference: Optional[str] = None,
         reference_type: Optional[str] = None,
+        run: Optional[Run] = None,
+        is_new_version_of: Optional["Dataset"] = None,
     ):
         ...
 
