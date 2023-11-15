@@ -1812,19 +1812,19 @@ class Dataset(Registry, Data):
         - track data batches of arbitrary format & size
         - can validate & link features (the measured dimensions in a data batch)
 
-        Often, a file stores a single batch of data and a dataset stores a collection of data batches:
+        Often, a file stores a single batch of data and a dataset stores a collection of data batches, while
 
-        - Files always have a one-to-one correspondence with a storage accessor.
-        - Datasets can reference multiple objects or an array store.
+        - files always have a one-to-one correspondence with a storage accessor
+        - datasets can reference multiple objects or an array store
 
         Examples:
 
-        - Store a blob-like file (pdf, txt, csv, jpg, ...) as a :class:`~lamindb.File`.
-        - Store a queryable array (parquet, HDF5, h5ad, DuckDB, zarr, TileDB, ...) as a
-          :class:`~lamindb.Dataset` or :class:`~lamindb.File`, depending on your use case.
-        - Store collections of files with :class:`~lamindb.Dataset`
-        - Once implemented, datasets in BigQuery, Snowflake, Postgres, ... would
-          be stored in :class:`~lamindb.Dataset`.
+        - store a blob-like file (pdf, txt, csv, jpg, ...) as a :class:`~lamindb.File`
+        - store a queryable array (parquet, HDF5, h5ad, DuckDB, zarr, TileDB, ...) as a
+          :class:`~lamindb.Dataset` or :class:`~lamindb.File`, depending on your use case
+        - store collections of files and arrays with :class:`~lamindb.Dataset`
+        - once implemented, datasets in BigQuery, Snowflake, Postgres, ... would
+          be stored in :class:`~lamindb.Dataset`
 
     Examples:
 
