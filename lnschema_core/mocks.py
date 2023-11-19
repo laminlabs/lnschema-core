@@ -6,5 +6,9 @@ class BackedAccessor:
     pass
 
 
+class ListDataset:
+    pass
+
+
 class QuerySet:
     pass

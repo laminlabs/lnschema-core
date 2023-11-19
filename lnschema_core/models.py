@@ -21,7 +21,7 @@ from lamin_utils import logger
 from lamindb_setup import _check_instance_setup
 from upath import UPath
 
-from lnschema_core.mocks import AnnDataAccessor, BackedAccessor, QuerySet
+from lnschema_core.mocks import AnnDataAccessor, BackedAccessor, ListDataset, QuerySet
 from lnschema_core.types import (
     AnnDataLike,
     CharField,
@@ -2061,6 +2061,15 @@ class Dataset(Registry, Data):
             >>> dataset = ln.Dataset.from_anndata(adata, name="My dataset", field=lb.Gene.ensembl_gene_id)
             >>> dataset.save()
         """
+        pass
+
+    def filelist_dataset(
+        self,
+        labels: Optional[Union[str, List[str]]] = None,
+        encode_labels: bool = True,
+        stream: bool = False,
+    ) -> "ListDataset":
+        """Make a dataset to use with dataloaders."""
         pass
 
     def load(
