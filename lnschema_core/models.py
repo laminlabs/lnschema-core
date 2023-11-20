@@ -2083,16 +2083,17 @@ class Dataset(Registry, Data):
         encode_labels: bool = True,
         stream: bool = False,
     ) -> "MappedDataset":
-        """Make a dataset to use with dataloaders.
+        """Convert to map-style dataset for data loaders.
 
-        Works only with AnnData files, the files should have the same label keys and variables.
+        Note: This currently only works for AnnData objects. The objects should
+        have the same label keys and variables.
 
         Examples:
             >>> import lamindb as ln
             >>> from torch.utils.data import DataLoader
-            >>> dataset = ln.Dataset.filter(description="my dataset").one()
-            >>> ds = dataset.indexed(labels=["cell_type", "batch"])
-            >>> dl = Dataloader(ds, batch_size=128, shuffle=True)
+            >>> ds = ln.Dataset.filter(description="my dataset").one()
+            >>> mapped = dataset.mapped(labels=["cell_type", "batch"])
+            >>> dl = Dataloader(mapped, batch_size=128, shuffle=True)
         """
         pass
 
