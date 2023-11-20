@@ -440,7 +440,7 @@ class Registry(models.Model):
         return filter(cls, **expressions)
 
     @classmethod
-    def df(cls) -> pd.DataFrame:
+    def df(cls) -> "pd.DataFrame":
         """Convert to `DataFrame`.
 
         Warning: This will run a long time on large registries.
