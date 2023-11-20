@@ -1,4 +1,5 @@
 import builtins
+import sys
 from datetime import datetime
 from pathlib import Path
 from typing import (  # noqa
@@ -43,12 +44,15 @@ from .ids import base62_8, base62_12, base62_20
 from .types import TransformType
 from .users import current_user_id
 
+# determine when it's save to make heavy imports
 _INSTANCE_SETUP = _check_instance_setup()
-
-if TYPE_CHECKING or _INSTANCE_SETUP:
+RUNNING_SPHINX = "sphinx" in sys.modules
+if TYPE_CHECKING or _INSTANCE_SETUP or RUNNING_SPHINX:
     import numpy as np
     import pandas as pd
     from lamin_utils._inspect import InspectResult
+
+if TYPE_CHECKING or _INSTANCE_SETUP:
     from lamindb.dev import FeatureManager, LabelManager
 
 
