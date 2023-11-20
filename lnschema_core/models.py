@@ -21,7 +21,12 @@ from lamin_utils import logger
 from lamindb_setup import _check_instance_setup
 from upath import UPath
 
-from lnschema_core.mocks import AnnDataAccessor, BackedAccessor, ListDataset, QuerySet
+from lnschema_core.mocks import (
+    AnnDataAccessor,
+    BackedAccessor,
+    IndexedDataset,
+    QuerySet,
+)
 from lnschema_core.types import (
     AnnDataLike,
     CharField,
@@ -2063,12 +2068,12 @@ class Dataset(Registry, Data):
         """
         pass
 
-    def filelist_dataset(
+    def indexed(
         self,
         labels: Optional[Union[str, List[str]]] = None,
         encode_labels: bool = True,
         stream: bool = False,
-    ) -> "ListDataset":
+    ) -> "IndexedDataset":
         """Make a dataset to use with dataloaders.
 
         Works only with AnnData files, the files should have the same label keys and variables.
@@ -2077,7 +2082,7 @@ class Dataset(Registry, Data):
             >>> import lamindb as ln
             >>> from torch.utils.data import DataLoader
             >>> dataset = ln.Dataset.filter(description="my dataset").one()
-            >>> ds = dataset.filelist_dataset(labels=["cell_type", "batch"])
+            >>> ds = dataset.indexed(labels=["cell_type", "batch"])
             >>> dl = Dataloader(ds, batch_size=128, shuffle=True)
         """
         pass

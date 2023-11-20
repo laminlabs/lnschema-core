@@ -6,7 +6,7 @@ class BackedAccessor:
     pass
 
 
-class ListDataset:
+class IndexedDataset:
     pass
 
 
