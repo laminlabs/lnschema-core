@@ -2100,7 +2100,7 @@ class Dataset(Registry, Data):
             >>> import lamindb as ln
             >>> from torch.utils.data import DataLoader
             >>> ds = ln.Dataset.filter(description="my dataset").one()
-            >>> mapped = dataset.mapped(labels=["cell_type", "batch"])
+            >>> mapped = dataset.mapped(label_keys=["cell_type", "batch"])
             >>> dl = DataLoader(mapped, batch_size=128, shuffle=True)
         """
         pass
