@@ -2069,7 +2069,17 @@ class Dataset(Registry, Data):
         encode_labels: bool = True,
         stream: bool = False,
     ) -> "ListDataset":
-        """Make a dataset to use with dataloaders."""
+        """Make a dataset to use with dataloaders.
+
+        Works only with AnnData files, the files should have the same label keys and variables.
+
+        Examples:
+            >>> import lamindb as ln
+            >>> from torch.utils.data import DataLoader
+            >>> dataset = ln.Dataset.filter(description="my dataset").one()
+            >>> ds = dataset.filelist_dataset(labels=["cell_type", "batch"])
+            >>> dl = Dataloader(ds, batch_size=128, shuffle=True)
+        """
         pass
 
     def load(
