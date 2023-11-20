@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚚 Rename indexed to mapped | [315](https://github.com/laminlabs/lnschema-core/pull/315) | [falexwolf](https://github.com/falexwolf) | 2023-11-20 |
 🚸 Add `.df()` to `Registry` | [314](https://github.com/laminlabs/lnschema-core/pull/314) | [falexwolf](https://github.com/falexwolf) | 2023-11-20 | 0.57.0
 ✨ Initial implementation of IndexedDataset | [313](https://github.com/laminlabs/lnschema-core/pull/313) | [Koncopd](https://github.com/Koncopd) | 2023-11-20 |
 🔥 Remove `Modality` | [312](https://github.com/laminlabs/lnschema-core/pull/312) | [sunnyosun](https://github.com/sunnyosun) | 2023-11-13 |
