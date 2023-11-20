@@ -22,12 +22,7 @@ from lamin_utils import logger
 from lamindb_setup import _check_instance_setup
 from upath import UPath
 
-from lnschema_core.mocks import (
-    AnnDataAccessor,
-    BackedAccessor,
-    IndexedDataset,
-    QuerySet,
-)
+from lnschema_core.mocks import AnnDataAccessor, BackedAccessor, MappedDataset, QuerySet
 from lnschema_core.types import (
     AnnDataLike,
     CharField,
@@ -2082,12 +2077,12 @@ class Dataset(Registry, Data):
         """
         pass
 
-    def indexed(
+    def mapped(
         self,
         labels: Optional[Union[str, List[str]]] = None,
         encode_labels: bool = True,
         stream: bool = False,
-    ) -> "IndexedDataset":
+    ) -> "MappedDataset":
         """Make a dataset to use with dataloaders.
 
         Works only with AnnData files, the files should have the same label keys and variables.
