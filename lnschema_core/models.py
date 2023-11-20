@@ -22,12 +22,7 @@ from lamin_utils import logger
 from lamindb_setup import _check_instance_setup
 from upath import UPath
 
-from lnschema_core.mocks import (
-    AnnDataAccessor,
-    BackedAccessor,
-    IndexedDataset,
-    QuerySet,
-)
+from lnschema_core.mocks import AnnDataAccessor, BackedAccessor, MappedDataset, QuerySet
 from lnschema_core.types import (
     AnnDataLike,
     CharField,
@@ -2082,22 +2077,23 @@ class Dataset(Registry, Data):
         """
         pass
 
-    def indexed(
+    def mapped(
         self,
         labels: Optional[Union[str, List[str]]] = None,
         encode_labels: bool = True,
         stream: bool = False,
-    ) -> "IndexedDataset":
-        """Make a dataset to use with dataloaders.
+    ) -> "MappedDataset":
+        """Convert to map-style dataset for data loaders.
 
-        Works only with AnnData files, the files should have the same label keys and variables.
+        Note: This currently only works for AnnData objects. The objects should
+        have the same label keys and variables.
 
         Examples:
             >>> import lamindb as ln
             >>> from torch.utils.data import DataLoader
-            >>> dataset = ln.Dataset.filter(description="my dataset").one()
-            >>> ds = dataset.indexed(labels=["cell_type", "batch"])
-            >>> dl = DataLoader(ds, batch_size=128, shuffle=True)
+            >>> ds = ln.Dataset.filter(description="my dataset").one()
+            >>> mapped = dataset.mapped(labels=["cell_type", "batch"])
+            >>> dl = DataLoader(mapped, batch_size=128, shuffle=True)
         """
         pass
 
