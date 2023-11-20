@@ -440,6 +440,16 @@ class Registry(models.Model):
         return filter(cls, **expressions)
 
     @classmethod
+    def df(cls) -> pd.DataFrame:
+        """Convert to `DataFrame`.
+
+        Warning: This will run a long time on large registries.
+        """
+        from lamindb._filter import filter
+
+        return filter(cls).df()
+
+    @classmethod
     def search(
         cls,
         string: str,
