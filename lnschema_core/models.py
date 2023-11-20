@@ -2097,7 +2097,7 @@ class Dataset(Registry, Data):
             >>> from torch.utils.data import DataLoader
             >>> dataset = ln.Dataset.filter(description="my dataset").one()
             >>> ds = dataset.indexed(labels=["cell_type", "batch"])
-            >>> dl = Dataloader(ds, batch_size=128, shuffle=True)
+            >>> dl = DataLoader(ds, batch_size=128, shuffle=True)
         """
         pass
 
