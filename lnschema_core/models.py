@@ -2079,14 +2079,22 @@ class Dataset(Registry, Data):
 
     def mapped(
         self,
-        labels: Optional[Union[str, List[str]]] = None,
+        label_keys: Optional[Union[str, List[str]]] = None,
         encode_labels: bool = True,
         stream: bool = False,
+        is_run_input: Optional[bool] = None,
     ) -> "MappedDataset":
         """Convert to map-style dataset for data loaders.
 
         Note: This currently only works for AnnData objects. The objects should
         have the same label keys and variables.
+
+        Args:
+            label_keys: Columns of the `.obs` slot - the names of the metadata
+                features storing labels.
+            encode_labels: Indicate whether you want to delete the linked file in storage.
+            stream: Whether to stream data from the array backend.
+            is_run_input: Whether to track this dataset as run input.
 
         Examples:
             >>> import lamindb as ln
