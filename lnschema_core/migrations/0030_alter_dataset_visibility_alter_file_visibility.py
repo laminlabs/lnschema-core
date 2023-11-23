@@ -14,8 +14,9 @@ def forwards_func(apps, schema_editor):
             File.objects.using(db_alias).filter(visibility=1).update(visibility=0)
             File.objects.using(db_alias).filter(visibility=3).update(visibility=1)
             File.objects.using(db_alias).filter(visibility=2).update(visibility=-1)
-            Dataset.objects.using(db_alias).filter(visibility=0).update(visibility=1)
+            Dataset.objects.using(db_alias).filter(visibility=0).update(visibility=3)
             Dataset.objects.using(db_alias).filter(visibility=1).update(visibility=0)
+            Dataset.objects.using(db_alias).filter(visibility=3).update(visibility=1)
             Dataset.objects.using(db_alias).filter(visibility=2).update(visibility=-1)
     except IntegrityError:
         pass
@@ -32,8 +33,9 @@ def reverse_func(apps, schema_editor):
             File.objects.using(db_alias).filter(visibility=1).update(visibility=0)
             File.objects.using(db_alias).filter(visibility=3).update(visibility=1)
             File.objects.using(db_alias).filter(visibility=-1).update(visibility=2)
-            Dataset.objects.using(db_alias).filter(visibility=0).update(visibility=1)
+            Dataset.objects.using(db_alias).filter(visibility=0).update(visibility=3)
             Dataset.objects.using(db_alias).filter(visibility=1).update(visibility=0)
+            Dataset.objects.using(db_alias).filter(visibility=3).update(visibility=1)
             Dataset.objects.using(db_alias).filter(visibility=-1).update(visibility=2)
     except IntegrityError:
         pass
