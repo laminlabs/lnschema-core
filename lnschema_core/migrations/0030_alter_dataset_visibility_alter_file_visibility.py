@@ -10,8 +10,9 @@ def forwards_func(apps, schema_editor):
     # see https://stackoverflow.com/a/23326971
     try:
         with transaction.atomic():
-            File.objects.using(db_alias).filter(visibility=0).update(visibility=1)
+            File.objects.using(db_alias).filter(visibility=0).update(visibility=3)
             File.objects.using(db_alias).filter(visibility=1).update(visibility=0)
+            File.objects.using(db_alias).filter(visibility=3).update(visibility=1)
             File.objects.using(db_alias).filter(visibility=2).update(visibility=-1)
             Dataset.objects.using(db_alias).filter(visibility=0).update(visibility=1)
             Dataset.objects.using(db_alias).filter(visibility=1).update(visibility=0)
@@ -27,8 +28,9 @@ def reverse_func(apps, schema_editor):
     # see https://stackoverflow.com/a/23326971
     try:
         with transaction.atomic():
-            File.objects.using(db_alias).filter(visibility=0).update(visibility=1)
+            File.objects.using(db_alias).filter(visibility=0).update(visibility=3)
             File.objects.using(db_alias).filter(visibility=1).update(visibility=0)
+            File.objects.using(db_alias).filter(visibility=3).update(visibility=1)
             File.objects.using(db_alias).filter(visibility=-1).update(visibility=2)
             Dataset.objects.using(db_alias).filter(visibility=0).update(visibility=1)
             Dataset.objects.using(db_alias).filter(visibility=1).update(visibility=0)
