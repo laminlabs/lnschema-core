@@ -52,7 +52,7 @@ class Migration(migrations.Migration):
             field=models.SmallIntegerField(
                 choices=[(1, "Default"), (0, "Hidden"), (-1, "Trash")],
                 db_index=True,
-                default=0,
+                default=1,
             ),
         ),
         migrations.AlterField(
@@ -61,7 +61,7 @@ class Migration(migrations.Migration):
             field=models.SmallIntegerField(
                 choices=[(1, "Default"), (0, "Hidden"), (-1, "Trash")],
                 db_index=True,
-                default=0,
+                default=1,
             ),
         ),
         migrations.RunPython(forwards_func, reverse_func),
