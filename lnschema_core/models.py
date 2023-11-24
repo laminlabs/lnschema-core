@@ -55,6 +55,28 @@ IPYTHON = getattr(builtins, "__IPYTHON__", False)
 TRANSFORM_TYPE_DEFAULT = TransformType.notebook if IPYTHON else TransformType.pipeline
 
 
+class IsTree:
+    """Base class providing view_tree function."""
+
+    @classmethod
+    def view_tree(
+        cls,
+        level: int = -1,
+        limit_to_directories: bool = False,
+        length_limit: int = 1000,
+        max_files_per_dir_per_type: int = 7,
+    ) -> None:
+        """View the tree structure of the keys.
+
+        Args:
+            level: ``int=-1`` Depth of the tree to be displayed. Default is -1 which means all levels.
+            limit_to_directories: ``bool=False`` If True, only directories will be displayed.
+            length_limit: ``int=1000`` Maximum number of nodes to be displayed.
+            max_files_per_dir_per_type: ``int=7`` Maximum number of files per directory per type.
+        """
+        pass
+
+
 class CanValidate:
     """Base class providing :class:`~lamindb.dev.Registry`-based validation."""
 
@@ -1291,7 +1313,7 @@ class FeatureSet(Registry):
         pass
 
 
-class File(Registry, Data):
+class File(Registry, Data, IsTree):
     """Files: data batches.
 
     Args:
@@ -1664,45 +1686,6 @@ class File(Registry, Data):
             >>> file = ln.File.filter(key="lndb-storage/pbmc68k.h5ad").one()
             >>> file.backed()
             AnnData object with n_obs × n_vars = 70 × 765 backed at 's3://lamindb-ci/lndb-storage/pbmc68k.h5ad'
-        """
-        pass
-
-    @classmethod
-    def view_tree(
-        cls,
-        path: Optional[PathLike] = None,
-        *,
-        level: int = -1,
-        limit_to_directories: bool = False,
-        length_limit: int = 1000,
-    ) -> None:
-        """Print a visual tree structure of files & directories.
-
-        Examples:
-            >>> dir_path = ln.dev.datasets.generate_cell_ranger_files("sample_001", ln.settings.storage)
-            >>> dir_path.name
-            'sample_001'
-            >>> ln.File.view_tree(dir_path)
-            3 subdirectories, 15 files
-            sample_001
-            ├── web_summary.html
-            ├── metrics_summary.csv
-            ├── molecule_info.h5
-            ├── filtered_feature_bc_matrix
-            │   ├── features.tsv.gz
-            │   ├── barcodes.tsv.gz
-            │   └── matrix.mtx.gz
-            ├── analysis
-            │   └── analysis.csv
-            ├── raw_feature_bc_matrix
-            │   ├── features.tsv.gz
-            │   ├── barcodes.tsv.gz
-            │   └── matrix.mtx.gz
-            ├── possorted_genome_bam.bam.bai
-            ├── cloupe.cloupe
-            ├── possorted_genome_bam.bam
-            ├── filtered_feature_bc_matrix.h5
-            └── raw_feature_bc_matrix.h5
         """
         pass
 
