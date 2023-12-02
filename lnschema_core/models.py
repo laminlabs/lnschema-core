@@ -165,6 +165,7 @@ class CanValidate:
         values: Iterable,
         field: Optional[Union[str, StrField]] = None,
         *,
+        return_field: Optional[Union[str, StrField]] = None,
         return_mapper: bool = False,
         case_sensitive: bool = False,
         mute: bool = False,
@@ -176,21 +177,20 @@ class CanValidate:
         """Maps input synonyms to standardized names.
 
         Args:
-            values: Synonyms that will be standardized.
-            return_mapper: If `True`, returns `{input_synonym1:
-                standardized_name1}`.
+            values: Identifiers that will be standardized.
+            field: The field representing the standardized names.
+            return_field: The field to return. Defaults to field.
+            return_mapper: If `True`, returns `{input_value: standardized_name}`.
             case_sensitive: Whether the mapping is case sensitive.
             mute: Mute logging.
-            bionty_aware: Whether to standardize from Bionty reference.
-            keep: When a synonym maps to
-                multiple names, determines which duplicates to mark as
-                `pd.DataFrame.duplicated`:
-
+            bionty_aware: Whether to standardize from Bionty reference. Defaults to `True` for Bionty registries.
+            keep: When a synonym maps to multiple names, determines which duplicates to mark as `pd.DataFrame.duplicated`:
                     - `"first"`: returns the first mapped standardized name
                     - `"last"`: returns the last mapped standardized name
-                    - `False`: returns all mapped standardized name
+                    - `False`: returns all mapped standardized name.
+                    When `keep` is `False`, the returned list of standardized names will contain nested lists in case of duplicates.
+                  When a field is converted into return_field, keep marks which matches to keep when multiple return_field values map to the same field value.
             synonyms_field: A field containing the concatenated synonyms.
-            field: The field representing the standardized names.
 
         Returns:
             If `return_mapper` is `False`: a list of standardized names. Otherwise,
