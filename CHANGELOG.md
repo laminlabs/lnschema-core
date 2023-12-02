@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+📝 Enabled ID conversion via return_field | [318](https://github.com/laminlabs/lnschema-core/pull/318) | [sunnyosun](https://github.com/sunnyosun) | 2023-12-02 |
 ✨ Added view_tree for keys | [317](https://github.com/laminlabs/lnschema-core/pull/317) | [sunnyosun](https://github.com/sunnyosun) | 2023-11-24 |
 🚚 Recode visibility | [316](https://github.com/laminlabs/lnschema-core/pull/316) | [sunnyosun](https://github.com/sunnyosun) | 2023-11-23 |
 🚚 Rename indexed to mapped | [315](https://github.com/laminlabs/lnschema-core/pull/315) | [falexwolf](https://github.com/falexwolf) | 2023-11-20 | 0.57.1
