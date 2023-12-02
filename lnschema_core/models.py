@@ -1316,7 +1316,7 @@ class FeatureSet(Registry):
 
 
 class File(Registry, Data, IsTree):
-    """Files: data batches.
+    """Files: data batches (blobs & array shards).
 
     Args:
         data: `Union[PathLike, DataLike]` A path or data
@@ -1330,8 +1330,6 @@ class File(Registry, Data, IsTree):
 
     .. dropdown:: Typical storage formats & their API accessors
 
-        Listed are typical values for the `suffix` & `accessor` fields.
-
         - Table: `.csv`, `.tsv`, `.parquet`, `.ipc` ⟷ `DataFrame`, `pyarrow.Table`
         - Annotated matrix: `.h5ad`, `.h5mu`, `.zrad` ⟷ `AnnData`, `MuData`
         - Image: `.jpg`, `.png` ⟷ `np.ndarray`, ...
@@ -1339,6 +1337,8 @@ class File(Registry, Data, IsTree):
         - Fastq: `.fastq` ⟷ /
         - VCF: `.vcf` ⟷ /
         - QC: `.html` ⟷ /
+
+        You'll find these values in the `suffix` & `accessor` fields.
 
         LaminDB makes some default choices (e.g., serialize a `DataFrame` as a
         `.parquet` file).
