@@ -2065,6 +2065,7 @@ class Dataset(Registry, Data):
     def mapped(
         self,
         label_keys: Optional[Union[str, List[str]]] = None,
+        join_vars: Optional[Literal["auto", "inner"]] = "auto",
         encode_labels: bool = True,
         stream: bool = False,
         is_run_input: Optional[bool] = None,
@@ -2077,6 +2078,9 @@ class Dataset(Registry, Data):
         Args:
             label_keys: Columns of the `.obs` slot - the names of the metadata
                 features storing labels.
+            join_vars: Do virtual inner join of varibales if set to "auto"
+                and the varibales in the underlying `AnnData` objects are different.
+                Always does the join if set to "inner". If `None`, does not do the join.
             encode_labels: Indicate whether you want to delete the linked file in storage.
             stream: Whether to stream data from the array backend.
             is_run_input: Whether to track this dataset as run input.
