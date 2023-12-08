@@ -1067,7 +1067,7 @@ class Feature(Registry, CanValidate):
 
     Args:
         name: `str` Name of the feature, typically, a column name.
-        type: `str` Simple type (`"number"`, `"category"`, `"str"`, `"datetime"`).
+        type: `str` Simple type (`"number"`, `"category"`, `"datetime"`).
         unit: `Optional[str] = None` Unit of measure, ideally SI (`"m"`, `"s"`, `"kg"`, etc.) or `"normalized"` etc.
         description: `Optional[str] = None` A description.
         synonyms: `Optional[str] = None` Bar-separated synonyms.
@@ -1113,7 +1113,7 @@ class Feature(Registry, CanValidate):
     name = CharField(max_length=255, db_index=True, default=None)
     """Name of feature (required)."""
     type = CharField(max_length=64, db_index=True, default=None)
-    """Simple type ("float", "int", "str", "category").
+    """Simple type.
 
     If "category", consider managing categories with :class:`~lamindb.ULabel` or
     another Registry for managing labels.
@@ -1139,7 +1139,7 @@ class Feature(Registry, CanValidate):
     def __init__(
         self,
         name: str,
-        type: str,
+        type: str,  # consider typing with Literal
         unit: Optional[str],
         description: Optional[str],
         synonyms: Optional[str],
