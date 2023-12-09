@@ -21,6 +21,10 @@ class Migration(migrations.Migration):
             old_name="FileFeatureSet",
             new_name="ArtifactFeatureSet",
         ),
+        migrations.RenameModel(
+            old_name="FileULabel",
+            new_name="ArtifactULabel",
+        ),
         migrations.RenameField(
             model_name="artifactfeatureset",
             old_name="file",
@@ -37,7 +41,7 @@ class Migration(migrations.Migration):
             new_name="artifacts",
         ),
         migrations.RenameField(
-            model_name="fileulabel",
+            model_name="ArtifactULabel",
             old_name="file",
             new_name="artifact",
         ),
@@ -84,6 +88,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="artifact",
             name="ulabels",
-            field=models.ManyToManyField(related_name="artifacts", through="lnschema_core.FileULabel", to="lnschema_core.ulabel"),
+            field=models.ManyToManyField(related_name="artifacts", through="lnschema_core.ArtifactULabel", to="lnschema_core.ulabel"),
         ),
     ]

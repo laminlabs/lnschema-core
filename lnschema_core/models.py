@@ -1448,7 +1448,7 @@ class Artifact(Registry, Data, IsTree):
     """Type of hash."""
     feature_sets = models.ManyToManyField(FeatureSet, related_name="artifacts", through="ArtifactFeatureSet")
     """The feature sets measured in the artifact (:class:`~lamindb.FeatureSet`)."""
-    ulabels = models.ManyToManyField(ULabel, through="FileULabel", related_name="artifacts")
+    ulabels = models.ManyToManyField(ULabel, through="ArtifactULabel", related_name="artifacts")
     """The ulabels measured in the artifact (:class:`~lamindb.ULabel`)."""
     transform = models.ForeignKey(Transform, PROTECT, related_name="output_artifacts", null=True, default=None)
     """:class:`~lamindb.Transform` whose run created the artifact."""
@@ -2178,7 +2178,7 @@ class DatasetFeatureSet(Registry, LinkORM):
         unique_together = ("dataset", "feature_set")
 
 
-class FileULabel(Registry, LinkORM):
+class ArtifactULabel(Registry, LinkORM):
     id = models.BigAutoField(primary_key=True)
     artifact = models.ForeignKey(Artifact, on_delete=models.CASCADE)
     ulabel = models.ForeignKey(ULabel, on_delete=models.CASCADE)
