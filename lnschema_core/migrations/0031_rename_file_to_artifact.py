@@ -50,7 +50,7 @@ class Migration(migrations.Migration):
             unique_together={("artifact", "feature_set")},
         ),
         migrations.AlterUniqueTogether(
-            name="fileulabel",
+            name="artifactulabel",
             unique_together={("artifact", "ulabel")},
         ),
         migrations.AlterField(
