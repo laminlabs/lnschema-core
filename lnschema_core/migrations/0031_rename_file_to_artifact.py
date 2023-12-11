@@ -90,4 +90,24 @@ class Migration(migrations.Migration):
             name="ulabels",
             field=models.ManyToManyField(related_name="artifacts", through="lnschema_core.ArtifactULabel", to="lnschema_core.ulabel"),
         ),
+        migrations.RenameField(
+            model_name="transform",
+            old_name="source_file",
+            new_name="source_code",
+        ),
+        migrations.AlterField(
+            model_name="transform",
+            name="source_code",
+            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, related_name="source_code_of", to="lnschema_core.artifact"),
+        ),
+        migrations.AlterField(
+            model_name="transform",
+            name="latest_report",
+            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, related_name="latest_report_of", to="lnschema_core.artifact"),
+        ),
+        migrations.AlterField(
+            model_name="run",
+            name="report",
+            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, related_name="report_of", to="lnschema_core.artifact"),
+        ),
     ]

@@ -808,7 +808,7 @@ class Transform(Registry, HasParents):
     """
     latest_report = models.ForeignKey("Artifact", PROTECT, default=None, null=True, related_name="latest_report_of")
     """Latest run report."""
-    source_file = models.ForeignKey("Artifact", PROTECT, default=None, null=True, related_name="source_of")
+    source_code = models.ForeignKey("Artifact", PROTECT, default=None, null=True, related_name="source_code_of")
     """Source of the transform if stored as artifact within LaminDB."""
     reference = CharField(max_length=255, db_index=True, null=True, default=None)
     """Reference for the transform, e.g., a URL.
@@ -1397,10 +1397,10 @@ class Artifact(Registry, Data, IsTree):
         >>> artifact = ln.Artifact(df1, description="My dataframe")
         >>> artifact.save()
         >>> # version an artifact
-        >>> new_artifact = ln.Artifact(df2, is_new_version_of=file)
-        >>> assert new_file.initial_version == file.initial_version
-        >>> assert file.version == "1"
-        >>> assert new_file.version == "2"
+        >>> new_artifact = ln.Artifact(df2, is_new_version_of=artifact)
+        >>> assert new_artifact.initial_version == artifact.initial_version
+        >>> assert artifact.version == "1"
+        >>> assert new_artifact.version == "2"
 
     """
 
