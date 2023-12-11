@@ -487,7 +487,7 @@ class Registry(models.Model):
 
         Makes reasonable choices of which fields to search.
 
-        For instance, for :class:`~lamindb.File`, searches `key` and
+        For instance, for :class:`~lamindb.Artifact`, searches `key` and
         `description` fields.
 
         Args:
@@ -544,7 +544,7 @@ class Registry(models.Model):
 
 
 class Data:
-    """Base class for :class:`~lamindb.File` & :class:`~lamindb.Dataset`."""
+    """Base class for :class:`~lamindb.Artifact` & :class:`~lamindb.Dataset`."""
 
     @property
     def features(self) -> "FeatureManager":
@@ -560,12 +560,12 @@ class Data:
         """Describe relations of data record.
 
         Examples:
-            >>> ln.File(ln.dev.datasets.file_jpg_paradisi05(), description="paradisi05").save()
-            >>> file = ln.File.filter(description="paradisi05").one()
+            >>> ln.Artifact(ln.dev.datasets.file_jpg_paradisi05(), description="paradisi05").save()
+            >>> artifact = ln.Artifact.filter(description="paradisi05").one()
             >>> ln.save(ln.ULabel.from_values(["image", "benchmark", "example"], field="name"))
             >>> ulabels = ln.ULabel.filter(name__in=["image", "benchmark", "example"]).all()
-            >>> file.ulabels.set(ulabels)
-            >>> file.describe()
+            >>> artifact.ulabels.set(ulabels)
+            >>> artifact.describe()
         """
         pass
 
@@ -734,7 +734,7 @@ class Storage(Registry):
 
 
 class Transform(Registry, HasParents):
-    """Transforms of files & datasets.
+    """Transforms of artifacts & datasets.
 
     Pipelines, notebooks, app uploads.
 
@@ -806,10 +806,10 @@ class Transform(Registry, HasParents):
 
     If run from the UI, it defaults to `app`.
     """
-    latest_report = models.ForeignKey("File", PROTECT, default=None, null=True, related_name="latest_report_of")
+    latest_report = models.ForeignKey("Artifact", PROTECT, default=None, null=True, related_name="latest_report_of")
     """Latest run report."""
-    source_file = models.ForeignKey("File", PROTECT, default=None, null=True, related_name="source_of")
-    """Source of the transform if stored as file within LaminDB."""
+    source_code = models.ForeignKey("Artifact", PROTECT, default=None, null=True, related_name="source_code_of")
+    """Source of the transform if stored as artifact within LaminDB."""
     reference = CharField(max_length=255, db_index=True, null=True, default=None)
     """Reference for the transform, e.g., a URL.
     """
@@ -818,7 +818,7 @@ class Transform(Registry, HasParents):
     parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
     """Parent transforms (predecessors) in data flow.
 
-    These are auto-populated whenever a transform loads a file as run input.
+    These are auto-populated whenever a transform loads an artifact or dataset as run input.
     """
     initial_version = models.ForeignKey("self", PROTECT, null=True, default=None)
     """Initial version of the transform, a :class:`~lamindb.Transform` record."""
@@ -874,8 +874,8 @@ class Run(Registry):
 
         Typically, a run has inputs (`run.inputs`) and outputs (`run.outputs`):
 
-            - References to outputs are also stored in the `run` field of :class:`~lamindb.File` and :class:`~lamindb.Dataset`.
-            - References to inputs are also stored in the `input_of` field of :class:`~lamindb.File` and :class:`~lamindb.Dataset`.
+            - References to outputs are also stored in the `run` field of :class:`~lamindb.Artifact` and :class:`~lamindb.Dataset`.
+            - References to inputs are also stored in the `input_of` field of :class:`~lamindb.Artifact` and :class:`~lamindb.Dataset`.
 
     Examples:
 
@@ -906,12 +906,12 @@ class Run(Registry):
     """Creator of record, a :class:`~lamindb.User`."""
     # we don't want to make below a OneToOne because there could be the same trivial report
     # generated for many different runs
-    report = models.ForeignKey("File", PROTECT, default=None, null=True, related_name="report_of")
+    report = models.ForeignKey("Artifact", PROTECT, default=None, null=True, related_name="report_of")
     """Report of run, e.g., an html file."""
     is_consecutive = models.BooleanField(null=True, default=None)
     """Indicates whether code was consecutively executed. Is relevant for notebooks."""
-    # input_files on File
-    # output_files on File
+    # input_artifacts on File
+    # output_artifacts on File
     reference = CharField(max_length=255, db_index=True, null=True, default=None)
     """A reference like a URL or external ID (such as from a workflow manager)."""
     reference_type = CharField(max_length=255, db_index=True, null=True, default=None)
@@ -953,14 +953,14 @@ class ULabel(Registry, HasParents, CanValidate):
         reference_type: `Optional[str] = None` For instance, `"url"`.
 
 
-    A `ULabel` record provides the easiest way to annotate a file or dataset
+    A `ULabel` record provides the easiest way to annotate an artifact or dataset
     with a label: `"My project"`, `"curated"`, or `"Batch X"`:
 
         >>> my_project = ULabel(name="My project")
         >>> my_project.save()
         >>> dataset.ulabels.add(my_project)
 
-    In some cases, a label is measured *within* a file or dataset a feature (a
+    In some cases, a label is measured *within* an artifact or dataset a feature (a
     :class:`~lamindb.Feature` record) denotes the column name in which the label
     is stored. For instance, the dataset might contain measurements across 2
     organism of the Iris flower: `"setosa"` & `"versicolor"`.
@@ -971,14 +971,14 @@ class ULabel(Registry, HasParents, CanValidate):
 
         If you work with complex entities like cell lines, cell types, tissues,
         etc., consider using the pre-defined biological registries in
-        :mod:`lnschema_bionty` to label files & datasets.
+        :mod:`lnschema_bionty` to label artifacts & datasets.
 
         If you work with biological samples, likely, the only sustainable way of
         tracking metadata, is to create a custom schema module.
 
     See Also:
         :meth:`lamindb.Feature`
-            Dimensions of measurement for files & datasets.
+            Dimensions of measurement for artifacts & datasets.
 
     Examples:
 
@@ -987,13 +987,13 @@ class ULabel(Registry, HasParents, CanValidate):
         >>> my_project = ln.ULabel(name="My project")
         >>> my_project.save()
 
-        Label a file without associating it to a feature:
+        Label a artifact without associating it to a feature:
 
         >>> ulabel = ln.ULabel.filter(name="My project").one()
-        >>> file = ln.File("./myfile.csv")
-        >>> file.save()
-        >>> file.ulabels.add(ulabel)
-        >>> file.ulabels.list("name")
+        >>> artifact = ln.Artifact("./myfile.csv")
+        >>> artifact.save()
+        >>> artifact.ulabels.add(ulabel)
+        >>> artifact.ulabels.list("name")
         ['My project']
 
         Organize labels in a hierarchy:
@@ -1005,7 +1005,7 @@ class ULabel(Registry, HasParents, CanValidate):
 
         Query by `ULabel`:
 
-        >>> ln.File.filter(ulabels=project).first()
+        >>> ln.Artifact.filter(ulabels=project).first()
     """
 
     id = models.AutoField(primary_key=True)
@@ -1061,9 +1061,9 @@ class Feature(Registry, CanValidate):
         :meth:`~lamindb.Feature.from_df`
             Create feature records from DataFrame.
         :attr:`~lamindb.dev.Data.features`
-            Manage feature annotations of files & datasets.
+            Manage feature annotations of artifacts & datasets.
         :meth:`lamindb.ULabel`
-            ULabels for files & datasets.
+            ULabels for artifacts & datasets.
 
     Args:
         name: `str` Name of the feature, typically, a column name.
@@ -1211,9 +1211,9 @@ class FeatureSet(Registry):
         >>> reference = bt.Gene(organism="mouse")
         >>> feature_set = ln.FeatureSet.from_values(adata.var["ensemble_id"], Gene.ensembl_gene_id)
         >>> feature_set.save()
-        >>> file = ln.File(adata, name="Mouse Lymph Node scRNA-seq")
-        >>> file.save()
-        >>> file.features.add_feature_st(feature_set, slot="var")
+        >>> artifact = ln.Artifact(adata, name="Mouse Lymph Node scRNA-seq")
+        >>> artifact.save()
+        >>> artifact.features.add_feature_st(feature_set, slot="var")
     """
 
     id = models.AutoField(primary_key=True)
@@ -1315,8 +1315,8 @@ class FeatureSet(Registry):
         pass
 
 
-class File(Registry, Data, IsTree):
-    """Files: data batches (blobs & array shards).
+class Artifact(Registry, Data, IsTree):
+    """Artifacts: data in files, arrays, directories.
 
     Args:
         data: `Union[PathLike, DataLike]` A path or data
@@ -1325,8 +1325,8 @@ class File(Registry, Data, IsTree):
             e.g., `"myfolder/myfile.fcs"`.
         description: `Optional[str] = None` A description.
         version: `Optional[str] = None` A version string.
-        is_new_version_of: `Optional[File] = None` An old version of the file.
-        run: `Optional[Run] = None` The run that creates the file.
+        is_new_version_of: `Optional[File] = None` A previous version of the artifact.
+        run: `Optional[Run] = None` The run that creates the artifact.
 
     .. dropdown:: Typical storage formats & their API accessors
 
@@ -1346,28 +1346,28 @@ class File(Registry, Data, IsTree):
     See Also:
         :class:`~lamindb.Dataset`
             Mutable collections of data batches.
-        :meth:`~lamindb.File.from_df`
-            Create a file object from `DataFrame` and track features.
-        :meth:`~lamindb.File.from_anndata`
-            Create a file object from `AnnData` and track features.
-        :meth:`~lamindb.File.from_dir`
-            Bulk create file objects from a directory.
+        :meth:`~lamindb.Artifact.from_df`
+            Create a artifact object from `DataFrame` and track features.
+        :meth:`~lamindb.Artifact.from_anndata`
+            Create a artifact object from `AnnData` and track features.
+        :meth:`~lamindb.Artifact.from_dir`
+            Bulk create artifact objects from a directory.
 
     Notes:
         For more info, see tutorial: :doc:`/tutorial`.
 
     Examples:
 
-        Create a file from a cloud storage (supports `s3://` and `gs://`):
+        Create an artifact from a cloud storage (supports `s3://` and `gs://`):
 
-        >>> file = ln.File("s3://lamindb-ci/test-data/test.csv")
-        >>> file.save()  # only metadata is saved
+        >>> artifact = ln.Artifact("s3://lamindb-ci/test-data/test.csv")
+        >>> artifact.save()  # only metadata is saved
 
-        Create a file from a local temporary filepath using `key`:
+        Create an artifact from a local temporary filepath using `key`:
 
-        >>> temporary_filepath = ln.dev.datasets.file_jpg_paradisi05()
-        >>> file = ln.File(temporary_filepath, key="images/paradisi05_image.jpg")
-        >>> file.save()
+        >>> filepath = ln.dev.datasets.file_jpg_paradisi05()
+        >>> artifact = ln.Artifact(filepath, key="images/paradisi05_image.jpg")
+        >>> artifact.save()
 
         .. dropdown:: Why does the API look this way?
 
@@ -1391,16 +1391,16 @@ class File(Registry, Data, IsTree):
                 bucket.put_file('hello.txt', '/tmp/hello.txt')
 
 
-        Make a new version of a file:
+        Make a new version of an artifact:
 
-        >>> # a non-versioned file
-        >>> file = ln.File(df1, description="My dataframe")
-        >>> file.save()
-        >>> # create new file from old file and version both
-        >>> new_file = ln.File(df2, is_new_version_of=file)
-        >>> assert new_file.initial_version == file.initial_version
-        >>> assert file.version == "1"
-        >>> assert new_file.version == "2"
+        >>> # a non-versioned artifact
+        >>> artifact = ln.Artifact(df1, description="My dataframe")
+        >>> artifact.save()
+        >>> # version an artifact
+        >>> new_artifact = ln.Artifact(df2, is_new_version_of=artifact)
+        >>> assert new_artifact.initial_version == artifact.initial_version
+        >>> assert artifact.version == "1"
+        >>> assert new_artifact.version == "2"
 
     """
 
@@ -1408,7 +1408,7 @@ class File(Registry, Data, IsTree):
     """Internal id, valid only in one DB instance."""
     uid = CharField(unique=True, db_index=True, max_length=20)
     """A universal random id (20-char base62 ~ UUID), valid across DB instances."""
-    storage = models.ForeignKey(Storage, PROTECT, related_name="files")
+    storage = models.ForeignKey(Storage, PROTECT, related_name="artifacts")
     """Storage location (:class:`~lamindb.Storage`), e.g., an S3 or GCP bucket or a local directory."""
     key = CharField(max_length=255, db_index=True, null=True, default=None)
     """Storage key, the relative path within the storage location."""
@@ -1429,7 +1429,7 @@ class File(Registry, Data, IsTree):
     version = CharField(max_length=10, null=True, default=None, db_index=True)
     """Version (default `None`).
 
-    Use this together with `initial_version` to label different versions of a file.
+    Use this together with `initial_version` to label different versions of a artifact.
 
     Consider using `semantic versioning <https://semver.org>`__
     with `Python versioning <https://peps.python.org/pep-0440/>`__.
@@ -1440,33 +1440,33 @@ class File(Registry, Data, IsTree):
     Examples: 1KB is 1e3 bytes, 1MB is 1e6, 1GB is 1e9, 1TB is 1e12 etc.
     """
     hash = CharField(max_length=86, db_index=True, null=True, default=None)  # 86 base64 chars allow to store 64 bytes, 512 bits
-    """Hash or pseudo-hash of file content.
+    """Hash or pseudo-hash of artifact content.
 
     Useful to ascertain integrity and avoid duplication.
     """
     hash_type = CharField(max_length=30, db_index=True, null=True, default=None)
     """Type of hash."""
-    feature_sets = models.ManyToManyField(FeatureSet, related_name="files", through="FileFeatureSet")
-    """The feature sets measured in the file (:class:`~lamindb.FeatureSet`)."""
-    ulabels = models.ManyToManyField(ULabel, through="FileULabel", related_name="files")
-    """The ulabels measured in the file (:class:`~lamindb.ULabel`)."""
-    transform = models.ForeignKey(Transform, PROTECT, related_name="output_files", null=True, default=None)
-    """:class:`~lamindb.Transform` whose run created the file."""
-    run = models.ForeignKey(Run, PROTECT, related_name="output_files", null=True, default=None)
-    """:class:`~lamindb.Run` that created the file."""
-    input_of = models.ManyToManyField(Run, related_name="input_files")
-    """Runs that use this file as an input."""
+    feature_sets = models.ManyToManyField(FeatureSet, related_name="artifacts", through="ArtifactFeatureSet")
+    """The feature sets measured in the artifact (:class:`~lamindb.FeatureSet`)."""
+    ulabels = models.ManyToManyField(ULabel, through="ArtifactULabel", related_name="artifacts")
+    """The ulabels measured in the artifact (:class:`~lamindb.ULabel`)."""
+    transform = models.ForeignKey(Transform, PROTECT, related_name="output_artifacts", null=True, default=None)
+    """:class:`~lamindb.Transform` whose run created the artifact."""
+    run = models.ForeignKey(Run, PROTECT, related_name="output_artifacts", null=True, default=None)
+    """:class:`~lamindb.Run` that created the artifact."""
+    input_of = models.ManyToManyField(Run, related_name="input_artifacts")
+    """Runs that use this artifact as an input."""
     initial_version = models.ForeignKey("self", PROTECT, null=True, default=None)
-    """Initial version of the file, a :class:`~lamindb.File` object."""
+    """Initial version of the artifact, a :class:`~lamindb.Artifact` object."""
     visibility = models.SmallIntegerField(db_index=True, choices=VisibilityChoice.choices, default=1)
-    """Visibility of file record in queries & searches (0 default, 1 hidden, 2 trash)."""
+    """Visibility of artifact record in queries & searches (0 default, 1 hidden, 2 trash)."""
     key_is_virtual = models.BooleanField()
     """Indicates whether `key` is virtual or part of an actual file path."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
-    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_files")
+    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_artifacts")
     """Creator of record, a :class:`~lamindb.User`."""
 
     class Meta:
@@ -1478,7 +1478,7 @@ class File(Registry, Data, IsTree):
         data: Union[PathLike, DataLike],
         key: Optional[str] = None,
         description: Optional[str] = None,
-        is_new_version_of: Optional["File"] = None,
+        is_new_version_of: Optional["Artifact"] = None,
         run: Optional[Run] = None,
     ):
         ...
@@ -1499,22 +1499,22 @@ class File(Registry, Data, IsTree):
 
     @property
     def path(self) -> Union[Path, UPath]:
-        """File path (`Path`, `UPath`).
+        """Path (`Path`, `UPath`).
 
         Examples:
 
             File in cloud storage:
 
-            >>> ln.File("s3://lamindb-ci/lndb-storage/pbmc68k.h5ad").save()
-            >>> file = ln.File.filter(key="lndb-storage/pbmc68k.h5ad").one()
-            >>> file.path
+            >>> ln.Artifact("s3://lamindb-ci/lndb-storage/pbmc68k.h5ad").save()
+            >>> artifact = ln.Artifact.filter(key="lndb-storage/pbmc68k.h5ad").one()
+            >>> artifact.path
             S3Path('s3://lamindb-ci/lndb-storage/pbmc68k.h5ad')
 
             File in local storage:
 
-            >>> ln.File("./myfile.csv", description="myfile").save()
-            >>> file = ln.File.filter(description="myfile").one()
-            >>> file.path
+            >>> ln.Artifact("./myfile.csv", description="myfile").save()
+            >>> artifact = ln.Artifact.filter(description="myfile").one()
+            >>> artifact.path
             PosixPath('/home/runner/work/lamindb/lamindb/docs/guide/mydata/myfile.csv')
         """
         pass
@@ -1528,9 +1528,9 @@ class File(Registry, Data, IsTree):
         description: Optional[str] = None,
         run: Optional[Run] = None,
         version: Optional[str] = None,
-        is_new_version_of: Optional["File"] = None,
+        is_new_version_of: Optional["Artifact"] = None,
         **kwargs,
-    ) -> "File":
+    ) -> "Artifact":
         """Create from ``DataFrame``, validate & link features.
 
         Args:
@@ -1540,8 +1540,8 @@ class File(Registry, Data, IsTree):
                 e.g., `"myfolder/myfile.fcs"`.
             description: A description.
             version: A version string.
-            is_new_version_of: An old version of the file.
-            run: The run that creates the file.
+            is_new_version_of: An old version of the artifact.
+            run: The run that creates the artifact.
 
         See Also:
             :meth:`lamindb.Dataset`
@@ -1561,8 +1561,8 @@ class File(Registry, Data, IsTree):
             2        0.047       0.032        0.013       0.002                 0
             3        0.046       0.031        0.015       0.002                 0
             4        0.050       0.036        0.014       0.002                 0
-            >>> file = ln.File.from_df(df, description="Iris flower dataset batch1")
-            >>> file.save()
+            >>> artifact = ln.Artifact.from_df(df, description="Iris flower dataset batch1")
+            >>> artifact.save()
         """
         pass
 
@@ -1575,9 +1575,9 @@ class File(Registry, Data, IsTree):
         description: Optional[str] = None,
         run: Optional[Run] = None,
         version: Optional[str] = None,
-        is_new_version_of: Optional["File"] = None,
+        is_new_version_of: Optional["Artifact"] = None,
         **kwargs,
-    ) -> "File":
+    ) -> "Artifact":
         """Create from ``AnnDataLike``, validate & link features.
 
         Args:
@@ -1587,8 +1587,8 @@ class File(Registry, Data, IsTree):
                 e.g., `"myfolder/myfile.fcs"`.
             description: A description.
             version: A version string.
-            is_new_version_of: An old version of the file.
-            run: The run that creates the file.
+            is_new_version_of: An old version of the artifact.
+            run: The run that creates the artifact.
 
         See Also:
 
@@ -1607,10 +1607,10 @@ class File(Registry, Data, IsTree):
             >>> adata = ln.dev.datasets.anndata_with_obs()
             >>> adata.var_names[:2]
             Index(['ENSG00000000003', 'ENSG00000000005'], dtype='object')
-            >>> file = ln.File.from_anndata(adata,
+            >>> artifact = ln.Artifact.from_anndata(adata,
             ...                             field=lb.Gene.ensembl_gene_id,
             ...                             description="mini anndata with obs")
-            >>> file.save()
+            >>> artifact.save()
         """
         pass
 
@@ -1621,8 +1621,8 @@ class File(Registry, Data, IsTree):
         key: Optional[str] = None,
         *,
         run: Optional[Run] = None,
-    ) -> List["File"]:
-        """Create a list of file objects from a directory.
+    ) -> List["Artifact"]:
+        """Create a list of artifact objects from a directory.
 
         .. note::
 
@@ -1640,8 +1640,8 @@ class File(Registry, Data, IsTree):
 
         Examples:
             >>> dir_path = ln.dev.datasets.generate_cell_ranger_files("sample_001", ln.settings.storage)
-            >>> files = ln.File.from_dir(dir_path)
-            >>> ln.save(files)
+            >>> artifacts = ln.Artifact.from_dir(dir_path)
+            >>> ln.save(artifacts)
         """
         pass
 
@@ -1651,27 +1651,27 @@ class File(Registry, Data, IsTree):
         run: Optional[Run] = None,
         format: Optional[str] = None,
     ) -> None:
-        """Replace file content.
+        """Replace artifact content.
 
         Args:
             data: A file path or an in-memory data
                 object (`DataFrame`, `AnnData`).
-            run: The run that created the file gets
+            run: The run that created the artifact gets
                 auto-linked if ``ln.track()`` was called.
 
         Examples:
 
-            Say we made a change to the content of a file (e.g., edited the image
-            `paradisi05_laminopathic_nuclei.jpg`).
+            Say we made a change to the content of an artifact, e.g., edited the image
+            `paradisi05_laminopathic_nuclei.jpg`.
 
             This is how we replace the old file in storage with the new file:
 
-            >>> file.replace("paradisi05_laminopathic_nuclei.jpg")
-            >>> file.save()
+            >>> artifact.replace("paradisi05_laminopathic_nuclei.jpg")
+            >>> artifact.save()
 
             Note that this neither changes the storage key nor the filename.
 
-            However, it will update the suffix if the file type changes.
+            However, it will update the suffix if it changes.
         """
         pass
 
@@ -1685,8 +1685,8 @@ class File(Registry, Data, IsTree):
 
             Read AnnData in backed mode from cloud:
 
-            >>> file = ln.File.filter(key="lndb-storage/pbmc68k.h5ad").one()
-            >>> file.backed()
+            >>> artifact = ln.Artifact.filter(key="lndb-storage/pbmc68k.h5ad").one()
+            >>> artifact.backed()
             AnnData object with n_obs × n_vars = 70 × 765 backed at 's3://lamindb-ci/lndb-storage/pbmc68k.h5ad'
         """
         pass
@@ -1701,9 +1701,9 @@ class File(Registry, Data, IsTree):
             Load as a `DataFrame`:
 
             >>> df = ln.dev.datasets.df_iris_in_meter_batch1()
-            >>> ln.File.from_df(df, description="iris").save()
-            >>> file = ln.File.filter(description="iris").one()
-            >>> file.load().head()
+            >>> ln.Artifact.from_df(df, description="iris").save()
+            >>> artifact = ln.Artifact.filter(description="iris").one()
+            >>> artifact.load().head()
             sepal_length sepal_width petal_length petal_width iris_organism_code
             0        0.051       0.035        0.014       0.002                 0
             1        0.049       0.030        0.014       0.002                 0
@@ -1713,16 +1713,16 @@ class File(Registry, Data, IsTree):
 
             Load as an `AnnData`:
 
-            >>> ln.File("s3://lamindb-ci/lndb-storage/pbmc68k.h5ad").save()
-            >>> file = ln.File.filter(key="lndb-storage/pbmc68k.h5ad").one()
-            >>> file.load()
+            >>> ln.Artifact("s3://lamindb-ci/lndb-storage/pbmc68k.h5ad").save()
+            >>> artifact = ln.Artifact.filter(key="lndb-storage/pbmc68k.h5ad").one()
+            >>> artifact.load()
             AnnData object with n_obs × n_vars = 70 × 765
 
-            Fall back to :meth:`~lamindb.File.stage` if no in-memory representation is configured:
+            Fall back to :meth:`~lamindb.Artifact.stage` if no in-memory representation is configured:
 
-            >>> ln.File(ln.dev.datasets.file_jpg_paradisi05(), description="paradisi05").save()
-            >>> file = ln.File.filter(description="paradisi05").one()
-            >>> file.load()
+            >>> ln.Artifact(ln.dev.datasets.file_jpg_paradisi05(), description="paradisi05").save()
+            >>> artifact = ln.Artifact.filter(description="paradisi05").one()
+            >>> artifact.load()
             PosixPath('/home/runner/work/lamindb/lamindb/docs/guide/mydata/.lamindb/jb7BY5UJoQVGMUOKiLcn.jpg')
         """
         pass
@@ -1737,49 +1737,51 @@ class File(Registry, Data, IsTree):
             Sync file from cloud and return the local path of the cache:
 
             >>> ln.settings.storage = "s3://lamindb-ci"
-            >>> ln.File("s3://lamindb-ci/lndb-storage/pbmc68k.h5ad").save()
-            >>> file = ln.File.filter(key="lndb-storage/pbmc68k.h5ad").one()
-            >>> file.stage()
+            >>> ln.Artifact("s3://lamindb-ci/lndb-storage/pbmc68k.h5ad").save()
+            >>> artifact = ln.Artifact.filter(key="lndb-storage/pbmc68k.h5ad").one()
+            >>> artifact.stage()
             PosixPath('/home/runner/work/Caches/lamindb/lamindb-ci/lndb-storage/pbmc68k.h5ad')
         """
         pass
 
     def delete(self, permanent: Optional[bool] = None, storage: Optional[bool] = None) -> None:
-        """Put file in trash.
+        """Delete.
 
-        Putting a file into the trash means setting its `visibility` field to 2.
+        A first call to `.delete()` puts an artifact into the trash (sets `visibility` to `-1`).
+
+        A second call permanently deletes the artifact.
 
         FAQ: :doc:`docs:faq/storage`
 
         Args:
-            permanent: Permanently delete the file (skips trash).
-            storage: Indicate whether you want to delete the file in storage.
+            permanent: Permanently delete the artifact (skip trash).
+            storage: Indicate whether you want to delete the artifact in storage.
 
         Examples:
 
-            For any `File` object `file`, call:
+            For an `Artifact` object `artifact`, call:
 
-            >>> file.delete()
+            >>> artifact.delete()
         """
         pass
 
     def save(self, *args, **kwargs) -> None:
-        """Save the file to database & storage.
+        """Save to database & storage.
 
         Examples:
-            >>> file = ln.File("./myfile.csv", description="myfile")
-            >>> file.save()
+            >>> artifact = ln.Artifact("./myfile.csv", description="myfile")
+            >>> artifact.save()
         """
         pass
 
     def restore(self) -> None:
-        """Restore file from trash.
+        """Restore from trash.
 
         Examples:
 
-            For any `File` object `file`, call:
+            For any `Artifact` object `artifact`, call:
 
-            >>> file.restore()
+            >>> artifact.restore()
         """
         pass
 
@@ -1801,7 +1803,7 @@ class Dataset(Registry, Data):
 
 
     See Also:
-        :class:`~lamindb.File`
+        :class:`~lamindb.Artifact`
 
     Notes:
         See tutorial: :doc:`/tutorial`.
@@ -1811,17 +1813,17 @@ class Dataset(Registry, Data):
         - track data batches of arbitrary format & size
         - can validate & link features (the measured dimensions in a data batch)
 
-        Often, a file stores a single batch of data and a dataset stores a collection of data batches, while
+        Often, an artifact stores a single batch of data and a dataset stores a collection of data batches, while
 
-        - files always have a one-to-one correspondence with a storage accessor
-        - datasets can reference multiple objects or an array store
+        - artifacts always have a one-to-one correspondence with a storage accessor
+        - datasets can reference multiple artifacts
 
         Examples:
 
-        - store a blob-like file (pdf, txt, csv, jpg, ...) as a :class:`~lamindb.File`
+        - store a blob-like file (pdf, txt, csv, jpg, ...) as a :class:`~lamindb.Artifact`
         - store a queryable array (parquet, HDF5, h5ad, DuckDB, zarr, TileDB, ...) as a
-          :class:`~lamindb.Dataset` or :class:`~lamindb.File`, depending on your use case
-        - store collections of files and arrays with :class:`~lamindb.Dataset`
+          :class:`~lamindb.Dataset` or :class:`~lamindb.Artifact`, depending on your use case
+        - store collections of artifacts with :class:`~lamindb.Dataset`
         - once implemented, datasets in BigQuery, Snowflake, Postgres, ... would
           be stored in :class:`~lamindb.Dataset`
 
@@ -1840,19 +1842,19 @@ class Dataset(Registry, Data):
         >>> dataset = ln.Dataset(df, name="Iris flower dataset batch1")
         >>> dataset.save()
 
-        Create a dataset from a collection of :class:`~lamindb.File` objects:
+        Create a dataset from a collection of :class:`~lamindb.Artifact` objects:
 
-        >>> dataset = ln.Dataset([file1, file2], name="My dataset")
+        >>> dataset = ln.Dataset([artifact1, artifact2], name="My dataset")
         >>> dataset.save()
 
         If you don't have 100k files or more in a directory, create ``File``
-        records via :class:`~lamindb.File.from_dir` (e.g., here :doc:`docs:tutorial`):
+        records via :class:`~lamindb.Artifact.from_dir` (e.g., here :doc:`docs:tutorial`):
 
-        >>> files = ln.File.from_dir("./my_dir")
-        >>> dataset = ln.Dataset([file1, file2], name="My dataset")
+        >>> artifacts = ln.Artifact.from_dir("./my_dir")
+        >>> dataset = ln.Dataset(artifacts, name="My dataset")
         >>> dataset.save()
 
-        If you have more than 100k files, consider creating a dataset directly from the
+        If you have more than 100k artifacts, consider creating a dataset directly from the
         directory without creating File records (e.g., here :doc:`docs:rxrx`):
 
         >>> dataset = ln.Dataset("s3://my-bucket/my-images/", name="My dataset", meta=df)
@@ -1864,7 +1866,7 @@ class Dataset(Registry, Data):
         >>> dataset = ln.Dataset(df1, description="My dataframe")
         >>> dataset.save()
         >>> # create new dataset from old dataset and version both
-        >>> new_dataset = ln.File(df2, is_new_version_of=dataset)
+        >>> new_dataset = ln.Artifact(df2, is_new_version_of=dataset)
         >>> assert new_dataset.initial_version == dataset.initial_version
         >>> assert dataset.version == "1"
         >>> assert new_dataset.version == "2"
@@ -1899,13 +1901,13 @@ class Dataset(Registry, Data):
     transform = models.ForeignKey(Transform, PROTECT, related_name="output_datasets", null=True, default=None)
     """:class:`~lamindb.Transform` whose run created the dataset."""
     run = models.ForeignKey(Run, PROTECT, related_name="output_datasets", null=True, default=None)
-    """:class:`~lamindb.Run` that created the `file`."""
+    """:class:`~lamindb.Run` that created the `dataset`."""
     input_of = models.ManyToManyField(Run, related_name="input_datasets")
     """Runs that use this dataset as an input."""
-    file = models.OneToOneField("File", on_delete=PROTECT, null=True, unique=True, related_name="dataset")
-    """Storage of dataset as a one file."""
-    files = models.ManyToManyField("File", related_name="datasets")
-    """Storage of dataset as multiple file."""
+    artifact = models.OneToOneField("Artifact", on_delete=PROTECT, null=True, unique=True, related_name="dataset")
+    """Storage of dataset as a one artifact."""
+    artifacts = models.ManyToManyField("Artifact", related_name="datasets")
+    """Storage of dataset as multiple artifacts."""
     # below shouldn't be a OneToOne because different states of the same storage location might represent
     # different datasets
     storage = models.ForeignKey(Storage, on_delete=PROTECT, null=True, related_name="datasets")
@@ -1983,7 +1985,7 @@ class Dataset(Registry, Data):
         reference: Optional[str] = None,
         reference_type: Optional[str] = None,
         version: Optional[str] = None,
-        is_new_version_of: Optional["File"] = None,
+        is_new_version_of: Optional["Artifact"] = None,
         **kwargs,
     ) -> "Dataset":
         """Create from ``DataFrame``, validate & link features.
@@ -1998,8 +2000,8 @@ class Dataset(Registry, Data):
             run: The run that creates the dataset.
 
         See Also:
-            :class:`~lamindb.File`
-                Track files.
+            :class:`~lamindb.Artifact`
+                Track artifacts.
             :class:`~lamindb.Feature`
                 Track features.
 
@@ -2030,7 +2032,7 @@ class Dataset(Registry, Data):
         reference: Optional[str] = None,
         reference_type: Optional[str] = None,
         version: Optional[str] = None,
-        is_new_version_of: Optional["File"] = None,
+        is_new_version_of: Optional["Artifact"] = None,
         **kwargs,
     ) -> "Dataset":
         """Create from ``AnnDataLike``, validate & link features.
@@ -2046,8 +2048,8 @@ class Dataset(Registry, Data):
 
         See Also:
 
-            :class:`~lamindb.File`
-                Track files.
+            :class:`~lamindb.Artifact`
+                Track artifacts.
             :class:`~lamindb.Feature`
                 Track features.
 
@@ -2132,7 +2134,7 @@ class Dataset(Registry, Data):
         pass
 
     def save(self, *args, **kwargs) -> None:
-        """Save the dataset and underlying file to database & storage.
+        """Save the dataset and underlying artifacts to database & storage.
 
         Examples:
             >>> dataset = ln.Dataset("./myfile.csv", name="myfile")
@@ -2156,14 +2158,14 @@ class LinkORM:
     pass
 
 
-class FileFeatureSet(Registry, LinkORM):
+class ArtifactFeatureSet(Registry, LinkORM):
     id = models.BigAutoField(primary_key=True)
-    file = models.ForeignKey(File, on_delete=models.CASCADE)
+    artifact = models.ForeignKey(Artifact, on_delete=models.CASCADE)
     feature_set = models.ForeignKey(FeatureSet, on_delete=models.CASCADE)
     slot = CharField(max_length=40, null=True, default=None)
 
     class Meta:
-        unique_together = ("file", "feature_set")
+        unique_together = ("artifact", "feature_set")
 
 
 class DatasetFeatureSet(Registry, LinkORM):
@@ -2176,14 +2178,14 @@ class DatasetFeatureSet(Registry, LinkORM):
         unique_together = ("dataset", "feature_set")
 
 
-class FileULabel(Registry, LinkORM):
+class ArtifactULabel(Registry, LinkORM):
     id = models.BigAutoField(primary_key=True)
-    file = models.ForeignKey(File, on_delete=models.CASCADE)
+    artifact = models.ForeignKey(Artifact, on_delete=models.CASCADE)
     ulabel = models.ForeignKey(ULabel, on_delete=models.CASCADE)
     feature = models.ForeignKey(Feature, CASCADE, null=True, default=None)
 
     class Meta:
-        unique_together = ("file", "ulabel")
+        unique_together = ("artifact", "ulabel")
 
 
 class DatasetULabel(Registry, LinkORM):
