@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚚 Rename File to Artifact | [321](https://github.com/laminlabs/lnschema-core/pull/321) | [falexwolf](https://github.com/falexwolf) | 2023-12-11 |
 ✨ Do virtual inner join of variables in Dataset.mapped | [320](https://github.com/laminlabs/lnschema-core/pull/320) | [Koncopd](https://github.com/Koncopd) | 2023-12-05 |
 💚 Fix docstring | [319](https://github.com/laminlabs/lnschema-core/pull/319) | [sunnyosun](https://github.com/sunnyosun) | 2023-12-02 |
 📝 Enabled ID conversion via return_field | [318](https://github.com/laminlabs/lnschema-core/pull/318) | [sunnyosun](https://github.com/sunnyosun) | 2023-12-02 |
