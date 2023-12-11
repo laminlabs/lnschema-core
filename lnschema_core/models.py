@@ -1908,10 +1908,6 @@ class Dataset(Registry, Data):
     """Storage of dataset as a one artifact."""
     artifacts = models.ManyToManyField("Artifact", related_name="datasets")
     """Storage of dataset as multiple artifacts."""
-    # below shouldn't be a OneToOne because different states of the same storage location might represent
-    # different datasets
-    storage = models.ForeignKey(Storage, on_delete=PROTECT, null=True, related_name="datasets")
-    """Storage of dataset as mere paths handled by a key value store or file system."""
     initial_version = models.ForeignKey("self", PROTECT, null=True, default=None)
     """Initial version of the dataset, a :class:`~lamindb.Dataset` object."""
     visibility = models.SmallIntegerField(db_index=True, choices=VisibilityChoice.choices, default=1)
