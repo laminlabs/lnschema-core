@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+♻️ Add n_objects and n_observations to Artifact and remove unique constraint for key, storage | [323](https://github.com/laminlabs/lnschema-core/pull/323) | [falexwolf](https://github.com/falexwolf) | 2023-12-12 |
 🔥 Remove field storage from dataset | [322](https://github.com/laminlabs/lnschema-core/pull/322) | [falexwolf](https://github.com/falexwolf) | 2023-12-11 | 0.58.0
 🚚 Rename File to Artifact | [321](https://github.com/laminlabs/lnschema-core/pull/321) | [falexwolf](https://github.com/falexwolf) | 2023-12-11 |
 ✨ Do virtual inner join of variables in Dataset.mapped | [320](https://github.com/laminlabs/lnschema-core/pull/320) | [Koncopd](https://github.com/Koncopd) | 2023-12-05 |
