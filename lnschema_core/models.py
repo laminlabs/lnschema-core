@@ -1316,7 +1316,7 @@ class FeatureSet(Registry):
 
 
 class Artifact(Registry, Data, IsTree):
-    """Artifacts: data in files, arrays, directories.
+    """Artifacts: data batches stored as files, arrays, directories.
 
     Args:
         data: `Union[PathLike, DataLike]` A path or data
@@ -1787,10 +1787,10 @@ class Artifact(Registry, Data, IsTree):
 
 
 class Dataset(Registry, Data):
-    """Datasets: collections of data batches.
+    """Datasets: collections of artifacts.
 
     Args:
-        data: `DataLike` An array (`DataFrame`, `AnnData`), a directory, or a list of `File` objects.
+        data: `DataLike` An artifact, a list of artifacts, or an array (`DataFrame`, `AnnData`).
         name: `str` A name.
         description: `Optional[str] = None` A description.
         version: `Optional[str] = None` A version string.
@@ -1808,56 +1808,17 @@ class Dataset(Registry, Data):
     Notes:
         See tutorial: :doc:`/tutorial`.
 
-        The `File` & `Dataset` registries both
-
-        - track data batches of arbitrary format & size
-        - can validate & link features (the measured dimensions in a data batch)
-
-        Often, an artifact stores a single batch of data and a dataset stores a collection of data batches, while
-
-        - artifacts always have a one-to-one correspondence with a storage accessor
-        - datasets can reference multiple artifacts
-
-        Examples:
-
-        - store a blob-like file (pdf, txt, csv, jpg, ...) as a :class:`~lamindb.Artifact`
-        - store a queryable array (parquet, HDF5, h5ad, DuckDB, zarr, TileDB, ...) as a
-          :class:`~lamindb.Dataset` or :class:`~lamindb.Artifact`, depending on your use case
-        - store collections of artifacts with :class:`~lamindb.Dataset`
-        - once implemented, datasets in BigQuery, Snowflake, Postgres, ... would
-          be stored in :class:`~lamindb.Dataset`
-
     Examples:
-
-        Create a dataset from a DataFrame:
-
-        >>> df = ln.dev.datasets.df_iris_in_meter_batch1()
-        >>> df.head()
-          sepal_length sepal_width petal_length petal_width iris_organism_code
-        0        0.051       0.035        0.014       0.002                 0
-        1        0.049       0.030        0.014       0.002                 0
-        2        0.047       0.032        0.013       0.002                 0
-        3        0.046       0.031        0.015       0.002                 0
-        4        0.050       0.036        0.014       0.002                 0
-        >>> dataset = ln.Dataset(df, name="Iris flower dataset batch1")
-        >>> dataset.save()
 
         Create a dataset from a collection of :class:`~lamindb.Artifact` objects:
 
         >>> dataset = ln.Dataset([artifact1, artifact2], name="My dataset")
         >>> dataset.save()
 
-        If you don't have 100k files or more in a directory, create ``File``
-        records via :class:`~lamindb.Artifact.from_dir` (e.g., here :doc:`docs:tutorial`):
-
-        >>> artifacts = ln.Artifact.from_dir("./my_dir")
-        >>> dataset = ln.Dataset(artifacts, name="My dataset")
-        >>> dataset.save()
-
         If you have more than 100k artifacts, consider creating a dataset directly from the
         directory without creating File records (e.g., here :doc:`docs:rxrx`):
 
-        >>> dataset = ln.Dataset("s3://my-bucket/my-images/", name="My dataset", meta=df)
+        >>> dataset = ln.Artifact("s3://my-bucket/my-images/", name="My dataset", meta=df)
         >>> dataset.save()
 
         Make a new version of a dataset:
@@ -1866,7 +1827,7 @@ class Dataset(Registry, Data):
         >>> dataset = ln.Dataset(df1, description="My dataframe")
         >>> dataset.save()
         >>> # create new dataset from old dataset and version both
-        >>> new_dataset = ln.Artifact(df2, is_new_version_of=dataset)
+        >>> new_dataset = ln.Dataset(df2, is_new_version_of=dataset)
         >>> assert new_dataset.initial_version == dataset.initial_version
         >>> assert dataset.version == "1"
         >>> assert new_dataset.version == "2"
@@ -1946,28 +1907,6 @@ class Dataset(Registry, Data):
         *args,
         **kwargs,
     ):
-        pass
-
-    @property
-    def path(self) -> Optional[Union[Path, UPath]]:
-        """None or bucket or folder path (`Path`, `UPath`).
-
-        Only relevant for datasets that merely reference to a bucket or folder.
-
-        Examples:
-
-            Cloud storage bucket:
-
-            >>> ln.Storage("s3://my-bucket").save()
-
-            Directory/folder in cloud storage:
-
-            >>> ln.Storage("s3://my-bucket/my-directory").save()
-
-            Local directory/folder:
-
-            >>> ln.Storage("./my-directory").save()
-        """
         pass
 
     @classmethod
