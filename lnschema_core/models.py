@@ -1446,6 +1446,16 @@ class Artifact(Registry, Data, IsTree):
     """
     hash_type = CharField(max_length=30, db_index=True, null=True, default=None)
     """Type of hash."""
+    n_objects = models.BigIntegerField(default=None, null=True, db_index=True)
+    """Number of objects.
+
+    Typically, this denotes the number of files in an artifact.
+    """
+    n_observations = models.BigIntegerField(default=None, null=True, db_index=True)
+    """Number of observations.
+
+    Typically, this denotes the first array dimension.
+    """
     feature_sets = models.ManyToManyField(FeatureSet, related_name="artifacts", through="ArtifactFeatureSet")
     """The feature sets measured in the artifact (:class:`~lamindb.FeatureSet`)."""
     ulabels = models.ManyToManyField(ULabel, through="ArtifactULabel", related_name="artifacts")
@@ -1468,9 +1478,6 @@ class Artifact(Registry, Data, IsTree):
     """Time of last update to record."""
     created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_artifacts")
     """Creator of record, a :class:`~lamindb.User`."""
-
-    class Meta:
-        unique_together = (("storage", "key"),)
 
     @overload
     def __init__(
