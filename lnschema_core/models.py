@@ -908,6 +908,11 @@ class Run(Registry):
     # generated for many different runs
     report = models.ForeignKey("Artifact", PROTECT, default=None, null=True, related_name="report_of")
     """Report of run, e.g., an html file."""
+    environment = models.ForeignKey("Artifact", PROTECT, default=None, null=True, related_name="environment_of")
+    """Computational environment for the run.
+
+    For instance, a `Dockerfile`, a docker image, a `requirements.txt`, an `environment.yml`, etc.
+    """
     is_consecutive = models.BooleanField(null=True, default=None)
     """Indicates whether code was consecutively executed. Is relevant for notebooks."""
     # input_artifacts on File
