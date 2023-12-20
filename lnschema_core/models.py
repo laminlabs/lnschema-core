@@ -355,6 +355,22 @@ class HasParents:
         pass
 
 
+class HasVersions:
+    """Base class for versioning methods."""
+
+    def versions(self):
+        """Lists all records of the same version family.
+
+        Examples:
+            >>> new_artifact = ln.Artifact(df2, is_new_version_of=artifact)
+            >>> new_artifact.save()
+            >>> new_artifact.versions()
+        """
+        from lamindb._filter import filter_version_family
+
+        return filter_version_family(self).all()
+
+
 class Registry(models.Model):
     """Registry base class.
 
@@ -733,7 +749,7 @@ class Storage(Registry):
         pass
 
 
-class Transform(Registry, HasParents):
+class Transform(Registry, HasParents, HasVersions):
     """Transforms of artifacts & datasets.
 
     Pipelines, notebooks, app uploads.
@@ -1320,7 +1336,7 @@ class FeatureSet(Registry):
         pass
 
 
-class Artifact(Registry, Data, IsTree):
+class Artifact(Registry, Data, IsTree, HasVersions):
     """Artifacts: data batches stored as files, arrays, directories.
 
     Args:
@@ -1798,7 +1814,7 @@ class Artifact(Registry, Data, IsTree):
         pass
 
 
-class Dataset(Registry, Data):
+class Dataset(Registry, Data, HasVersions):
     """Datasets: collections of artifacts.
 
     Args:
