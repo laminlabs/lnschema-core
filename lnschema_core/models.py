@@ -355,7 +355,7 @@ class HasParents:
         pass
 
 
-class HasVersions:
+class IsVersioned:
     """Base class for versioning methods."""
 
     def versions(self):
@@ -749,7 +749,7 @@ class Storage(Registry):
         pass
 
 
-class Transform(Registry, HasParents, HasVersions):
+class Transform(Registry, HasParents, IsVersioned):
     """Transforms of artifacts & datasets.
 
     Pipelines, notebooks, app uploads.
@@ -1331,7 +1331,7 @@ class FeatureSet(Registry):
         pass
 
 
-class Artifact(Registry, Data, IsTree, HasVersions):
+class Artifact(Registry, Data, IsTree, IsVersioned):
     """Artifacts: data batches stored as files, arrays, directories.
 
     Args:
@@ -1809,7 +1809,7 @@ class Artifact(Registry, Data, IsTree, HasVersions):
         pass
 
 
-class Dataset(Registry, Data, HasVersions):
+class Dataset(Registry, Data, IsVersioned):
     """Datasets: collections of artifacts.
 
     Args:
