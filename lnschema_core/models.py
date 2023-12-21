@@ -358,8 +358,9 @@ class HasParents:
 class IsVersioned:
     """Base class for versioning methods."""
 
-    def versions(self):
-        """Lists all records of the same version family.
+    @property
+    def versions(self) -> "QuerySet":
+        """A query set for all the records of the same version family.
 
         Examples:
             >>> new_artifact = ln.Artifact(df2, is_new_version_of=artifact)
@@ -368,7 +369,7 @@ class IsVersioned:
         """
         from lamindb._filter import filter_version_family
 
-        return filter_version_family(self).all()
+        return filter_version_family(self)
 
 
 class Registry(models.Model):
