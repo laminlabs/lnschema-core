@@ -799,10 +799,11 @@ class Transform(Registry, HasParents, IsVersioned):
     """
 
     _len_stem_uid: int = 12
+    _len_full_uid: int = 16
 
     id = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
-    uid = CharField(unique=True, db_index=True, max_length=14, default=None)
+    uid = CharField(unique=True, db_index=True, max_length=_len_full_uid, default=None)
     """Universal id."""
     name = CharField(max_length=255, db_index=True, null=True, default=None)
     """Transform name or title, a pipeline name, notebook title, etc..
@@ -1430,11 +1431,12 @@ class Artifact(Registry, Data, IsTree):
 
     """
 
+    _len_full_uid: int = 20
     _len_stem_uid: int = 16
 
     id = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
-    uid = CharField(unique=True, db_index=True, max_length=20)
+    uid = CharField(unique=True, db_index=True, max_length=_len_full_uid)
     """A universal random id (20-char base62 ~ UUID), valid across DB instances."""
     storage = models.ForeignKey(Storage, PROTECT, related_name="artifacts")
     """Storage location (:class:`~lamindb.Storage`), e.g., an S3 or GCP bucket or a local directory."""
@@ -1866,11 +1868,12 @@ class Dataset(Registry, Data):
         >>> assert new_dataset.version == "2"
     """
 
+    _len_full_uid: int = 20
     _len_stem_uid: int = 16
 
     id = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
-    uid = CharField(unique=True, db_index=True, max_length=20, default=base62_20)
+    uid = CharField(unique=True, db_index=True, max_length=_len_full_uid, default=base62_20)
     """Universal id, valid across DB instances."""
     name = CharField(max_length=255, db_index=True, default=None)
     """Name or title of dataset (required)."""
