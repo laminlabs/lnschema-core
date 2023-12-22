@@ -1342,7 +1342,7 @@ class FeatureSet(Registry):
         pass
 
 
-class Artifact(Registry, Data, IsTree):
+class Artifact(Registry, Data, IsTree, IsVersioned):
     """Artifacts: data batches stored as files, arrays, directories.
 
     Args:
@@ -1821,7 +1821,7 @@ class Artifact(Registry, Data, IsTree):
         pass
 
 
-class Dataset(Registry, Data):
+class Dataset(Registry, Data, IsVersioned):
     """Datasets: collections of artifacts.
 
     Args:
