@@ -358,7 +358,8 @@ class HasParents:
 class IsVersioned:
     """Base class for versioning methods."""
 
-    def versions(self):
+    @property
+    def versions(self) -> "QuerySet":
         """Lists all records of the same version family.
 
         Examples:
@@ -368,7 +369,7 @@ class IsVersioned:
         """
         from lamindb._filter import filter_version_family
 
-        return filter_version_family(self).all()
+        return filter_version_family(self)
 
 
 class Registry(models.Model):
