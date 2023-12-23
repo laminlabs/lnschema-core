@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚚 Add field description to storage | [329](https://github.com/laminlabs/lnschema-core/pull/329) | [falexwolf](https://github.com/falexwolf) | 2023-12-23 |
 🔥 Remove initial_version_id | [328](https://github.com/laminlabs/lnschema-core/pull/328) | [falexwolf](https://github.com/falexwolf) | 2023-12-23 |
 🚚 Add environment foreign key | [324](https://github.com/laminlabs/lnschema-core/pull/324) | [falexwolf](https://github.com/falexwolf) | 2023-12-21 | 0.59.0
 ♻️ Add n_objects and n_observations to Artifact and remove unique constraint for key, storage | [323](https://github.com/laminlabs/lnschema-core/pull/323) | [falexwolf](https://github.com/falexwolf) | 2023-12-12 | 0.58.1
