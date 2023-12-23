@@ -15,7 +15,7 @@ if _INSTANCE_SETUP:
     from .models import (  # type: ignore
         Artifact,
         CanValidate,
-        Dataset,
+        Collection,
         Feature,
         FeatureSet,
         HasParents,
