@@ -675,7 +675,7 @@ class Storage(Registry):
     Can be local or remote directories or entire S3/GCP buckets.
 
     See Also:
-        :attr:`~lamindb.dev.Settings.storage`
+        Default storage: :attr:`~lamindb.dev.Settings.storage`
 
     Examples:
 
@@ -700,7 +700,7 @@ class Storage(Registry):
     root = CharField(max_length=255, db_index=True, unique=True, default=None)
     """Root path of storage, an s3 path, a local path, etc. (required)."""
     description = CharField(max_length=255, db_index=True, default=None)
-    """Root path of storage, an s3 path, a local path, etc. (required)."""
+    """A description of what the storage location is used for (optional)."""
     type = CharField(max_length=30, db_index=True)
     """Local vs. s3 vs. gcp etc."""
     region = CharField(max_length=64, db_index=True, null=True, default=None)
