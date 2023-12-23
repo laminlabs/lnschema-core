@@ -762,7 +762,7 @@ class Storage(Registry):
 
 
 class Transform(Registry, HasParents, IsVersioned):
-    """Transforms of artifacts & datasets.
+    """Transforms of artifacts & collections.
 
     Pipelines, notebooks, app uploads.
 
@@ -849,7 +849,7 @@ class Transform(Registry, HasParents, IsVersioned):
     parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
     """Parent transforms (predecessors) in data flow.
 
-    These are auto-populated whenever a transform loads an artifact or dataset as run input.
+    These are auto-populated whenever a transform loads an artifact or collection as run input.
     """
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
@@ -987,16 +987,16 @@ class ULabel(Registry, HasParents, CanValidate):
         reference_type: `Optional[str] = None` For instance, `"url"`.
 
 
-    A `ULabel` record provides the easiest way to annotate an artifact or dataset
+    A `ULabel` record provides the easiest way to annotate an artifact or collection
     with a label: `"My project"`, `"curated"`, or `"Batch X"`:
 
         >>> my_project = ULabel(name="My project")
         >>> my_project.save()
-        >>> dataset.ulabels.add(my_project)
+        >>> collection.ulabels.add(my_project)
 
-    In some cases, a label is measured *within* an artifact or dataset a feature (a
+    In some cases, a label is measured *within* an artifact or collection a feature (a
     :class:`~lamindb.Feature` record) denotes the column name in which the label
-    is stored. For instance, the dataset might contain measurements across 2
+    is stored. For instance, the collection might contain measurements across 2
     organism of the Iris flower: `"setosa"` & `"versicolor"`.
 
     See :doc:`tutorial2` to learn more.
@@ -1005,14 +1005,14 @@ class ULabel(Registry, HasParents, CanValidate):
 
         If you work with complex entities like cell lines, cell types, tissues,
         etc., consider using the pre-defined biological registries in
-        :mod:`lnschema_bionty` to label artifacts & datasets.
+        :mod:`lnschema_bionty` to label artifacts & collections.
 
         If you work with biological samples, likely, the only sustainable way of
         tracking metadata, is to create a custom schema module.
 
     See Also:
         :meth:`lamindb.Feature`
-            Dimensions of measurement for artifacts & datasets.
+            Dimensions of measurement for artifacts & collections.
 
     Examples:
 
@@ -1095,9 +1095,9 @@ class Feature(Registry, CanValidate):
         :meth:`~lamindb.Feature.from_df`
             Create feature records from DataFrame.
         :attr:`~lamindb.dev.Data.features`
-            Manage feature annotations of artifacts & datasets.
+            Manage feature annotations of artifacts & collections.
         :meth:`lamindb.ULabel`
-            ULabels for artifacts & datasets.
+            ULabels for artifacts & collections.
 
     Args:
         name: `str` Name of the feature, typically, a column name.
@@ -1587,7 +1587,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
 
         See Also:
             :meth:`lamindb.Collection`
-                Track datasets.
+                Track collections.
             :class:`lamindb.Feature`
                 Track features.
 
@@ -1603,7 +1603,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
             2        0.047       0.032        0.013       0.002                 0
             3        0.046       0.031        0.015       0.002                 0
             4        0.050       0.036        0.014       0.002                 0
-            >>> artifact = ln.Artifact.from_df(df, description="Iris flower dataset batch1")
+            >>> artifact = ln.Artifact.from_df(df, description="Iris flower collection batch1")
             >>> artifact.save()
         """
         pass
@@ -1635,7 +1635,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
         See Also:
 
             :meth:`lamindb.Collection`
-                Track datasets.
+                Track collections.
             :class:`lamindb.Feature`
                 Track features.
 
@@ -1836,8 +1836,8 @@ class Collection(Registry, Data, IsVersioned):
         name: `str` A name.
         description: `Optional[str] = None` A description.
         version: `Optional[str] = None` A version string.
-        is_new_version_of: `Optional[Collection] = None` An old version of the dataset.
-        run: `Optional[Run] = None` The run that creates the dataset.
+        is_new_version_of: `Optional[Collection] = None` An old version of the collection.
+        run: `Optional[Run] = None` The run that creates the collection.
         meta: `Optional[DataLike]` An array (`DataFrame`, `AnnData`) or a `File`
             object that defines metadata for a directory of objects.
         reference: `Optional[str] = None` For instance, an external ID or a URL.
@@ -1852,27 +1852,27 @@ class Collection(Registry, Data, IsVersioned):
 
     Examples:
 
-        Create a dataset from a collection of :class:`~lamindb.Artifact` objects:
+        Create a collection from a collection of :class:`~lamindb.Artifact` objects:
 
-        >>> dataset = ln.Collection([artifact1, artifact2], name="My dataset")
-        >>> dataset.save()
+        >>> collection = ln.Collection([artifact1, artifact2], name="My collection")
+        >>> collection.save()
 
-        If you have more than 100k artifacts, consider creating a dataset directly from the
+        If you have more than 100k artifacts, consider creating a collection directly from the
         directory without creating File records (e.g., here :doc:`docs:rxrx`):
 
-        >>> dataset = ln.Artifact("s3://my-bucket/my-images/", name="My dataset", meta=df)
-        >>> dataset.save()
+        >>> collection = ln.Artifact("s3://my-bucket/my-images/", name="My collection", meta=df)
+        >>> collection.save()
 
-        Make a new version of a dataset:
+        Make a new version of a collection:
 
-        >>> # a non-versioned dataset
-        >>> dataset = ln.Collection(df1, description="My dataframe")
-        >>> dataset.save()
-        >>> # create new dataset from old dataset and version both
-        >>> new_dataset = ln.Collection(df2, is_new_version_of=dataset)
-        >>> assert new_dataset.stem_uid == dataset.stem_uid
-        >>> assert dataset.version == "1"
-        >>> assert new_dataset.version == "2"
+        >>> # a non-versioned collection
+        >>> collection = ln.Collection(df1, description="My dataframe")
+        >>> collection.save()
+        >>> # create new collection from old collection and version both
+        >>> new_collection = ln.Collection(df2, is_new_version_of=collection)
+        >>> assert new_collection.stem_uid == collection.stem_uid
+        >>> assert collection.version == "1"
+        >>> assert new_collection.version == "2"
     """
 
     _len_full_uid: int = 20
@@ -1883,7 +1883,7 @@ class Collection(Registry, Data, IsVersioned):
     uid = CharField(unique=True, db_index=True, max_length=_len_full_uid, default=base62_20)
     """Universal id, valid across DB instances."""
     name = CharField(max_length=255, db_index=True, default=None)
-    """Name or title of dataset (required)."""
+    """Name or title of collection (required)."""
     description = TextField(null=True, default=None)
     """A description."""
     version = CharField(max_length=10, null=True, default=None, db_index=True)
@@ -1895,32 +1895,32 @@ class Collection(Registry, Data, IsVersioned):
     with `Python versioning <https://peps.python.org/pep-0440/>`__.
     """
     hash = CharField(max_length=86, db_index=True, null=True, default=None)
-    """Hash of dataset content. 86 base64 chars allow to store 64 bytes, 512 bits."""
+    """Hash of collection content. 86 base64 chars allow to store 64 bytes, 512 bits."""
     reference = CharField(max_length=255, db_index=True, null=True, default=None)
     """A reference like URL or external ID."""
     reference_type = CharField(max_length=255, db_index=True, null=True, default=None)
-    """Type of reference, e.g., cellxgene Census dataset_id."""
-    feature_sets = models.ManyToManyField("FeatureSet", related_name="datasets", through="CollectionFeatureSet")
-    """The feature sets measured in this dataset (see :class:`~lamindb.FeatureSet`)."""
-    ulabels = models.ManyToManyField("ULabel", through="CollectionULabel", related_name="datasets")
-    """ULabels sampled in the dataset (see :class:`~lamindb.Feature`)."""
-    transform = models.ForeignKey(Transform, PROTECT, related_name="output_datasets", null=True, default=None)
-    """:class:`~lamindb.Transform` whose run created the dataset."""
-    run = models.ForeignKey(Run, PROTECT, related_name="output_datasets", null=True, default=None)
-    """:class:`~lamindb.Run` that created the `dataset`."""
-    input_of = models.ManyToManyField(Run, related_name="input_datasets")
-    """Runs that use this dataset as an input."""
-    artifact = models.OneToOneField("Artifact", on_delete=PROTECT, null=True, unique=True, related_name="dataset")
-    """Storage of dataset as a one artifact."""
-    artifacts = models.ManyToManyField("Artifact", related_name="datasets")
-    """Storage of dataset as multiple artifacts."""
+    """Type of reference, e.g., cellxgene Census collection_id."""
+    feature_sets = models.ManyToManyField("FeatureSet", related_name="collections", through="CollectionFeatureSet")
+    """The feature sets measured in this collection (see :class:`~lamindb.FeatureSet`)."""
+    ulabels = models.ManyToManyField("ULabel", through="CollectionULabel", related_name="collections")
+    """ULabels sampled in the collection (see :class:`~lamindb.Feature`)."""
+    transform = models.ForeignKey(Transform, PROTECT, related_name="output_collections", null=True, default=None)
+    """:class:`~lamindb.Transform` whose run created the collection."""
+    run = models.ForeignKey(Run, PROTECT, related_name="output_collections", null=True, default=None)
+    """:class:`~lamindb.Run` that created the `collection`."""
+    input_of = models.ManyToManyField(Run, related_name="input_collections")
+    """Runs that use this collection as an input."""
+    artifact = models.OneToOneField("Artifact", on_delete=PROTECT, null=True, unique=True, related_name="collection")
+    """Storage of collection as a one artifact."""
+    artifacts = models.ManyToManyField("Artifact", related_name="collections")
+    """Storage of collection as multiple artifacts."""
     visibility = models.SmallIntegerField(db_index=True, choices=VisibilityChoice.choices, default=1)
     """Visibility of record,  0-default, 1-hidden, 2-trash."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of run execution."""
-    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_datasets")
+    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_collections")
     """Creator of record, a :class:`~lamindb.User`."""
 
     @overload
@@ -1974,8 +1974,8 @@ class Collection(Registry, Data, IsVersioned):
             name: A name.
             description: A description.
             version: A version string.
-            is_new_version_of: An old version of the dataset.
-            run: The run that creates the dataset.
+            is_new_version_of: An old version of the collection.
+            run: The run that creates the collection.
 
         See Also:
             :class:`~lamindb.Artifact`
@@ -1995,7 +1995,7 @@ class Collection(Registry, Data, IsVersioned):
             2        0.047       0.032        0.013       0.002                 0
             3        0.046       0.031        0.015       0.002                 0
             4        0.050       0.036        0.014       0.002                 0
-            >>> dataset = ln.Collection.from_df(df, description="Iris flower dataset batch1")
+            >>> collection = ln.Collection.from_df(df, description="Iris flower collection batch1")
         """
         pass
 
@@ -2021,8 +2021,8 @@ class Collection(Registry, Data, IsVersioned):
             name: A name.
             description: A description.
             version: A version string.
-            is_new_version_of: An old version of the dataset.
-            run: The run that creates the dataset.
+            is_new_version_of: An old version of the collection.
+            run: The run that creates the collection.
 
         See Also:
 
@@ -2037,8 +2037,8 @@ class Collection(Registry, Data, IsVersioned):
             >>> adata = ln.dev.datasets.anndata_with_obs()
             >>> adata.var_names[:2]
             Index(['ENSG00000000003', 'ENSG00000000005'], dtype='object')
-            >>> dataset = ln.Collection.from_anndata(adata, name="My dataset", field=lb.Gene.ensembl_gene_id)
-            >>> dataset.save()
+            >>> collection = ln.Collection.from_anndata(adata, name="My collection", field=lb.Gene.ensembl_gene_id)
+            >>> collection.save()
         """
         pass
 
@@ -2051,7 +2051,7 @@ class Collection(Registry, Data, IsVersioned):
         stream: bool = False,
         is_run_input: Optional[bool] = None,
     ) -> "MappedCollection":
-        """Convert to map-style dataset for data loaders.
+        """Convert to map-style collection for data loaders.
 
         Note: This currently only works for AnnData objects. The objects should
         have the same label keys and variables.
@@ -2065,13 +2065,13 @@ class Collection(Registry, Data, IsVersioned):
             encode_labels: Indicate whether you want to delete the linked file in storage.
             parallel: Enable sampling with multiple processes.
             stream: Whether to stream data from the array backend.
-            is_run_input: Whether to track this dataset as run input.
+            is_run_input: Whether to track this collection as run input.
 
         Examples:
             >>> import lamindb as ln
             >>> from torch.utils.data import DataLoader
-            >>> ds = ln.Collection.filter(description="my dataset").one()
-            >>> mapped = dataset.mapped(label_keys=["cell_type", "batch"])
+            >>> ds = ln.Collection.filter(description="my collection").one()
+            >>> mapped = collection.mapped(label_keys=["cell_type", "batch"])
             >>> dl = DataLoader(mapped, batch_size=128, shuffle=True)
         """
         pass
@@ -2097,37 +2097,37 @@ class Collection(Registry, Data, IsVersioned):
         pass
 
     def delete(self, permanent: Optional[bool] = None, storage: Optional[bool] = None) -> None:
-        """Delete dataset.
+        """Delete collection.
 
         Args:
-            permanent: Whether to permanently delete the dataset record (skips trash).
+            permanent: Whether to permanently delete the collection record (skips trash).
             storage: Indicate whether you want to delete the linked file in storage.
 
         Examples:
 
-            For any `Collection` object `dataset`, call:
+            For any `Collection` object `collection`, call:
 
-            >>> dataset.delete()
+            >>> collection.delete()
         """
         pass
 
     def save(self, *args, **kwargs) -> None:
-        """Save the dataset and underlying artifacts to database & storage.
+        """Save the collection and underlying artifacts to database & storage.
 
         Examples:
-            >>> dataset = ln.Collection("./myfile.csv", name="myfile")
-            >>> dataset.save()
+            >>> collection = ln.Collection("./myfile.csv", name="myfile")
+            >>> collection.save()
         """
         pass
 
     def restore(self) -> None:
-        """Restore dataset record from trash.
+        """Restore collection record from trash.
 
         Examples:
 
-            For any `Collection` object `dataset`, call:
+            For any `Collection` object `collection`, call:
 
-            >>> dataset.restore()
+            >>> collection.restore()
         """
         pass
 
@@ -2148,12 +2148,12 @@ class ArtifactFeatureSet(Registry, LinkORM):
 
 class CollectionFeatureSet(Registry, LinkORM):
     id = models.BigAutoField(primary_key=True)
-    dataset = models.ForeignKey(Collection, on_delete=models.CASCADE)
+    collection = models.ForeignKey(Collection, on_delete=models.CASCADE)
     feature_set = models.ForeignKey(FeatureSet, on_delete=models.CASCADE)
     slot = CharField(max_length=50, null=True, default=None)
 
     class Meta:
-        unique_together = ("dataset", "feature_set")
+        unique_together = ("collection", "feature_set")
 
 
 class ArtifactULabel(Registry, LinkORM):
@@ -2168,12 +2168,12 @@ class ArtifactULabel(Registry, LinkORM):
 
 class CollectionULabel(Registry, LinkORM):
     id = models.BigAutoField(primary_key=True)
-    dataset = models.ForeignKey(Collection, on_delete=models.CASCADE)
+    collection = models.ForeignKey(Collection, on_delete=models.CASCADE)
     ulabel = models.ForeignKey(ULabel, on_delete=models.CASCADE)
     feature = models.ForeignKey(Feature, CASCADE, null=True, default=None)
 
     class Meta:
-        unique_together = ("dataset", "ulabel")
+        unique_together = ("collection", "ulabel")
 
 
 # -------------------------------------------------------------------------------------
