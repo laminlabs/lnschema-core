@@ -55,6 +55,27 @@ IPYTHON = getattr(builtins, "__IPYTHON__", False)
 TRANSFORM_TYPE_DEFAULT = TransformType.notebook if IPYTHON else TransformType.pipeline
 
 
+class IsVersioned:
+    """Base class for versioned models."""
+
+    _len_stem_uid: int
+
+    @property
+    def stem_uid(self) -> str:
+        return self.uid[: self._len_stem_uid]  # type: ignore
+
+    @property
+    def versions(self) -> "QuerySet":
+        """Lists all records of the same version family.
+
+        Examples:
+            >>> new_artifact = ln.Artifact(df2, is_new_version_of=artifact)
+            >>> new_artifact.save()
+            >>> new_artifact.versions()
+        """
+        return self.__class__.filter(uid__startswith=self.stem_uid)  # type: ignore
+
+
 class IsTree:
     """Base class providing view_tree function."""
 
@@ -733,7 +754,7 @@ class Storage(Registry):
         pass
 
 
-class Transform(Registry, HasParents):
+class Transform(Registry, HasParents, IsVersioned):
     """Transforms of artifacts & datasets.
 
     Pipelines, notebooks, app uploads.
@@ -777,9 +798,12 @@ class Transform(Registry, HasParents):
         >>> transform.view_parents()
     """
 
+    _len_stem_uid: int = 12
+    _len_full_uid: int = 16
+
     id = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
-    uid = CharField(unique=True, db_index=True, max_length=14, default=None)
+    uid = CharField(unique=True, db_index=True, max_length=_len_full_uid, default=None)
     """Universal id."""
     name = CharField(max_length=255, db_index=True, null=True, default=None)
     """Transform name or title, a pipeline name, notebook title, etc..
@@ -789,7 +813,7 @@ class Transform(Registry, HasParents):
     version = CharField(max_length=10, default=None, null=True, db_index=True)
     """Version (default `None`).
 
-    Use this to label different versions of a transform.
+    Defines version of a family of records characterized by the same `stem_uid`.
 
     Consider using `semantic versioning <https://semver.org>`__
     with `Python versioning <https://peps.python.org/pep-0440/>`__.
@@ -820,8 +844,6 @@ class Transform(Registry, HasParents):
 
     These are auto-populated whenever a transform loads an artifact or dataset as run input.
     """
-    initial_version = models.ForeignKey("self", PROTECT, null=True, default=None)
-    """Initial version of the transform, a :class:`~lamindb.Transform` record."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
@@ -1320,7 +1342,7 @@ class FeatureSet(Registry):
         pass
 
 
-class Artifact(Registry, Data, IsTree):
+class Artifact(Registry, Data, IsTree, IsVersioned):
     """Artifacts: data batches stored as files, arrays, directories.
 
     Args:
@@ -1403,15 +1425,18 @@ class Artifact(Registry, Data, IsTree):
         >>> artifact.save()
         >>> # version an artifact
         >>> new_artifact = ln.Artifact(df2, is_new_version_of=artifact)
-        >>> assert new_artifact.initial_version == artifact.initial_version
+        >>> assert new_artifact.stem_uid == artifact.stem_uid
         >>> assert artifact.version == "1"
         >>> assert new_artifact.version == "2"
 
     """
 
+    _len_full_uid: int = 20
+    _len_stem_uid: int = 16
+
     id = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
-    uid = CharField(unique=True, db_index=True, max_length=20)
+    uid = CharField(unique=True, db_index=True, max_length=_len_full_uid)
     """A universal random id (20-char base62 ~ UUID), valid across DB instances."""
     storage = models.ForeignKey(Storage, PROTECT, related_name="artifacts")
     """Storage location (:class:`~lamindb.Storage`), e.g., an S3 or GCP bucket or a local directory."""
@@ -1434,7 +1459,7 @@ class Artifact(Registry, Data, IsTree):
     version = CharField(max_length=10, null=True, default=None, db_index=True)
     """Version (default `None`).
 
-    Use this together with `initial_version` to label different versions of a artifact.
+    Defines version of a family of records characterized by the same `stem_uid`.
 
     Consider using `semantic versioning <https://semver.org>`__
     with `Python versioning <https://peps.python.org/pep-0440/>`__.
@@ -1471,8 +1496,6 @@ class Artifact(Registry, Data, IsTree):
     """:class:`~lamindb.Run` that created the artifact."""
     input_of = models.ManyToManyField(Run, related_name="input_artifacts")
     """Runs that use this artifact as an input."""
-    initial_version = models.ForeignKey("self", PROTECT, null=True, default=None)
-    """Initial version of the artifact, a :class:`~lamindb.Artifact` object."""
     visibility = models.SmallIntegerField(db_index=True, choices=VisibilityChoice.choices, default=1)
     """Visibility of artifact record in queries & searches (0 default, 1 hidden, 2 trash)."""
     key_is_virtual = models.BooleanField()
@@ -1798,7 +1821,7 @@ class Artifact(Registry, Data, IsTree):
         pass
 
 
-class Dataset(Registry, Data):
+class Dataset(Registry, Data, IsVersioned):
     """Datasets: collections of artifacts.
 
     Args:
@@ -1840,14 +1863,17 @@ class Dataset(Registry, Data):
         >>> dataset.save()
         >>> # create new dataset from old dataset and version both
         >>> new_dataset = ln.Dataset(df2, is_new_version_of=dataset)
-        >>> assert new_dataset.initial_version == dataset.initial_version
+        >>> assert new_dataset.stem_uid == dataset.stem_uid
         >>> assert dataset.version == "1"
         >>> assert new_dataset.version == "2"
     """
 
+    _len_full_uid: int = 20
+    _len_stem_uid: int = 16
+
     id = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
-    uid = CharField(unique=True, db_index=True, max_length=20, default=base62_20)
+    uid = CharField(unique=True, db_index=True, max_length=_len_full_uid, default=base62_20)
     """Universal id, valid across DB instances."""
     name = CharField(max_length=255, db_index=True, default=None)
     """Name or title of dataset (required)."""
@@ -1856,7 +1882,7 @@ class Dataset(Registry, Data):
     version = CharField(max_length=10, null=True, default=None, db_index=True)
     """Version (default `None`).
 
-    Use this together with `initial_version` to label different versions of a dataset.
+    Defines version of a family of records characterized by the same `stem_uid`.
 
     Consider using `semantic versioning <https://semver.org>`__
     with `Python versioning <https://peps.python.org/pep-0440/>`__.
@@ -1881,8 +1907,6 @@ class Dataset(Registry, Data):
     """Storage of dataset as a one artifact."""
     artifacts = models.ManyToManyField("Artifact", related_name="datasets")
     """Storage of dataset as multiple artifacts."""
-    initial_version = models.ForeignKey("self", PROTECT, null=True, default=None)
-    """Initial version of the dataset, a :class:`~lamindb.Dataset` object."""
     visibility = models.SmallIntegerField(db_index=True, choices=VisibilityChoice.choices, default=1)
     """Visibility of record,  0-default, 1-hidden, 2-trash."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
