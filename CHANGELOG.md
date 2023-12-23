@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚚 Rename `Dataset` to `Collection` | [330](https://github.com/laminlabs/lnschema-core/pull/330) | [falexwolf](https://github.com/falexwolf) | 2023-12-23 |
 🚚 Add field description to storage | [329](https://github.com/laminlabs/lnschema-core/pull/329) | [falexwolf](https://github.com/falexwolf) | 2023-12-23 |
 🔥 Remove initial_version_id | [328](https://github.com/laminlabs/lnschema-core/pull/328) | [falexwolf](https://github.com/falexwolf) | 2023-12-23 |
 🚚 Add environment foreign key | [324](https://github.com/laminlabs/lnschema-core/pull/324) | [falexwolf](https://github.com/falexwolf) | 2023-12-21 | 0.59.0
