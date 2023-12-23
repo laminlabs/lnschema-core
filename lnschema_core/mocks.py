@@ -6,7 +6,7 @@ class BackedAccessor:
     pass
 
 
-class MappedDataset:
+class MappedCollection:
     pass
 
 

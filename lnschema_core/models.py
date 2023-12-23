@@ -22,7 +22,12 @@ from lamin_utils import logger
 from lamindb_setup import _check_instance_setup
 from upath import UPath
 
-from lnschema_core.mocks import AnnDataAccessor, BackedAccessor, MappedDataset, QuerySet
+from lnschema_core.mocks import (
+    AnnDataAccessor,
+    BackedAccessor,
+    MappedCollection,
+    QuerySet,
+)
 from lnschema_core.types import (
     AnnDataLike,
     CharField,
@@ -565,7 +570,7 @@ class Registry(models.Model):
 
 
 class Data:
-    """Base class for :class:`~lamindb.Artifact` & :class:`~lamindb.Dataset`."""
+    """Base class for :class:`~lamindb.Artifact` & :class:`~lamindb.Collection`."""
 
     @property
     def features(self) -> "FeatureManager":
@@ -898,8 +903,8 @@ class Run(Registry):
 
         Typically, a run has inputs (`run.inputs`) and outputs (`run.outputs`):
 
-            - References to outputs are also stored in the `run` field of :class:`~lamindb.Artifact` and :class:`~lamindb.Dataset`.
-            - References to inputs are also stored in the `input_of` field of :class:`~lamindb.Artifact` and :class:`~lamindb.Dataset`.
+            - References to outputs are also stored in the `run` field of :class:`~lamindb.Artifact` and :class:`~lamindb.Collection`.
+            - References to inputs are also stored in the `input_of` field of :class:`~lamindb.Artifact` and :class:`~lamindb.Collection`.
 
     Examples:
 
@@ -1373,7 +1378,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
         `.parquet` file).
 
     See Also:
-        :class:`~lamindb.Dataset`
+        :class:`~lamindb.Collection`
             Mutable collections of data batches.
         :meth:`~lamindb.Artifact.from_df`
             Create a artifact object from `DataFrame` and track features.
@@ -1581,7 +1586,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
             run: The run that creates the artifact.
 
         See Also:
-            :meth:`lamindb.Dataset`
+            :meth:`lamindb.Collection`
                 Track datasets.
             :class:`lamindb.Feature`
                 Track features.
@@ -1629,7 +1634,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
 
         See Also:
 
-            :meth:`lamindb.Dataset`
+            :meth:`lamindb.Collection`
                 Track datasets.
             :class:`lamindb.Feature`
                 Track features.
@@ -1664,8 +1669,8 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
         .. note::
 
             If you have a high number of files (several 100k) and don't want to
-            track them individually, consider creating a :class:`~lamindb.Dataset` via
-            ``Dataset(path, meta=metadata)`` for them. See, e.g., :doc:`docs:rxrx`.
+            track them individually, consider creating a :class:`~lamindb.Collection` via
+            ``Collection(path, meta=metadata)`` for them. See, e.g., :doc:`docs:rxrx`.
 
         Args:
             path: Source path of folder.
@@ -1823,15 +1828,15 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
         pass
 
 
-class Dataset(Registry, Data, IsVersioned):
-    """Datasets: collections of artifacts.
+class Collection(Registry, Data, IsVersioned):
+    """Collections: collections of artifacts.
 
     Args:
         data: `DataLike` An artifact, a list of artifacts, or an array (`DataFrame`, `AnnData`).
         name: `str` A name.
         description: `Optional[str] = None` A description.
         version: `Optional[str] = None` A version string.
-        is_new_version_of: `Optional[Dataset] = None` An old version of the dataset.
+        is_new_version_of: `Optional[Collection] = None` An old version of the dataset.
         run: `Optional[Run] = None` The run that creates the dataset.
         meta: `Optional[DataLike]` An array (`DataFrame`, `AnnData`) or a `File`
             object that defines metadata for a directory of objects.
@@ -1849,7 +1854,7 @@ class Dataset(Registry, Data, IsVersioned):
 
         Create a dataset from a collection of :class:`~lamindb.Artifact` objects:
 
-        >>> dataset = ln.Dataset([artifact1, artifact2], name="My dataset")
+        >>> dataset = ln.Collection([artifact1, artifact2], name="My dataset")
         >>> dataset.save()
 
         If you have more than 100k artifacts, consider creating a dataset directly from the
@@ -1861,10 +1866,10 @@ class Dataset(Registry, Data, IsVersioned):
         Make a new version of a dataset:
 
         >>> # a non-versioned dataset
-        >>> dataset = ln.Dataset(df1, description="My dataframe")
+        >>> dataset = ln.Collection(df1, description="My dataframe")
         >>> dataset.save()
         >>> # create new dataset from old dataset and version both
-        >>> new_dataset = ln.Dataset(df2, is_new_version_of=dataset)
+        >>> new_dataset = ln.Collection(df2, is_new_version_of=dataset)
         >>> assert new_dataset.stem_uid == dataset.stem_uid
         >>> assert dataset.version == "1"
         >>> assert new_dataset.version == "2"
@@ -1895,9 +1900,9 @@ class Dataset(Registry, Data, IsVersioned):
     """A reference like URL or external ID."""
     reference_type = CharField(max_length=255, db_index=True, null=True, default=None)
     """Type of reference, e.g., cellxgene Census dataset_id."""
-    feature_sets = models.ManyToManyField("FeatureSet", related_name="datasets", through="DatasetFeatureSet")
+    feature_sets = models.ManyToManyField("FeatureSet", related_name="datasets", through="CollectionFeatureSet")
     """The feature sets measured in this dataset (see :class:`~lamindb.FeatureSet`)."""
-    ulabels = models.ManyToManyField("ULabel", through="DatasetULabel", related_name="datasets")
+    ulabels = models.ManyToManyField("ULabel", through="CollectionULabel", related_name="datasets")
     """ULabels sampled in the dataset (see :class:`~lamindb.Feature`)."""
     transform = models.ForeignKey(Transform, PROTECT, related_name="output_datasets", null=True, default=None)
     """:class:`~lamindb.Transform` whose run created the dataset."""
@@ -1929,7 +1934,7 @@ class Dataset(Registry, Data, IsVersioned):
         reference: Optional[str] = None,
         reference_type: Optional[str] = None,
         run: Optional[Run] = None,
-        is_new_version_of: Optional["Dataset"] = None,
+        is_new_version_of: Optional["Collection"] = None,
     ):
         ...
 
@@ -1960,7 +1965,7 @@ class Dataset(Registry, Data, IsVersioned):
         version: Optional[str] = None,
         is_new_version_of: Optional["Artifact"] = None,
         **kwargs,
-    ) -> "Dataset":
+    ) -> "Collection":
         """Create from ``DataFrame``, validate & link features.
 
         Args:
@@ -1990,7 +1995,7 @@ class Dataset(Registry, Data, IsVersioned):
             2        0.047       0.032        0.013       0.002                 0
             3        0.046       0.031        0.015       0.002                 0
             4        0.050       0.036        0.014       0.002                 0
-            >>> dataset = ln.Dataset.from_df(df, description="Iris flower dataset batch1")
+            >>> dataset = ln.Collection.from_df(df, description="Iris flower dataset batch1")
         """
         pass
 
@@ -2007,7 +2012,7 @@ class Dataset(Registry, Data, IsVersioned):
         version: Optional[str] = None,
         is_new_version_of: Optional["Artifact"] = None,
         **kwargs,
-    ) -> "Dataset":
+    ) -> "Collection":
         """Create from ``AnnDataLike``, validate & link features.
 
         Args:
@@ -2032,7 +2037,7 @@ class Dataset(Registry, Data, IsVersioned):
             >>> adata = ln.dev.datasets.anndata_with_obs()
             >>> adata.var_names[:2]
             Index(['ENSG00000000003', 'ENSG00000000005'], dtype='object')
-            >>> dataset = ln.Dataset.from_anndata(adata, name="My dataset", field=lb.Gene.ensembl_gene_id)
+            >>> dataset = ln.Collection.from_anndata(adata, name="My dataset", field=lb.Gene.ensembl_gene_id)
             >>> dataset.save()
         """
         pass
@@ -2045,7 +2050,7 @@ class Dataset(Registry, Data, IsVersioned):
         parallel: bool = False,
         stream: bool = False,
         is_run_input: Optional[bool] = None,
-    ) -> "MappedDataset":
+    ) -> "MappedCollection":
         """Convert to map-style dataset for data loaders.
 
         Note: This currently only works for AnnData objects. The objects should
@@ -2065,7 +2070,7 @@ class Dataset(Registry, Data, IsVersioned):
         Examples:
             >>> import lamindb as ln
             >>> from torch.utils.data import DataLoader
-            >>> ds = ln.Dataset.filter(description="my dataset").one()
+            >>> ds = ln.Collection.filter(description="my dataset").one()
             >>> mapped = dataset.mapped(label_keys=["cell_type", "batch"])
             >>> dl = DataLoader(mapped, batch_size=128, shuffle=True)
         """
@@ -2100,7 +2105,7 @@ class Dataset(Registry, Data, IsVersioned):
 
         Examples:
 
-            For any `Dataset` object `dataset`, call:
+            For any `Collection` object `dataset`, call:
 
             >>> dataset.delete()
         """
@@ -2110,7 +2115,7 @@ class Dataset(Registry, Data, IsVersioned):
         """Save the dataset and underlying artifacts to database & storage.
 
         Examples:
-            >>> dataset = ln.Dataset("./myfile.csv", name="myfile")
+            >>> dataset = ln.Collection("./myfile.csv", name="myfile")
             >>> dataset.save()
         """
         pass
@@ -2120,7 +2125,7 @@ class Dataset(Registry, Data, IsVersioned):
 
         Examples:
 
-            For any `Dataset` object `dataset`, call:
+            For any `Collection` object `dataset`, call:
 
             >>> dataset.restore()
         """
@@ -2141,9 +2146,9 @@ class ArtifactFeatureSet(Registry, LinkORM):
         unique_together = ("artifact", "feature_set")
 
 
-class DatasetFeatureSet(Registry, LinkORM):
+class CollectionFeatureSet(Registry, LinkORM):
     id = models.BigAutoField(primary_key=True)
-    dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE)
+    dataset = models.ForeignKey(Collection, on_delete=models.CASCADE)
     feature_set = models.ForeignKey(FeatureSet, on_delete=models.CASCADE)
     slot = CharField(max_length=50, null=True, default=None)
 
@@ -2161,9 +2166,9 @@ class ArtifactULabel(Registry, LinkORM):
         unique_together = ("artifact", "ulabel")
 
 
-class DatasetULabel(Registry, LinkORM):
+class CollectionULabel(Registry, LinkORM):
     id = models.BigAutoField(primary_key=True)
-    dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE)
+    dataset = models.ForeignKey(Collection, on_delete=models.CASCADE)
     ulabel = models.ForeignKey(ULabel, on_delete=models.CASCADE)
     feature = models.ForeignKey(Feature, CASCADE, null=True, default=None)
 
