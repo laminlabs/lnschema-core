@@ -699,7 +699,7 @@ class Storage(Registry):
     """Universal id, valid across DB instances."""
     root = CharField(max_length=255, db_index=True, unique=True, default=None)
     """Root path of storage, an s3 path, a local path, etc. (required)."""
-    description = CharField(max_length=255, db_index=True, default=None)
+    description = CharField(max_length=255, db_index=True, null=True, default=None)
     """A description of what the storage location is used for (optional)."""
     type = CharField(max_length=30, db_index=True)
     """Local vs. s3 vs. gcp etc."""
