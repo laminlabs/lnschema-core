@@ -2049,6 +2049,7 @@ class Collection(Registry, Data, IsVersioned):
         encode_labels: bool = True,
         cache_categories: bool = True,
         parallel: bool = False,
+        dtype: Optional[str] = None,
         stream: bool = False,
         is_run_input: Optional[bool] = None,
     ) -> "MappedCollection":
@@ -2066,6 +2067,7 @@ class Collection(Registry, Data, IsVersioned):
             encode_labels: Indicate whether you want to delete the linked file in storage.
             cache_categories: Enable caching categories of `label_keys` for faster access.
             parallel: Enable sampling with multiple processes.
+            dtype: Convert numpy arrays from `.X` to this dtype on selection.
             stream: Whether to stream data from the array backend.
             is_run_input: Whether to track this collection as run input.
 
