@@ -2047,7 +2047,9 @@ class Collection(Registry, Data, IsVersioned):
         label_keys: Optional[Union[str, List[str]]] = None,
         join_vars: Optional[Literal["auto", "inner"]] = "auto",
         encode_labels: bool = True,
+        cache_categories: bool = True,
         parallel: bool = False,
+        dtype: Optional[str] = None,
         stream: bool = False,
         is_run_input: Optional[bool] = None,
     ) -> "MappedCollection":
@@ -2063,7 +2065,9 @@ class Collection(Registry, Data, IsVersioned):
                 and the varibales in the underlying `AnnData` objects are different.
                 Always does the join if set to "inner". If `None`, does not do the join.
             encode_labels: Indicate whether you want to delete the linked file in storage.
+            cache_categories: Enable caching categories of `label_keys` for faster access.
             parallel: Enable sampling with multiple processes.
+            dtype: Convert numpy arrays from `.X` to this dtype on selection.
             stream: Whether to stream data from the array backend.
             is_run_input: Whether to track this collection as run input.
 
