@@ -12,3 +12,7 @@ class MappedCollection:
 
 class QuerySet:
     pass
+
+
+class RecordsList:
+    pass

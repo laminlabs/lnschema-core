@@ -27,6 +27,7 @@ from lnschema_core.mocks import (
     BackedAccessor,
     MappedCollection,
     QuerySet,
+    RecordsList,
 )
 from lnschema_core.types import (
     AnnDataLike,
@@ -1195,7 +1196,7 @@ class Feature(Registry, CanValidate):
         pass
 
     @classmethod
-    def from_df(cls, df: "pd.DataFrame") -> List["Feature"]:
+    def from_df(cls, df: "pd.DataFrame") -> RecordsList:
         """Create Feature records for columns."""
         pass
 
