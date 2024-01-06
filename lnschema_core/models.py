@@ -1350,7 +1350,7 @@ class FeatureSet(Registry):
 
 
 class Artifact(Registry, Data, IsTree, IsVersioned):
-    """Artifacts: data batches stored as files, arrays, directories.
+    """Artifacts: data batches stored as files, folders, or arrays.
 
     Args:
         data: `Union[PathLike, DataLike]` A path or data
