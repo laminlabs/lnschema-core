@@ -1926,7 +1926,8 @@ class Collection(Registry, Data, IsVersioned):
 
     @property
     def artifacts(self) -> "QuerySet":
-        return self.unordered_artifacts.order_by("collectionartifact__id")
+        """Ordered QuerySet of artifacts."""
+        pass
 
     @overload
     def __init__(
