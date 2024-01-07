@@ -2046,7 +2046,7 @@ class Collection(Registry, Data, IsVersioned):
     def mapped(
         self,
         label_keys: Optional[Union[str, List[str]]] = None,
-        join_vars: Optional[Literal["auto", "inner"]] = "auto",
+        join_vars: Optional[Literal["auto", "inner", "outer"]] = "auto",
         encode_labels: bool = True,
         cache_categories: bool = True,
         parallel: bool = False,
@@ -2062,9 +2062,11 @@ class Collection(Registry, Data, IsVersioned):
         Args:
             label_keys: Columns of the `.obs` slot - the names of the metadata
                 features storing labels.
-            join_vars: Do virtual inner join of varibales if set to "auto"
-                and the varibales in the underlying `AnnData` objects are different.
-                Always does the join if set to "inner". If `None`, does not do the join.
+            join_vars: if set to `"auto"`, does virtual inner join of varibales
+                when there is a nonempty intersection. If the intersection is empty,
+                `"auto"` does virtual outer join. If the variables are the same,
+                no join is done by `"auto"`. `"inner"` or `"outer"` can be passed explicitly
+                to do the respective virtual joins. If `None` is passed, does not do the join.
             encode_labels: Indicate whether you want to delete the linked file in storage.
             cache_categories: Enable caching categories of `label_keys` for faster access.
             parallel: Enable sampling with multiple processes.
