@@ -1924,9 +1924,9 @@ class Collection(Registry, Data, IsVersioned):
     created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_collections")
     """Creator of record, a :class:`~lamindb.User`."""
 
-    # @property
-    # def artifacts(self) -> "QuerySet":
-    #     return self.unordered_artifacts.order_by('collectionartifact__id')
+    @property
+    def artifacts(self) -> "QuerySet":
+        return self.unordered_artifacts.order_by("collectionartifact__id")
 
     @overload
     def __init__(

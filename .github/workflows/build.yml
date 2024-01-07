@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.9"]
+        python-version: ['3.10']
     timeout-minutes: 15
 
     steps:
@@ -22,8 +22,8 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-          cache: "pip"
-          cache-dependency-path: ".github/workflows/build.yml" # See dependencies below
+          cache: 'pip'
+          cache-dependency-path: '.github/workflows/build.yml' # See dependencies below
       - name: cache pre-commit
         uses: actions/cache@v3
         with:
