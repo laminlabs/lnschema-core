@@ -1913,7 +1913,7 @@ class Collection(Registry, Data, IsVersioned):
     """Runs that use this collection as an input."""
     artifact = models.OneToOneField("Artifact", on_delete=PROTECT, null=True, unique=True, related_name="collection")
     """Storage of collection as a one artifact."""
-    artifacts = models.ManyToManyField("Artifact", related_name="collections")
+    unordered_artifacts = models.ManyToManyField("Artifact", related_name="collections", through="CollectionArtifact")
     """Storage of collection as multiple artifacts."""
     visibility = models.SmallIntegerField(db_index=True, choices=VisibilityChoice.choices, default=1)
     """Visibility of record,  0-default, 1-hidden, 2-trash."""
@@ -1923,6 +1923,10 @@ class Collection(Registry, Data, IsVersioned):
     """Time of run execution."""
     created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_collections")
     """Creator of record, a :class:`~lamindb.User`."""
+
+    # @property
+    # def artifacts(self) -> "QuerySet":
+    #     return self.unordered_artifacts.order_by('collectionartifact__id')
 
     @overload
     def __init__(
@@ -2046,7 +2050,7 @@ class Collection(Registry, Data, IsVersioned):
     def mapped(
         self,
         label_keys: Optional[Union[str, List[str]]] = None,
-        join: Optional[Literal["inner", "outer"]] = "outer",
+        join: Optional[Literal["inner", "outer"]] = "inner",
         encode_labels: bool = True,
         cache_categories: bool = True,
         parallel: bool = False,
@@ -2158,6 +2162,15 @@ class CollectionFeatureSet(Registry, LinkORM):
 
     class Meta:
         unique_together = ("collection", "feature_set")
+
+
+class CollectionArtifact(Registry, LinkORM):
+    id = models.BigAutoField(primary_key=True)
+    collection = models.ForeignKey(Collection, on_delete=models.CASCADE)
+    artifact = models.ForeignKey(Artifact, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ("collection", "artifact")
 
 
 class ArtifactULabel(Registry, LinkORM):
