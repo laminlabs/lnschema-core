@@ -21,7 +21,7 @@ Home = "https://github.com/laminlabs/lnschema-core"
 
 [project.optional-dependencies]
 dev = [
-    "lamindb_setup>=0.55.0",  # not possible on PyPI:  @ git+https://github.com/laminlabs/lamindb-setup
+    "lamindb_setup@git+https://github.com/laminlabs/lamindb-setup",
     "pre-commit",
     "nox",
     "laminci",
