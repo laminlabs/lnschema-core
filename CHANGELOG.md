@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-🎨 Order artifact collections | [333](https://github.com/laminlabs/lnschema-core/pull/333) | [falexwolf](https://github.com/falexwolf) | 2024-01-07 |
+🎨 Order artifact collections | [333](https://github.com/laminlabs/lnschema-core/pull/333) | [falexwolf](https://github.com/falexwolf) | 2024-01-07 | 0.61.0
 📝 Explain join_vars="auto" in Collection.mapped | [332](https://github.com/laminlabs/lnschema-core/pull/332) | [Koncopd](https://github.com/Koncopd) | 2024-01-07 |
 ✨ Add outer join and categories caching to Collection.mapped | [331](https://github.com/laminlabs/lnschema-core/pull/331) | [Koncopd](https://github.com/Koncopd) | 2024-01-02 | 0.60.1
 🚚 Rename `Dataset` to `Collection` | [330](https://github.com/laminlabs/lnschema-core/pull/330) | [falexwolf](https://github.com/falexwolf) | 2023-12-23 | 0.60.0
