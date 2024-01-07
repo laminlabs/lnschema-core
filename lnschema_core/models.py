@@ -2064,7 +2064,7 @@ class Collection(Registry, Data, IsVersioned):
                 features storing labels.
             join: `"inner"` or `"outer"` virtual joins. If ``None`` is passed,
                 does not join.
-            encode_labels: One-hot encode labels.
+            encode_labels: Encode labels into integers.
             cache_categories: Enable caching categories of ``label_keys`` for faster access.
             parallel: Enable sampling with multiple processes.
             dtype: Convert numpy arrays from ``.X`` to this dtype on selection.
