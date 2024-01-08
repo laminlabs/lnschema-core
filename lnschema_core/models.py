@@ -497,7 +497,10 @@ class Registry(models.Model):
         """
         from lamindb._filter import filter
 
-        return filter(cls).df()
+        query_set = filter(cls)
+        if hasattr(cls, "updated_at"):
+            query_set = query_set.order_by("-updated_at")
+        return query_set.df()
 
     @classmethod
     def search(
