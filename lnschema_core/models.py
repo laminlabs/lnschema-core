@@ -196,7 +196,7 @@ class CanValidate:
         return_mapper: bool = False,
         case_sensitive: bool = False,
         mute: bool = False,
-        bionty_aware: bool = True,
+        public_aware: bool = True,
         keep: Literal["first", "last", False] = "first",
         synonyms_field: str = "synonyms",
         **kwargs,
@@ -210,7 +210,7 @@ class CanValidate:
             return_mapper: If `True`, returns `{input_value: standardized_name}`.
             case_sensitive: Whether the mapping is case sensitive.
             mute: Mute logging.
-            bionty_aware: Whether to standardize from Bionty reference. Defaults to `True` for Bionty registries.
+            public_aware: Whether to standardize from Bionty reference. Defaults to `True` for Bionty registries.
             keep: When a synonym maps to multiple names, determines which duplicates to mark as `pd.DataFrame.duplicated`:
                     - `"first"`: returns the first mapped standardized name
                     - `"last"`: returns the last mapped standardized name
@@ -286,7 +286,7 @@ class CanValidate:
 
         Examples:
             >>> import lnschema_bionty as lb
-            >>> lb.CellType.from_bionty(name="T cell").save()
+            >>> lb.CellType.from_public(name="T cell").save()
             >>> lookup = lb.CellType.lookup()
             >>> record = lookup.t_cell
             >>> record.synonyms
@@ -309,7 +309,7 @@ class CanValidate:
 
         Examples:
             >>> import lnschema_bionty as lb
-            >>> lb.CellType.from_bionty(name="T cell").save()
+            >>> lb.CellType.from_public(name="T cell").save()
             >>> lookup = lb.CellType.lookup()
             >>> record = lookup.t_cell
             >>> record.synonyms
@@ -331,7 +331,7 @@ class CanValidate:
 
         Examples:
             >>> import lnschema_bionty as lb
-            >>> lb.ExperimentalFactor.from_bionty(name="single-cell RNA sequencing").save()
+            >>> lb.ExperimentalFactor.from_public(name="single-cell RNA sequencing").save()
             >>> scrna = lb.ExperimentalFactor.filter(name="single-cell RNA sequencing").one()
             >>> scrna.abbr
             None
@@ -374,7 +374,7 @@ class HasParents:
 
         Examples:
             >>> import lnschema_bionty as lb
-            >>> lb.Tissue.from_bionty(name="subsegmental bronchus").save()
+            >>> lb.Tissue.from_public(name="subsegmental bronchus").save()
             >>> record = lb.Tissue.filter(name="respiratory tube").one()
             >>> record.view_parents()
             >>> tissue.view_parents(with_children=True)
@@ -426,7 +426,7 @@ class Registry(models.Model):
             ...                                      type="pipeline", version="1")
             >>> pipelines
 
-            Bulk create records from bionty:
+            Bulk create records from public reference:
 
             >>> import lnschema_bionty as lb
             >>> records = lb.CellType.from_values(["T cell", "B cell"], field="name")
@@ -456,7 +456,7 @@ class Registry(models.Model):
         Examples:
             >>> import lnschema_bionty as lb
             >>> lb.settings.organism = "human"
-            >>> lb.Gene.from_bionty(symbol="ADGB-DT").save()
+            >>> lb.Gene.from_public(symbol="ADGB-DT").save()
             >>> lookup = lb.Gene.lookup()
             >>> lookup.adgb_dt
             >>> lookup_dict = lookup.dict()
