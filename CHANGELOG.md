@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚚 Rename .bionty to .public | [335](https://github.com/laminlabs/lnschema-core/pull/335) | [sunnyosun](https://github.com/sunnyosun) | 2024-01-09 |
 🚸 Order `.df()` by `updated_at` | [334](https://github.com/laminlabs/lnschema-core/pull/334) | [falexwolf](https://github.com/falexwolf) | 2024-01-08 |
 🎨 Order artifact collections | [333](https://github.com/laminlabs/lnschema-core/pull/333) | [falexwolf](https://github.com/falexwolf) | 2024-01-07 | 0.61.0
 📝 Explain join_vars="auto" in Collection.mapped | [332](https://github.com/laminlabs/lnschema-core/pull/332) | [Koncopd](https://github.com/Koncopd) | 2024-01-07 |
