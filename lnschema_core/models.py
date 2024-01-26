@@ -2108,12 +2108,11 @@ class Collection(Registry, Data, IsVersioned):
         """
         pass
 
-    def delete(self, permanent: Optional[bool] = None, storage: Optional[bool] = None) -> None:
+    def delete(self, permanent: Optional[bool] = None) -> None:
         """Delete collection.
 
         Args:
             permanent: Whether to permanently delete the collection record (skips trash).
-            storage: Indicate whether you want to delete the linked file in storage.
 
         Examples:
 
