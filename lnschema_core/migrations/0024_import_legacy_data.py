@@ -39,13 +39,17 @@ def import_db(apps, schema_editor):
     directory = Path(f"./lamindb_export/{ln_setup.settings.instance.identifier}/")
     if directory.exists():
         response = input(
-            "\n\nHave you deleted or archived your old instance (sqlite file or postgres database) and re-initialized your instance? Only if so, proceed to import data from"
-            f" the parquet files: {directory}? Otherwise hit 'n' and see instructions. (y/n)\n"
+            "\n\nHave you deleted or archived your old instance (sqlite file or"
+            " postgres database) and re-initialized your instance? Only if so, proceed"
+            f" to import data from the parquet files: {directory}? Otherwise hit 'n'"
+            " and see instructions. (y/n)\n"
         )
         if response != "y":
             print(
-                "Please delete or archive your current database (sqlite file or postgres database) and re-initialize your instance using lamin init and the same account,"
-                " instance name, schema, db & storage settings; you can see them using: lamin info"
+                "Please delete or archive your current database (sqlite file or"
+                " postgres database) and re-initialize your instance using lamin init"
+                " and the same account, instance name, schema, db & storage settings;"
+                " you can see them using: lamin info"
             )
             raise SystemExit
         from sqlalchemy import create_engine
@@ -75,6 +79,6 @@ class Migration(migrations.Migration):
 
 schemas = lamindb_setup.settings.instance.schema
 if "bionty" in schemas:
-    Migration.dependencies.append(("lnschema_bionty", "0016_export_legacy_data"))
+    Migration.dependencies.append(("bionty", "0016_export_legacy_data"))
 if "lamin1" in schemas:
     Migration.dependencies.append(("lnschema_lamin1", "0012_export_legacy_data"))

@@ -141,11 +141,11 @@ class CanValidate:
             :meth:`~lamindb.dev.CanValidate.validate`
 
         Examples:
-            >>> import lnschema_bionty as lb
-            >>> lb.settings.organism = "human"
-            >>> ln.save(lb.Gene.from_values(["A1CF", "A1BG", "BRCA2"], field="symbol"))
+            >>> import bionty as bt
+            >>> bt.settings.organism = "human"
+            >>> ln.save(bt.Gene.from_values(["A1CF", "A1BG", "BRCA2"], field="symbol"))
             >>> gene_symbols = ["A1CF", "A1BG", "FANCD1", "FANCD20"]
-            >>> result = lb.Gene.inspect(gene_symbols, field=lb.Gene.symbol)
+            >>> result = bt.Gene.inspect(gene_symbols, field=bt.Gene.symbol)
             ✅ 2 terms (50.00%) are validated
             🔶 2 terms (50.00%) are not validated
                 🟠 detected synonyms
@@ -184,11 +184,11 @@ class CanValidate:
             :meth:`~lamindb.dev.CanValidate.inspect`
 
         Examples:
-            >>> import lnschema_bionty as lb
-            >>> lb.settings.organism = "human"
-            >>> ln.save(lb.Gene.from_values(["A1CF", "A1BG", "BRCA2"], field="symbol"))
+            >>> import bionty as bt
+            >>> bt.settings.organism = "human"
+            >>> ln.save(bt.Gene.from_values(["A1CF", "A1BG", "BRCA2"], field="symbol"))
             >>> gene_symbols = ["A1CF", "A1BG", "FANCD1", "FANCD20"]
-            >>> lb.Gene.validate(gene_symbols, field=lb.Gene.symbol)
+            >>> bt.Gene.validate(gene_symbols, field=bt.Gene.symbol)
             ✅ 2 terms (50.00%) are validated
             🔶 2 terms (50.00%) are not validated
             array([ True,  True, False, False])
@@ -242,11 +242,11 @@ class CanValidate:
                 Remove synonyms
 
         Examples:
-            >>> import lnschema_bionty as lb
-            >>> lb.settings.organism = "human"
-            >>> ln.save(lb.Gene.from_values(["A1CF", "A1BG", "BRCA2"], field="symbol"))
+            >>> import bionty as bt
+            >>> bt.settings.organism = "human"
+            >>> ln.save(bt.Gene.from_values(["A1CF", "A1BG", "BRCA2"], field="symbol"))
             >>> gene_synonyms = ["A1CF", "A1BG", "FANCD1", "FANCD20"]
-            >>> standardized_names = lb.Gene.standardize(gene_synonyms)
+            >>> standardized_names = bt.Gene.standardize(gene_synonyms)
             >>> standardized_names
             ['A1CF', 'A1BG', 'BRCA2', 'FANCD20']
         """
@@ -294,9 +294,9 @@ class CanValidate:
                 Remove synonyms
 
         Examples:
-            >>> import lnschema_bionty as lb
-            >>> lb.CellType.from_public(name="T cell").save()
-            >>> lookup = lb.CellType.lookup()
+            >>> import bionty as bt
+            >>> bt.CellType.from_public(name="T cell").save()
+            >>> lookup = bt.CellType.lookup()
             >>> record = lookup.t_cell
             >>> record.synonyms
             'T-cell|T lymphocyte|T-lymphocyte'
@@ -317,9 +317,9 @@ class CanValidate:
                 Add synonyms
 
         Examples:
-            >>> import lnschema_bionty as lb
-            >>> lb.CellType.from_public(name="T cell").save()
-            >>> lookup = lb.CellType.lookup()
+            >>> import bionty as bt
+            >>> bt.CellType.from_public(name="T cell").save()
+            >>> lookup = bt.CellType.lookup()
             >>> record = lookup.t_cell
             >>> record.synonyms
             'T-cell|T lymphocyte|T-lymphocyte'
@@ -339,9 +339,9 @@ class CanValidate:
                 Add synonyms
 
         Examples:
-            >>> import lnschema_bionty as lb
-            >>> lb.ExperimentalFactor.from_public(name="single-cell RNA sequencing").save()
-            >>> scrna = lb.ExperimentalFactor.filter(name="single-cell RNA sequencing").one()
+            >>> import bionty as bt
+            >>> bt.ExperimentalFactor.from_public(name="single-cell RNA sequencing").save()
+            >>> scrna = bt.ExperimentalFactor.filter(name="single-cell RNA sequencing").one()
             >>> scrna.abbr
             None
             >>> scrna.synonyms
@@ -374,7 +374,7 @@ class HasParents:
 
         There are two types of registries with a `parents` field:
 
-        - Ontological hierarchies: :class:`~lamindb.ULabel` (project & sub-project), :class:`~lnschema_bionty.CellType` (cell type & subtype), ...
+        - Ontological hierarchies: :class:`~lamindb.ULabel` (project & sub-project), :class:`~bionty.CellType` (cell type & subtype), ...
         - Procedural/temporal hierarchies: :class:`~lamindb.Transform` (preceding transform & successing transform), ...
 
         See Also:
@@ -382,9 +382,9 @@ class HasParents:
             - :doc:`/tutorial`
 
         Examples:
-            >>> import lnschema_bionty as lb
-            >>> lb.Tissue.from_public(name="subsegmental bronchus").save()
-            >>> record = lb.Tissue.filter(name="respiratory tube").one()
+            >>> import bionty as bt
+            >>> bt.Tissue.from_public(name="subsegmental bronchus").save()
+            >>> record = bt.Tissue.filter(name="respiratory tube").one()
             >>> record.view_parents()
             >>> tissue.view_parents(with_children=True)
         """
@@ -407,7 +407,7 @@ class Registry(models.Model):
         Args:
             values: A list of values for an identifier, e.g.
                 `["name1", "name2"]`.
-            field: A `Registry` field to look up, e.g., `lb.CellMarker.name`.
+            field: A `Registry` field to look up, e.g., `bt.CellMarker.name`.
             **kwargs: Additional conditions for creation of records, e.g., `organism="human"`.
 
         Returns:
@@ -437,8 +437,8 @@ class Registry(models.Model):
 
             Bulk create records from public reference:
 
-            >>> import lnschema_bionty as lb
-            >>> records = lb.CellType.from_values(["T cell", "B cell"], field="name")
+            >>> import bionty as bt
+            >>> records = bt.CellType.from_values(["T cell", "B cell"], field="name")
             >>> records
         """
         pass
@@ -463,16 +463,16 @@ class Registry(models.Model):
             :meth:`~lamindb.dev.Registry.search`
 
         Examples:
-            >>> import lnschema_bionty as lb
-            >>> lb.settings.organism = "human"
-            >>> lb.Gene.from_public(symbol="ADGB-DT").save()
-            >>> lookup = lb.Gene.lookup()
+            >>> import bionty as bt
+            >>> bt.settings.organism = "human"
+            >>> bt.Gene.from_public(symbol="ADGB-DT").save()
+            >>> lookup = bt.Gene.lookup()
             >>> lookup.adgb_dt
             >>> lookup_dict = lookup.dict()
             >>> lookup_dict['ADGB-DT']
-            >>> lookup_by_ensembl_id = lb.Gene.lookup(field="ensembl_gene_id")
+            >>> lookup_by_ensembl_id = bt.Gene.lookup(field="ensembl_gene_id")
             >>> genes.ensg00000002745
-            >>> lookup_return_symbols = lb.Gene.lookup(field="ensembl_gene_id", return_field="symbol")
+            >>> lookup_return_symbols = bt.Gene.lookup(field="ensembl_gene_id", return_field="symbol")
         """
         pass
 
@@ -1018,7 +1018,7 @@ class ULabel(Registry, HasParents, CanValidate):
 
         If you work with complex entities like cell lines, cell types, tissues,
         etc., consider using the pre-defined biological registries in
-        :mod:`lnschema_bionty` to label artifacts & collections.
+        :mod:`bionty` to label artifacts & collections.
 
         If you work with biological samples, likely, the only sustainable way of
         tracking metadata, is to create a custom schema module.
@@ -1132,7 +1132,7 @@ class Feature(Registry, CanValidate):
 
     Notes:
 
-        For more control, you can use :mod:`lnschema_bionty` ORMs to manage
+        For more control, you can use :mod:`bionty` ORMs to manage
         common basic biological entities like genes, proteins & cell markers
         involved in expression/count measurements.
 
@@ -1254,7 +1254,7 @@ class FeatureSet(Registry):
         >>> features = ln.Feature.from_values(["feat1", "feat2"], type=float)
         >>> ln.FeatureSet(features)
 
-        >>> import lnschema_bionty as bt
+        >>> import bionty as bt
         >>> reference = bt.Gene(organism="mouse")
         >>> feature_set = ln.FeatureSet.from_values(adata.var["ensemble_id"], Gene.ensembl_gene_id)
         >>> feature_set.save()
@@ -1337,7 +1337,7 @@ class FeatureSet(Registry):
             >>> feature_set = ln.FeatureSet.from_values(features)
 
             >>> genes = ["ENS980983409", "ENS980983410"]
-            >>> feature_set = ln.FeatureSet.from_values(features, lb.Gene.ensembl_gene_id, float)
+            >>> feature_set = ln.FeatureSet.from_values(features, bt.Gene.ensembl_gene_id, float)
         """
         pass
 
@@ -1657,13 +1657,13 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
             For more info, see tutorial: :doc:`/tutorial`.
 
         Examples:
-            >>> import lnschema_bionty as lb
-            >>> lb.settings.organism = "human"
+            >>> import bionty as bt
+            >>> bt.settings.organism = "human"
             >>> adata = ln.dev.datasets.anndata_with_obs()
             >>> adata.var_names[:2]
             Index(['ENSG00000000003', 'ENSG00000000005'], dtype='object')
             >>> artifact = ln.Artifact.from_anndata(adata,
-            ...                             field=lb.Gene.ensembl_gene_id,
+            ...                             field=bt.Gene.ensembl_gene_id,
             ...                             description="mini anndata with obs")
             >>> artifact.save()
         """
@@ -2050,12 +2050,12 @@ class Collection(Registry, Data, IsVersioned):
                 Track features.
 
         Examples:
-            >>> import lnschema_bionty as lb
-            >>> lb.settings.organism = "human"
+            >>> import bionty as bt
+            >>> bt.settings.organism = "human"
             >>> adata = ln.dev.datasets.anndata_with_obs()
             >>> adata.var_names[:2]
             Index(['ENSG00000000003', 'ENSG00000000005'], dtype='object')
-            >>> collection = ln.Collection.from_anndata(adata, name="My collection", field=lb.Gene.ensembl_gene_id)
+            >>> collection = ln.Collection.from_anndata(adata, name="My collection", field=bt.Gene.ensembl_gene_id)
             >>> collection.save()
         """
         pass
