@@ -81,6 +81,15 @@ class IsVersioned:
         """
         return self.__class__.filter(uid__startswith=self.stem_uid)  # type: ignore
 
+    def add_to_version_family(self, is_new_version_of: "IsVersioned", version: Optional[str] = None):
+        """Add current record to a version family.
+
+        Args:
+            is_new_version_of: a record that belongs to the version family.
+            version: semantic version of the record.
+        """
+        pass
+
 
 class IsTree:
     """Base class providing view_tree function."""
