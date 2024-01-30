@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+📝 Update docstring to use bionty | [340](https://github.com/laminlabs/lnschema-core/pull/340) | [sunnyosun](https://github.com/sunnyosun) | 2024-01-30 |
 ✨ Add add_to_version_family | [338](https://github.com/laminlabs/lnschema-core/pull/338) | [sunnyosun](https://github.com/sunnyosun) | 2024-01-29 | 0.61.2
 📝 Update collection.delete signature | [336](https://github.com/laminlabs/lnschema-core/pull/336) | [sunnyosun](https://github.com/sunnyosun) | 2024-01-26 |
 🚚 Rename .bionty to .public | [335](https://github.com/laminlabs/lnschema-core/pull/335) | [sunnyosun](https://github.com/sunnyosun) | 2024-01-09 |
