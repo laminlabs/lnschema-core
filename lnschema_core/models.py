@@ -142,10 +142,10 @@ class CanValidate:
 
         Examples:
             >>> import lnschema_bionty as lb
-            >>> lb.settings.organism = "human"
-            >>> ln.save(lb.Gene.from_values(["A1CF", "A1BG", "BRCA2"], field="symbol"))
+            >>> bionty.settings.organism = "human"
+            >>> ln.save(bionty.Gene.from_values(["A1CF", "A1BG", "BRCA2"], field="symbol"))
             >>> gene_symbols = ["A1CF", "A1BG", "FANCD1", "FANCD20"]
-            >>> result = lb.Gene.inspect(gene_symbols, field=lb.Gene.symbol)
+            >>> result = bionty.Gene.inspect(gene_symbols, field=bionty.Gene.symbol)
             ✅ 2 terms (50.00%) are validated
             🔶 2 terms (50.00%) are not validated
                 🟠 detected synonyms
@@ -185,10 +185,10 @@ class CanValidate:
 
         Examples:
             >>> import lnschema_bionty as lb
-            >>> lb.settings.organism = "human"
-            >>> ln.save(lb.Gene.from_values(["A1CF", "A1BG", "BRCA2"], field="symbol"))
+            >>> bionty.settings.organism = "human"
+            >>> ln.save(bionty.Gene.from_values(["A1CF", "A1BG", "BRCA2"], field="symbol"))
             >>> gene_symbols = ["A1CF", "A1BG", "FANCD1", "FANCD20"]
-            >>> lb.Gene.validate(gene_symbols, field=lb.Gene.symbol)
+            >>> bionty.Gene.validate(gene_symbols, field=bionty.Gene.symbol)
             ✅ 2 terms (50.00%) are validated
             🔶 2 terms (50.00%) are not validated
             array([ True,  True, False, False])
@@ -243,10 +243,10 @@ class CanValidate:
 
         Examples:
             >>> import lnschema_bionty as lb
-            >>> lb.settings.organism = "human"
-            >>> ln.save(lb.Gene.from_values(["A1CF", "A1BG", "BRCA2"], field="symbol"))
+            >>> bionty.settings.organism = "human"
+            >>> ln.save(bionty.Gene.from_values(["A1CF", "A1BG", "BRCA2"], field="symbol"))
             >>> gene_synonyms = ["A1CF", "A1BG", "FANCD1", "FANCD20"]
-            >>> standardized_names = lb.Gene.standardize(gene_synonyms)
+            >>> standardized_names = bionty.Gene.standardize(gene_synonyms)
             >>> standardized_names
             ['A1CF', 'A1BG', 'BRCA2', 'FANCD20']
         """
@@ -295,8 +295,8 @@ class CanValidate:
 
         Examples:
             >>> import lnschema_bionty as lb
-            >>> lb.CellType.from_public(name="T cell").save()
-            >>> lookup = lb.CellType.lookup()
+            >>> bionty.CellType.from_public(name="T cell").save()
+            >>> lookup = bionty.CellType.lookup()
             >>> record = lookup.t_cell
             >>> record.synonyms
             'T-cell|T lymphocyte|T-lymphocyte'
@@ -318,8 +318,8 @@ class CanValidate:
 
         Examples:
             >>> import lnschema_bionty as lb
-            >>> lb.CellType.from_public(name="T cell").save()
-            >>> lookup = lb.CellType.lookup()
+            >>> bionty.CellType.from_public(name="T cell").save()
+            >>> lookup = bionty.CellType.lookup()
             >>> record = lookup.t_cell
             >>> record.synonyms
             'T-cell|T lymphocyte|T-lymphocyte'
@@ -340,8 +340,8 @@ class CanValidate:
 
         Examples:
             >>> import lnschema_bionty as lb
-            >>> lb.ExperimentalFactor.from_public(name="single-cell RNA sequencing").save()
-            >>> scrna = lb.ExperimentalFactor.filter(name="single-cell RNA sequencing").one()
+            >>> bionty.ExperimentalFactor.from_public(name="single-cell RNA sequencing").save()
+            >>> scrna = bionty.ExperimentalFactor.filter(name="single-cell RNA sequencing").one()
             >>> scrna.abbr
             None
             >>> scrna.synonyms
@@ -383,8 +383,8 @@ class HasParents:
 
         Examples:
             >>> import lnschema_bionty as lb
-            >>> lb.Tissue.from_public(name="subsegmental bronchus").save()
-            >>> record = lb.Tissue.filter(name="respiratory tube").one()
+            >>> bionty.Tissue.from_public(name="subsegmental bronchus").save()
+            >>> record = bionty.Tissue.filter(name="respiratory tube").one()
             >>> record.view_parents()
             >>> tissue.view_parents(with_children=True)
         """
@@ -407,7 +407,7 @@ class Registry(models.Model):
         Args:
             values: A list of values for an identifier, e.g.
                 `["name1", "name2"]`.
-            field: A `Registry` field to look up, e.g., `lb.CellMarker.name`.
+            field: A `Registry` field to look up, e.g., `bionty.CellMarker.name`.
             **kwargs: Additional conditions for creation of records, e.g., `organism="human"`.
 
         Returns:
@@ -438,7 +438,7 @@ class Registry(models.Model):
             Bulk create records from public reference:
 
             >>> import lnschema_bionty as lb
-            >>> records = lb.CellType.from_values(["T cell", "B cell"], field="name")
+            >>> records = bionty.CellType.from_values(["T cell", "B cell"], field="name")
             >>> records
         """
         pass
@@ -464,15 +464,15 @@ class Registry(models.Model):
 
         Examples:
             >>> import lnschema_bionty as lb
-            >>> lb.settings.organism = "human"
-            >>> lb.Gene.from_public(symbol="ADGB-DT").save()
-            >>> lookup = lb.Gene.lookup()
+            >>> bionty.settings.organism = "human"
+            >>> bionty.Gene.from_public(symbol="ADGB-DT").save()
+            >>> lookup = bionty.Gene.lookup()
             >>> lookup.adgb_dt
             >>> lookup_dict = lookup.dict()
             >>> lookup_dict['ADGB-DT']
-            >>> lookup_by_ensembl_id = lb.Gene.lookup(field="ensembl_gene_id")
+            >>> lookup_by_ensembl_id = bionty.Gene.lookup(field="ensembl_gene_id")
             >>> genes.ensg00000002745
-            >>> lookup_return_symbols = lb.Gene.lookup(field="ensembl_gene_id", return_field="symbol")
+            >>> lookup_return_symbols = bionty.Gene.lookup(field="ensembl_gene_id", return_field="symbol")
         """
         pass
 
@@ -1337,7 +1337,7 @@ class FeatureSet(Registry):
             >>> feature_set = ln.FeatureSet.from_values(features)
 
             >>> genes = ["ENS980983409", "ENS980983410"]
-            >>> feature_set = ln.FeatureSet.from_values(features, lb.Gene.ensembl_gene_id, float)
+            >>> feature_set = ln.FeatureSet.from_values(features, bionty.Gene.ensembl_gene_id, float)
         """
         pass
 
@@ -1658,12 +1658,12 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
 
         Examples:
             >>> import lnschema_bionty as lb
-            >>> lb.settings.organism = "human"
+            >>> bionty.settings.organism = "human"
             >>> adata = ln.dev.datasets.anndata_with_obs()
             >>> adata.var_names[:2]
             Index(['ENSG00000000003', 'ENSG00000000005'], dtype='object')
             >>> artifact = ln.Artifact.from_anndata(adata,
-            ...                             field=lb.Gene.ensembl_gene_id,
+            ...                             field=bionty.Gene.ensembl_gene_id,
             ...                             description="mini anndata with obs")
             >>> artifact.save()
         """
@@ -2051,11 +2051,11 @@ class Collection(Registry, Data, IsVersioned):
 
         Examples:
             >>> import lnschema_bionty as lb
-            >>> lb.settings.organism = "human"
+            >>> bionty.settings.organism = "human"
             >>> adata = ln.dev.datasets.anndata_with_obs()
             >>> adata.var_names[:2]
             Index(['ENSG00000000003', 'ENSG00000000005'], dtype='object')
-            >>> collection = ln.Collection.from_anndata(adata, name="My collection", field=lb.Gene.ensembl_gene_id)
+            >>> collection = ln.Collection.from_anndata(adata, name="My collection", field=bionty.Gene.ensembl_gene_id)
             >>> collection.save()
         """
         pass
