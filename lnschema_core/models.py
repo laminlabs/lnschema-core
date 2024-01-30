@@ -53,7 +53,7 @@ if TYPE_CHECKING or _INSTANCE_SETUP or RUNNING_SPHINX:
     import pandas as pd
     from lamin_utils._inspect import InspectResult
 
-if TYPE_CHECKING or _INSTANCE_SETUP:
+if TYPE_CHECKING:  # there was _INSTANCE_SETUP here before, but this errors for multi-instance mode
     from lamindb.dev import FeatureManager, LabelManager
 
 
