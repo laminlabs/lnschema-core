@@ -374,7 +374,7 @@ class HasParents:
 
         There are two types of registries with a `parents` field:
 
-        - Ontological hierarchies: :class:`~lamindb.ULabel` (project & sub-project), :class:`~lnschema_bt.CellType` (cell type & subtype), ...
+        - Ontological hierarchies: :class:`~lamindb.ULabel` (project & sub-project), :class:`~bionty.CellType` (cell type & subtype), ...
         - Procedural/temporal hierarchies: :class:`~lamindb.Transform` (preceding transform & successing transform), ...
 
         See Also:
@@ -1018,7 +1018,7 @@ class ULabel(Registry, HasParents, CanValidate):
 
         If you work with complex entities like cell lines, cell types, tissues,
         etc., consider using the pre-defined biological registries in
-        :mod:`lnschema_bionty` to label artifacts & collections.
+        :mod:`bionty` to label artifacts & collections.
 
         If you work with biological samples, likely, the only sustainable way of
         tracking metadata, is to create a custom schema module.
@@ -1132,7 +1132,7 @@ class Feature(Registry, CanValidate):
 
     Notes:
 
-        For more control, you can use :mod:`lnschema_bionty` ORMs to manage
+        For more control, you can use :mod:`bionty` ORMs to manage
         common basic biological entities like genes, proteins & cell markers
         involved in expression/count measurements.
 
@@ -1254,7 +1254,7 @@ class FeatureSet(Registry):
         >>> features = ln.Feature.from_values(["feat1", "feat2"], type=float)
         >>> ln.FeatureSet(features)
 
-        >>> import lnschema_bionty as bt
+        >>> import bionty as bt
         >>> reference = bt.Gene(organism="mouse")
         >>> feature_set = ln.FeatureSet.from_values(adata.var["ensemble_id"], Gene.ensembl_gene_id)
         >>> feature_set.save()
