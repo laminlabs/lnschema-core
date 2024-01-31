@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+💚 Fix docs | [343](https://github.com/laminlabs/lnschema-core/pull/343) | [sunnyosun](https://github.com/sunnyosun) | 2024-01-31 |
 📝 Fix docstrings | [342](https://github.com/laminlabs/lnschema-core/pull/342) | [sunnyosun](https://github.com/sunnyosun) | 2024-01-31 |
 📝 Update docstring to use bionty | [340](https://github.com/laminlabs/lnschema-core/pull/340) | [sunnyosun](https://github.com/sunnyosun) | 2024-01-30 | 0.61.3
 ✨ Add add_to_version_family | [338](https://github.com/laminlabs/lnschema-core/pull/338) | [sunnyosun](https://github.com/sunnyosun) | 2024-01-29 | 0.61.2
