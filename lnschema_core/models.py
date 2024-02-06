@@ -1530,7 +1530,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
     @overload
     def __init__(
         self,
-        data: Union[PathLike, DataLike],
+        data: PathLike,
         key: Optional[str] = None,
         description: Optional[str] = None,
         is_new_version_of: Optional["Artifact"] = None,
