@@ -51,6 +51,7 @@ RUNNING_SPHINX = "sphinx" in sys.modules
 if TYPE_CHECKING or _INSTANCE_SETUP or RUNNING_SPHINX:
     import numpy as np
     import pandas as pd
+    from anndata import AnnData
     from lamin_utils._inspect import InspectResult
 
 if TYPE_CHECKING or _INSTANCE_SETUP:
@@ -1578,7 +1579,6 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
     def from_df(
         cls,
         df: "pd.DataFrame",
-        field: FieldAttr = Feature.name,
         key: Optional[str] = None,
         description: Optional[str] = None,
         run: Optional[Run] = None,
@@ -1590,7 +1590,6 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
 
         Args:
             df: A `DataFrame` object.
-            field: The registry field to validate & annotate features.
             key: A relative path within default storage,
                 e.g., `"myfolder/myfile.fcs"`.
             description: A description.
@@ -1624,8 +1623,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
     @classmethod
     def from_anndata(
         cls,
-        adata: "AnnDataLike",
-        field: Optional[FieldAttr],
+        adata: "AnnData",
         key: Optional[str] = None,
         description: Optional[str] = None,
         run: Optional[Run] = None,
@@ -1637,7 +1635,6 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
 
         Args:
             adata: An `AnnData` object or path to it.
-            field: The registry field to validate & annotate features.
             key: A relative path within default storage,
                 e.g., `"myfolder/myfile.fcs"`.
             description: A description.
@@ -1660,10 +1657,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
             >>> import bionty as bt
             >>> bt.settings.organism = "human"
             >>> adata = ln.dev.datasets.anndata_with_obs()
-            >>> adata.var_names[:2]
-            Index(['ENSG00000000003', 'ENSG00000000005'], dtype='object')
             >>> artifact = ln.Artifact.from_anndata(adata,
-            ...                             field=bt.Gene.ensembl_gene_id,
             ...                             description="mini anndata with obs")
             >>> artifact.save()
         """
