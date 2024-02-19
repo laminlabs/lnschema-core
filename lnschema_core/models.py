@@ -2077,9 +2077,9 @@ class Collection(Registry, Data, IsVersioned):
             join: `"inner"` or `"outer"` virtual joins. If ``None`` is passed,
                 does not join.
             encode_labels: Encode labels into integers.
-            cache_categories: Enable caching categories of ``label_keys`` for faster access.
             unknown_label: Encode this label to -1.
                 Can be a dictionary with keys from ``label_keys``.
+            cache_categories: Enable caching categories of ``label_keys`` for faster access.
             parallel: Enable sampling with multiple processes.
             dtype: Convert numpy arrays from ``.X`` to this dtype on selection.
             stream: Whether to stream data from the array backend.
