@@ -2058,7 +2058,7 @@ class Collection(Registry, Data, IsVersioned):
         self,
         label_keys: Optional[Union[str, List[str]]] = None,
         join: Optional[Literal["inner", "outer"]] = "inner",
-        encode_labels: bool = True,
+        encode_labels: Union[bool, List[str]] = True,
         unknown_label: Optional[Union[str, Dict[str, str]]] = None,
         cache_categories: bool = True,
         parallel: bool = False,
@@ -2077,8 +2077,10 @@ class Collection(Registry, Data, IsVersioned):
             join: `"inner"` or `"outer"` virtual joins. If ``None`` is passed,
                 does not join.
             encode_labels: Encode labels into integers.
+                Can be a list with elements from ``label_keys```.
             unknown_label: Encode this label to -1.
-                Can be a dictionary with keys from ``label_keys``.
+                Can be a dictionary with keys from ``label_keys`` if ``encode_labels=True```
+                or from ``encode_labels`` if it is a list.
             cache_categories: Enable caching categories of ``label_keys`` for faster access.
             parallel: Enable sampling with multiple processes.
             dtype: Convert numpy arrays from ``.X`` to this dtype on selection.
