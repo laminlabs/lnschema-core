@@ -1214,7 +1214,8 @@ class Feature(Registry, CanValidate):
         pass
 
     @classmethod
-    def from_anndata(cls, adata: "AnnData", field=Optional[FieldAttr], **kwargs):
+    def from_anndata(cls, adata: "AnnData", field=FieldAttr, **kwargs):
+        """Create Feature records from AnnData."""
         pass
 
     def save(self, *args, **kwargs) -> None:
