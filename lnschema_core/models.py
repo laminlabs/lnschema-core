@@ -1213,11 +1213,6 @@ class Feature(Registry, CanValidate):
         """Create Feature records for columns."""
         pass
 
-    @classmethod
-    def from_anndata(cls, adata: "AnnData", field=FieldAttr, **kwargs):
-        """Create Feature records from AnnData."""
-        pass
-
     def save(self, *args, **kwargs) -> None:
         """Save."""
         pass
