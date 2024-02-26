@@ -1118,6 +1118,7 @@ class Feature(Registry, CanValidate):
         unit: `Optional[str] = None` Unit of measure, ideally SI (`"m"`, `"s"`, `"kg"`, etc.) or `"normalized"` etc.
         description: `Optional[str] = None` A description.
         synonyms: `Optional[str] = None` Bar-separated synonyms.
+        registries: `Optional[str] = None` Bar-separated Registries that provide values for labels.
 
     .. note::
 
