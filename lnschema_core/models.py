@@ -1588,7 +1588,6 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
         run: Optional[Run] = None,
         version: Optional[str] = None,
         is_new_version_of: Optional["Artifact"] = None,
-        **kwargs,
     ) -> "Artifact":
         """Create from ``DataFrame``, validate & link features.
 
@@ -1633,7 +1632,6 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
         run: Optional[Run] = None,
         version: Optional[str] = None,
         is_new_version_of: Optional["Artifact"] = None,
-        **kwargs,
     ) -> "Artifact":
         """Create from ``AnnDataLike``, validate & link features.
 
