@@ -29,8 +29,7 @@ from lnschema_core.mocks import (
     QuerySet,
     RecordsList,
 )
-from lnschema_core.types import (
-    AnnDataLike,
+from lnschema_core.types import (  # AnnDataLike,
     CharField,
     DataLike,
     FieldAttr,
@@ -1973,7 +1972,7 @@ class Collection(Registry, Data, IsVersioned):
     def from_df(
         cls,
         df: "pd.DataFrame",
-        field: FieldAttr = Feature.name,
+        # field: FieldAttr = Feature.name,
         name: Optional[str] = None,
         description: Optional[str] = None,
         run: Optional[Run] = None,
@@ -2019,8 +2018,8 @@ class Collection(Registry, Data, IsVersioned):
     @classmethod
     def from_anndata(
         cls,
-        adata: "AnnDataLike",
-        field: Optional[FieldAttr],
+        adata: "AnnData",
+        # field: Optional[FieldAttr],
         name: Optional[str] = None,
         description: Optional[str] = None,
         run: Optional[Run] = None,
