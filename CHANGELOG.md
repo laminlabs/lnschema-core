@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚸 Simplify features linking | [347](https://github.com/laminlabs/lnschema-core/pull/347) | [sunnyosun](https://github.com/sunnyosun) | 2024-02-27 |
 🎨 Decouple features from Artifact construction | [344](https://github.com/laminlabs/lnschema-core/pull/344) | [sunnyosun](https://github.com/sunnyosun) | 2024-02-26 |
 Add registries docstring | [346](https://github.com/laminlabs/lnschema-core/pull/346) | [Zethson](https://github.com/Zethson) | 2024-02-26 |
 💚 Fix docs | [343](https://github.com/laminlabs/lnschema-core/pull/343) | [sunnyosun](https://github.com/sunnyosun) | 2024-01-31 |
