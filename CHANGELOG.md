@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+✨ Add unknown_label to Collection.mapped signature | [345](https://github.com/laminlabs/lnschema-core/pull/345) | [Koncopd](https://github.com/Koncopd) | 2024-02-27 |
 🚚 Use var_field for anndata | [348](https://github.com/laminlabs/lnschema-core/pull/348) | [sunnyosun](https://github.com/sunnyosun) | 2024-02-27 |
 🚸 Simplify features linking | [347](https://github.com/laminlabs/lnschema-core/pull/347) | [sunnyosun](https://github.com/sunnyosun) | 2024-02-27 |
 🎨 Decouple features from Artifact construction | [344](https://github.com/laminlabs/lnschema-core/pull/344) | [sunnyosun](https://github.com/sunnyosun) | 2024-02-26 |
