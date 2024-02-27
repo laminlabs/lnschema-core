@@ -1209,7 +1209,7 @@ class Feature(Registry, CanValidate):
         pass
 
     @classmethod
-    def from_df(cls, df: "pd.DataFrame") -> "RecordsList":
+    def from_df(cls, df: "pd.DataFrame", field: Optional[FieldAttr] = None) -> "RecordsList":
         """Create Feature records for columns."""
         pass
 
