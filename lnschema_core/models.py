@@ -54,7 +54,7 @@ if TYPE_CHECKING or _INSTANCE_SETUP or RUNNING_SPHINX:
     from lamin_utils._inspect import InspectResult
 
 if TYPE_CHECKING or _INSTANCE_SETUP:
-    from lamindb.dev import FeatureManager, LabelManager
+    from lamindb.core import FeatureManager, LabelManager
 
 
 IPYTHON = getattr(builtins, "__IPYTHON__", False)
@@ -114,7 +114,7 @@ class IsTree:
 
 
 class CanValidate:
-    """Base class providing :class:`~lamindb.dev.Registry`-based validation."""
+    """Base class providing :class:`~lamindb.core.Registry`-based validation."""
 
     @classmethod
     def inspect(
@@ -138,7 +138,7 @@ class CanValidate:
             mute: Mute logging.
 
         See Also:
-            :meth:`~lamindb.dev.CanValidate.validate`
+            :meth:`~lamindb.core.CanValidate.validate`
 
         Examples:
             >>> import bionty as bt
@@ -181,7 +181,7 @@ class CanValidate:
             A vector of booleans indicating if an element is validated.
 
         See Also:
-            :meth:`~lamindb.dev.CanValidate.inspect`
+            :meth:`~lamindb.core.CanValidate.inspect`
 
         Examples:
             >>> import bionty as bt
@@ -236,9 +236,9 @@ class CanValidate:
             standardized names as values.
 
         See Also:
-            :meth:`~lamindb.dev.CanValidate.add_synonym`
+            :meth:`~lamindb.core.CanValidate.add_synonym`
                 Add synonyms
-            :meth:`~lamindb.dev.CanValidate.remove_synonym`
+            :meth:`~lamindb.core.CanValidate.remove_synonym`
                 Remove synonyms
 
         Examples:
@@ -290,7 +290,7 @@ class CanValidate:
             save
 
         See Also:
-            :meth:`~lamindb.dev.CanValidate.remove_synonym`
+            :meth:`~lamindb.core.CanValidate.remove_synonym`
                 Remove synonyms
 
         Examples:
@@ -313,7 +313,7 @@ class CanValidate:
             synonym: The synonym value.
 
         See Also:
-            :meth:`~lamindb.dev.CanValidate.add_synonym`
+            :meth:`~lamindb.core.CanValidate.add_synonym`
                 Add synonyms
 
         Examples:
@@ -335,7 +335,7 @@ class CanValidate:
             value: A value for an abbreviation.
 
         See Also:
-            :meth:`~lamindb.dev.CanValidate.add_synonym`
+            :meth:`~lamindb.core.CanValidate.add_synonym`
                 Add synonyms
 
         Examples:
@@ -460,7 +460,7 @@ class Registry(models.Model):
             dictionary converter.
 
         See Also:
-            :meth:`~lamindb.dev.Registry.search`
+            :meth:`~lamindb.core.Registry.search`
 
         Examples:
             >>> import bionty as bt
@@ -484,7 +484,7 @@ class Registry(models.Model):
             expressions: Fields and values passed as Django query expressions.
 
         Returns:
-            A :class:`~lamindb.dev.QuerySet`.
+            A :class:`~lamindb.core.QuerySet`.
 
         See Also:
             - Guide: :doc:`meta`
@@ -543,8 +543,8 @@ class Registry(models.Model):
             If `return_queryset` is `True`, an ordered `QuerySet`.
 
         See Also:
-            :meth:`~lamindb.dev.Registry.filter`
-            :meth:`~lamindb.dev.Registry.lookup`
+            :meth:`~lamindb.core.Registry.filter`
+            :meth:`~lamindb.core.Registry.lookup`
 
         Examples:
             >>> ln.save(ln.ULabel.from_values(["ULabel1", "ULabel2", "ULabel3"], field="name"))
@@ -587,12 +587,12 @@ class Data:
 
     @property
     def features(self) -> "FeatureManager":
-        """Feature manager (:class:`~lamindb.dev.FeatureManager`)."""
+        """Feature manager (:class:`~lamindb.core.FeatureManager`)."""
         pass
 
     @property
     def labels(self) -> "LabelManager":
-        """Label manager (:class:`~lamindb.dev.LabelManager`)."""
+        """Label manager (:class:`~lamindb.core.LabelManager`)."""
         pass
 
     def describe(self):
@@ -693,7 +693,7 @@ class Storage(Registry):
     Can be local or remote directories or entire S3/GCP buckets.
 
     See Also:
-        Default storage: :attr:`~lamindb.dev.Settings.storage`
+        Default storage: :attr:`~lamindb.core.Settings.storage`
 
     Examples:
 
@@ -1107,7 +1107,7 @@ class Feature(Registry, CanValidate):
     See Also:
         :meth:`~lamindb.Feature.from_df`
             Create feature records from DataFrame.
-        :attr:`~lamindb.dev.Data.features`
+        :attr:`~lamindb.core.Data.features`
             Manage feature annotations of artifacts & collections.
         :meth:`lamindb.ULabel`
             ULabels for artifacts & collections.
