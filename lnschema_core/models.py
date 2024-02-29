@@ -599,7 +599,7 @@ class Data:
         """Describe relations of data record.
 
         Examples:
-            >>> ln.Artifact(ln.dev.datasets.file_jpg_paradisi05(), description="paradisi05").save()
+            >>> ln.Artifact(ln.core.datasets.file_jpg_paradisi05(), description="paradisi05").save()
             >>> artifact = ln.Artifact.filter(description="paradisi05").one()
             >>> ln.save(ln.ULabel.from_values(["image", "benchmark", "example"], field="name"))
             >>> ulabels = ln.ULabel.filter(name__in=["image", "benchmark", "example"]).all()
@@ -928,12 +928,12 @@ class Run(Registry):
         Create a global run context:
 
         >>> ln.track(transform)
-        >>> ln.dev.run_context.run  # global available run
+        >>> ln.core.run_context.run  # global available run
 
         Track a notebook run:
 
         >>> ln.track()  # Jupyter notebook metadata is automatically parsed
-        >>> ln.dev.context.run
+        >>> ln.core.context.run
     """
 
     id = models.BigAutoField(primary_key=True)
@@ -1413,7 +1413,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
 
         Create an artifact from a local temporary filepath using `key`:
 
-        >>> filepath = ln.dev.datasets.file_jpg_paradisi05()
+        >>> filepath = ln.core.datasets.file_jpg_paradisi05()
         >>> artifact = ln.Artifact(filepath, key="images/paradisi05_image.jpg")
         >>> artifact.save()
 
@@ -1607,7 +1607,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
             For more info, see tutorial: :doc:`/tutorial`.
 
         Examples:
-            >>> df = ln.dev.datasets.df_iris_in_meter_batch1()
+            >>> df = ln.core.datasets.df_iris_in_meter_batch1()
             >>> df.head()
               sepal_length sepal_width petal_length petal_width iris_organism_code
             0        0.051       0.035        0.014       0.002                 0
@@ -1656,7 +1656,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
         Examples:
             >>> import bionty as bt
             >>> bt.settings.organism = "human"
-            >>> adata = ln.dev.datasets.anndata_with_obs()
+            >>> adata = ln.core.datasets.anndata_with_obs()
             >>> artifact = ln.Artifact.from_anndata(adata,
             ...                             description="mini anndata with obs")
             >>> artifact.save()
@@ -1688,7 +1688,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
             run: A `Run` object.
 
         Examples:
-            >>> dir_path = ln.dev.datasets.generate_cell_ranger_files("sample_001", ln.settings.storage)
+            >>> dir_path = ln.core.datasets.generate_cell_ranger_files("sample_001", ln.settings.storage)
             >>> artifacts = ln.Artifact.from_dir(dir_path)
             >>> ln.save(artifacts)
         """
@@ -1749,7 +1749,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
 
             Load as a `DataFrame`:
 
-            >>> df = ln.dev.datasets.df_iris_in_meter_batch1()
+            >>> df = ln.core.datasets.df_iris_in_meter_batch1()
             >>> ln.Artifact.from_df(df, description="iris").save()
             >>> artifact = ln.Artifact.filter(description="iris").one()
             >>> artifact.load().head()
@@ -1769,7 +1769,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
 
             Fall back to :meth:`~lamindb.Artifact.stage` if no in-memory representation is configured:
 
-            >>> ln.Artifact(ln.dev.datasets.file_jpg_paradisi05(), description="paradisi05").save()
+            >>> ln.Artifact(ln.core.datasets.file_jpg_paradisi05(), description="paradisi05").save()
             >>> artifact = ln.Artifact.filter(description="paradisi05").one()
             >>> artifact.load()
             PosixPath('/home/runner/work/lamindb/lamindb/docs/guide/mydata/.lamindb/jb7BY5UJoQVGMUOKiLcn.jpg')
@@ -1999,7 +1999,7 @@ class Collection(Registry, Data, IsVersioned):
             For more info, see tutorial: :doc:`/tutorial`.
 
         Examples:
-            >>> df = ln.dev.datasets.df_iris_in_meter_batch1()
+            >>> df = ln.core.datasets.df_iris_in_meter_batch1()
             >>> df.head()
               sepal_length sepal_width petal_length petal_width iris_organism_code
             0        0.051       0.035        0.014       0.002                 0
@@ -2046,7 +2046,7 @@ class Collection(Registry, Data, IsVersioned):
         Examples:
             >>> import bionty as bt
             >>> bt.settings.organism = "human"
-            >>> adata = ln.dev.datasets.anndata_with_obs()
+            >>> adata = ln.core.datasets.anndata_with_obs()
             >>> adata.var_names[:2]
             Index(['ENSG00000000003', 'ENSG00000000005'], dtype='object')
             >>> collection = ln.Collection.from_anndata(adata, name="My collection", field=bt.Gene.ensembl_gene_id)
