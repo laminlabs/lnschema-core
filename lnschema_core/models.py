@@ -29,8 +29,7 @@ from lnschema_core.mocks import (
     QuerySet,
     RecordsList,
 )
-from lnschema_core.types import (
-    AnnDataLike,
+from lnschema_core.types import (  # AnnDataLike,
     CharField,
     DataLike,
     FieldAttr,
@@ -51,10 +50,11 @@ RUNNING_SPHINX = "sphinx" in sys.modules
 if TYPE_CHECKING or _INSTANCE_SETUP or RUNNING_SPHINX:
     import numpy as np
     import pandas as pd
+    from anndata import AnnData
     from lamin_utils._inspect import InspectResult
 
 if TYPE_CHECKING or _INSTANCE_SETUP:
-    from lamindb.dev import FeatureManager, LabelManager
+    from lamindb.core import FeatureManager, LabelManager
 
 
 IPYTHON = getattr(builtins, "__IPYTHON__", False)
@@ -114,7 +114,7 @@ class IsTree:
 
 
 class CanValidate:
-    """Base class providing :class:`~lamindb.dev.Registry`-based validation."""
+    """Base class providing :class:`~lamindb.core.Registry`-based validation."""
 
     @classmethod
     def inspect(
@@ -138,7 +138,7 @@ class CanValidate:
             mute: Mute logging.
 
         See Also:
-            :meth:`~lamindb.dev.CanValidate.validate`
+            :meth:`~lamindb.core.CanValidate.validate`
 
         Examples:
             >>> import bionty as bt
@@ -181,7 +181,7 @@ class CanValidate:
             A vector of booleans indicating if an element is validated.
 
         See Also:
-            :meth:`~lamindb.dev.CanValidate.inspect`
+            :meth:`~lamindb.core.CanValidate.inspect`
 
         Examples:
             >>> import bionty as bt
@@ -236,9 +236,9 @@ class CanValidate:
             standardized names as values.
 
         See Also:
-            :meth:`~lamindb.dev.CanValidate.add_synonym`
+            :meth:`~lamindb.core.CanValidate.add_synonym`
                 Add synonyms
-            :meth:`~lamindb.dev.CanValidate.remove_synonym`
+            :meth:`~lamindb.core.CanValidate.remove_synonym`
                 Remove synonyms
 
         Examples:
@@ -290,7 +290,7 @@ class CanValidate:
             save
 
         See Also:
-            :meth:`~lamindb.dev.CanValidate.remove_synonym`
+            :meth:`~lamindb.core.CanValidate.remove_synonym`
                 Remove synonyms
 
         Examples:
@@ -313,7 +313,7 @@ class CanValidate:
             synonym: The synonym value.
 
         See Also:
-            :meth:`~lamindb.dev.CanValidate.add_synonym`
+            :meth:`~lamindb.core.CanValidate.add_synonym`
                 Add synonyms
 
         Examples:
@@ -335,7 +335,7 @@ class CanValidate:
             value: A value for an abbreviation.
 
         See Also:
-            :meth:`~lamindb.dev.CanValidate.add_synonym`
+            :meth:`~lamindb.core.CanValidate.add_synonym`
                 Add synonyms
 
         Examples:
@@ -460,7 +460,7 @@ class Registry(models.Model):
             dictionary converter.
 
         See Also:
-            :meth:`~lamindb.dev.Registry.search`
+            :meth:`~lamindb.core.Registry.search`
 
         Examples:
             >>> import bionty as bt
@@ -484,7 +484,7 @@ class Registry(models.Model):
             expressions: Fields and values passed as Django query expressions.
 
         Returns:
-            A :class:`~lamindb.dev.QuerySet`.
+            A :class:`~lamindb.core.QuerySet`.
 
         See Also:
             - Guide: :doc:`meta`
@@ -543,8 +543,8 @@ class Registry(models.Model):
             If `return_queryset` is `True`, an ordered `QuerySet`.
 
         See Also:
-            :meth:`~lamindb.dev.Registry.filter`
-            :meth:`~lamindb.dev.Registry.lookup`
+            :meth:`~lamindb.core.Registry.filter`
+            :meth:`~lamindb.core.Registry.lookup`
 
         Examples:
             >>> ln.save(ln.ULabel.from_values(["ULabel1", "ULabel2", "ULabel3"], field="name"))
@@ -587,19 +587,19 @@ class Data:
 
     @property
     def features(self) -> "FeatureManager":
-        """Feature manager (:class:`~lamindb.dev.FeatureManager`)."""
+        """Feature manager (:class:`~lamindb.core.FeatureManager`)."""
         pass
 
     @property
     def labels(self) -> "LabelManager":
-        """Label manager (:class:`~lamindb.dev.LabelManager`)."""
+        """Label manager (:class:`~lamindb.core.LabelManager`)."""
         pass
 
     def describe(self):
         """Describe relations of data record.
 
         Examples:
-            >>> ln.Artifact(ln.dev.datasets.file_jpg_paradisi05(), description="paradisi05").save()
+            >>> ln.Artifact(ln.core.datasets.file_jpg_paradisi05(), description="paradisi05").save()
             >>> artifact = ln.Artifact.filter(description="paradisi05").one()
             >>> ln.save(ln.ULabel.from_values(["image", "benchmark", "example"], field="name"))
             >>> ulabels = ln.ULabel.filter(name__in=["image", "benchmark", "example"]).all()
@@ -693,7 +693,7 @@ class Storage(Registry):
     Can be local or remote directories or entire S3/GCP buckets.
 
     See Also:
-        Default storage: :attr:`~lamindb.dev.Settings.storage`
+        Default storage: :attr:`~lamindb.core.Settings.storage`
 
     Examples:
 
@@ -928,12 +928,12 @@ class Run(Registry):
         Create a global run context:
 
         >>> ln.track(transform)
-        >>> ln.dev.run_context.run  # global available run
+        >>> ln.core.run_context.run  # global available run
 
         Track a notebook run:
 
         >>> ln.track()  # Jupyter notebook metadata is automatically parsed
-        >>> ln.dev.context.run
+        >>> ln.core.context.run
     """
 
     id = models.BigAutoField(primary_key=True)
@@ -1107,7 +1107,7 @@ class Feature(Registry, CanValidate):
     See Also:
         :meth:`~lamindb.Feature.from_df`
             Create feature records from DataFrame.
-        :attr:`~lamindb.dev.Data.features`
+        :attr:`~lamindb.core.Data.features`
             Manage feature annotations of artifacts & collections.
         :meth:`lamindb.ULabel`
             ULabels for artifacts & collections.
@@ -1118,6 +1118,7 @@ class Feature(Registry, CanValidate):
         unit: `Optional[str] = None` Unit of measure, ideally SI (`"m"`, `"s"`, `"kg"`, etc.) or `"normalized"` etc.
         description: `Optional[str] = None` A description.
         synonyms: `Optional[str] = None` Bar-separated synonyms.
+        registries: `Optional[str] = None` Bar-separated Registries that provide values for labels.
 
     .. note::
 
@@ -1208,8 +1209,8 @@ class Feature(Registry, CanValidate):
         pass
 
     @classmethod
-    def from_df(cls, df: "pd.DataFrame") -> "RecordsList":
-        """Create Feature records for columns"""
+    def from_df(cls, df: "pd.DataFrame", field: Optional[FieldAttr] = None) -> "RecordsList":
+        """Create Feature records for columns."""
         pass
 
     def save(self, *args, **kwargs) -> None:
@@ -1412,7 +1413,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
 
         Create an artifact from a local temporary filepath using `key`:
 
-        >>> filepath = ln.dev.datasets.file_jpg_paradisi05()
+        >>> filepath = ln.core.datasets.file_jpg_paradisi05()
         >>> artifact = ln.Artifact(filepath, key="images/paradisi05_image.jpg")
         >>> artifact.save()
 
@@ -1530,7 +1531,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
     @overload
     def __init__(
         self,
-        data: Union[PathLike, DataLike],
+        data: PathLike,
         key: Optional[str] = None,
         description: Optional[str] = None,
         is_new_version_of: Optional["Artifact"] = None,
@@ -1578,7 +1579,6 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
     def from_df(
         cls,
         df: "pd.DataFrame",
-        field: FieldAttr = Feature.name,
         key: Optional[str] = None,
         description: Optional[str] = None,
         run: Optional[Run] = None,
@@ -1590,7 +1590,6 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
 
         Args:
             df: A `DataFrame` object.
-            field: The registry field to validate & annotate features.
             key: A relative path within default storage,
                 e.g., `"myfolder/myfile.fcs"`.
             description: A description.
@@ -1608,7 +1607,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
             For more info, see tutorial: :doc:`/tutorial`.
 
         Examples:
-            >>> df = ln.dev.datasets.df_iris_in_meter_batch1()
+            >>> df = ln.core.datasets.df_iris_in_meter_batch1()
             >>> df.head()
               sepal_length sepal_width petal_length petal_width iris_organism_code
             0        0.051       0.035        0.014       0.002                 0
@@ -1624,8 +1623,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
     @classmethod
     def from_anndata(
         cls,
-        adata: "AnnDataLike",
-        field: Optional[FieldAttr],
+        adata: "AnnData",
         key: Optional[str] = None,
         description: Optional[str] = None,
         run: Optional[Run] = None,
@@ -1637,7 +1635,6 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
 
         Args:
             adata: An `AnnData` object or path to it.
-            field: The registry field to validate & annotate features.
             key: A relative path within default storage,
                 e.g., `"myfolder/myfile.fcs"`.
             description: A description.
@@ -1659,11 +1656,8 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
         Examples:
             >>> import bionty as bt
             >>> bt.settings.organism = "human"
-            >>> adata = ln.dev.datasets.anndata_with_obs()
-            >>> adata.var_names[:2]
-            Index(['ENSG00000000003', 'ENSG00000000005'], dtype='object')
+            >>> adata = ln.core.datasets.anndata_with_obs()
             >>> artifact = ln.Artifact.from_anndata(adata,
-            ...                             field=bt.Gene.ensembl_gene_id,
             ...                             description="mini anndata with obs")
             >>> artifact.save()
         """
@@ -1694,7 +1688,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
             run: A `Run` object.
 
         Examples:
-            >>> dir_path = ln.dev.datasets.generate_cell_ranger_files("sample_001", ln.settings.storage)
+            >>> dir_path = ln.core.datasets.generate_cell_ranger_files("sample_001", ln.settings.storage)
             >>> artifacts = ln.Artifact.from_dir(dir_path)
             >>> ln.save(artifacts)
         """
@@ -1755,7 +1749,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
 
             Load as a `DataFrame`:
 
-            >>> df = ln.dev.datasets.df_iris_in_meter_batch1()
+            >>> df = ln.core.datasets.df_iris_in_meter_batch1()
             >>> ln.Artifact.from_df(df, description="iris").save()
             >>> artifact = ln.Artifact.filter(description="iris").one()
             >>> artifact.load().head()
@@ -1775,7 +1769,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
 
             Fall back to :meth:`~lamindb.Artifact.stage` if no in-memory representation is configured:
 
-            >>> ln.Artifact(ln.dev.datasets.file_jpg_paradisi05(), description="paradisi05").save()
+            >>> ln.Artifact(ln.core.datasets.file_jpg_paradisi05(), description="paradisi05").save()
             >>> artifact = ln.Artifact.filter(description="paradisi05").one()
             >>> artifact.load()
             PosixPath('/home/runner/work/lamindb/lamindb/docs/guide/mydata/.lamindb/jb7BY5UJoQVGMUOKiLcn.jpg')
@@ -1974,7 +1968,7 @@ class Collection(Registry, Data, IsVersioned):
     def from_df(
         cls,
         df: "pd.DataFrame",
-        field: FieldAttr = Feature.name,
+        # field: FieldAttr = Feature.name,
         name: Optional[str] = None,
         description: Optional[str] = None,
         run: Optional[Run] = None,
@@ -2005,7 +1999,7 @@ class Collection(Registry, Data, IsVersioned):
             For more info, see tutorial: :doc:`/tutorial`.
 
         Examples:
-            >>> df = ln.dev.datasets.df_iris_in_meter_batch1()
+            >>> df = ln.core.datasets.df_iris_in_meter_batch1()
             >>> df.head()
               sepal_length sepal_width petal_length petal_width iris_organism_code
             0        0.051       0.035        0.014       0.002                 0
@@ -2020,8 +2014,8 @@ class Collection(Registry, Data, IsVersioned):
     @classmethod
     def from_anndata(
         cls,
-        adata: "AnnDataLike",
-        field: Optional[FieldAttr],
+        adata: "AnnData",
+        # field: Optional[FieldAttr],
         name: Optional[str] = None,
         description: Optional[str] = None,
         run: Optional[Run] = None,
@@ -2052,7 +2046,7 @@ class Collection(Registry, Data, IsVersioned):
         Examples:
             >>> import bionty as bt
             >>> bt.settings.organism = "human"
-            >>> adata = ln.dev.datasets.anndata_with_obs()
+            >>> adata = ln.core.datasets.anndata_with_obs()
             >>> adata.var_names[:2]
             Index(['ENSG00000000003', 'ENSG00000000005'], dtype='object')
             >>> collection = ln.Collection.from_anndata(adata, name="My collection", field=bt.Gene.ensembl_gene_id)
@@ -2064,7 +2058,8 @@ class Collection(Registry, Data, IsVersioned):
         self,
         label_keys: Optional[Union[str, List[str]]] = None,
         join: Optional[Literal["inner", "outer"]] = "inner",
-        encode_labels: bool = True,
+        encode_labels: Union[bool, List[str]] = True,
+        unknown_label: Optional[Union[str, Dict[str, str]]] = None,
         cache_categories: bool = True,
         parallel: bool = False,
         dtype: Optional[str] = None,
@@ -2082,6 +2077,10 @@ class Collection(Registry, Data, IsVersioned):
             join: `"inner"` or `"outer"` virtual joins. If ``None`` is passed,
                 does not join.
             encode_labels: Encode labels into integers.
+                Can be a list with elements from ``label_keys```.
+            unknown_label: Encode this label to -1.
+                Can be a dictionary with keys from ``label_keys`` if ``encode_labels=True```
+                or from ``encode_labels`` if it is a list.
             cache_categories: Enable caching categories of ``label_keys`` for faster access.
             parallel: Enable sampling with multiple processes.
             dtype: Convert numpy arrays from ``.X`` to this dtype on selection.

@@ -3,6 +3,12 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚚 Rename dev to core | [349](https://github.com/laminlabs/lnschema-core/pull/349) | [falexwolf](https://github.com/falexwolf) | 2024-02-29 |
+✨ Add unknown_label to Collection.mapped signature | [345](https://github.com/laminlabs/lnschema-core/pull/345) | [Koncopd](https://github.com/Koncopd) | 2024-02-27 |
+🚚 Use var_field for anndata | [348](https://github.com/laminlabs/lnschema-core/pull/348) | [sunnyosun](https://github.com/sunnyosun) | 2024-02-27 |
+🚸 Simplify features linking | [347](https://github.com/laminlabs/lnschema-core/pull/347) | [sunnyosun](https://github.com/sunnyosun) | 2024-02-27 |
+🎨 Decouple features from Artifact construction | [344](https://github.com/laminlabs/lnschema-core/pull/344) | [sunnyosun](https://github.com/sunnyosun) | 2024-02-26 |
+Add registries docstring | [346](https://github.com/laminlabs/lnschema-core/pull/346) | [Zethson](https://github.com/Zethson) | 2024-02-26 |
 💚 Fix docs | [343](https://github.com/laminlabs/lnschema-core/pull/343) | [sunnyosun](https://github.com/sunnyosun) | 2024-01-31 |
 📝 Fix docstrings | [342](https://github.com/laminlabs/lnschema-core/pull/342) | [sunnyosun](https://github.com/sunnyosun) | 2024-01-31 |
 📝 Update docstring to use bionty | [340](https://github.com/laminlabs/lnschema-core/pull/340) | [sunnyosun](https://github.com/sunnyosun) | 2024-01-30 | 0.61.3
