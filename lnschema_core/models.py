@@ -1210,7 +1210,7 @@ class Feature(Registry, CanValidate):
 
     @classmethod
     def from_df(cls, df: "pd.DataFrame", field: Optional[FieldAttr] = None) -> "RecordsList":
-        """Create Feature records for columns."""
+        """Create Feature records for columns"""
         pass
 
     def save(self, *args, **kwargs) -> None:
