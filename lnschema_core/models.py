@@ -34,9 +34,9 @@ from lnschema_core.types import (  # AnnDataLike,
     DataLike,
     FieldAttr,
     ListLike,
-    PathLike,
     StrField,
     TextField,
+    UPathStr,
     VisibilityChoice,
 )
 
@@ -1367,7 +1367,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
     """Artifacts: data batches stored as files, folders, or arrays.
 
     Args:
-        data: `Union[PathLike, DataLike]` A path or data
+        data: `Union[UPathStr, DataLike]` A path or data
             object (`DataFrame`, `AnnData`).
         key: `Optional[str] = None` A relative path within default storage,
             e.g., `"myfolder/myfile.fcs"`.
@@ -1531,7 +1531,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
     @overload
     def __init__(
         self,
-        data: PathLike,
+        data: UPathStr,
         key: Optional[str] = None,
         description: Optional[str] = None,
         is_new_version_of: Optional["Artifact"] = None,
@@ -1666,7 +1666,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
     @classmethod
     def from_dir(
         cls,
-        path: PathLike,
+        path: UPathStr,
         key: Optional[str] = None,
         *,
         run: Optional[Run] = None,
@@ -1696,7 +1696,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
 
     def replace(
         self,
-        data: Union[PathLike, DataLike],
+        data: Union[UPathStr, DataLike],
         run: Optional[Run] = None,
         format: Optional[str] = None,
     ) -> None:
