@@ -1,17 +1,15 @@
 from enum import Enum
-from pathlib import Path
 from typing import TYPE_CHECKING, Any, TypeVar
 
 from django.db.models import CharField, IntegerChoices, TextField  # noqa
 from django.db.models.query_utils import DeferredAttribute as FieldAttr  # noqa
-from upath import UPath
+from lamindb_setup.core.types import UPathStr  # noqa
 
 if TYPE_CHECKING:
     import numpy as np
     import pandas as pd
 
 
-PathLike = TypeVar("PathLike", str, Path, UPath)
 # statically typing the following is hard because these are all heavy
 # dependencies, even DataFrame is heavy & slow to import
 DataLike = Any
