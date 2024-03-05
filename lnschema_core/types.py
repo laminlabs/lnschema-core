@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING, Any, TypeVar
 
 from django.db.models import CharField, IntegerChoices, TextField  # noqa
 from django.db.models.query_utils import DeferredAttribute as FieldAttr  # noqa
-from lamindb_setup.core.types import UPathStr  # noqa
 
 if TYPE_CHECKING:
     import numpy as np

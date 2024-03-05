@@ -20,6 +20,7 @@ from django.db import models
 from django.db.models import CASCADE, PROTECT
 from lamin_utils import logger
 from lamindb_setup import _check_instance_setup
+from lamindb_setup.core.types import UPathStr
 from upath import UPath
 
 from lnschema_core.mocks import (
@@ -36,7 +37,6 @@ from lnschema_core.types import (  # AnnDataLike,
     ListLike,
     StrField,
     TextField,
-    UPathStr,
     VisibilityChoice,
 )
 
