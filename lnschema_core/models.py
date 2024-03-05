@@ -1367,8 +1367,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
     """Artifacts: data batches stored as files, folders, or arrays.
 
     Args:
-        data: `Union[UPathStr, DataLike]` A path or data
-            object (`DataFrame`, `AnnData`).
+        data: `UPathStr` A path to a local or remote folder or file.
         key: `Optional[str] = None` A relative path within default storage,
             e.g., `"myfolder/myfile.fcs"`.
         description: `Optional[str] = None` A description.
@@ -1554,8 +1553,8 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
         pass
 
     @property
-    def path(self) -> Union[Path, UPath]:
-        """Path (`Path`, `UPath`).
+    def path(self) -> Path:
+        """Path.
 
         Examples:
 
