@@ -13,8 +13,8 @@ def current_user_id() -> int:
             return 1
 
     if settings._instance_exists:
-        if settings.instance.identifier not in user_id_cache:
-            user_id_cache[settings.instance.identifier] = query_user_id()
-        return user_id_cache[settings.instance.identifier]
+        if settings.instance.slug not in user_id_cache:
+            user_id_cache[settings.instance.slug] = query_user_id()
+        return user_id_cache[settings.instance.slug]
     else:
         return query_user_id()
