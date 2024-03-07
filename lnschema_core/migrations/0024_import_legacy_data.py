@@ -36,7 +36,7 @@ def import_registry(registry, directory, connection):
 
 def import_db(apps, schema_editor):
     # import data from parquet files
-    directory = Path(f"./lamindb_export/{ln_setup.settings.instance.identifier}/")
+    directory = Path(f"./lamindb_export/{ln_setup.settings.instance.slug}/")
     if directory.exists():
         response = input(
             "\n\nHave you deleted or archived your old instance (sqlite file or postgres database) and re-initialized your instance? Only if so, proceed to import data from"
