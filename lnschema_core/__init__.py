@@ -5,9 +5,7 @@ __version__ = "0.62.0"
 
 from lamindb_setup import _check_instance_setup
 
-_INSTANCE_SETUP = _check_instance_setup()
-
-if _INSTANCE_SETUP:
+if _check_instance_setup():
     from . import ids, types
     from .models import ORM  # backward compat
     from .models import (  # type: ignore
