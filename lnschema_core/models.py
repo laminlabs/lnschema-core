@@ -1,4 +1,3 @@
-import builtins
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -55,10 +54,6 @@ if TYPE_CHECKING or _INSTANCE_SETUP or RUNNING_SPHINX:
 
 if TYPE_CHECKING or _INSTANCE_SETUP:
     from lamindb.core import FeatureManager, LabelManager
-
-
-IPYTHON = getattr(builtins, "__IPYTHON__", False)
-TRANSFORM_TYPE_DEFAULT = TransformType.notebook if IPYTHON else TransformType.pipeline
 
 
 class IsVersioned:
@@ -842,14 +837,9 @@ class Transform(Registry, HasParents, IsVersioned):
         max_length=20,
         choices=TransformType.choices(),
         db_index=True,
-        default=TRANSFORM_TYPE_DEFAULT,
+        default=TransformType.pipeline,
     )
-    """Transform type.
-
-    Defaults to `"notebook"` if run from ipython and to `"pipeline"` if run from python.
-
-    If run from the UI, it defaults to `app`.
-    """
+    """Transform type (default `"pipeline"`)."""
     latest_report = models.ForeignKey("Artifact", PROTECT, default=None, null=True, related_name="latest_report_of")
     """Latest run report."""
     source_code = models.ForeignKey("Artifact", PROTECT, default=None, null=True, related_name="source_code_of")
