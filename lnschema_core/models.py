@@ -1675,8 +1675,8 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
         .. note::
 
             If you have a high number of files (several 100k) and don't want to
-            track them individually, consider creating a :class:`~lamindb.Collection` via
-            ``Collection(path, meta=metadata)`` for them. See, e.g., :doc:`docs:rxrx`.
+            track them individually, create a single :class:`~lamindb.Artifact` via
+            ``Artifact(path)`` for them. See, e.g., :doc:`docs:rxrx`.
 
         Args:
             path: Source path of folder.
