@@ -34,8 +34,8 @@ class ChoicesMixin:
 class TransformType(ChoicesMixin, Enum):
     pipeline = "pipeline"
     notebook = "notebook"
-    app = "app"
-    api = "api"
+    upload = "upload"
+    script = "script"
 
 
 class VisibilityChoice(IntegerChoices):
