@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-🚸 More sensible transform types | [352](https://github.com/laminlabs/lnschema-core/pull/352) | [falexwolf](https://github.com/falexwolf) | 2024-03-09 |
+🚸 More sensible transform types | [352](https://github.com/laminlabs/lnschema-core/pull/352) | [falexwolf](https://github.com/falexwolf) | 2024-03-09 | 0.63.0
 🏷️ Replace PathLike with UPathStr | [351](https://github.com/laminlabs/lnschema-core/pull/351) | [falexwolf](https://github.com/falexwolf) | 2024-03-05 | 0.62.1
 🚚 Rename dev to core | [349](https://github.com/laminlabs/lnschema-core/pull/349) | [falexwolf](https://github.com/falexwolf) | 2024-02-29 |
 ✨ Add unknown_label to Collection.mapped signature | [345](https://github.com/laminlabs/lnschema-core/pull/345) | [Koncopd](https://github.com/Koncopd) | 2024-02-27 |
