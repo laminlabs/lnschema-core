@@ -494,10 +494,22 @@ class Registry(models.Model):
         return filter(cls, **expressions)
 
     @classmethod
-    def df(cls) -> "pd.DataFrame":
-        """Convert to `DataFrame`.
+    def df(cls, include: Optional[Union[str, List[str]]] = None) -> "pd.DataFrame":
+        """Convert to ``pd.DataFrame``.
 
-        Warning: This will run a long time on large registries.
+        By default, shows all direct fields, except ``created_at``.
+
+        If you'd like to include related fields, use parameter ``include``.
+
+        Args:
+            include: Related fields to include as columns. Takes strings of
+                form ``"labels__name"``, ``"cell_types__name"``, etc. or a list
+                of such strings.
+
+        Examples:
+            >>> labels = [ln.ULabel(name="Label {i}") for i in range(3)]
+            >>> ln.save(labels)
+            >>> ln.ULabel.filter().df(include=["created_by__name"])
         """
         from lamindb._filter import filter
 
