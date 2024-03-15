@@ -945,7 +945,7 @@ class Run(Registry):
 
         Create a global run context:
 
-        >>> ln.track(transform)
+        >>> ln.track(transform=transform)
         >>> ln.core.run_context.run  # global available run
 
         Track a notebook run:
