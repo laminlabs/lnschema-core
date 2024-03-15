@@ -637,6 +637,21 @@ class Data:
 #
 # All of these are defined and tested within lamindb, in files starting with _{orm_name}.py
 
+# -------------------------------------------------------------------------------------
+# A note on maximal lengths of char fields
+#
+# 100 characters:
+#     "Raindrops pitter-pattered on the windowpane, blurring the"
+#     "city lights outside, curled up with a mug."
+# A good maximal length for a name (title).
+#
+# 255 characters:
+#     "In creating a precise 255-character paragraph, one engages in"
+#     "a dance of words, where clarity meets brevity. Every syllable counts,"
+#     "illustrating the skill in compact expression, ensuring the essence of the"
+#     "message shines through within the exacting limit."
+# This is a good maximal length for a description field.
+
 
 class User(Registry, CanValidate):
     """Users.
@@ -661,7 +676,7 @@ class User(Registry, CanValidate):
     """Universal id, valid across DB instances."""
     handle = CharField(max_length=30, unique=True, db_index=True, default=None)
     """Universal handle, valid across DB instances (required)."""
-    name = CharField(max_length=255, db_index=True, null=True, default=None)
+    name = CharField(max_length=100, db_index=True, null=True, default=None)
     """Name (optional)."""  # has to match hub specification, where it's also optional
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
@@ -722,6 +737,7 @@ class Storage(Registry):
     """Internal id, valid only in one DB instance."""
     uid = CharField(unique=True, max_length=8, default=base62_8, db_index=True)
     """Universal id, valid across DB instances."""
+    # we are very conservative here with 255 characters
     root = CharField(max_length=255, db_index=True, unique=True, default=None)
     """Root path of storage, an s3 path, a local path, etc. (required)."""
     description = CharField(max_length=255, db_index=True, null=True, default=None)
@@ -832,11 +848,10 @@ class Transform(Registry, HasParents, IsVersioned):
     """Internal id, valid only in one DB instance."""
     uid = CharField(unique=True, db_index=True, max_length=_len_full_uid, default=None)
     """Universal id."""
-    name = CharField(max_length=255, db_index=True, null=True, default=None)
-    """Transform name or title, a pipeline name, notebook title, etc..
-    """
-    short_name = CharField(max_length=128, db_index=True, null=True, default=None)
-    """A short name (optional)."""
+    name = CharField(max_length=100, db_index=True, null=True, default=None)
+    """A name or title. For instance, a pipeline name, notebook title, etc."""
+    key = CharField(max_length=120, db_index=True, null=True, default=None)
+    """A key for concise reference & versioning (optional)."""
     version = CharField(max_length=10, default=None, null=True, db_index=True)
     """Version (default `None`).
 
@@ -845,6 +860,8 @@ class Transform(Registry, HasParents, IsVersioned):
     Consider using `semantic versioning <https://semver.org>`__
     with `Python versioning <https://peps.python.org/pep-0440/>`__.
     """
+    description = CharField(max_length=255, null=True, default=None)
+    """A description (optional)."""
     type = CharField(
         max_length=20,
         choices=TransformType.choices(),
@@ -857,10 +874,9 @@ class Transform(Registry, HasParents, IsVersioned):
     source_code = models.ForeignKey("Artifact", PROTECT, default=None, null=True, related_name="source_code_of")
     """Source of the transform if stored as artifact within LaminDB."""
     reference = CharField(max_length=255, db_index=True, null=True, default=None)
-    """Reference for the transform, e.g., a URL.
-    """
-    reference_type = CharField(max_length=255, db_index=True, null=True, default=None)
-    """Type of reference, e.g., github link."""
+    """Reference for the transform, e.g., a URL."""
+    reference_type = CharField(max_length=10, db_index=True, null=True, default=None)
+    """Type of reference, e.g., 'url' or 'doi'."""
     parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
     """Parent transforms (predecessors) in data flow.
 
@@ -963,7 +979,7 @@ class Run(Registry):
     # output_artifacts on File
     reference = CharField(max_length=255, db_index=True, null=True, default=None)
     """A reference like a URL or external ID (such as from a workflow manager)."""
-    reference_type = CharField(max_length=255, db_index=True, null=True, default=None)
+    reference_type = CharField(max_length=10, db_index=True, null=True, default=None)
     """Type of reference, e.g., a workflow manager execution ID."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
@@ -1061,13 +1077,13 @@ class ULabel(Registry, HasParents, CanValidate):
     """Internal id, valid only in one DB instance."""
     uid = CharField(unique=True, db_index=True, max_length=8, default=base62_8)
     """A universal random id, valid across DB instances."""
-    name = CharField(max_length=255, db_index=True, unique=True, default=None)
+    name = CharField(max_length=100, db_index=True, unique=True, default=None)
     """Name or title of ulabel (required)."""
     description = TextField(null=True, default=None)
     """A description (optional)."""
     reference = CharField(max_length=255, db_index=True, null=True, default=None)
     """A reference like URL or external ID."""
-    reference_type = CharField(max_length=255, db_index=True, null=True, default=None)
+    reference_type = CharField(max_length=10, db_index=True, null=True, default=None)
     """Type of reference, e.g., donor_id from Vendor X."""
     parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
     """Parent labels, useful to hierarchically group labels (optional)."""
@@ -1160,7 +1176,7 @@ class Feature(Registry, CanValidate):
     """Internal id, valid only in one DB instance."""
     uid = CharField(unique=True, db_index=True, max_length=12, default=base62_12)
     """Universal id, valid across DB instances."""
-    name = CharField(max_length=255, db_index=True, default=None)
+    name = CharField(max_length=100, db_index=True, default=None)
     """Name of feature (required)."""
     type = CharField(max_length=64, db_index=True, default=None)
     """Simple type.
@@ -1172,7 +1188,7 @@ class Feature(Registry, CanValidate):
     """Unit of measure, ideally SI (`m`, `s`, `kg`, etc.) or 'normalized' etc. (optional)."""
     description = TextField(db_index=True, null=True, default=None)
     """A description."""
-    registries = CharField(max_length=128, db_index=True, default=None, null=True)
+    registries = CharField(max_length=120, db_index=True, default=None, null=True)
     """Registries that provide values for labels, bar-separated (|) (optional)."""
     synonyms = TextField(null=True, default=None)
     """Bar-separated (|) synonyms (optional)."""
@@ -1270,7 +1286,7 @@ class FeatureSet(Registry):
     """Internal id, valid only in one DB instance."""
     uid = CharField(unique=True, db_index=True, max_length=20, default=None)
     """A universal id (hash of the set of feature values)."""
-    name = CharField(max_length=128, null=True, default=None)
+    name = CharField(max_length=100, null=True, default=None)
     """A name (optional)."""
     n = models.IntegerField()
     """Number of features in the set."""
@@ -1279,7 +1295,7 @@ class FeatureSet(Registry):
 
     For :class:`~lamindb.Feature`, types are expected to be in-homogeneous and defined on a per-feature level.
     """
-    registry = CharField(max_length=128, db_index=True)
+    registry = CharField(max_length=120, db_index=True)
     """The registry that stores & validated the feature identifiers, e.g., `'core.Feature'` or `'bt.Gene'`."""
     hash = CharField(max_length=20, default=None, db_index=True, null=True)
     """The hash of the set."""
@@ -1890,7 +1906,7 @@ class Collection(Registry, Data, IsVersioned):
     """Internal id, valid only in one DB instance."""
     uid = CharField(unique=True, db_index=True, max_length=_len_full_uid, default=base62_20)
     """Universal id, valid across DB instances."""
-    name = CharField(max_length=255, db_index=True, default=None)
+    name = CharField(max_length=100, db_index=True, default=None)
     """Name or title of collection (required)."""
     description = TextField(null=True, default=None)
     """A description."""
@@ -1906,7 +1922,7 @@ class Collection(Registry, Data, IsVersioned):
     """Hash of collection content. 86 base64 chars allow to store 64 bytes, 512 bits."""
     reference = CharField(max_length=255, db_index=True, null=True, default=None)
     """A reference like URL or external ID."""
-    reference_type = CharField(max_length=255, db_index=True, null=True, default=None)
+    reference_type = CharField(max_length=10, db_index=True, null=True, default=None)
     """Type of reference, e.g., cellxgene Census collection_id."""
     feature_sets = models.ManyToManyField("FeatureSet", related_name="collections", through="CollectionFeatureSet")
     """The feature sets measured in this collection (see :class:`~lamindb.FeatureSet`)."""
@@ -2093,7 +2109,7 @@ class Collection(Registry, Data, IsVersioned):
             >>> from torch.utils.data import DataLoader
             >>> ds = ln.Collection.filter(description="my collection").one()
             >>> mapped = collection.mapped(label_keys=["cell_type", "batch"])
-            >>> dl = DataLoader(mapped, batch_size=128, shuffle=True)
+            >>> dl = DataLoader(mapped, batch_size=120, shuffle=True)
         """
         pass
 
