@@ -9,16 +9,13 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name="transform",
-            name="short_name",
-        ),
         migrations.AddField(
             model_name="transform",
             name="description",
             field=models.CharField(default=None, max_length=255, null=True),
         ),
-        migrations.AddField(
+        migrations.RenameField(model_name="transform", old_name="short_name", new_name="key"),
+        migrations.AlterField(
             model_name="transform",
             name="key",
             field=models.CharField(db_index=True, default=None, max_length=120, null=True),
