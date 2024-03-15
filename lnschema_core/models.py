@@ -945,7 +945,7 @@ class Run(Registry):
 
         Create a global run context:
 
-        >>> ln.track(transform)
+        >>> ln.track(transform=transform)
         >>> ln.core.run_context.run  # global available run
 
         Track a notebook run:
@@ -960,10 +960,12 @@ class Run(Registry):
     """Universal id, valid across DB instances."""
     transform = models.ForeignKey(Transform, CASCADE, related_name="runs")
     """The transform :class:`~lamindb.Transform` that is being run."""
-    run_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    """Time of run execution."""
+    started_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    """Start time of run."""
+    finished_at = models.DateTimeField(db_index=True, null=True, default=None)
+    """Finished time of run."""
     created_by = models.ForeignKey(User, CASCADE, default=current_user_id, related_name="created_runs")
-    """Creator of record, a :class:`~lamindb.User`."""
+    """Creator of run, a :class:`~lamindb.User`."""
     # we don't want to make below a OneToOne because there could be the same trivial report
     # generated for many different runs
     report = models.ForeignKey("Artifact", PROTECT, default=None, null=True, related_name="report_of")
@@ -975,14 +977,12 @@ class Run(Registry):
     """
     is_consecutive = models.BooleanField(null=True, default=None)
     """Indicates whether code was consecutively executed. Is relevant for notebooks."""
-    # input_artifacts on File
-    # output_artifacts on File
     reference = CharField(max_length=255, db_index=True, null=True, default=None)
     """A reference like a URL or external ID (such as from a workflow manager)."""
     reference_type = CharField(max_length=10, db_index=True, null=True, default=None)
     """Type of reference, e.g., a workflow manager execution ID."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    """Time of creation of record."""
+    """Time of first creation. Mismatches ``started_at`` if the run is re-run."""
 
     @overload
     def __init__(
