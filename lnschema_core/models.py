@@ -1382,10 +1382,10 @@ class FeatureSet(Registry):
 
 
 class Artifact(Registry, Data, IsTree, IsVersioned):
-    """Artifacts: data batches stored as files, folders, or arrays.
+    """Artifacts: files, folders, or arrays.
 
     Args:
-        data: `UPathStr` A path to a local or remote folder or file.
+        path: `UPathStr` A path to a local or remote folder or file.
         key: `Optional[str] = None` A relative path within default storage,
             e.g., `"myfolder/myfile.fcs"`.
         description: `Optional[str] = None` A description.
@@ -2109,7 +2109,7 @@ class Collection(Registry, Data, IsVersioned):
             >>> from torch.utils.data import DataLoader
             >>> ds = ln.Collection.filter(description="my collection").one()
             >>> mapped = collection.mapped(label_keys=["cell_type", "batch"])
-            >>> dl = DataLoader(mapped, batch_size=120, shuffle=True)
+            >>> dl = DataLoader(mapped, batch_size=128, shuffle=True)
         """
         pass
 
