@@ -966,6 +966,8 @@ class Run(Registry):
     """Finished time of run."""
     created_by = models.ForeignKey(User, CASCADE, default=current_user_id, related_name="created_runs")
     """Creator of run, a :class:`~lamindb.User`."""
+    json = models.JSONField(null=True, default=None)
+    """JSON field."""
     # we don't want to make below a OneToOne because there could be the same trivial report
     # generated for many different runs
     report = models.ForeignKey("Artifact", PROTECT, default=None, null=True, related_name="report_of")
