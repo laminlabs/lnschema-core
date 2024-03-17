@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+♻️ Add a json field to run | [355](https://github.com/laminlabs/lnschema-core/pull/355) | [falexwolf](https://github.com/falexwolf) | 2024-03-17 |
 🚚 Rename `run_at` to `started_at` for `Run`, add `finished_at` | [354](https://github.com/laminlabs/lnschema-core/pull/354) | [falexwolf](https://github.com/falexwolf) | 2024-03-15 |
 🚚 Add `.description` to `Transform` & rename `short_name` to `key`, char field fixes | [353](https://github.com/laminlabs/lnschema-core/pull/353) | [falexwolf](https://github.com/falexwolf) | 2024-03-15 |
 🚸 More sensible transform types | [352](https://github.com/laminlabs/lnschema-core/pull/352) | [falexwolf](https://github.com/falexwolf) | 2024-03-09 | 0.63.0
