@@ -645,6 +645,8 @@ class Data:
 #     "city lights outside, curled up with a mug."
 # A good maximal length for a name (title).
 #
+# 150 characters: We choose this for name maximal length because some users like long names.
+#
 # 255 characters:
 #     "In creating a precise 255-character paragraph, one engages in"
 #     "a dance of words, where clarity meets brevity. Every syllable counts,"
@@ -676,7 +678,7 @@ class User(Registry, CanValidate):
     """Universal id, valid across DB instances."""
     handle = CharField(max_length=30, unique=True, db_index=True, default=None)
     """Universal handle, valid across DB instances (required)."""
-    name = CharField(max_length=100, db_index=True, null=True, default=None)
+    name = CharField(max_length=150, db_index=True, null=True, default=None)
     """Name (optional)."""  # has to match hub specification, where it's also optional
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
@@ -848,7 +850,7 @@ class Transform(Registry, HasParents, IsVersioned):
     """Internal id, valid only in one DB instance."""
     uid = CharField(unique=True, db_index=True, max_length=_len_full_uid, default=None)
     """Universal id."""
-    name = CharField(max_length=100, db_index=True, null=True, default=None)
+    name = CharField(max_length=150, db_index=True, null=True, default=None)
     """A name or title. For instance, a pipeline name, notebook title, etc."""
     key = CharField(max_length=120, db_index=True, null=True, default=None)
     """A key for concise reference & versioning (optional)."""
@@ -875,7 +877,7 @@ class Transform(Registry, HasParents, IsVersioned):
     """Source of the transform if stored as artifact within LaminDB."""
     reference = CharField(max_length=255, db_index=True, null=True, default=None)
     """Reference for the transform, e.g., a URL."""
-    reference_type = CharField(max_length=10, db_index=True, null=True, default=None)
+    reference_type = CharField(max_length=25, db_index=True, null=True, default=None)
     """Type of reference, e.g., 'url' or 'doi'."""
     parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
     """Parent transforms (predecessors) in data flow.
@@ -981,7 +983,7 @@ class Run(Registry):
     """Indicates whether code was consecutively executed. Is relevant for notebooks."""
     reference = CharField(max_length=255, db_index=True, null=True, default=None)
     """A reference like a URL or external ID (such as from a workflow manager)."""
-    reference_type = CharField(max_length=10, db_index=True, null=True, default=None)
+    reference_type = CharField(max_length=25, db_index=True, null=True, default=None)
     """Type of reference, e.g., a workflow manager execution ID."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of first creation. Mismatches ``started_at`` if the run is re-run."""
@@ -1079,13 +1081,13 @@ class ULabel(Registry, HasParents, CanValidate):
     """Internal id, valid only in one DB instance."""
     uid = CharField(unique=True, db_index=True, max_length=8, default=base62_8)
     """A universal random id, valid across DB instances."""
-    name = CharField(max_length=100, db_index=True, unique=True, default=None)
+    name = CharField(max_length=150, db_index=True, unique=True, default=None)
     """Name or title of ulabel (required)."""
     description = TextField(null=True, default=None)
     """A description (optional)."""
     reference = CharField(max_length=255, db_index=True, null=True, default=None)
     """A reference like URL or external ID."""
-    reference_type = CharField(max_length=10, db_index=True, null=True, default=None)
+    reference_type = CharField(max_length=25, db_index=True, null=True, default=None)
     """Type of reference, e.g., donor_id from Vendor X."""
     parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
     """Parent labels, useful to hierarchically group labels (optional)."""
@@ -1178,7 +1180,7 @@ class Feature(Registry, CanValidate):
     """Internal id, valid only in one DB instance."""
     uid = CharField(unique=True, db_index=True, max_length=12, default=base62_12)
     """Universal id, valid across DB instances."""
-    name = CharField(max_length=100, db_index=True, default=None)
+    name = CharField(max_length=150, db_index=True, default=None)
     """Name of feature (required)."""
     type = CharField(max_length=64, db_index=True, default=None)
     """Simple type.
@@ -1288,7 +1290,7 @@ class FeatureSet(Registry):
     """Internal id, valid only in one DB instance."""
     uid = CharField(unique=True, db_index=True, max_length=20, default=None)
     """A universal id (hash of the set of feature values)."""
-    name = CharField(max_length=100, null=True, default=None)
+    name = CharField(max_length=150, null=True, default=None)
     """A name (optional)."""
     n = models.IntegerField()
     """Number of features in the set."""
@@ -1908,7 +1910,7 @@ class Collection(Registry, Data, IsVersioned):
     """Internal id, valid only in one DB instance."""
     uid = CharField(unique=True, db_index=True, max_length=_len_full_uid, default=base62_20)
     """Universal id, valid across DB instances."""
-    name = CharField(max_length=100, db_index=True, default=None)
+    name = CharField(max_length=150, db_index=True, default=None)
     """Name or title of collection (required)."""
     description = TextField(null=True, default=None)
     """A description."""
@@ -1924,7 +1926,8 @@ class Collection(Registry, Data, IsVersioned):
     """Hash of collection content. 86 base64 chars allow to store 64 bytes, 512 bits."""
     reference = CharField(max_length=255, db_index=True, null=True, default=None)
     """A reference like URL or external ID."""
-    reference_type = CharField(max_length=10, db_index=True, null=True, default=None)
+    # also for reference_type here, we allow an extra long max_length
+    reference_type = CharField(max_length=25, db_index=True, null=True, default=None)
     """Type of reference, e.g., cellxgene Census collection_id."""
     feature_sets = models.ManyToManyField("FeatureSet", related_name="collections", through="CollectionFeatureSet")
     """The feature sets measured in this collection (see :class:`~lamindb.FeatureSet`)."""

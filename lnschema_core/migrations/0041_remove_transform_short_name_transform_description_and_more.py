@@ -23,17 +23,17 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="collection",
             name="name",
-            field=models.CharField(db_index=True, default=None, max_length=100),
+            field=models.CharField(db_index=True, default=None, max_length=150),
         ),
         migrations.AlterField(
             model_name="collection",
             name="reference_type",
-            field=models.CharField(db_index=True, default=None, max_length=10, null=True),
+            field=models.CharField(db_index=True, default=None, max_length=25, null=True),
         ),
         migrations.AlterField(
             model_name="feature",
             name="name",
-            field=models.CharField(db_index=True, default=None, max_length=100),
+            field=models.CharField(db_index=True, default=None, max_length=150),
         ),
         migrations.AlterField(
             model_name="feature",
@@ -43,7 +43,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="featureset",
             name="name",
-            field=models.CharField(default=None, max_length=100, null=True),
+            field=models.CharField(default=None, max_length=150, null=True),
         ),
         migrations.AlterField(
             model_name="featureset",
@@ -53,31 +53,31 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="run",
             name="reference_type",
-            field=models.CharField(db_index=True, default=None, max_length=10, null=True),
+            field=models.CharField(db_index=True, default=None, max_length=25, null=True),
         ),
         migrations.AlterField(
             model_name="transform",
             name="name",
-            field=models.CharField(db_index=True, default=None, max_length=100, null=True),
+            field=models.CharField(db_index=True, default=None, max_length=150, null=True),
         ),
         migrations.AlterField(
             model_name="transform",
             name="reference_type",
-            field=models.CharField(db_index=True, default=None, max_length=10, null=True),
+            field=models.CharField(db_index=True, default=None, max_length=25, null=True),
         ),
         migrations.AlterField(
             model_name="ulabel",
             name="name",
-            field=models.CharField(db_index=True, default=None, max_length=100, unique=True),
+            field=models.CharField(db_index=True, default=None, max_length=150, unique=True),
         ),
         migrations.AlterField(
             model_name="ulabel",
             name="reference_type",
-            field=models.CharField(db_index=True, default=None, max_length=10, null=True),
+            field=models.CharField(db_index=True, default=None, max_length=25, null=True),
         ),
         migrations.AlterField(
             model_name="user",
             name="name",
-            field=models.CharField(db_index=True, default=None, max_length=100, null=True),
+            field=models.CharField(db_index=True, default=None, max_length=150, null=True),
         ),
     ]
