@@ -810,7 +810,7 @@ class Transform(Registry, HasParents, IsVersioned):
 
     Args:
         name: `str` A name or title.
-        short_name: `Optional[str] = None` A short name or abbreviation.
+        key: `Optional[str] = None` A short name or abbreviation.
         version: `Optional[str] = None` A version.
         type: `Optional[TransformType] = None` Either `'notebook'`, `'pipeline'`
             or `'app'`. If `None`, defaults to `'notebook'` within an IPython
@@ -895,7 +895,7 @@ class Transform(Registry, HasParents, IsVersioned):
     def __init__(
         self,
         name: str,
-        short_name: Optional[str] = None,
+        key: Optional[str] = None,
         version: Optional[str] = None,
         type: Optional[TransformType] = None,
         reference: Optional[str] = None,
