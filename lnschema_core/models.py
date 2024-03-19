@@ -802,20 +802,23 @@ class Storage(Registry):
 class Transform(Registry, HasParents, IsVersioned):
     """Transforms of artifacts & collections.
 
-    Pipelines, notebooks, app uploads.
+    A transform is either a script, a notebook, or a pipeline.
 
-    A pipeline is versioned software that transforms data.
-    This can be anything from typical workflow tools (Nextflow, Snakemake,
-    Prefect, Apache Airflow, etc.) to simple (versioned) scripts.
+    If you execute a script, a notebook, or a pipeline, you generate a run
+    (:class:`~lamindb.Run`).
+
+    A pipeline is typically created with a workflow tool (Nextflow, Snakemake,
+    Prefect, Flyte, MetaFlow, redun, Airflow, ...).
+
+    Transforms are versioned so that any transform maps 1:1 on a specific
+    different version of a script, a notebook or a pipeline.
 
     Args:
         name: `str` A name or title.
-        key: `Optional[str] = None` A short name or abbreviation.
+        key: `Optional[str] = None` A short name or path-like semantic key.
         version: `Optional[str] = None` A version.
-        type: `Optional[TransformType] = None` Either `'notebook'`, `'pipeline'`
-            or `'app'`. If `None`, defaults to `'notebook'` within an IPython
-            environment and to `'pipeline'` outside of it.
-        reference: `Optional[str] = None` A reference like a URL.
+        type: `Optional[TransformType] = "pipeline"` Either `'notebook'`, `'pipeline'`
+            or `'script'`.
         is_new_version_of: `Optional[Transform] = None` An old version of the transform.
 
     See Also:
@@ -825,7 +828,7 @@ class Transform(Registry, HasParents, IsVersioned):
             Executions of the transform.
 
     Notes:
-        For more info, see tutorial: :doc:`docs:data-flow`.
+        For more info, see use case: :doc:`docs:data-flow`.
 
     Examples:
 
@@ -898,8 +901,6 @@ class Transform(Registry, HasParents, IsVersioned):
         key: Optional[str] = None,
         version: Optional[str] = None,
         type: Optional[TransformType] = None,
-        reference: Optional[str] = None,
-        reference_type: Optional[str] = None,
         is_new_version_of: Optional["Transform"] = None,
     ):
         ...
