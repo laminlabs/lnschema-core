@@ -802,16 +802,18 @@ class Storage(Registry):
 class Transform(Registry, HasParents, IsVersioned):
     """Transforms of artifacts & collections.
 
-    A transform is either a script, a notebook, or a pipeline.
-
-    If you execute a script, a notebook, or a pipeline, you generate a run
-    (:class:`~lamindb.Run`).
+    A transform can refer to a script, a notebook, or a pipeline. If you execute
+    a script, a notebook, or a pipeline, you generate a run of a transform
+    (:class:`~lamindb.Run`). A run has input and output data.
 
     A pipeline is typically created with a workflow tool (Nextflow, Snakemake,
-    Prefect, Flyte, MetaFlow, redun, Airflow, ...).
+    Prefect, Flyte, MetaFlow, redun, Airflow, ...) and stored in a versioned
+    repository.
 
-    Transforms are versioned so that any transform maps 1:1 on a specific
-    different version of a script, a notebook or a pipeline.
+    Transforms are versioned so that a given transform maps 1:1 to a specific
+    version of a script, a notebook or a pipeline. If you switch on
+    :attr:`~lamindb.core.Settings.sync_git_repo`, any script-like transform is
+    synced its hashed state in a git repository.
 
     Args:
         name: `str` A name or title.
@@ -823,12 +825,16 @@ class Transform(Registry, HasParents, IsVersioned):
 
     See Also:
         :meth:`lamindb.track`
-            Track global Transform & Run for a notebook or pipeline.
+            Globally track a script, notebook or pipeline run.
         :class:`~lamindb.Run`
-            Executions of the transform.
+            Executions of scripts, notebooks or pipelines.
 
     Notes:
-        For more info, see use case: :doc:`docs:data-flow`.
+        - :doc:`docs:track`
+        - :doc:`docs:data-flow`
+        - :doc:`docs:redun`
+        - :doc:`docs:nextflow`
+        - :doc:`docs:snakemake`
 
     Examples:
 
