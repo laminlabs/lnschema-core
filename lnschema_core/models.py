@@ -802,30 +802,39 @@ class Storage(Registry):
 class Transform(Registry, HasParents, IsVersioned):
     """Transforms of artifacts & collections.
 
-    Pipelines, notebooks, app uploads.
+    A transform can refer to a script, a notebook, or a pipeline. If you execute
+    a script, a notebook, or a pipeline, you generate a run of a transform
+    (:class:`~lamindb.Run`). A run has input and output data.
 
-    A pipeline is versioned software that transforms data.
-    This can be anything from typical workflow tools (Nextflow, Snakemake,
-    Prefect, Apache Airflow, etc.) to simple (versioned) scripts.
+    A pipeline is typically created with a workflow tool (Nextflow, Snakemake,
+    Prefect, Flyte, MetaFlow, redun, Airflow, ...) and stored in a versioned
+    repository.
+
+    Transforms are versioned so that a given transform maps 1:1 to a specific
+    version of a script, a notebook or a pipeline. If you switch on
+    :attr:`~lamindb.core.Settings.sync_git_repo`, any script-like transform is
+    synced its hashed state in a git repository.
 
     Args:
         name: `str` A name or title.
-        key: `Optional[str] = None` A short name or abbreviation.
+        key: `Optional[str] = None` A short name or path-like semantic key.
         version: `Optional[str] = None` A version.
-        type: `Optional[TransformType] = None` Either `'notebook'`, `'pipeline'`
-            or `'app'`. If `None`, defaults to `'notebook'` within an IPython
-            environment and to `'pipeline'` outside of it.
-        reference: `Optional[str] = None` A reference like a URL.
+        type: `Optional[TransformType] = "pipeline"` Either `'notebook'`, `'pipeline'`
+            or `'script'`.
         is_new_version_of: `Optional[Transform] = None` An old version of the transform.
 
     See Also:
         :meth:`lamindb.track`
-            Track global Transform & Run for a notebook or pipeline.
+            Globally track a script, notebook or pipeline run.
         :class:`~lamindb.Run`
-            Executions of the transform.
+            Executions of scripts, notebooks or pipelines.
 
     Notes:
-        For more info, see tutorial: :doc:`docs:data-flow`.
+        - :doc:`docs:track`
+        - :doc:`docs:data-flow`
+        - :doc:`docs:redun`
+        - :doc:`docs:nextflow`
+        - :doc:`docs:snakemake`
 
     Examples:
 
@@ -898,8 +907,6 @@ class Transform(Registry, HasParents, IsVersioned):
         key: Optional[str] = None,
         version: Optional[str] = None,
         type: Optional[TransformType] = None,
-        reference: Optional[str] = None,
-        reference_type: Optional[str] = None,
         is_new_version_of: Optional["Transform"] = None,
     ):
         ...
