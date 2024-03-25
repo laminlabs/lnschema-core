@@ -2125,6 +2125,16 @@ class Collection(Registry, Data, IsVersioned):
         """
         pass
 
+    def stage(self, is_run_input: Optional[bool] = None) -> List[UPath]:
+        """Update cache from cloud storage if outdated.
+
+        Returns paths to locally cached on-disk objects in the collection.
+
+        Args:
+            is_run_input: Whether to track this collection as run input.
+        """
+        pass
+
     def load(
         self,
         join: Literal["inner", "outer"] = "outer",
