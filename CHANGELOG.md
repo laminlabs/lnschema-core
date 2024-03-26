@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-✨ Collection stage | [357](https://github.com/laminlabs/lnschema-core/pull/357) | [Koncopd](https://github.com/Koncopd) | 2024-03-25 |
+✨ Collection stage | [357](https://github.com/laminlabs/lnschema-core/pull/357) | [Koncopd](https://github.com/Koncopd) | 2024-03-25 | 0.64.1
 📝 Clarify the transform docs | [356](https://github.com/laminlabs/lnschema-core/pull/356) | [falexwolf](https://github.com/falexwolf) | 2024-03-19 |
 ♻️ Add a json field to run | [355](https://github.com/laminlabs/lnschema-core/pull/355) | [falexwolf](https://github.com/falexwolf) | 2024-03-17 | 0.64.0
 🚚 Rename `run_at` to `started_at` for `Run`, add `finished_at` | [354](https://github.com/laminlabs/lnschema-core/pull/354) | [falexwolf](https://github.com/falexwolf) | 2024-03-15 |
