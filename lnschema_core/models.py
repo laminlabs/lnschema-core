@@ -1993,96 +1993,6 @@ class Collection(Registry, Data, IsVersioned):
     ):
         pass
 
-    @classmethod
-    def from_df(
-        cls,
-        df: "pd.DataFrame",
-        # field: FieldAttr = Feature.name,
-        name: Optional[str] = None,
-        description: Optional[str] = None,
-        run: Optional[Run] = None,
-        reference: Optional[str] = None,
-        reference_type: Optional[str] = None,
-        version: Optional[str] = None,
-        is_new_version_of: Optional["Artifact"] = None,
-        **kwargs,
-    ) -> "Collection":
-        """Create from ``DataFrame``, validate & link features.
-
-        Args:
-            df: A `DataFrame` object.
-            field: The registry field to validate & annotate features.
-            name: A name.
-            description: A description.
-            version: A version string.
-            is_new_version_of: An old version of the collection.
-            run: The run that creates the collection.
-
-        See Also:
-            :class:`~lamindb.Artifact`
-                Track artifacts.
-            :class:`~lamindb.Feature`
-                Track features.
-
-        Notes:
-            For more info, see tutorial: :doc:`/tutorial`.
-
-        Examples:
-            >>> df = ln.core.datasets.df_iris_in_meter_batch1()
-            >>> df.head()
-              sepal_length sepal_width petal_length petal_width iris_organism_code
-            0        0.051       0.035        0.014       0.002                 0
-            1        0.049       0.030        0.014       0.002                 0
-            2        0.047       0.032        0.013       0.002                 0
-            3        0.046       0.031        0.015       0.002                 0
-            4        0.050       0.036        0.014       0.002                 0
-            >>> collection = ln.Collection.from_df(df, description="Iris flower collection batch1")
-        """
-        pass
-
-    @classmethod
-    def from_anndata(
-        cls,
-        adata: "AnnData",
-        # field: Optional[FieldAttr],
-        name: Optional[str] = None,
-        description: Optional[str] = None,
-        run: Optional[Run] = None,
-        reference: Optional[str] = None,
-        reference_type: Optional[str] = None,
-        version: Optional[str] = None,
-        is_new_version_of: Optional["Artifact"] = None,
-        **kwargs,
-    ) -> "Collection":
-        """Create from ``AnnDataLike``, validate & link features.
-
-        Args:
-            adata: An `AnnData` object.
-            field: The registry field to validate & annotate features.
-            name: A name.
-            description: A description.
-            version: A version string.
-            is_new_version_of: An old version of the collection.
-            run: The run that creates the collection.
-
-        See Also:
-
-            :class:`~lamindb.Artifact`
-                Track artifacts.
-            :class:`~lamindb.Feature`
-                Track features.
-
-        Examples:
-            >>> import bionty as bt
-            >>> bt.settings.organism = "human"
-            >>> adata = ln.core.datasets.anndata_with_obs()
-            >>> adata.var_names[:2]
-            Index(['ENSG00000000003', 'ENSG00000000005'], dtype='object')
-            >>> collection = ln.Collection.from_anndata(adata, name="My collection", field=bt.Gene.ensembl_gene_id)
-            >>> collection.save()
-        """
-        pass
-
     def mapped(
         self,
         label_keys: Optional[Union[str, List[str]]] = None,
@@ -2144,14 +2054,6 @@ class Collection(Registry, Data, IsVersioned):
         """Stage and load to memory.
 
         Returns in-memory representation if possible, e.g., a concatenated `DataFrame` or `AnnData` object.
-        """
-        pass
-
-    def backed(self, is_run_input: Optional[bool] = None) -> Union["AnnDataAccessor", "BackedAccessor"]:
-        """Return a cloud-backed data object.
-
-        Notes:
-            For more info, see tutorial: :doc:`/data`.
         """
         pass
 
