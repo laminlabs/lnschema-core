@@ -31,7 +31,7 @@ class ChoicesMixin:
         return self.value
 
 
-class TransformType(ChoicesMixin, Enum):
+class TransformType(ChoicesMixin, str, Enum):
     pipeline = "pipeline"
     notebook = "notebook"
     upload = "upload"
