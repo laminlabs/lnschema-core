@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+✨ Introduce Registry.get() | [360](https://github.com/laminlabs/lnschema-core/pull/360) | [falexwolf](https://github.com/falexwolf) | 2024-03-30 |
 ✅ Add test for string equivalency of transform types | [359](https://github.com/laminlabs/lnschema-core/pull/359) | [falexwolf](https://github.com/falexwolf) | 2024-03-30 | 0.64.3
 🔥 No collections from anndata or df anymore | [358](https://github.com/laminlabs/lnschema-core/pull/358) | [falexwolf](https://github.com/falexwolf) | 2024-03-28 | 0.64.2
 ✨ Collection stage | [357](https://github.com/laminlabs/lnschema-core/pull/357) | [Koncopd](https://github.com/Koncopd) | 2024-03-25 | 0.64.1
