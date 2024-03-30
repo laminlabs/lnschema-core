@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+✅ Add test for string equivalency of transform types | [359](https://github.com/laminlabs/lnschema-core/pull/359) | [falexwolf](https://github.com/falexwolf) | 2024-03-30 |
 🔥 No collections from anndata or df anymore | [358](https://github.com/laminlabs/lnschema-core/pull/358) | [falexwolf](https://github.com/falexwolf) | 2024-03-28 | 0.64.2
 ✨ Collection stage | [357](https://github.com/laminlabs/lnschema-core/pull/357) | [Koncopd](https://github.com/Koncopd) | 2024-03-25 | 0.64.1
 📝 Clarify the transform docs | [356](https://github.com/laminlabs/lnschema-core/pull/356) | [falexwolf](https://github.com/falexwolf) | 2024-03-19 |
