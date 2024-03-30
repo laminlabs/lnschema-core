@@ -494,6 +494,35 @@ class Registry(models.Model):
         return filter(cls, **expressions)
 
     @classmethod
+    def get(cls, idlike: Union[int, str]) -> "Registry":
+        """Query records (see :doc:`meta`).
+
+        Args:
+            idlike: Either a uid stub, a uid or an integer id.
+
+        Returns:
+            A record.
+
+        See Also:
+            - Guide: :doc:`meta`
+            - Django documentation: `Queries <https://docs.djangoproject.com/en/4.2/topics/db/queries/>`__
+
+        Examples:
+            >>> ln.ULabel(name="my ulabel").save()
+            >>> ulabel = ln.ULabel.filter(name="my ulabel").one()
+        """
+        from lamindb._filter import filter
+
+        if isinstance(idlike, int):
+            return filter(cls, id=idlike).one()
+        else:
+            qs = filter(cls, uid__startswith=idlike)
+            if issubclass(cls, IsVersioned):
+                return qs.latest_version().one()
+            else:
+                return qs.one()
+
+    @classmethod
     def df(cls, include: Optional[Union[str, List[str]]] = None) -> "pd.DataFrame":
         """Convert to ``pd.DataFrame``.
 
