@@ -1,4 +1,4 @@
-from lnschema_core.types import TransformType
+from lnschema_core.types import TransformType, VisibilityChoice
 
 
 def test_transform_type():
@@ -9,6 +9,6 @@ def test_transform_type():
 
 
 def test_visibility_choice():
-    assert TransformType.default == 1
-    assert TransformType.hidden == 0
-    assert TransformType.trash == -1
+    assert VisibilityChoice.default == 1
+    assert VisibilityChoice.hidden == 0
+    assert VisibilityChoice.trash == -1
