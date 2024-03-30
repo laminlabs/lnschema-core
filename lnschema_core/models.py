@@ -518,10 +518,8 @@ class Registry(models.Model):
         else:
             qs = filter(cls, uid__startswith=idlike)
             if issubclass(cls, IsVersioned):
-                # TODO: account for more edge cases
-                return qs.order_by("-version").first()
+                return qs.latest_version().one()
             else:
-                assert qs.count() == 1, f"Multiple records found for {idlike}"
                 return qs.one()
 
     @classmethod
