@@ -495,7 +495,7 @@ class Registry(models.Model):
 
     @classmethod
     def get(cls, idlike: Union[int, str]) -> "Registry":
-        """Query records (see :doc:`meta`).
+        """Get a single record.
 
         Args:
             idlike: Either a uid stub, a uid or an integer id.
@@ -508,8 +508,7 @@ class Registry(models.Model):
             - Django documentation: `Queries <https://docs.djangoproject.com/en/4.2/topics/db/queries/>`__
 
         Examples:
-            >>> ln.ULabel(name="my ulabel").save()
-            >>> ulabel = ln.ULabel.filter(name="my ulabel").one()
+            >>> ulabel = ln.ULabel.get("2riu039")
         """
         from lamindb._filter import filter
 
