@@ -740,9 +740,9 @@ class User(Registry, CanValidate):
 class Storage(Registry):
     """Storage locations.
 
-    Is auto-managed, no need to create records.
+    A storage location can be a local or remote directory/folder or an entire S3/GCP bucket.
 
-    Can be local or remote directories or entire S3/GCP buckets.
+    This registry is auto-managed and read-only.
 
     See Also:
         Default storage: :attr:`~lamindb.core.Settings.storage`
@@ -828,10 +828,10 @@ class Storage(Registry):
 
 
 class Transform(Registry, HasParents, IsVersioned):
-    """Transforms of artifacts & collections.
+    """Transformations of artifacts & collections.
 
     A transform can refer to a script, a notebook, or a pipeline. If you execute
-    a script, a notebook, or a pipeline, you generate a run of a transform
+    a transform, you generate a run of a transform
     (:class:`~lamindb.Run`). A run has input and output data.
 
     A pipeline is typically created with a workflow tool (Nextflow, Snakemake,
@@ -839,7 +839,7 @@ class Transform(Registry, HasParents, IsVersioned):
     repository.
 
     Transforms are versioned so that a given transform maps 1:1 to a specific
-    version of a script, a notebook or a pipeline. If you switch on
+    version of code. If you switch on
     :attr:`~lamindb.core.Settings.sync_git_repo`, any script-like transform is
     synced its hashed state in a git repository.
 
@@ -1421,7 +1421,7 @@ class FeatureSet(Registry):
 
 
 class Artifact(Registry, Data, IsTree, IsVersioned):
-    """Artifacts: files, folders, or arrays.
+    """Artifacts: files, folders & arrays in storage.
 
     Args:
         path: `UPathStr` A path to a local or remote folder or file.
