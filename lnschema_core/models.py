@@ -2033,10 +2033,20 @@ class Collection(Registry, Data, IsVersioned):
         stream: bool = False,
         is_run_input: Optional[bool] = None,
     ) -> "MappedCollection":
-        """Convert to map-style collection for data loaders.
+        """Return a map-style dataset.
 
-        Note: This currently only works for AnnData objects. The objects should
-        have the same label keys and variables.
+        Returns a `pytorch map-style dataset
+        <https://pytorch.org/docs/stable/data.html#map-style-datasets>`__ by
+        virtually concatenating `AnnData` arrays.
+
+        If your `AnnData` collection is in the cloud, move them into a local
+        cache first via :meth:`~lamindb.Collection.stage`.
+
+        .. note::
+
+            For a guide, see :doc:`docs:scrna5`.
+
+            This method currently only works for collections of `AnnData` artifacts.
 
         Args:
             label_keys: Columns of the ``.obs`` slot - the names of the metadata
