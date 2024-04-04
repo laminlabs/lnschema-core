@@ -16,9 +16,8 @@ from django.db.models import CASCADE, PROTECT
 from lamin_utils import logger
 from lamindb_setup import _check_instance_setup
 
-from lnschema_core.types import (  # AnnDataLike,
+from lnschema_core.types import (
     CharField,
-    DataLike,
     FieldAttr,
     ListLike,
     StrField,
@@ -1731,7 +1730,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
         """Create from ``AnnDataLike``, validate & link features.
 
         Args:
-            adata: An `AnnData` object or path to it.
+            adata: An `AnnData` object or a path to an ``.h5ad`` file.
             key: A relative path within default storage,
                 e.g., `"myfolder/myfile.fcs"`.
             description: A description.
@@ -1793,15 +1792,14 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
 
     def replace(
         self,
-        data: UPathStr | DataLike,
+        data: UPathStr,
         run: Run | None = None,
         format: str | None = None,
     ) -> None:
         """Replace artifact content.
 
         Args:
-            data: A file path or an in-memory data
-                object (`DataFrame`, `AnnData`).
+            data: A file path.
             run: The run that created the artifact gets
                 auto-linked if ``ln.track()`` was called.
 
@@ -1841,7 +1839,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
 
     def load(
         self, is_run_input: bool | None = None, stream: bool = False, **kwargs
-    ) -> DataLike:
+    ) -> Any:
         """Stage and load to memory.
 
         Returns in-memory representation if possible, e.g., an `AnnData` object for an `h5ad` file.
@@ -2152,7 +2150,7 @@ class Collection(Registry, Data, IsVersioned):
         join: Literal["inner", "outer"] = "outer",
         is_run_input: bool | None = None,
         **kwargs,
-    ) -> DataLike:
+    ) -> Any:
         """Stage and load to memory.
 
         Returns in-memory representation if possible, e.g., a concatenated `DataFrame` or `AnnData` object.

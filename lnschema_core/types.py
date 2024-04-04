@@ -1,19 +1,15 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import TYPE_CHECKING, Any
+from typing import TypeAlias  # type: ignore
 
 import numpy as np
 import pandas as pd
-from django.db.models import CharField, IntegerChoices, TextField
+from django.db.models import CharField, IntegerChoices, TextField  # needed elsewhere
 from django.db.models.query_utils import DeferredAttribute as FieldAttr
 
-# statically typing the following is hard because these are all heavy
-# dependencies, even DataFrame is heavy & slow to import
-DataLike = Any
-AnnDataLike = Any
-ListLike = list[str] | pd.Series | np.array
-StrField = str | FieldAttr
+ListLike: TypeAlias = list[str] | pd.Series | np.array
+StrField: TypeAlias = str | FieldAttr
 
 
 class ChoicesMixin:
