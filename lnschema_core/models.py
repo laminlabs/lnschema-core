@@ -854,11 +854,11 @@ class Transform(Registry, HasParents, IsVersioned):
 
     Args:
         name: `str` A name or title.
-        key: `Optional[str] = None` A short name or path-like semantic key.
-        version: `Optional[str] = None` A version.
-        type: `Optional[TransformType] = "pipeline"` Either `'notebook'`, `'pipeline'`
+        key: `str | None = None` A short name or path-like semantic key.
+        version: `str | None = None` A version.
+        type: `TransformType | None = "pipeline"` Either `'notebook'`, `'pipeline'`
             or `'script'`.
-        is_new_version_of: `Optional[Transform] = None` An old version of the transform.
+        is_new_version_of: `Transform | None = None` An old version of the transform.
 
     See Also:
         :meth:`lamindb.track`
@@ -974,8 +974,8 @@ class Run(Registry):
 
     Args:
         transform: `Transform` A :class:`~lamindb.Transform` record.
-        reference: `Optional[str] = None` For instance, an external ID or a download URL.
-        reference_type: `Optional[str] = None` For instance, `redun_id`, `nextflow_id` or `url`.
+        reference: `str | None = None` For instance, an external ID or a download URL.
+        reference_type: `str | N = None` For instance, `redun_id`, `nextflow_id` or `url`.
 
     See Also:
         :meth:`~lamindb.track`
@@ -1074,8 +1074,8 @@ class ULabel(Registry, HasParents, CanValidate):
     Args:
         name: `str` A name.
         description: `str` A description.
-        reference: `Optional[str] = None` For instance, an external ID or a URL.
-        reference_type: `Optional[str] = None` For instance, `"url"`.
+        reference: `str | None = None` For instance, an external ID or a URL.
+        reference_type: `str | None = None` For instance, `"url"`.
 
 
     A `ULabel` record provides the easiest way to annotate an artifact or collection
@@ -1195,10 +1195,10 @@ class Feature(Registry, CanValidate):
     Args:
         name: `str` Name of the feature, typically, a column name.
         type: `str` Simple type (`"number"`, `"category"`, `"datetime"`).
-        unit: `Optional[str] = None` Unit of measure, ideally SI (`"m"`, `"s"`, `"kg"`, etc.) or `"normalized"` etc.
-        description: `Optional[str] = None` A description.
-        synonyms: `Optional[str] = None` Bar-separated synonyms.
-        registries: `Optional[str] = None` Bar-separated Registries that provide values for labels.
+        unit: `str | None = None` Unit of measure, ideally SI (`"m"`, `"s"`, `"kg"`, etc.) or `"normalized"` etc.
+        description: `str | None = None` A description.
+        synonyms: `str | None = None` Bar-separated synonyms.
+        registries: `str | None = None` Bar-separated Registries that provide values for labels.
 
     .. note::
 
@@ -1324,10 +1324,10 @@ class FeatureSet(Registry):
             a set upon instantiation. If you'd like to pass values, use
             :meth:`~lamindb.FeatureSet.from_values` or
             :meth:`~lamindb.FeatureSet.from_df`.
-        type: `Optional[Union[Type, str]] = None` The simple type. Defaults to
+        type: `str | None = None` The simple type. Defaults to
             `None` if reference Registry is :class:`~lamindb.Feature`, defaults to
-            `"float"` otherwise.
-        name: `Optional[str] = None` A name.
+            `"number"` otherwise.
+        name: `str | None = None` A name.
 
     Examples:
 
@@ -1452,12 +1452,12 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
 
     Args:
         path: `UPathStr` A path to a local or remote folder or file.
-        key: `Optional[str] = None` A relative path within default storage,
+        key: `str | None = None` A relative path within default storage,
             e.g., `"myfolder/myfile.fcs"`.
-        description: `Optional[str] = None` A description.
-        version: `Optional[str] = None` A version string.
-        is_new_version_of: `Optional[File] = None` A previous version of the artifact.
-        run: `Optional[Run] = None` The run that creates the artifact.
+        description: `str | None = None` A description.
+        version: `str | None = None` A version string.
+        is_new_version_of: `Artifact | None = None` A previous version of the artifact.
+        run: `Run | None = None` The run that creates the artifact.
 
     .. dropdown:: Typical storage formats & their API accessors
 
@@ -1942,16 +1942,15 @@ class Collection(Registry, Data, IsVersioned):
     """Collections: collections of artifacts.
 
     Args:
-        data: `DataLike` An artifact, a list of artifacts, or an array (`DataFrame`, `AnnData`).
+        data: `List[Artifact]` A list of artifacts.
         name: `str` A name.
-        description: `Optional[str] = None` A description.
-        version: `Optional[str] = None` A version string.
-        is_new_version_of: `Optional[Collection] = None` An old version of the collection.
-        run: `Optional[Run] = None` The run that creates the collection.
-        meta: `Optional[DataLike]` An array (`DataFrame`, `AnnData`) or a `File`
-            object that defines metadata for a directory of objects.
-        reference: `Optional[str] = None` For instance, an external ID or a URL.
-        reference_type: `Optional[str] = None` For instance, `"url"`.
+        description: `str | None = None` A description.
+        version: `str | None = None` A version string.
+        is_new_version_of: `Collection | None = None` An old version of the collection.
+        run: `Run | None = None` The run that creates the collection.
+        meta: `Artifact | None = None` An artifact that defines metadata for the collection.
+        reference: `str | None = None` For instance, an external ID or a URL.
+        reference_type: `str | None = None` For instance, `"url"`.
 
 
     See Also:
