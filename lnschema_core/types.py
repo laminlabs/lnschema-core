@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum
+from typing import List
 
 import numpy as np
 import pandas as pd
@@ -8,7 +9,7 @@ from django.db.models import CharField, IntegerChoices, TextField  # needed else
 from django.db.models.query_utils import DeferredAttribute as FieldAttr
 
 ListLike = (
-    list[str] | pd.Series | np.array
+    List[str] | pd.Series | np.array
 )  # typing.TypeAlias, >3.10 on but already deprecated
 StrField = str | FieldAttr  # typing.TypeAlias
 
