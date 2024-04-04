@@ -1,17 +1,13 @@
+from __future__ import annotations
+
 import sys
 from datetime import datetime
-from pathlib import Path
-from typing import (  # noqa
+from typing import (
     TYPE_CHECKING,
     Any,
-    Dict,
     Iterable,
-    List,
     Literal,
     NamedTuple,
-    Optional,
-    Type,
-    Union,
     overload,
 )
 
@@ -19,16 +15,7 @@ from django.db import models
 from django.db.models import CASCADE, PROTECT
 from lamin_utils import logger
 from lamindb_setup import _check_instance_setup
-from lamindb_setup.core.types import UPathStr
-from upath import UPath
 
-from lnschema_core.mocks import (
-    AnnDataAccessor,
-    BackedAccessor,
-    MappedCollection,
-    QuerySet,
-    RecordsList,
-)
 from lnschema_core.types import (  # AnnDataLike,
     CharField,
     DataLike,
@@ -43,17 +30,33 @@ from .ids import base62_8, base62_12, base62_20
 from .types import TransformType
 from .users import current_user_id
 
-# determine when it's save to make heavy imports
-_INSTANCE_SETUP = _check_instance_setup()
-RUNNING_SPHINX = "sphinx" in sys.modules
-if TYPE_CHECKING or _INSTANCE_SETUP or RUNNING_SPHINX:
+if TYPE_CHECKING:
+    from pathlib import Path
+
     import numpy as np
     import pandas as pd
     from anndata import AnnData
     from lamin_utils._inspect import InspectResult
+    from lamindb.core import FeatureManager, LabelManager
+    from lamindb_setup.core.types import UPathStr
+    from upath import UPath
+
+    from lnschema_core.mocks import (
+        AnnDataAccessor,
+        BackedAccessor,
+        MappedCollection,
+        QuerySet,
+        RecordsList,
+    )
+
+# determine when it's save to make heavy imports
+_INSTANCE_SETUP = _check_instance_setup()
+RUNNING_SPHINX = "sphinx" in sys.modules
+if TYPE_CHECKING or _INSTANCE_SETUP or RUNNING_SPHINX:
+    pass
 
 if TYPE_CHECKING or _INSTANCE_SETUP:
-    from lamindb.core import FeatureManager, LabelManager
+    pass
 
 
 class IsVersioned:
@@ -66,7 +69,7 @@ class IsVersioned:
         return self.uid[: self._len_stem_uid]  # type: ignore
 
     @property
-    def versions(self) -> "QuerySet":
+    def versions(self) -> QuerySet:
         """Lists all records of the same version family.
 
         Examples:
@@ -76,7 +79,9 @@ class IsVersioned:
         """
         return self.__class__.filter(uid__startswith=self.stem_uid)  # type: ignore
 
-    def add_to_version_family(self, is_new_version_of: "IsVersioned", version: Optional[str] = None):
+    def add_to_version_family(
+        self, is_new_version_of: IsVersioned, version: str | None = None
+    ):
         """Add current record to a version family.
 
         Args:
@@ -115,11 +120,11 @@ class CanValidate:
     def inspect(
         cls,
         values: ListLike,
-        field: Optional[Union[str, StrField]] = None,
+        field: str | StrField | None = None,
         *,
         mute: bool = False,
         **kwargs,
-    ) -> "InspectResult":
+    ) -> InspectResult:
         """Inspect if values are mappable to a field.
 
         Being mappable means that an exact match exists.
@@ -156,11 +161,11 @@ class CanValidate:
     def validate(
         cls,
         values: ListLike,
-        field: Optional[Union[str, StrField]] = None,
+        field: str | StrField | None = None,
         *,
         mute: bool = False,
         **kwargs,
-    ) -> "np.ndarray":
+    ) -> np.ndarray:
         """Validate values against existing values of a string field.
 
         Note this is strict validation, only asserts exact matches.
@@ -194,9 +199,9 @@ class CanValidate:
     def standardize(
         cls,
         values: Iterable,
-        field: Optional[Union[str, StrField]] = None,
+        field: str | StrField | None = None,
         *,
-        return_field: Optional[Union[str, StrField]] = None,
+        return_field: str | StrField | None = None,
         return_mapper: bool = False,
         case_sensitive: bool = False,
         mute: bool = False,
@@ -204,7 +209,7 @@ class CanValidate:
         keep: Literal["first", "last", False] = "first",
         synonyms_field: str = "synonyms",
         **kwargs,
-    ) -> Union[List[str], Dict[str, str]]:
+    ) -> list[str] | dict[str, str]:
         """Maps input synonyms to standardized names.
 
         Args:
@@ -256,10 +261,10 @@ class CanValidate:
         case_sensitive: bool = False,
         keep: Literal["first", "last", False] = "first",
         synonyms_field: str = "synonyms",
-        field: Optional[str] = None,
+        field: str | None = None,
         **kwargs,
-    ) -> Union[List[str], Dict[str, str]]:
-        """{}"""
+    ) -> list[str] | dict[str, str]:
+        """{}."""
         logger.warning("`map_synonyms()` is deprecated, use `.standardize()`!'")
         return cls.standardize(
             values=synonyms,
@@ -273,9 +278,9 @@ class CanValidate:
 
     def add_synonym(
         self,
-        synonym: Union[str, ListLike],
+        synonym: str | ListLike,
         force: bool = False,
-        save: Optional[bool] = None,
+        save: bool | None = None,
     ):
         """Add synonyms to a record.
 
@@ -301,7 +306,7 @@ class CanValidate:
         """
         pass
 
-    def remove_synonym(self, synonym: Union[str, ListLike]):
+    def remove_synonym(self, synonym: str | ListLike):
         """Remove synonyms from a record.
 
         Args:
@@ -356,7 +361,7 @@ class HasParents:
 
     def view_parents(
         self,
-        field: Optional[StrField] = None,
+        field: StrField | None = None,
         with_children: bool = False,
         distance: int = 5,
     ):
@@ -396,7 +401,9 @@ class Registry(models.Model):
     """
 
     @classmethod
-    def from_values(cls, values: ListLike, field: Optional[StrField] = None, **kwargs) -> List["Registry"]:
+    def from_values(
+        cls, values: ListLike, field: StrField | None = None, **kwargs
+    ) -> list[Registry]:
         """Bulk create validated records by parsing values for an identifier (a name, an id, etc.).
 
         Args:
@@ -441,8 +448,8 @@ class Registry(models.Model):
     @classmethod
     def lookup(
         cls,
-        field: Optional[StrField] = None,
-        return_field: Optional[StrField] = None,
+        field: StrField | None = None,
+        return_field: StrField | None = None,
     ) -> NamedTuple:
         """Return an auto-complete object for a field.
 
@@ -472,7 +479,7 @@ class Registry(models.Model):
         pass
 
     @classmethod
-    def filter(cls, **expressions) -> "QuerySet":
+    def filter(cls, **expressions) -> QuerySet:
         """Query records (see :doc:`meta`).
 
         Args:
@@ -494,7 +501,7 @@ class Registry(models.Model):
         return filter(cls, **expressions)
 
     @classmethod
-    def get(cls, idlike: Union[int, str]) -> "Registry":
+    def get(cls, idlike: int | str) -> Registry:
         """Get a single record.
 
         Args:
@@ -522,7 +529,7 @@ class Registry(models.Model):
                 return qs.one()
 
     @classmethod
-    def df(cls, include: Optional[Union[str, List[str]]] = None) -> "pd.DataFrame":
+    def df(cls, include: str | list[str] | None = None) -> pd.DataFrame:
         """Convert to ``pd.DataFrame``.
 
         By default, shows all direct fields, except ``created_at``.
@@ -551,12 +558,12 @@ class Registry(models.Model):
         cls,
         string: str,
         *,
-        field: Optional[StrField] = None,
-        limit: Optional[int] = 20,
+        field: StrField | None = None,
+        limit: int | None = 20,
         return_queryset: bool = False,
         case_sensitive: bool = False,
-        synonyms_field: Optional[StrField] = "synonyms",  # type: ignore
-    ) -> Union["pd.DataFrame", "QuerySet"]:
+        synonyms_field: StrField | None = "synonyms",  # type: ignore
+    ) -> pd.DataFrame | QuerySet:
         """Search.
 
         Makes reasonable choices of which fields to search.
@@ -596,7 +603,7 @@ class Registry(models.Model):
     def using(
         cls,
         instance: str,
-    ) -> "QuerySet":
+    ) -> QuerySet:
         """Use a non-default LaminDB instance.
 
         Args:
@@ -611,7 +618,7 @@ class Registry(models.Model):
         """
         # we need this here because we're using models also from plain
         # django outside of lamindb
-        super(Registry, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     class Meta:
         abstract = True
@@ -621,12 +628,12 @@ class Data:
     """Base class for :class:`~lamindb.Artifact` & :class:`~lamindb.Collection`."""
 
     @property
-    def features(self) -> "FeatureManager":
+    def features(self) -> FeatureManager:
         """Feature manager (:class:`~lamindb.core.FeatureManager`)."""
         pass
 
     @property
-    def labels(self) -> "LabelManager":
+    def labels(self) -> LabelManager:
         """Label manager (:class:`~lamindb.core.LabelManager`)."""
         pass
 
@@ -718,7 +725,7 @@ class User(Registry, CanValidate):
         self,
         handle: str,
         email: str,
-        name: Optional[str],
+        name: str | None,
     ):
         ...
 
@@ -734,7 +741,7 @@ class User(Registry, CanValidate):
         *args,
         **kwargs,
     ):
-        super(User, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class Storage(Registry):
@@ -780,7 +787,9 @@ class Storage(Registry):
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
-    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_storages")
+    created_by = models.ForeignKey(
+        User, PROTECT, default=current_user_id, related_name="created_storages"
+    )
     """Creator of record, a :class:`~lamindb.User`."""
 
     @overload
@@ -788,7 +797,7 @@ class Storage(Registry):
         self,
         root: str,
         type: str,
-        region: Optional[str],
+        region: str | None,
     ):
         ...
 
@@ -804,10 +813,10 @@ class Storage(Registry):
         *args,
         **kwargs,
     ):
-        super(Storage, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     @property
-    def path(self) -> Union[Path, UPath]:
+    def path(self) -> Path | UPath:
         """Bucket or folder path (`Path`, `UPath`).
 
         Examples:
@@ -908,9 +917,13 @@ class Transform(Registry, HasParents, IsVersioned):
         default=TransformType.pipeline,
     )
     """Transform type (default `"pipeline"`)."""
-    latest_report = models.ForeignKey("Artifact", PROTECT, default=None, null=True, related_name="latest_report_of")
+    latest_report = models.ForeignKey(
+        "Artifact", PROTECT, default=None, null=True, related_name="latest_report_of"
+    )
     """Latest run report."""
-    source_code = models.ForeignKey("Artifact", PROTECT, default=None, null=True, related_name="source_code_of")
+    source_code = models.ForeignKey(
+        "Artifact", PROTECT, default=None, null=True, related_name="source_code_of"
+    )
     """Source of the transform if stored as artifact within LaminDB."""
     reference = CharField(max_length=255, db_index=True, null=True, default=None)
     """Reference for the transform, e.g., a URL."""
@@ -925,17 +938,19 @@ class Transform(Registry, HasParents, IsVersioned):
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
-    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_transforms")
+    created_by = models.ForeignKey(
+        User, PROTECT, default=current_user_id, related_name="created_transforms"
+    )
     """Creator of record, a :class:`~lamindb.User`."""
 
     @overload
     def __init__(
         self,
         name: str,
-        key: Optional[str] = None,
-        version: Optional[str] = None,
-        type: Optional[TransformType] = None,
-        is_new_version_of: Optional["Transform"] = None,
+        key: str | None = None,
+        version: str | None = None,
+        type: TransformType | None = None,
+        is_new_version_of: Transform | None = None,
     ):
         ...
 
@@ -951,7 +966,7 @@ class Transform(Registry, HasParents, IsVersioned):
         *args,
         **kwargs,
     ):
-        super(Transform, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class Run(Registry):
@@ -1001,15 +1016,21 @@ class Run(Registry):
     """Start time of run."""
     finished_at = models.DateTimeField(db_index=True, null=True, default=None)
     """Finished time of run."""
-    created_by = models.ForeignKey(User, CASCADE, default=current_user_id, related_name="created_runs")
+    created_by = models.ForeignKey(
+        User, CASCADE, default=current_user_id, related_name="created_runs"
+    )
     """Creator of run, a :class:`~lamindb.User`."""
     json = models.JSONField(null=True, default=None)
     """JSON field."""
     # we don't want to make below a OneToOne because there could be the same trivial report
     # generated for many different runs
-    report = models.ForeignKey("Artifact", PROTECT, default=None, null=True, related_name="report_of")
+    report = models.ForeignKey(
+        "Artifact", PROTECT, default=None, null=True, related_name="report_of"
+    )
     """Report of run, e.g., an html file."""
-    environment = models.ForeignKey("Artifact", PROTECT, default=None, null=True, related_name="environment_of")
+    environment = models.ForeignKey(
+        "Artifact", PROTECT, default=None, null=True, related_name="environment_of"
+    )
     """Computational environment for the run.
 
     For instance, a `Dockerfile`, a docker image, a `requirements.txt`, an `environment.yml`, etc.
@@ -1027,8 +1048,8 @@ class Run(Registry):
     def __init__(
         self,
         transform: Transform,
-        reference: Optional[str] = None,
-        reference_type: Optional[str] = None,
+        reference: str | None = None,
+        reference_type: str | None = None,
     ):
         ...
 
@@ -1044,7 +1065,7 @@ class Run(Registry):
         *args,
         **kwargs,
     ):
-        super(Run, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class ULabel(Registry, HasParents, CanValidate):
@@ -1130,16 +1151,18 @@ class ULabel(Registry, HasParents, CanValidate):
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
-    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_ulabels")
+    created_by = models.ForeignKey(
+        User, PROTECT, default=current_user_id, related_name="created_ulabels"
+    )
     """Creator of record, a :class:`~lamindb.User`."""
 
     @overload
     def __init__(
         self,
         name: str,
-        description: Optional[str] = None,
-        reference: Optional[str] = None,
-        reference_type: Optional[str] = None,
+        description: str | None = None,
+        reference: str | None = None,
+        reference_type: str | None = None,
     ):
         ...
 
@@ -1237,7 +1260,9 @@ class Feature(Registry, CanValidate):
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of run execution."""
-    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_features")
+    created_by = models.ForeignKey(
+        User, PROTECT, default=current_user_id, related_name="created_features"
+    )
     """Creator of record, a :class:`~lamindb.User`."""
 
     @overload
@@ -1245,9 +1270,9 @@ class Feature(Registry, CanValidate):
         self,
         name: str,
         type: str,  # consider typing with Literal
-        unit: Optional[str],
-        description: Optional[str],
-        synonyms: Optional[str],
+        unit: str | None,
+        description: str | None,
+        synonyms: str | None,
     ):
         ...
 
@@ -1266,7 +1291,7 @@ class Feature(Registry, CanValidate):
         pass
 
     @classmethod
-    def from_df(cls, df: "pd.DataFrame", field: Optional[FieldAttr] = None) -> "RecordsList":
+    def from_df(cls, df: pd.DataFrame, field: FieldAttr | None = None) -> RecordsList:
         """Create Feature records for columns."""
         pass
 
@@ -1342,15 +1367,17 @@ class FeatureSet(Registry):
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
-    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_feature_sets")
+    created_by = models.ForeignKey(
+        User, PROTECT, default=current_user_id, related_name="created_feature_sets"
+    )
     """Creator of record, a :class:`~lamindb.User`."""
 
     @overload
     def __init__(
         self,
         features: Iterable[Registry],
-        type: Optional[Union[Type, str]] = None,
-        name: Optional[str] = None,
+        type: str | None = None,
+        name: str | None = None,
     ):
         ...
 
@@ -1373,10 +1400,10 @@ class FeatureSet(Registry):
         cls,
         values: ListLike,
         field: FieldAttr = Feature.name,
-        type: Optional[Union[Type, str]] = None,
-        name: Optional[str] = None,
+        type: str | None = None,
+        name: str | None = None,
         **kwargs,
-    ) -> Optional["FeatureSet"]:
+    ) -> FeatureSet | None:
         """Create feature set for validated features.
 
         Args:
@@ -1402,11 +1429,11 @@ class FeatureSet(Registry):
     @classmethod
     def from_df(
         cls,
-        df: "pd.DataFrame",
+        df: pd.DataFrame,
         field: FieldAttr = Feature.name,
-        name: Optional[str] = None,
+        name: str | None = None,
         **kwargs,
-    ) -> Optional["FeatureSet"]:
+    ) -> FeatureSet | None:
         """Create feature set for validated features."""
         pass
 
@@ -1415,7 +1442,7 @@ class FeatureSet(Registry):
         pass
 
     @property
-    def members(self) -> "QuerySet":
+    def members(self) -> QuerySet:
         """A queryset for the individual records of the set."""
         pass
 
@@ -1546,7 +1573,9 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
 
     Examples: 1KB is 1e3 bytes, 1MB is 1e6, 1GB is 1e9, 1TB is 1e12 etc.
     """
-    hash = CharField(max_length=86, db_index=True, null=True, default=None)  # 86 base64 chars allow to store 64 bytes, 512 bits
+    hash = CharField(
+        max_length=86, db_index=True, null=True, default=None
+    )  # 86 base64 chars allow to store 64 bytes, 512 bits
     """Hash or pseudo-hash of artifact content.
 
     Useful to ascertain integrity and avoid duplication.
@@ -1563,17 +1592,27 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
 
     Typically, this denotes the first array dimension.
     """
-    feature_sets = models.ManyToManyField(FeatureSet, related_name="artifacts", through="ArtifactFeatureSet")
+    feature_sets = models.ManyToManyField(
+        FeatureSet, related_name="artifacts", through="ArtifactFeatureSet"
+    )
     """The feature sets measured in the artifact (:class:`~lamindb.FeatureSet`)."""
-    ulabels = models.ManyToManyField(ULabel, through="ArtifactULabel", related_name="artifacts")
+    ulabels = models.ManyToManyField(
+        ULabel, through="ArtifactULabel", related_name="artifacts"
+    )
     """The ulabels measured in the artifact (:class:`~lamindb.ULabel`)."""
-    transform = models.ForeignKey(Transform, PROTECT, related_name="output_artifacts", null=True, default=None)
+    transform = models.ForeignKey(
+        Transform, PROTECT, related_name="output_artifacts", null=True, default=None
+    )
     """:class:`~lamindb.Transform` whose run created the artifact."""
-    run = models.ForeignKey(Run, PROTECT, related_name="output_artifacts", null=True, default=None)
+    run = models.ForeignKey(
+        Run, PROTECT, related_name="output_artifacts", null=True, default=None
+    )
     """:class:`~lamindb.Run` that created the artifact."""
     input_of = models.ManyToManyField(Run, related_name="input_artifacts")
     """Runs that use this artifact as an input."""
-    visibility = models.SmallIntegerField(db_index=True, choices=VisibilityChoice.choices, default=1)
+    visibility = models.SmallIntegerField(
+        db_index=True, choices=VisibilityChoice.choices, default=1
+    )
     """Visibility of artifact record in queries & searches (0 default, 1 hidden, 2 trash)."""
     key_is_virtual = models.BooleanField()
     """Indicates whether `key` is virtual or part of an actual file path."""
@@ -1581,17 +1620,19 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
-    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_artifacts")
+    created_by = models.ForeignKey(
+        User, PROTECT, default=current_user_id, related_name="created_artifacts"
+    )
     """Creator of record, a :class:`~lamindb.User`."""
 
     @overload
     def __init__(
         self,
         data: UPathStr,
-        key: Optional[str] = None,
-        description: Optional[str] = None,
-        is_new_version_of: Optional["Artifact"] = None,
-        run: Optional[Run] = None,
+        key: str | None = None,
+        description: str | None = None,
+        is_new_version_of: Artifact | None = None,
+        run: Run | None = None,
     ):
         ...
 
@@ -1634,14 +1675,14 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
     @classmethod
     def from_df(
         cls,
-        df: "pd.DataFrame",
-        key: Optional[str] = None,
-        description: Optional[str] = None,
-        run: Optional[Run] = None,
-        version: Optional[str] = None,
-        is_new_version_of: Optional["Artifact"] = None,
+        df: pd.DataFrame,
+        key: str | None = None,
+        description: str | None = None,
+        run: Run | None = None,
+        version: str | None = None,
+        is_new_version_of: Artifact | None = None,
         **kwargs,
-    ) -> "Artifact":
+    ) -> Artifact:
         """Create from ``DataFrame``, validate & link features.
 
         Args:
@@ -1679,14 +1720,14 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
     @classmethod
     def from_anndata(
         cls,
-        adata: "AnnData",
-        key: Optional[str] = None,
-        description: Optional[str] = None,
-        run: Optional[Run] = None,
-        version: Optional[str] = None,
-        is_new_version_of: Optional["Artifact"] = None,
+        adata: AnnData,
+        key: str | None = None,
+        description: str | None = None,
+        run: Run | None = None,
+        version: str | None = None,
+        is_new_version_of: Artifact | None = None,
         **kwargs,
-    ) -> "Artifact":
+    ) -> Artifact:
         """Create from ``AnnDataLike``, validate & link features.
 
         Args:
@@ -1723,10 +1764,10 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
     def from_dir(
         cls,
         path: UPathStr,
-        key: Optional[str] = None,
+        key: str | None = None,
         *,
-        run: Optional[Run] = None,
-    ) -> List["Artifact"]:
+        run: Run | None = None,
+    ) -> list[Artifact]:
         """Create a list of artifact objects from a directory.
 
         .. note::
@@ -1752,9 +1793,9 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
 
     def replace(
         self,
-        data: Union[UPathStr, DataLike],
-        run: Optional[Run] = None,
-        format: Optional[str] = None,
+        data: UPathStr | DataLike,
+        run: Run | None = None,
+        format: str | None = None,
     ) -> None:
         """Replace artifact content.
 
@@ -1780,7 +1821,9 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
         """
         pass
 
-    def backed(self, is_run_input: Optional[bool] = None) -> Union["AnnDataAccessor", "BackedAccessor"]:
+    def backed(
+        self, is_run_input: bool | None = None
+    ) -> AnnDataAccessor | BackedAccessor:
         """Return a cloud-backed data object.
 
         Notes:
@@ -1796,7 +1839,9 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
         """
         pass
 
-    def load(self, is_run_input: Optional[bool] = None, stream: bool = False, **kwargs) -> DataLike:
+    def load(
+        self, is_run_input: bool | None = None, stream: bool = False, **kwargs
+    ) -> DataLike:
         """Stage and load to memory.
 
         Returns in-memory representation if possible, e.g., an `AnnData` object for an `h5ad` file.
@@ -1832,7 +1877,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
         """
         pass
 
-    def stage(self, is_run_input: Optional[bool] = None) -> Path:
+    def stage(self, is_run_input: bool | None = None) -> Path:
         """Update cache from cloud storage if outdated.
 
         Returns a path to a locally cached on-disk object (say, a `.jpg` file).
@@ -1849,7 +1894,9 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
         """
         pass
 
-    def delete(self, permanent: Optional[bool] = None, storage: Optional[bool] = None) -> None:
+    def delete(
+        self, permanent: bool | None = None, storage: bool | None = None
+    ) -> None:
         """Delete.
 
         A first call to `.delete()` puts an artifact into the trash (sets `visibility` to `-1`).
@@ -1943,7 +1990,9 @@ class Collection(Registry, Data, IsVersioned):
 
     id = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
-    uid = CharField(unique=True, db_index=True, max_length=_len_full_uid, default=base62_20)
+    uid = CharField(
+        unique=True, db_index=True, max_length=_len_full_uid, default=base62_20
+    )
     """Universal id, valid across DB instances."""
     name = CharField(max_length=150, db_index=True, default=None)
     """Name or title of collection (required)."""
@@ -1964,31 +2013,47 @@ class Collection(Registry, Data, IsVersioned):
     # also for reference_type here, we allow an extra long max_length
     reference_type = CharField(max_length=25, db_index=True, null=True, default=None)
     """Type of reference, e.g., cellxgene Census collection_id."""
-    feature_sets = models.ManyToManyField("FeatureSet", related_name="collections", through="CollectionFeatureSet")
+    feature_sets = models.ManyToManyField(
+        "FeatureSet", related_name="collections", through="CollectionFeatureSet"
+    )
     """The feature sets measured in this collection (see :class:`~lamindb.FeatureSet`)."""
-    ulabels = models.ManyToManyField("ULabel", through="CollectionULabel", related_name="collections")
+    ulabels = models.ManyToManyField(
+        "ULabel", through="CollectionULabel", related_name="collections"
+    )
     """ULabels sampled in the collection (see :class:`~lamindb.Feature`)."""
-    transform = models.ForeignKey(Transform, PROTECT, related_name="output_collections", null=True, default=None)
+    transform = models.ForeignKey(
+        Transform, PROTECT, related_name="output_collections", null=True, default=None
+    )
     """:class:`~lamindb.Transform` whose run created the collection."""
-    run = models.ForeignKey(Run, PROTECT, related_name="output_collections", null=True, default=None)
+    run = models.ForeignKey(
+        Run, PROTECT, related_name="output_collections", null=True, default=None
+    )
     """:class:`~lamindb.Run` that created the `collection`."""
     input_of = models.ManyToManyField(Run, related_name="input_collections")
     """Runs that use this collection as an input."""
-    artifact = models.OneToOneField("Artifact", on_delete=PROTECT, null=True, unique=True, related_name="collection")
+    artifact = models.OneToOneField(
+        "Artifact", on_delete=PROTECT, null=True, unique=True, related_name="collection"
+    )
     """Storage of collection as a one artifact."""
-    unordered_artifacts = models.ManyToManyField("Artifact", related_name="collections", through="CollectionArtifact")
+    unordered_artifacts = models.ManyToManyField(
+        "Artifact", related_name="collections", through="CollectionArtifact"
+    )
     """Storage of collection as multiple artifacts."""
-    visibility = models.SmallIntegerField(db_index=True, choices=VisibilityChoice.choices, default=1)
+    visibility = models.SmallIntegerField(
+        db_index=True, choices=VisibilityChoice.choices, default=1
+    )
     """Visibility of record,  0-default, 1-hidden, 2-trash."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of run execution."""
-    created_by = models.ForeignKey(User, PROTECT, default=current_user_id, related_name="created_collections")
+    created_by = models.ForeignKey(
+        User, PROTECT, default=current_user_id, related_name="created_collections"
+    )
     """Creator of record, a :class:`~lamindb.User`."""
 
     @property
-    def artifacts(self) -> "QuerySet":
+    def artifacts(self) -> QuerySet:
         """Ordered QuerySet of artifacts."""
         pass
 
@@ -1998,12 +2063,12 @@ class Collection(Registry, Data, IsVersioned):
         data: Any,
         name: str,
         version: str,
-        description: Optional[str] = None,
-        meta: Optional[Any] = None,
-        reference: Optional[str] = None,
-        reference_type: Optional[str] = None,
-        run: Optional[Run] = None,
-        is_new_version_of: Optional["Collection"] = None,
+        description: str | None = None,
+        meta: Any | None = None,
+        reference: str | None = None,
+        reference_type: str | None = None,
+        run: Run | None = None,
+        is_new_version_of: Collection | None = None,
     ):
         ...
 
@@ -2023,16 +2088,16 @@ class Collection(Registry, Data, IsVersioned):
 
     def mapped(
         self,
-        label_keys: Optional[Union[str, List[str]]] = None,
-        join: Optional[Literal["inner", "outer"]] = "inner",
-        encode_labels: Union[bool, List[str]] = True,
-        unknown_label: Optional[Union[str, Dict[str, str]]] = None,
+        label_keys: str | list[str] | None = None,
+        join: Literal["inner", "outer"] | None = "inner",
+        encode_labels: bool | list[str] = True,
+        unknown_label: str | dict[str, str] | None = None,
         cache_categories: bool = True,
         parallel: bool = False,
-        dtype: Optional[str] = None,
+        dtype: str | None = None,
         stream: bool = False,
-        is_run_input: Optional[bool] = None,
-    ) -> "MappedCollection":
+        is_run_input: bool | None = None,
+    ) -> MappedCollection:
         """Return a map-style dataset.
 
         Returns a `pytorch map-style dataset
@@ -2073,7 +2138,7 @@ class Collection(Registry, Data, IsVersioned):
         """
         pass
 
-    def stage(self, is_run_input: Optional[bool] = None) -> List[UPath]:
+    def stage(self, is_run_input: bool | None = None) -> list[UPath]:
         """Update cache from cloud storage if outdated.
 
         Returns paths to locally cached on-disk objects in the collection.
@@ -2086,7 +2151,7 @@ class Collection(Registry, Data, IsVersioned):
     def load(
         self,
         join: Literal["inner", "outer"] = "outer",
-        is_run_input: Optional[bool] = None,
+        is_run_input: bool | None = None,
         **kwargs,
     ) -> DataLike:
         """Stage and load to memory.
@@ -2095,7 +2160,7 @@ class Collection(Registry, Data, IsVersioned):
         """
         pass
 
-    def delete(self, permanent: Optional[bool] = None) -> None:
+    def delete(self, permanent: bool | None = None) -> None:
         """Delete collection.
 
         Args:
@@ -2190,7 +2255,7 @@ class CollectionULabel(Registry, LinkORM):
 # some logging
 
 
-def format_field_value(value: Union[datetime, str, Any]) -> Any:
+def format_field_value(value: datetime | str | Any) -> Any:
     if isinstance(value, datetime):
         return value.strftime("%Y-%m-%d %H:%M:%S %Z")
     elif isinstance(value, str):
@@ -2200,11 +2265,27 @@ def format_field_value(value: Union[datetime, str, Any]) -> Any:
 
 
 def __repr__(self: Registry, include_foreign_keys: bool = True) -> str:
-    field_names = [field.name for field in self._meta.fields if (not isinstance(field, models.ForeignKey) and field.name != "created_at" and field.name != "id")]
+    field_names = [
+        field.name
+        for field in self._meta.fields
+        if (
+            not isinstance(field, models.ForeignKey)
+            and field.name != "created_at"
+            and field.name != "id"
+        )
+    ]
     if include_foreign_keys:
-        field_names += [f"{field.name}_id" for field in self._meta.fields if isinstance(field, models.ForeignKey)]
-    fields_str = {k: format_field_value(getattr(self, k)) for k in field_names if hasattr(self, k)}
-    fields_joined_str = ", ".join([f"{k}={fields_str[k]}" for k in fields_str if fields_str[k] is not None])
+        field_names += [
+            f"{field.name}_id"
+            for field in self._meta.fields
+            if isinstance(field, models.ForeignKey)
+        ]
+    fields_str = {
+        k: format_field_value(getattr(self, k)) for k in field_names if hasattr(self, k)
+    }
+    fields_joined_str = ", ".join(
+        [f"{k}={fields_str[k]}" for k in fields_str if fields_str[k] is not None]
+    )
     return f"{self.__class__.__name__}({fields_joined_str})"
 
 

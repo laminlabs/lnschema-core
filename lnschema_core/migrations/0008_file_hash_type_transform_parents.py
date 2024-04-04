@@ -12,11 +12,15 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="file",
             name="hash_type",
-            field=models.CharField(db_index=True, default=None, max_length=30, null=True),
+            field=models.CharField(
+                db_index=True, default=None, max_length=30, null=True
+            ),
         ),
         migrations.AddField(
             model_name="transform",
             name="parents",
-            field=models.ManyToManyField(related_name="children", to="lnschema_core.transform"),
+            field=models.ManyToManyField(
+                related_name="children", to="lnschema_core.transform"
+            ),
         ),
     ]

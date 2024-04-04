@@ -13,11 +13,21 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="dataset",
             name="storage",
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, related_name="datasets", to="lnschema_core.storage"),
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="datasets",
+                to="lnschema_core.storage",
+            ),
         ),
         migrations.AlterField(
             model_name="dataset",
             name="file",
-            field=models.OneToOneField(null=True, on_delete=django.db.models.deletion.PROTECT, related_name="dataset", to="lnschema_core.file"),
+            field=models.OneToOneField(
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="dataset",
+                to="lnschema_core.file",
+            ),
         ),
     ]

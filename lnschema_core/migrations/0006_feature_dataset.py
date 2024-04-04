@@ -16,7 +16,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Feature",
             fields=[
-                ("id", models.CharField(default=lnschema_core.ids.base62_12, max_length=12, primary_key=True, serialize=False)),
+                (
+                    "id",
+                    models.CharField(
+                        default=lnschema_core.ids.base62_12,
+                        max_length=12,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
                 ("name", models.CharField(db_index=True, default=None, max_length=255)),
                 ("type", models.CharField(default=None, max_length=96, null=True)),
                 ("description", models.TextField(default=None, null=True)),
@@ -25,10 +33,18 @@ class Migration(migrations.Migration):
                 (
                     "created_by",
                     models.ForeignKey(
-                        default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.PROTECT, related_name="created_features", to="lnschema_core.user"
+                        default=lnschema_core.users.current_user_id,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="created_features",
+                        to="lnschema_core.user",
                     ),
                 ),
-                ("feature_sets", models.ManyToManyField(related_name="features", to="lnschema_core.featureset")),
+                (
+                    "feature_sets",
+                    models.ManyToManyField(
+                        related_name="features", to="lnschema_core.featureset"
+                    ),
+                ),
             ],
             options={
                 "abstract": False,
@@ -37,21 +53,56 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Dataset",
             fields=[
-                ("id", models.CharField(default=lnschema_core.ids.base62_20, max_length=20, primary_key=True, serialize=False)),
+                (
+                    "id",
+                    models.CharField(
+                        default=lnschema_core.ids.base62_20,
+                        max_length=20,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
                 ("name", models.CharField(db_index=True, default=None, max_length=255)),
                 ("description", models.TextField(default=None, null=True)),
-                ("hash", models.CharField(db_index=True, default=None, max_length=86, null=True)),
+                (
+                    "hash",
+                    models.CharField(
+                        db_index=True, default=None, max_length=86, null=True
+                    ),
+                ),
                 ("created_at", models.DateTimeField(auto_now_add=True, db_index=True)),
                 ("updated_at", models.DateTimeField(auto_now=True, db_index=True)),
                 (
                     "created_by",
                     models.ForeignKey(
-                        default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.PROTECT, related_name="created_datasets", to="lnschema_core.user"
+                        default=lnschema_core.users.current_user_id,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="created_datasets",
+                        to="lnschema_core.user",
                     ),
                 ),
-                ("feature_sets", models.ManyToManyField(related_name="datasets", to="lnschema_core.featureset")),
-                ("file", models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, related_name="datasets", to="lnschema_core.file", unique=True)),
-                ("files", models.ManyToManyField(related_name="datasets", to="lnschema_core.file")),
+                (
+                    "feature_sets",
+                    models.ManyToManyField(
+                        related_name="datasets", to="lnschema_core.featureset"
+                    ),
+                ),
+                (
+                    "file",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="datasets",
+                        to="lnschema_core.file",
+                        unique=True,
+                    ),
+                ),
+                (
+                    "files",
+                    models.ManyToManyField(
+                        related_name="datasets", to="lnschema_core.file"
+                    ),
+                ),
             ],
             options={
                 "abstract": False,
@@ -60,6 +111,8 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="featureset",
             name="files",
-            field=models.ManyToManyField(related_name="feature_sets", to="lnschema_core.file"),
+            field=models.ManyToManyField(
+                related_name="feature_sets", to="lnschema_core.file"
+            ),
         ),
     ]

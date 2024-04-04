@@ -13,11 +13,18 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="file",
             name="initial_version",
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, to="lnschema_core.file"),
+            field=models.ForeignKey(
+                default=None,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                to="lnschema_core.file",
+            ),
         ),
         migrations.AddField(
             model_name="file",
             name="version",
-            field=models.CharField(db_index=True, default=None, max_length=10, null=True),
+            field=models.CharField(
+                db_index=True, default=None, max_length=10, null=True
+            ),
         ),
     ]

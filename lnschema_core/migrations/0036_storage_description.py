@@ -12,6 +12,8 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="storage",
             name="description",
-            field=models.CharField(db_index=True, default=None, max_length=255, null=True),
+            field=models.CharField(
+                db_index=True, default=None, max_length=255, null=True
+            ),
         ),
     ]

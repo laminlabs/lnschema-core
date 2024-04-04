@@ -16,9 +16,13 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="file",
             name="feature_sets",
-            field=models.ManyToManyField(related_name="files", to="lnschema_core.featureset"),
+            field=models.ManyToManyField(
+                related_name="files", to="lnschema_core.featureset"
+            ),
         ),
-        migrations.RunSQL("insert into lnschema_core_file_feature_sets (id, file_id, featureset_id) select id, file_id, featureset_id from lnschema_core_featureset_files"),
+        migrations.RunSQL(
+            "insert into lnschema_core_file_feature_sets (id, file_id, featureset_id) select id, file_id, featureset_id from lnschema_core_featureset_files"
+        ),
         migrations.RemoveField(
             model_name="featureset",
             name="files",
@@ -26,7 +30,9 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="feature",
             name="unit",
-            field=models.CharField(db_index=True, default=None, max_length=30, null=True),
+            field=models.CharField(
+                db_index=True, default=None, max_length=30, null=True
+            ),
         ),
         migrations.AlterField(
             model_name="feature",
@@ -36,7 +42,9 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="feature",
             name="type",
-            field=models.CharField(db_index=True, default=None, max_length=96, null=True),
+            field=models.CharField(
+                db_index=True, default=None, max_length=96, null=True
+            ),
         ),
         migrations.AlterField(
             model_name="featureset",
@@ -47,28 +55,53 @@ class Migration(migrations.Migration):
             model_name="run",
             name="created_by",
             field=models.ForeignKey(
-                default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.CASCADE, related_name="created_runs", to="lnschema_core.user"
+                default=lnschema_core.users.current_user_id,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="created_runs",
+                to="lnschema_core.user",
             ),
         ),
         migrations.AlterField(
             model_name="run",
             name="transform",
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="runs", to="lnschema_core.transform"),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="runs",
+                to="lnschema_core.transform",
+            ),
         ),
         migrations.CreateModel(
             name="Category",
             fields=[
-                ("id", models.CharField(default=lnschema_core.ids.base62_12, max_length=12, primary_key=True, serialize=False)),
+                (
+                    "id",
+                    models.CharField(
+                        default=lnschema_core.ids.base62_12,
+                        max_length=12,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
                 ("name", models.CharField(db_index=True, max_length=128)),
                 ("created_at", models.DateTimeField(auto_now_add=True, db_index=True)),
                 ("updated_at", models.DateTimeField(auto_now=True, db_index=True)),
                 (
                     "created_by",
                     models.ForeignKey(
-                        default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.PROTECT, related_name="created_categories", to="lnschema_core.user"
+                        default=lnschema_core.users.current_user_id,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="created_categories",
+                        to="lnschema_core.user",
                     ),
                 ),
-                ("feature", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="categories", to="lnschema_core.feature")),
+                (
+                    "feature",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="categories",
+                        to="lnschema_core.feature",
+                    ),
+                ),
             ],
             options={
                 "unique_together": {("name", "feature")},

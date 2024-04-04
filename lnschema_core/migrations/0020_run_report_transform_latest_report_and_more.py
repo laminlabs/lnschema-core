@@ -13,22 +13,46 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="run",
             name="report",
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, related_name="report_of", to="lnschema_core.file"),
+            field=models.ForeignKey(
+                default=None,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="report_of",
+                to="lnschema_core.file",
+            ),
         ),
         migrations.AddField(
             model_name="transform",
             name="latest_report",
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, related_name="latest_report_of", to="lnschema_core.file"),
+            field=models.ForeignKey(
+                default=None,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="latest_report_of",
+                to="lnschema_core.file",
+            ),
         ),
         migrations.AddField(
             model_name="transform",
             name="source_file",
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, related_name="source_of", to="lnschema_core.file"),
+            field=models.ForeignKey(
+                default=None,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="source_of",
+                to="lnschema_core.file",
+            ),
         ),
         migrations.AlterField(
             model_name="file",
             name="transform",
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, related_name="output_files", to="lnschema_core.transform"),
+            field=models.ForeignKey(
+                default=None,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="output_files",
+                to="lnschema_core.transform",
+            ),
         ),
         migrations.AddField(
             model_name="run",

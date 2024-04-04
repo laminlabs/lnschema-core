@@ -12,11 +12,15 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="storage",
             name="region",
-            field=models.CharField(db_index=True, default=None, max_length=64, null=True),
+            field=models.CharField(
+                db_index=True, default=None, max_length=64, null=True
+            ),
         ),
         migrations.AlterField(
             model_name="transform",
             name="short_name",
-            field=models.CharField(db_index=True, default=None, max_length=128, null=True),
+            field=models.CharField(
+                db_index=True, default=None, max_length=128, null=True
+            ),
         ),
     ]

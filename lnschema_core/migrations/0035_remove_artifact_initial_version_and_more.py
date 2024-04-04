@@ -24,6 +24,8 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="transform",
             name="uid",
-            field=models.CharField(db_index=True, default=None, max_length=16, unique=True),
+            field=models.CharField(
+                db_index=True, default=None, max_length=16, unique=True
+            ),
         ),
     ]

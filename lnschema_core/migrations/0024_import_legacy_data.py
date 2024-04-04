@@ -28,7 +28,9 @@ def import_registry(registry, directory, connection):
 
     table_name = registry._meta.db_table
     df = pd.read_parquet(directory / f"{table_name}.parquet")
-    old_foreign_key_columns = [column for column in df.columns if column.endswith("_old")]
+    old_foreign_key_columns = [
+        column for column in df.columns if column.endswith("_old")
+    ]
     for column in old_foreign_key_columns:
         df.drop(column, axis=1, inplace=True)
     df.to_sql(table_name, connection, if_exists="append", index=False)
@@ -57,7 +59,9 @@ def import_db(apps, schema_editor):
             for model_name in CORE_MODELS.keys():
                 registry = getattr(lnschema_core.models, model_name)
                 import_registry(registry, directory, connection)
-                many_to_many_names = [field.name for field in registry._meta.many_to_many]
+                many_to_many_names = [
+                    field.name for field in registry._meta.many_to_many
+                ]
                 for many_to_many_name in many_to_many_names:
                     link_orm = getattr(registry, many_to_many_name).through
                     import_registry(link_orm, directory, connection)
