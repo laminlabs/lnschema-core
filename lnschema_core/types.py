@@ -1,15 +1,16 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import TypeAlias  # type: ignore
 
 import numpy as np
 import pandas as pd
 from django.db.models import CharField, IntegerChoices, TextField  # needed elsewhere
 from django.db.models.query_utils import DeferredAttribute as FieldAttr
 
-ListLike: TypeAlias = list[str] | pd.Series | np.array
-StrField: TypeAlias = str | FieldAttr
+ListLike = (
+    list[str] | pd.Series | np.array
+)  # typing.TypeAlias, >3.10 on but already deprecated
+StrField = str | FieldAttr  # typing.TypeAlias
 
 
 class ChoicesMixin:
