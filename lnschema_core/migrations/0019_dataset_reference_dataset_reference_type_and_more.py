@@ -12,26 +12,36 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="dataset",
             name="reference",
-            field=models.CharField(db_index=True, default=None, max_length=255, null=True),
+            field=models.CharField(
+                db_index=True, default=None, max_length=255, null=True
+            ),
         ),
         migrations.AddField(
             model_name="dataset",
             name="reference_type",
-            field=models.CharField(db_index=True, default=None, max_length=255, null=True),
+            field=models.CharField(
+                db_index=True, default=None, max_length=255, null=True
+            ),
         ),
         migrations.AddField(
             model_name="transform",
             name="reference_type",
-            field=models.CharField(db_index=True, default=None, max_length=255, null=True),
+            field=models.CharField(
+                db_index=True, default=None, max_length=255, null=True
+            ),
         ),
         migrations.AddField(
             model_name="ulabel",
             name="reference",
-            field=models.CharField(db_index=True, default=None, max_length=255, null=True),
+            field=models.CharField(
+                db_index=True, default=None, max_length=255, null=True
+            ),
         ),
         migrations.AddField(
             model_name="ulabel",
             name="reference_type",
-            field=models.CharField(db_index=True, default=None, max_length=255, null=True),
+            field=models.CharField(
+                db_index=True, default=None, max_length=255, null=True
+            ),
         ),
     ]

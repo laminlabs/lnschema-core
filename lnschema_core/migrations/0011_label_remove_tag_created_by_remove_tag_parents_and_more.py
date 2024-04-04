@@ -43,7 +43,9 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="dataset",
             name="labels",
-            field=models.ManyToManyField(related_name="datasets", to="lnschema_core.label"),
+            field=models.ManyToManyField(
+                related_name="datasets", to="lnschema_core.label"
+            ),
         ),
         migrations.AddField(
             model_name="featureset",
@@ -70,7 +72,13 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="label",
             name="feature",
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.CASCADE, related_name="labels", to="lnschema_core.feature"),
+            field=models.ForeignKey(
+                default=None,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="labels",
+                to="lnschema_core.feature",
+            ),
         ),
         migrations.AddField(
             model_name="label",
@@ -87,7 +95,9 @@ class Migration(migrations.Migration):
             name="ref_schema",
             field=models.CharField(default=None, max_length=30, null=True),
         ),
-        migrations.RunSQL("UPDATE lnschema_core_feature SET type='float' where type IS NULL"),
+        migrations.RunSQL(
+            "UPDATE lnschema_core_feature SET type='float' where type IS NULL"
+        ),
         migrations.AlterField(
             model_name="feature",
             name="type",
@@ -101,18 +111,33 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="file",
             name="run",
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, related_name="output_files", to="lnschema_core.run"),
+            field=models.ForeignKey(
+                default=None,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="output_files",
+                to="lnschema_core.run",
+            ),
         ),
         migrations.AlterField(
             model_name="file",
             name="transform",
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, related_name="files", to="lnschema_core.transform"),
+            field=models.ForeignKey(
+                default=None,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="files",
+                to="lnschema_core.transform",
+            ),
         ),
         migrations.AlterField(
             model_name="label",
             name="created_by",
             field=models.ForeignKey(
-                default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.PROTECT, related_name="created_labels", to="lnschema_core.user"
+                default=lnschema_core.users.current_user_id,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="created_labels",
+                to="lnschema_core.user",
             ),
         ),
         migrations.AlterUniqueTogether(

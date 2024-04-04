@@ -32,7 +32,10 @@ class Migration(migrations.Migration):
             model_name="tag",
             name="created_by",
             field=models.ForeignKey(
-                default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.PROTECT, related_name="created_tags", to="lnschema_core.user"
+                default=lnschema_core.users.current_user_id,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="created_tags",
+                to="lnschema_core.user",
             ),
         ),
         migrations.AlterField(
@@ -47,16 +50,25 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="project",
             name="tags",
-            field=models.ManyToManyField(related_name="projects", to="lnschema_core.tag"),
+            field=models.ManyToManyField(
+                related_name="projects", to="lnschema_core.tag"
+            ),
         ),
         migrations.AlterField(
             model_name="tag",
             name="id",
-            field=models.CharField(default=lnschema_core.ids.base62_8, max_length=8, primary_key=True, serialize=False),
+            field=models.CharField(
+                default=lnschema_core.ids.base62_8,
+                max_length=8,
+                primary_key=True,
+                serialize=False,
+            ),
         ),
         migrations.AlterField(
             model_name="tag",
             name="name",
-            field=models.CharField(db_index=True, default=None, max_length=255, unique=True),
+            field=models.CharField(
+                db_index=True, default=None, max_length=255, unique=True
+            ),
         ),
     ]

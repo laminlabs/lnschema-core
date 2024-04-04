@@ -6,13 +6,22 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("lnschema_core", "0033_alter_artifact_unique_together_artifact_n_objects_and_more"),
+        (
+            "lnschema_core",
+            "0033_alter_artifact_unique_together_artifact_n_objects_and_more",
+        ),
     ]
 
     operations = [
         migrations.AddField(
             model_name="run",
             name="environment",
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, related_name="environment_of", to="lnschema_core.artifact"),
+            field=models.ForeignKey(
+                default=None,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="environment_of",
+                to="lnschema_core.artifact",
+            ),
         ),
     ]

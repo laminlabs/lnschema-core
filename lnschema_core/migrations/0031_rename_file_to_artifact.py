@@ -58,38 +58,67 @@ class Migration(migrations.Migration):
             model_name="artifact",
             name="created_by",
             field=models.ForeignKey(
-                default=lnschema_core.users.current_user_id, on_delete=django.db.models.deletion.PROTECT, related_name="created_artifacts", to="lnschema_core.user"
+                default=lnschema_core.users.current_user_id,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="created_artifacts",
+                to="lnschema_core.user",
             ),
         ),
         migrations.AlterField(
             model_name="artifact",
             name="feature_sets",
-            field=models.ManyToManyField(related_name="artifacts", through="lnschema_core.ArtifactFeatureSet", to="lnschema_core.featureset"),
+            field=models.ManyToManyField(
+                related_name="artifacts",
+                through="lnschema_core.ArtifactFeatureSet",
+                to="lnschema_core.featureset",
+            ),
         ),
         migrations.AlterField(
             model_name="artifact",
             name="input_of",
-            field=models.ManyToManyField(related_name="input_artifacts", to="lnschema_core.run"),
+            field=models.ManyToManyField(
+                related_name="input_artifacts", to="lnschema_core.run"
+            ),
         ),
         migrations.AlterField(
             model_name="artifact",
             name="run",
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, related_name="output_artifacts", to="lnschema_core.run"),
+            field=models.ForeignKey(
+                default=None,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="output_artifacts",
+                to="lnschema_core.run",
+            ),
         ),
         migrations.AlterField(
             model_name="artifact",
             name="storage",
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name="artifacts", to="lnschema_core.storage"),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="artifacts",
+                to="lnschema_core.storage",
+            ),
         ),
         migrations.AlterField(
             model_name="artifact",
             name="transform",
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, related_name="output_artifacts", to="lnschema_core.transform"),
+            field=models.ForeignKey(
+                default=None,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="output_artifacts",
+                to="lnschema_core.transform",
+            ),
         ),
         migrations.AlterField(
             model_name="artifact",
             name="ulabels",
-            field=models.ManyToManyField(related_name="artifacts", through="lnschema_core.ArtifactULabel", to="lnschema_core.ulabel"),
+            field=models.ManyToManyField(
+                related_name="artifacts",
+                through="lnschema_core.ArtifactULabel",
+                to="lnschema_core.ulabel",
+            ),
         ),
         migrations.RenameField(
             model_name="transform",
@@ -99,23 +128,45 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="transform",
             name="source_code",
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, related_name="source_code_of", to="lnschema_core.artifact"),
+            field=models.ForeignKey(
+                default=None,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="source_code_of",
+                to="lnschema_core.artifact",
+            ),
         ),
         migrations.AlterField(
             model_name="transform",
             name="latest_report",
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, related_name="latest_report_of", to="lnschema_core.artifact"),
+            field=models.ForeignKey(
+                default=None,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="latest_report_of",
+                to="lnschema_core.artifact",
+            ),
         ),
         migrations.AlterField(
             model_name="run",
             name="report",
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.PROTECT, related_name="report_of", to="lnschema_core.artifact"),
+            field=models.ForeignKey(
+                default=None,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="report_of",
+                to="lnschema_core.artifact",
+            ),
         ),
     ]
 
 
 schemas = lamindb_setup.settings.instance.schema
 if "bionty" in schemas:
-    Migration.dependencies.append(("lnschema_bionty", "0020_alter_organism_bionty_source"))
+    Migration.dependencies.append(
+        ("lnschema_bionty", "0020_alter_organism_bionty_source")
+    )
 if "lamin1" in schemas:
-    Migration.dependencies.append(("lnschema_lamin1", "0014_rename_species_biosample_organism"))
+    Migration.dependencies.append(
+        ("lnschema_lamin1", "0014_rename_species_biosample_organism")
+    )

@@ -21,7 +21,9 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="feature",
             name="registries",
-            field=models.CharField(db_index=True, default=None, max_length=128, null=True),
+            field=models.CharField(
+                db_index=True, default=None, max_length=128, null=True
+            ),
         ),
         migrations.AlterUniqueTogether(
             name="label",
@@ -30,17 +32,49 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="FileLabel",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
-                ("feature", models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.CASCADE, to="lnschema_core.feature")),
-                ("file", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="lnschema_core.file")),
-                ("label", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="lnschema_core.label")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "feature",
+                    models.ForeignKey(
+                        default=None,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="lnschema_core.feature",
+                    ),
+                ),
+                (
+                    "file",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="lnschema_core.file",
+                    ),
+                ),
+                (
+                    "label",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="lnschema_core.label",
+                    ),
+                ),
             ],
             options={
                 "unique_together": {("file", "label")},
             },
         ),
-        migrations.RunSQL("CREATE TABLE lnschema_core_filelabel_tmp (id BIGINT, file_id TEXT, label_id TEXT)"),
-        migrations.RunSQL("INSERT INTO lnschema_core_filelabel_tmp (id, file_id, label_id) SELECT id, file_id, label_id from lnschema_core_file_labels"),
+        migrations.RunSQL(
+            "CREATE TABLE lnschema_core_filelabel_tmp (id BIGINT, file_id TEXT, label_id TEXT)"
+        ),
+        migrations.RunSQL(
+            "INSERT INTO lnschema_core_filelabel_tmp (id, file_id, label_id) SELECT id, file_id, label_id from lnschema_core_file_labels"
+        ),
         migrations.RemoveField(
             model_name="file",
             name="labels",
@@ -48,9 +82,15 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="file",
             name="labels",
-            field=models.ManyToManyField(related_name="files", through="lnschema_core.FileLabel", to="lnschema_core.label"),
+            field=models.ManyToManyField(
+                related_name="files",
+                through="lnschema_core.FileLabel",
+                to="lnschema_core.label",
+            ),
         ),
-        migrations.RunSQL("INSERT INTO lnschema_core_filelabel (id, file_id, label_id) SELECT id, file_id, label_id from lnschema_core_filelabel_tmp"),
+        migrations.RunSQL(
+            "INSERT INTO lnschema_core_filelabel (id, file_id, label_id) SELECT id, file_id, label_id from lnschema_core_filelabel_tmp"
+        ),
         migrations.RunSQL("DROP TABLE lnschema_core_filelabel_tmp"),
         migrations.RemoveField(
             model_name="label",
