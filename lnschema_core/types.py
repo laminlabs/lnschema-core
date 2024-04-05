@@ -1,17 +1,17 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import List
+from typing import List, Union
 
 import numpy as np
 import pandas as pd
 from django.db.models import CharField, IntegerChoices, TextField  # needed elsewhere
 from django.db.models.query_utils import DeferredAttribute as FieldAttr
 
-ListLike = (
-    List[str] | pd.Series | np.array
-)  # typing.TypeAlias, >3.10 on but already deprecated
-StrField = str | FieldAttr  # typing.TypeAlias
+# need to use Union because __future__.annotations doesn't do the job here <3.10
+# typing.TypeAlias, >3.10 on but already deprecated
+ListLike = Union[List[str], pd.Series, np.array]
+StrField = Union[str, FieldAttr]  # typing.TypeAlias
 
 
 class ChoicesMixin:
