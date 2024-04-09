@@ -8,6 +8,7 @@ from typing import (
     Iterable,
     Literal,
     NamedTuple,
+    Optional,
     overload,
 )
 
@@ -35,10 +36,10 @@ if TYPE_CHECKING:
     import numpy as np
     import pandas as pd
     from anndata import AnnData
-    from mudata import MuData
     from lamin_utils._inspect import InspectResult
     from lamindb.core import FeatureManager, LabelManager
     from lamindb_setup.core.types import UPathStr
+    from mudata import MuData
     from upath import UPath
 
     from lnschema_core.mocks import (
@@ -1724,7 +1725,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
         version: str | None = None,
         is_new_version_of: Artifact | None = None,
         **kwargs,
-    ) -> "Artifact":
+    ) -> Artifact:
         """Create from ``AnnData``, validate & link features.
 
         Args:
@@ -1759,14 +1760,14 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
     @classmethod
     def from_mudata(
         cls,
-        mdata: "MuData",
-        key: Optional[str] = None,
-        description: Optional[str] = None,
-        run: Optional[Run] = None,
-        version: Optional[str] = None,
-        is_new_version_of: Optional["Artifact"] = None,
+        mdata: MuData,
+        key: str | None = None,
+        description: str | None = None,
+        run: Run | None = None,
+        version: str | None = None,
+        is_new_version_of: Artifact | None = None,
         **kwargs,
-    ) -> "Artifact":
+    ) -> Artifact:
         """Create from ``MuData``, validate & link features.
 
         Args:
