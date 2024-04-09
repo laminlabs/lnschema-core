@@ -5,7 +5,10 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("lnschema_core", "0041_remove_transform_short_name_transform_description_and_more"),
+        (
+            "lnschema_core",
+            "0041_remove_transform_short_name_transform_description_and_more",
+        ),
     ]
 
     operations = [

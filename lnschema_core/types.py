@@ -1,20 +1,17 @@
+from __future__ import annotations
+
 from enum import Enum
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import List, Union
 
-from django.db.models import CharField, IntegerChoices, TextField  # noqa
-from django.db.models.query_utils import DeferredAttribute as FieldAttr  # noqa
+import numpy as np
+import pandas as pd
+from django.db.models import CharField, IntegerChoices, TextField  # needed elsewhere
+from django.db.models.query_utils import DeferredAttribute as FieldAttr
 
-if TYPE_CHECKING:
-    import numpy as np
-    import pandas as pd
-
-
-# statically typing the following is hard because these are all heavy
-# dependencies, even DataFrame is heavy & slow to import
-DataLike = Any
-AnnDataLike = Any
-ListLike = TypeVar("ListLike", list, "pd.Series", "np.array")
-StrField = TypeVar("StrField", str, FieldAttr)
+# need to use Union because __future__.annotations doesn't do the job here <3.10
+# typing.TypeAlias, >3.10 on but already deprecated
+ListLike = Union[List[str], pd.Series, np.array]
+StrField = Union[str, FieldAttr]  # typing.TypeAlias
 
 
 class ChoicesMixin:

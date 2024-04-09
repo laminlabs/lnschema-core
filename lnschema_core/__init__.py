@@ -1,14 +1,14 @@
 """LaminDB's core registries."""
 
-__version__ = "0.64.4"
+__version__ = "0.64.6"
 
 
 from lamindb_setup import _check_instance_setup
 
 if _check_instance_setup():
     from . import ids, types
-    from .models import ORM  # backward compat
     from .models import (  # type: ignore
+        ORM,  # backward compat
         Artifact,
         CanValidate,
         Collection,

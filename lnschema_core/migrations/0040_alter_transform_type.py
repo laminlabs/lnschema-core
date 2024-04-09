@@ -7,7 +7,10 @@ import lnschema_core.types
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("lnschema_core", "0039_remove_collection_artifacts_collectionartifact_and_more"),
+        (
+            "lnschema_core",
+            "0039_remove_collection_artifacts_collectionartifact_and_more",
+        ),
     ]
 
     operations = [
@@ -15,7 +18,12 @@ class Migration(migrations.Migration):
             model_name="transform",
             name="type",
             field=models.CharField(
-                choices=[("pipeline", "pipeline"), ("notebook", "notebook"), ("upload", "upload"), ("script", "script")],
+                choices=[
+                    ("pipeline", "pipeline"),
+                    ("notebook", "notebook"),
+                    ("upload", "upload"),
+                    ("script", "script"),
+                ],
                 db_index=True,
                 default=lnschema_core.types.TransformType["pipeline"],
                 max_length=20,

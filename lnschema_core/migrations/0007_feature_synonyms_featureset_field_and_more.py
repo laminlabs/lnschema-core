@@ -23,7 +23,9 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="featureset",
             name="id",
-            field=models.CharField(default=None, max_length=20, primary_key=True, serialize=False),
+            field=models.CharField(
+                default=None, max_length=20, primary_key=True, serialize=False
+            ),
         ),
         migrations.RenameField(
             model_name="file",

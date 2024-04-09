@@ -13,12 +13,16 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="dataset",
             name="categories",
-            field=models.ManyToManyField(related_name="datasets", to="lnschema_core.category"),
+            field=models.ManyToManyField(
+                related_name="datasets", to="lnschema_core.category"
+            ),
         ),
         migrations.AddField(
             model_name="file",
             name="categories",
-            field=models.ManyToManyField(related_name="files", to="lnschema_core.category"),
+            field=models.ManyToManyField(
+                related_name="files", to="lnschema_core.category"
+            ),
         ),
         migrations.AddField(
             model_name="tag",
@@ -28,7 +32,9 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="tag",
             name="parents",
-            field=models.ManyToManyField(related_name="children", to="lnschema_core.tag"),
+            field=models.ManyToManyField(
+                related_name="children", to="lnschema_core.tag"
+            ),
         ),
         migrations.RenameField(
             model_name="run",
@@ -48,7 +54,9 @@ class Migration(migrations.Migration):
             name="tags",
             field=models.ManyToManyField(related_name="files", to="lnschema_core.tag"),
         ),
-        migrations.RunSQL("insert into lnschema_core_file_tags (id, file_id, tag_id) select id, file_id, tag_id from lnschema_core_tag_files"),
+        migrations.RunSQL(
+            "insert into lnschema_core_file_tags (id, file_id, tag_id) select id, file_id, tag_id from lnschema_core_tag_files"
+        ),
         migrations.RemoveField(
             model_name="tag",
             name="files",
@@ -56,9 +64,13 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="file",
             name="input_of",
-            field=models.ManyToManyField(related_name="input_files", to="lnschema_core.run"),
+            field=models.ManyToManyField(
+                related_name="input_files", to="lnschema_core.run"
+            ),
         ),
-        migrations.RunSQL("insert into lnschema_core_file_input_of (id, file_id, run_id) select id, file_id, run_id from lnschema_core_run_inputs"),
+        migrations.RunSQL(
+            "insert into lnschema_core_file_input_of (id, file_id, run_id) select id, file_id, run_id from lnschema_core_run_inputs"
+        ),
         migrations.RemoveField(
             model_name="run",
             name="inputs",
@@ -66,6 +78,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="file",
             name="run",
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, related_name="output_files", to="lnschema_core.run"),
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="output_files",
+                to="lnschema_core.run",
+            ),
         ),
     ]

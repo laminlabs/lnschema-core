@@ -16,7 +16,9 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="run",
             name="inputs",
-            field=models.ManyToManyField(related_name="input_of", to="lnschema_core.file"),
+            field=models.ManyToManyField(
+                related_name="input_of", to="lnschema_core.file"
+            ),
         ),
         migrations.DeleteModel(
             name="RunInput",

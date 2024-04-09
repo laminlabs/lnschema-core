@@ -3,6 +3,9 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+♻️ Replace TypeVar with TypeAlias | [363](https://github.com/laminlabs/lnschema-core/pull/363) | [falexwolf](https://github.com/falexwolf) | 2024-04-04 | 0.64.6
+📝 Fix manual type annotations in docstrings | [362](https://github.com/laminlabs/lnschema-core/pull/362) | [falexwolf](https://github.com/falexwolf) | 2024-04-04 | 0.64.5
+Future annotations | [361](https://github.com/laminlabs/lnschema-core/pull/361) | [Zethson](https://github.com/Zethson) | 2024-04-04 |
 ✨ Introduce Registry.get() | [360](https://github.com/laminlabs/lnschema-core/pull/360) | [falexwolf](https://github.com/falexwolf) | 2024-03-30 | 0.64.4
 ✅ Add test for string equivalency of transform types | [359](https://github.com/laminlabs/lnschema-core/pull/359) | [falexwolf](https://github.com/falexwolf) | 2024-03-30 | 0.64.3
 🔥 No collections from anndata or df anymore | [358](https://github.com/laminlabs/lnschema-core/pull/358) | [falexwolf](https://github.com/falexwolf) | 2024-03-28 | 0.64.2
