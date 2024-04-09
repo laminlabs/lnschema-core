@@ -51,6 +51,7 @@ if TYPE_CHECKING or _INSTANCE_SETUP or RUNNING_SPHINX:
     import pandas as pd
     from anndata import AnnData
     from lamin_utils._inspect import InspectResult
+    from mudata import MuData
 
 if TYPE_CHECKING or _INSTANCE_SETUP:
     from lamindb.core import FeatureManager, LabelManager
@@ -1647,7 +1648,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
         Args:
             df: A `DataFrame` object.
             key: A relative path within default storage,
-                e.g., `"myfolder/myfile.fcs"`.
+                e.g., `"myfolder/myfile.parquet"`.
             description: A description.
             version: A version string.
             is_new_version_of: An old version of the artifact.
@@ -1687,12 +1688,12 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
         is_new_version_of: Optional["Artifact"] = None,
         **kwargs,
     ) -> "Artifact":
-        """Create from ``AnnDataLike``, validate & link features.
+        """Create from ``AnnData``, validate & link features.
 
         Args:
-            adata: An `AnnData` object or path to it.
+            adata: An `AnnData` object.
             key: A relative path within default storage,
-                e.g., `"myfolder/myfile.fcs"`.
+                e.g., `"myfolder/myfile.h5ad"`.
             description: A description.
             version: A version string.
             is_new_version_of: An old version of the artifact.
@@ -1713,8 +1714,49 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
             >>> import bionty as bt
             >>> bt.settings.organism = "human"
             >>> adata = ln.core.datasets.anndata_with_obs()
-            >>> artifact = ln.Artifact.from_anndata(adata,
-            ...                             description="mini anndata with obs")
+            >>> artifact = ln.Artifact.from_anndata(adata, description="mini anndata with obs")
+            >>> artifact.save()
+        """
+        pass
+
+    @classmethod
+    def from_mudata(
+        cls,
+        mdata: "MuData",
+        key: Optional[str] = None,
+        description: Optional[str] = None,
+        run: Optional[Run] = None,
+        version: Optional[str] = None,
+        is_new_version_of: Optional["Artifact"] = None,
+        **kwargs,
+    ) -> "Artifact":
+        """Create from ``MuData``, validate & link features.
+
+        Args:
+            mdata: An `MuData` object.
+            key: A relative path within default storage,
+                e.g., `"myfolder/myfile.h5mu"`.
+            description: A description.
+            version: A version string.
+            is_new_version_of: An old version of the artifact.
+            run: The run that creates the artifact.
+
+        See Also:
+
+            :meth:`lamindb.Collection`
+                Track collections.
+            :class:`lamindb.Feature`
+                Track features.
+
+        Notes:
+
+            For more info, see tutorial: :doc:`/tutorial`.
+
+        Examples:
+            >>> import bionty as bt
+            >>> bt.settings.organism = "human"
+            >>> mdata = ln.core.datasets.mudata_papalexi21_subset()
+            >>> artifact = ln.Artifact.from_mudata(mdata, description="a mudata object")
             >>> artifact.save()
         """
         pass
