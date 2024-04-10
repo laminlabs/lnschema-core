@@ -1447,7 +1447,11 @@ class FeatureSet(Registry):
 
 
 class Artifact(Registry, Data, IsTree, IsVersioned):
-    """Artifacts: files, folders & arrays in storage.
+    """Artifacts: files and folders.
+
+    With this class, you manage data in local or remote storage.
+
+
 
     Args:
         path: `UPathStr` A path to a local or remote folder or file.
@@ -1490,7 +1494,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
 
         Create an artifact from a cloud storage (supports `s3://` and `gs://`):
 
-        >>> artifact = ln.Artifact("s3://lamindb-ci/test-data/test.csv")
+        >>> artifact = ln.Artifact("s3://my-bucket/my-folder/my-file.csv")
         >>> artifact.save()  # only metadata is saved
 
         Create an artifact from a local temporary filepath using `key`:
@@ -2057,7 +2061,7 @@ class Collection(Registry, Data, IsVersioned):
     @overload
     def __init__(
         self,
-        data: Any,
+        data: list[Artifact],
         name: str,
         version: str,
         description: str | None = None,
