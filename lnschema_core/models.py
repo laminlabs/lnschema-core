@@ -1309,7 +1309,7 @@ class FeatureSet(Registry):
 
     Note:
 
-        Feature sets are useful as you might have millions of data batches
+        Feature sets are useful as you might have thousands of datasets
         that measure the same features: all of them link against the same
         feature set. If instead, you'd link against single features (say, genes),
         you'd face exploding link tables.
@@ -1478,7 +1478,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
 
     See Also:
         :class:`~lamindb.Collection`
-            Mutable collections of data batches.
+            Collections of artifacts.
         :meth:`~lamindb.Artifact.from_df`
             Create a artifact object from `DataFrame` and track features.
         :meth:`~lamindb.Artifact.from_anndata`
