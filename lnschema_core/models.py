@@ -121,7 +121,7 @@ class CanValidate:
         field: str | StrField | None = None,
         *,
         mute: bool = False,
-        **kwargs,
+        organism: str | Registry | None = None,
     ) -> InspectResult:
         """Inspect if values are mappable to a field.
 
@@ -134,6 +134,7 @@ class CanValidate:
                 against the source ID or `'name'` to map against the ontologies
                 field names.
             mute: Mute logging.
+            organism: An Organism name or record.
 
         See Also:
             :meth:`~lamindb.core.CanValidate.validate`
@@ -162,7 +163,7 @@ class CanValidate:
         field: str | StrField | None = None,
         *,
         mute: bool = False,
-        **kwargs,
+        organism: str | Registry | None = None,
     ) -> np.ndarray:
         """Validate values against existing values of a string field.
 
@@ -206,7 +207,7 @@ class CanValidate:
         public_aware: bool = True,
         keep: Literal["first", "last", False] = "first",
         synonyms_field: str = "synonyms",
-        **kwargs,
+        organism: str | Registry | None = None,
     ) -> list[str] | dict[str, str]:
         """Maps input synonyms to standardized names.
 
@@ -227,6 +228,7 @@ class CanValidate:
 
                   When a field is converted into return_field, keep marks which matches to keep when multiple return_field values map to the same field value.
             synonyms_field: A field containing the concatenated synonyms.
+            organism: An Organism name or record.
 
         Returns:
             If `return_mapper` is `False`: a list of standardized names. Otherwise,
@@ -400,7 +402,11 @@ class Registry(models.Model):
 
     @classmethod
     def from_values(
-        cls, values: ListLike, field: StrField | None = None, **kwargs
+        cls,
+        values: ListLike,
+        field: StrField | None = None,
+        organism: Registry | str | None = None,
+        public_source: Registry | None = None,
     ) -> list[Registry]:
         """Bulk create validated records by parsing values for an identifier (a name, an id, etc.).
 
@@ -408,7 +414,8 @@ class Registry(models.Model):
             values: A list of values for an identifier, e.g.
                 `["name1", "name2"]`.
             field: A `Registry` field to look up, e.g., `bt.CellMarker.name`.
-            **kwargs: Additional conditions for creation of records, e.g., `organism="human"`.
+            organism: An Organism name or record.
+            public_source: A PublicSource record.
 
         Returns:
             A list of validated records. For bionty registries, also returns knowledge-coupled records.
@@ -1400,7 +1407,9 @@ class FeatureSet(Registry):
         field: FieldAttr = Feature.name,
         type: str | None = None,
         name: str | None = None,
-        **kwargs,
+        mute: bool = False,
+        organism: Registry | str | None = None,
+        public_source: Registry | None = None,
     ) -> FeatureSet | None:
         """Create feature set for validated features.
 
@@ -1430,7 +1439,9 @@ class FeatureSet(Registry):
         df: pd.DataFrame,
         field: FieldAttr = Feature.name,
         name: str | None = None,
-        **kwargs,
+        mute: bool = False,
+        organism: Registry | str | None = None,
+        public_source: Registry | None = None,
     ) -> FeatureSet | None:
         """Create feature set for validated features."""
         pass
