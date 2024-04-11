@@ -2215,8 +2215,11 @@ class Collection(Registry, Data, IsVersioned):
         """
         pass
 
-    def save(self, *args, **kwargs) -> None:
+    def save(self, transfer_labels: bool = False) -> None:
         """Save the collection and underlying artifacts to database & storage.
+
+        Args:
+            transfer_labels: Transfer labels from artifacts to the collection.
 
         Examples:
             >>> collection = ln.Collection("./myfile.csv", name="myfile")
