@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚸 Eliminate kwargs | [366](https://github.com/laminlabs/lnschema-core/pull/366) | [sunnyosun](https://github.com/sunnyosun) | 2024-04-11 |
 ✨ Add from_mudata | [365](https://github.com/laminlabs/lnschema-core/pull/365) | [sunnyosun](https://github.com/sunnyosun) | 2024-04-10 | 0.64.7
 ♻️ Replace TypeVar with TypeAlias | [363](https://github.com/laminlabs/lnschema-core/pull/363) | [falexwolf](https://github.com/falexwolf) | 2024-04-04 | 0.64.6
 📝 Fix manual type annotations in docstrings | [362](https://github.com/laminlabs/lnschema-core/pull/362) | [falexwolf](https://github.com/falexwolf) | 2024-04-04 | 0.64.5
