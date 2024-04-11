@@ -2101,7 +2101,7 @@ class Collection(Registry, Data, IsVersioned):
     @overload
     def __init__(
         self,
-        data: list[Artifact],
+        artifacts: list[Artifact],
         name: str,
         version: str,
         description: str | None = None,
@@ -2215,11 +2215,12 @@ class Collection(Registry, Data, IsVersioned):
         """
         pass
 
-    def save(self, transfer_labels: bool = False) -> None:
+    def save(self, transfer_labels: bool = False, using: str | None = None) -> None:
         """Save the collection and underlying artifacts to database & storage.
 
         Args:
             transfer_labels: Transfer labels from artifacts to the collection.
+            using: The database to which you want to save.
 
         Examples:
             >>> collection = ln.Collection("./myfile.csv", name="myfile")
