@@ -436,12 +436,6 @@ class Registry(models.Model):
             >>> ulabels = ln.ULabel.from_values(["benchmark", "prediction", "test"], field="name")
             >>> assert len(ulabels) == 3
 
-            Bulk create records with shared kwargs:
-
-            >>> pipelines = ln.Transform.from_values(["Pipeline 1", "Pipeline 2"], field="name",
-            ...                                      type="pipeline", version="1")
-            >>> pipelines
-
             Bulk create records from public reference:
 
             >>> import bionty as bt
