@@ -2134,7 +2134,9 @@ class Collection(Registry, Data, IsVersioned):
 
     def mapped(
         self,
-        label_keys: str | list[str] | None = None,
+        layers_keys: str | list[str] | None = None,
+        obs_keys: str | list[str] | None = None,
+        obsm_keys: str | list[str] | None = None,
         join: Literal["inner", "outer"] | None = "inner",
         encode_labels: bool | list[str] = True,
         unknown_label: str | dict[str, str] | None = None,
@@ -2160,18 +2162,20 @@ class Collection(Registry, Data, IsVersioned):
             This method currently only works for collections of `AnnData` artifacts.
 
         Args:
-            label_keys: Columns of the ``.obs`` slot - the names of the metadata
-                features storing labels.
+            layers_keys: Keys from the ``.layers`` slot. ``layers_keys=None`` or ``"X"`` in the list
+                retrieves ``.X``.
+            obsm_keys: Keys from the ``.obsm`` slots.
+            obs_keys: Keys from the ``.obs`` slots.
             join: `"inner"` or `"outer"` virtual joins. If ``None`` is passed,
                 does not join.
             encode_labels: Encode labels into integers.
-                Can be a list with elements from ``label_keys```.
+                Can be a list with elements from ``obs_keys``.
             unknown_label: Encode this label to -1.
-                Can be a dictionary with keys from ``label_keys`` if ``encode_labels=True```
+                Can be a dictionary with keys from ``obs_keys`` if ``encode_labels=True``
                 or from ``encode_labels`` if it is a list.
-            cache_categories: Enable caching categories of ``label_keys`` for faster access.
+            cache_categories: Enable caching categories of ``obs_keys`` for faster access.
             parallel: Enable sampling with multiple processes.
-            dtype: Convert numpy arrays from ``.X`` to this dtype on selection.
+            dtype: Convert numpy arrays from ``.X``, ``.layers`` and ``.obsm``
             stream: Whether to stream data from the array backend.
             is_run_input: Whether to track this collection as run input.
 
