@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚚 Add `Run.replicated_outputs` & `Transform.ulabels` | [370](https://github.com/laminlabs/lnschema-core/pull/370) | [falexwolf](https://github.com/falexwolf) | 2024-04-16 |
 📝 Update signature and docs for Collection.mapped | [367](https://github.com/laminlabs/lnschema-core/pull/367) | [Koncopd](https://github.com/Koncopd) | 2024-04-12 | 0.64.11
 🚸 Eliminate kwargs | [366](https://github.com/laminlabs/lnschema-core/pull/366) | [sunnyosun](https://github.com/sunnyosun) | 2024-04-11 |
 ✨ Add from_mudata | [365](https://github.com/laminlabs/lnschema-core/pull/365) | [sunnyosun](https://github.com/sunnyosun) | 2024-04-10 | 0.64.7
