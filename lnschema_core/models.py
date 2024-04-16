@@ -928,6 +928,7 @@ class Transform(Registry, HasParents, IsVersioned):
     """Reference for the transform, e.g., a URL."""
     reference_type = CharField(max_length=25, db_index=True, null=True, default=None)
     """Type of reference, e.g., 'url' or 'doi'."""
+    ulabels = models.ManyToManyField("ULabel", related_name="transforms")
     parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
     """Parent transforms (predecessors) in data flow.
 
