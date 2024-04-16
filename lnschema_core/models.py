@@ -1910,22 +1910,20 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
 
             Load as an `AnnData`:
 
-            >>> ln.Artifact("s3://lamindb-ci/lndb-storage/pbmc68k.h5ad").save()
-            >>> artifact = ln.Artifact.filter(key="lndb-storage/pbmc68k.h5ad").one()
             >>> artifact.load()
             AnnData object with n_obs × n_vars = 70 × 765
 
             Fall back to :meth:`~lamindb.Artifact.download` if no in-memory representation is configured:
 
-            >>> ln.Artifact(ln.core.datasets.file_jpg_paradisi05(), description="paradisi05").save()
-            >>> artifact = ln.Artifact.filter(description="paradisi05").one()
             >>> artifact.load()
             PosixPath('/home/runner/work/lamindb/lamindb/docs/guide/mydata/.lamindb/jb7BY5UJoQVGMUOKiLcn.jpg')
         """
         pass
 
     def download(self, is_run_input: bool | None = None) -> Path:
-        """Update cache from cloud storage if outdated.
+        """Download cloud artifact to local cache.
+
+        Follows synching logic: only downloads an artifact if it's outdated in the local cache.
 
         Returns a path to a locally cached on-disk object (say, a `.jpg` file).
 
@@ -1933,11 +1931,15 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
 
             Sync file from cloud and return the local path of the cache:
 
-            >>> ln.settings.storage = "s3://lamindb-ci"
-            >>> ln.Artifact("s3://lamindb-ci/lndb-storage/pbmc68k.h5ad").save()
-            >>> artifact = ln.Artifact.filter(key="lndb-storage/pbmc68k.h5ad").one()
             >>> artifact.download()
             PosixPath('/home/runner/work/Caches/lamindb/lamindb-ci/lndb-storage/pbmc68k.h5ad')
+        """
+        pass
+
+    def upload(self) -> UPath:
+        """Upload to cloud storage.
+
+        Is only relevant for LaminDB instances with storage mode: "hybrid".
         """
         pass
 
@@ -2195,9 +2197,11 @@ class Collection(Registry, Data, IsVersioned):
         pass
 
     def download(self, is_run_input: bool | None = None) -> list[UPath]:
-        """Update cache from cloud storage if outdated.
+        """Download cloud artifacts in collection to local cache.
 
-        Returns paths to locally cached on-disk objects in the collection.
+        Follows synching logic: only downloads outdated artifacts.
+
+        Returns paths to locally cached on-disk artifacts.
 
         Args:
             is_run_input: Whether to track this collection as run input.
