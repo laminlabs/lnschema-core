@@ -771,7 +771,7 @@ class Storage(Registry):
 
     id = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
-    uid = CharField(unique=True, max_length=8, default=base62_8, db_index=True)
+    uid = CharField(unique=True, max_length=12, default=base62_12, db_index=True)
     """Universal id, valid across DB instances."""
     # we are very conservative here with 255 characters
     root = CharField(max_length=255, db_index=True, unique=True, default=None)
@@ -928,6 +928,7 @@ class Transform(Registry, HasParents, IsVersioned):
     """Reference for the transform, e.g., a URL."""
     reference_type = CharField(max_length=25, db_index=True, null=True, default=None)
     """Type of reference, e.g., 'url' or 'doi'."""
+    ulabels = models.ManyToManyField("ULabel", related_name="transforms")
     parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
     """Parent transforms (predecessors) in data flow.
 
@@ -1040,6 +1041,10 @@ class Run(Registry):
     """A reference like a URL or external ID (such as from a workflow manager)."""
     reference_type = CharField(max_length=25, db_index=True, null=True, default=None)
     """Type of reference, e.g., a workflow manager execution ID."""
+    replicated_outputs = models.ManyToManyField(
+        "Artifact", related_name="replicating_runs"
+    )
+    """Outputs that were replicated in later runs."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of first creation. Mismatches ``started_at`` if the run is re-run."""
 
