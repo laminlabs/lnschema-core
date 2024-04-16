@@ -1915,7 +1915,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
             >>> artifact.load()
             AnnData object with n_obs × n_vars = 70 × 765
 
-            Fall back to :meth:`~lamindb.Artifact.stage` if no in-memory representation is configured:
+            Fall back to :meth:`~lamindb.Artifact.download` if no in-memory representation is configured:
 
             >>> ln.Artifact(ln.core.datasets.file_jpg_paradisi05(), description="paradisi05").save()
             >>> artifact = ln.Artifact.filter(description="paradisi05").one()
@@ -1924,7 +1924,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
         """
         pass
 
-    def stage(self, is_run_input: bool | None = None) -> Path:
+    def download(self, is_run_input: bool | None = None) -> Path:
         """Update cache from cloud storage if outdated.
 
         Returns a path to a locally cached on-disk object (say, a `.jpg` file).
@@ -1936,7 +1936,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
             >>> ln.settings.storage = "s3://lamindb-ci"
             >>> ln.Artifact("s3://lamindb-ci/lndb-storage/pbmc68k.h5ad").save()
             >>> artifact = ln.Artifact.filter(key="lndb-storage/pbmc68k.h5ad").one()
-            >>> artifact.stage()
+            >>> artifact.download()
             PosixPath('/home/runner/work/Caches/lamindb/lamindb-ci/lndb-storage/pbmc68k.h5ad')
         """
         pass
@@ -2153,7 +2153,7 @@ class Collection(Registry, Data, IsVersioned):
         virtually concatenating `AnnData` arrays.
 
         If your `AnnData` collection is in the cloud, move them into a local
-        cache first via :meth:`~lamindb.Collection.stage`.
+        cache first via :meth:`~lamindb.Collection.download`.
 
         `__getitem__` of the `MappedCollection` object takes a single integer index
         and returns a dictionary with the observation data sample for this index from
@@ -2194,7 +2194,7 @@ class Collection(Registry, Data, IsVersioned):
         """
         pass
 
-    def stage(self, is_run_input: bool | None = None) -> list[UPath]:
+    def download(self, is_run_input: bool | None = None) -> list[UPath]:
         """Update cache from cloud storage if outdated.
 
         Returns paths to locally cached on-disk objects in the collection.
