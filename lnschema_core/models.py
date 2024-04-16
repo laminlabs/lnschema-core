@@ -1941,13 +1941,6 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
         """
         pass
 
-    def upload(self) -> UPath:
-        """Upload to cloud storage.
-
-        Is only relevant for LaminDB instances with storage mode: "hybrid".
-        """
-        pass
-
     def delete(
         self, permanent: bool | None = None, storage: bool | None = None
     ) -> None:
@@ -1971,8 +1964,12 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
         """
         pass
 
-    def save(self, *args, **kwargs) -> None:
+    def save(self, upload: bool | None = None, **kwargs) -> None:
         """Save to database & storage.
+
+        Args:
+            upload: Trigger upload to cloud storage in instances with hybrid
+                storage mode.
 
         Examples:
             >>> artifact = ln.Artifact("./myfile.csv", description="myfile")
