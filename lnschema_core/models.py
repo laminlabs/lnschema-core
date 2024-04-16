@@ -771,7 +771,7 @@ class Storage(Registry):
 
     id = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
-    uid = CharField(unique=True, max_length=8, default=base62_8, db_index=True)
+    uid = CharField(unique=True, max_length=12, default=base62_12, db_index=True)
     """Universal id, valid across DB instances."""
     # we are very conservative here with 255 characters
     root = CharField(max_length=255, db_index=True, unique=True, default=None)
