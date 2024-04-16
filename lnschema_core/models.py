@@ -974,7 +974,7 @@ class Run(Registry):
 
     Args:
         transform: `Transform` A :class:`~lamindb.Transform` record.
-        reference: `str | None = None` For instance, an external ID or a cache URL.
+        reference: `str | None = None` For instance, an external ID or a download URL.
         reference_type: `str | N = None` For instance, `redun_id`, `nextflow_id` or `url`.
 
     See Also:
