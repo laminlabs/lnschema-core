@@ -26,7 +26,7 @@ env/
 build/
 develop-eggs/
 dist/
-downloads/
+caches/
 eggs/
 .eggs/
 lib/

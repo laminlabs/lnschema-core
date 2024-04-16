@@ -974,7 +974,7 @@ class Run(Registry):
 
     Args:
         transform: `Transform` A :class:`~lamindb.Transform` record.
-        reference: `str | None = None` For instance, an external ID or a download URL.
+        reference: `str | None = None` For instance, an external ID or a cache URL.
         reference_type: `str | N = None` For instance, `redun_id`, `nextflow_id` or `url`.
 
     See Also:
@@ -1918,17 +1918,17 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
             >>> artifact.load()
             AnnData object with n_obs × n_vars = 70 × 765
 
-            Fall back to :meth:`~lamindb.Artifact.download` if no in-memory representation is configured:
+            Fall back to :meth:`~lamindb.Artifact.cache` if no in-memory representation is configured:
 
             >>> artifact.load()
             PosixPath('/home/runner/work/lamindb/lamindb/docs/guide/mydata/.lamindb/jb7BY5UJoQVGMUOKiLcn.jpg')
         """
         pass
 
-    def download(self, is_run_input: bool | None = None) -> Path:
+    def cache(self, is_run_input: bool | None = None) -> Path:
         """Download cloud artifact to local cache.
 
-        Follows synching logic: only downloads an artifact if it's outdated in the local cache.
+        Follows synching logic: only caches an artifact if it's outdated in the local cache.
 
         Returns a path to a locally cached on-disk object (say, a `.jpg` file).
 
@@ -1936,7 +1936,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
 
             Sync file from cloud and return the local path of the cache:
 
-            >>> artifact.download()
+            >>> artifact.cache()
             PosixPath('/home/runner/work/Caches/lamindb/lamindb-ci/lndb-storage/pbmc68k.h5ad')
         """
         pass
@@ -2160,7 +2160,7 @@ class Collection(Registry, Data, IsVersioned):
         virtually concatenating `AnnData` arrays.
 
         If your `AnnData` collection is in the cloud, move them into a local
-        cache first via :meth:`~lamindb.Collection.download`.
+        cache first via :meth:`~lamindb.Collection.cache`.
 
         `__getitem__` of the `MappedCollection` object takes a single integer index
         and returns a dictionary with the observation data sample for this index from
@@ -2201,10 +2201,10 @@ class Collection(Registry, Data, IsVersioned):
         """
         pass
 
-    def download(self, is_run_input: bool | None = None) -> list[UPath]:
+    def cache(self, is_run_input: bool | None = None) -> list[UPath]:
         """Download cloud artifacts in collection to local cache.
 
-        Follows synching logic: only downloads outdated artifacts.
+        Follows synching logic: only caches outdated artifacts.
 
         Returns paths to locally cached on-disk artifacts.
 
