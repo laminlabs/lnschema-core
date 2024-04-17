@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🐛 Fix replicated outputs slot | [371](https://github.com/laminlabs/lnschema-core/pull/371) | [falexwolf](https://github.com/falexwolf) | 2024-04-17 |
 🚚 Rename `.stage()` to `.cache()`, add `.save(upload=None)` | [369](https://github.com/laminlabs/lnschema-core/pull/369) | [falexwolf](https://github.com/falexwolf) | 2024-04-16 |
 🚚 Add `Run.replicated_outputs` & `Transform.ulabels` | [370](https://github.com/laminlabs/lnschema-core/pull/370) | [falexwolf](https://github.com/falexwolf) | 2024-04-16 |
 📝 Update signature and docs for Collection.mapped | [367](https://github.com/laminlabs/lnschema-core/pull/367) | [Koncopd](https://github.com/Koncopd) | 2024-04-12 | 0.64.11
