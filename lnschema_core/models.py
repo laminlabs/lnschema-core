@@ -122,6 +122,7 @@ class CanValidate:
         *,
         mute: bool = False,
         organism: str | Registry | None = None,
+        public_source: Registry | None = None,
     ) -> InspectResult:
         """Inspect if values are mappable to a field.
 
@@ -135,6 +136,7 @@ class CanValidate:
                 field names.
             mute: Mute logging.
             organism: An Organism name or record.
+            public_source: A PublicSource record.
 
         See Also:
             :meth:`~lamindb.core.CanValidate.validate`
@@ -407,6 +409,7 @@ class Registry(models.Model):
         field: StrField | None = None,
         organism: Registry | str | None = None,
         public_source: Registry | None = None,
+        mute: bool = False,
     ) -> list[Registry]:
         """Bulk create validated records by parsing values for an identifier (a name, an id, etc.).
 
