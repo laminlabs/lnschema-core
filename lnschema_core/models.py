@@ -1739,7 +1739,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
     @classmethod
     def from_anndata(
         cls,
-        adata: AnnData,
+        adata: AnnData | UPathStr,
         key: str | None = None,
         description: str | None = None,
         run: Run | None = None,
@@ -1750,7 +1750,7 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
         """Create from ``AnnData``, validate & link features.
 
         Args:
-            adata: An `AnnData` object.
+            adata: An `AnnData` object or a path of AnnData-like.
             key: A relative path within default storage,
                 e.g., `"myfolder/myfile.h5ad"`.
             description: A description.
