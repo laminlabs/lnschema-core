@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+✨ Allow passing path to .from_anndata | [373](https://github.com/laminlabs/lnschema-core/pull/373) | [sunnyosun](https://github.com/sunnyosun) | 2024-04-23 |
 🚑️ Fix public_source in inspect | [372](https://github.com/laminlabs/lnschema-core/pull/372) | [sunnyosun](https://github.com/sunnyosun) | 2024-04-18 |
 🐛 Fix replicated outputs slot | [371](https://github.com/laminlabs/lnschema-core/pull/371) | [falexwolf](https://github.com/falexwolf) | 2024-04-17 | 0.65.0
 🚚 Rename `.stage()` to `.cache()`, add `.save(upload=None)` | [369](https://github.com/laminlabs/lnschema-core/pull/369) | [falexwolf](https://github.com/falexwolf) | 2024-04-16 |
