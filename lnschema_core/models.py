@@ -613,7 +613,7 @@ class Registry(models.Model):
         """
         pass
 
-    def save(self, *args, **kwargs) -> None:
+    def save(self, *args, **kwargs) -> Registry:
         """Save.
 
         Always saves to the default database.
@@ -621,6 +621,7 @@ class Registry(models.Model):
         # we need this here because we're using models also from plain
         # django outside of lamindb
         super().save(*args, **kwargs)
+        return self
 
     class Meta:
         abstract = True
