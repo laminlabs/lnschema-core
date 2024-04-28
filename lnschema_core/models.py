@@ -855,10 +855,10 @@ class Storage(Registry):
 
 
 class Transform(Registry, HasParents, IsVersioned):
-    """Transformations of artifacts & collections.
+    """Data transformations.
 
-    A transform can refer to a script, a notebook, or a pipeline. If you execute
-    a transform, you generate a run of a transform
+    A transform can refer to a simple Python function, script, a notebook, or a
+    pipeline. If you execute a transform, you generate a run of a transform
     (:class:`~lamindb.Run`). A run has input and output data.
 
     A pipeline is typically created with a workflow tool (Nextflow, Snakemake,
@@ -870,6 +870,11 @@ class Transform(Registry, HasParents, IsVersioned):
     :attr:`~lamindb.core.Settings.sync_git_repo`, any script-like transform is
     synced its hashed state in a git repository.
 
+    If you execute a transform, you generate a :class:`~lamindb.Run` record. The
+    definition of transforms and runs is consistent the OpenLineage
+    specification where a :class:`~lamindb.Transform` record would be called a
+    "job" and a :class:`~lamindb.Run` record a "run".
+
     Args:
         name: `str` A name or title.
         key: `str | None = None` A short name or path-like semantic key.
@@ -879,10 +884,10 @@ class Transform(Registry, HasParents, IsVersioned):
         is_new_version_of: `Transform | None = None` An old version of the transform.
 
     See Also:
-        :meth:`lamindb.track`
+        :meth:`~lamindb.track`
             Globally track a script, notebook or pipeline run.
         :class:`~lamindb.Run`
-            Executions of scripts, notebooks or pipelines.
+            Executions of transforms.
 
     Notes:
         - :doc:`docs:track`
@@ -1096,7 +1101,7 @@ class Run(Registry):
 
 
 class ULabel(Registry, HasParents, CanValidate):
-    """Universal label ontology.
+    """Universal labels (valid categories).
 
     Args:
         name: `str` A name.
@@ -1129,7 +1134,7 @@ class ULabel(Registry, HasParents, CanValidate):
         tracking metadata, is to create a custom schema module.
 
     See Also:
-        :meth:`lamindb.Feature`
+        :meth:`~lamindb.Feature`
             Dimensions of measurement for artifacts & collections.
 
     Examples:
@@ -1209,42 +1214,52 @@ class ULabel(Registry, HasParents, CanValidate):
 
 
 class Feature(Registry, CanValidate):
-    """Dimensions of measurement.
+    """Numerical and categorical random variables.
+
+    A feature denotes a random variable, or, equivalently, a "measured dimension".
+
+    A feature that you'd want to track with LaminDB is almost always a column
+    storing observations of numbers or categories in a table or array.
+
+    The `Feature` registry is used to manage the metadata of these columns, most
+    importantly, the column name & the data type. It helps validate column names
+    & annotating datasets by whether they measured a feature.
 
     See Also:
         :meth:`~lamindb.Feature.from_df`
             Create feature records from DataFrame.
         :attr:`~lamindb.core.Data.features`
-            Manage feature annotations of artifacts & collections.
-        :meth:`lamindb.ULabel`
-            ULabels for artifacts & collections.
+            Feature manager of an artifact or collection.
+        :class:`~lamindb.ULabel`
+            Universal labels.
+        :class:`~lamindb.FeatureSet`
+            Feature sets.
 
     Args:
         name: `str` Name of the feature, typically, a column name.
-        type: `str` Simple type (`"number"`, `"category"`, `"datetime"`).
+        type: `str` Simple type (`"number"`, `"category"`, `"datetime"`), equivalent of `dtype` in numpy.
         unit: `str | None = None` Unit of measure, ideally SI (`"m"`, `"s"`, `"kg"`, etc.) or `"normalized"` etc.
         description: `str | None = None` A description.
         synonyms: `str | None = None` Bar-separated synonyms.
-        registries: `str | None = None` Bar-separated Registries that provide values for labels.
+        registries: `str | None = None` Bar-separated registries that provide values for categories.
 
     .. note::
 
         *Features* and *labels* denote two ways for using entities to organize data:
 
-        1. A feature qualifies *which entity* is measured (e.g., is a vector of categories)
-        2. A label *is* a measured value of an entity (a category)
+        1. A feature qualifies *what* is measured (a numerical or categorical random variable)
+        2. A label *is* a measured value (a category)
 
-        If re-shaping data introduced ambiguity, ask yourself what the joint measurement was:
-        a feature qualifies variables in a joint measurement.
-        You might be looking at a label if data was re-shaped from there.
+        If re-shaping data introduced ambiguity, ask yourself what the joint
+        measurement was: a feature qualifies variables in a joint measurement.
 
     Notes:
 
-        For more control, you can use :mod:`bionty` ORMs to manage
+        For more control, you can use :mod:`bionty` registries to manage
         common basic biological entities like genes, proteins & cell markers
         involved in expression/count measurements.
 
-        Similarly, you can define custom ORMs to manage high-level derived
+        Similarly, you can define custom registries to manage high-level derived
         features like gene sets, malignancy, etc.
 
     Examples:
@@ -1328,7 +1343,11 @@ class Feature(Registry, CanValidate):
 
 
 class FeatureSet(Registry):
-    """Jointly measured sets of features.
+    """Feature sets.
+
+    Stores references to sets of :class:`~lamindb.Feature` and other registries
+    that may be used to identify features (e.g., class:`~bionty.Gene` or
+    class:`~bionty.Protein`).
 
     See Also:
         :meth:`~lamindb.FeatureSet.from_values`
@@ -1338,12 +1357,12 @@ class FeatureSet(Registry):
 
     Note:
 
-        Feature sets are useful as you might have thousands of datasets
-        that measure the same features: all of them link against the same
-        feature set. If instead, you'd link against single features (say, genes),
-        you'd face exploding link tables.
+        Feature sets are useful as you likely have many datasets that measure
+        the same features. In LaminDB, they are all linked against the exact
+        same *feature set*. If instead, you'd link each of the datasets against
+        single features (say, genes), you'd face exploding link tables.
 
-        A `feature_set` is identified by the hash of feature values.
+        A feature set is identified by the hash of the feature uids in the set.
 
     Args:
         features: `Iterable[Registry]` An iterable of :class:`~lamindb.Feature`
@@ -1352,8 +1371,8 @@ class FeatureSet(Registry):
             :meth:`~lamindb.FeatureSet.from_values` or
             :meth:`~lamindb.FeatureSet.from_df`.
         type: `str | None = None` The simple type. Defaults to
-            `None` if reference Registry is :class:`~lamindb.Feature`, defaults to
-            `"number"` otherwise.
+            `None` for sets of :class:`~lamindb.Feature` records, and otherwise
+            defaults to `"number"` (e.g., for sets of :class:`~bionty.Gene`).
         name: `str | None = None` A name.
 
     Examples:
@@ -1479,11 +1498,14 @@ class FeatureSet(Registry):
 
 
 class Artifact(Registry, Data, IsTree, IsVersioned):
-    """Artifacts: files and folders.
+    """Artifacts: datasets & models stored as files, folders, or arrays.
 
-    With this class, you manage data in local or remote storage.
+    Artifacts manage data in local or remote storage.
 
+    An artifact stores a dataset or model as either a file or a folder.
 
+    Some artifacts are array-like, e.g., when stored as `.parquet`, `.h5ad`,
+    `.zarr`, or `.tiledb`.
 
     Args:
         path: `UPathStr` A path to a local or remote folder or file.
@@ -1496,10 +1518,15 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
 
     .. dropdown:: Typical storage formats & their API accessors
 
+        Arrays:
+
         - Table: `.csv`, `.tsv`, `.parquet`, `.ipc` ⟷ `DataFrame`, `pyarrow.Table`
         - Annotated matrix: `.h5ad`, `.h5mu`, `.zrad` ⟷ `AnnData`, `MuData`
+        - Generic array: HDF5 group, zarr group, TileDB store ⟷ HDF5, zarr, TileDB loaders
+
+        Non-arrays:
+
         - Image: `.jpg`, `.png` ⟷ `np.ndarray`, ...
-        - Arrays: HDF5 group, zarr group, TileDB store ⟷ HDF5, zarr, TileDB loaders
         - Fastq: `.fastq` ⟷ /
         - VCF: `.vcf` ⟷ /
         - QC: `.html` ⟷ /
@@ -1510,29 +1537,30 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
         `.parquet` file).
 
     See Also:
+        :class:`~lamindb.Storage`
+            Storage locations for artifacts.
         :class:`~lamindb.Collection`
             Collections of artifacts.
         :meth:`~lamindb.Artifact.from_df`
-            Create a artifact object from `DataFrame` and track features.
+            Create an artifact from a `DataFrame`.
         :meth:`~lamindb.Artifact.from_anndata`
-            Create a artifact object from `AnnData` and track features.
+            Create an artifact from an `AnnData`.
         :meth:`~lamindb.Artifact.from_dir`
-            Bulk create artifact objects from a directory.
+            Bulk create file-like artifacts from a directory.
 
     Notes:
         For more info, see tutorial: :doc:`/tutorial`.
 
     Examples:
 
-        Create an artifact from a cloud storage (supports `s3://` and `gs://`):
+        Create an artifact from a file in the cloud:
 
-        >>> artifact = ln.Artifact("s3://my-bucket/my-folder/my-file.csv")
+        >>> artifact = ln.Artifact("s3://my-bucket/my-folder/my-file.csv", description="My file")
         >>> artifact.save()  # only metadata is saved
 
-        Create an artifact from a local temporary filepath using `key`:
+        Create an artifact from a local filepath:
 
-        >>> filepath = ln.core.datasets.file_jpg_paradisi05()
-        >>> artifact = ln.Artifact(filepath, key="images/paradisi05_image.jpg")
+        >>> artifact = ln.Artifact("./my_file.jpg", description="My image")
         >>> artifact.save()
 
         .. dropdown:: Why does the API look this way?
@@ -1730,9 +1758,9 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
             run: The run that creates the artifact.
 
         See Also:
-            :meth:`lamindb.Collection`
+            :meth:`~lamindb.Collection`
                 Track collections.
-            :class:`lamindb.Feature`
+            :class:`~lamindb.Feature`
                 Track features.
 
         Notes:
@@ -1776,9 +1804,9 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
 
         See Also:
 
-            :meth:`lamindb.Collection`
+            :meth:`~lamindb.Collection`
                 Track collections.
-            :class:`lamindb.Feature`
+            :class:`~lamindb.Feature`
                 Track features.
 
         Notes:
@@ -1818,9 +1846,9 @@ class Artifact(Registry, Data, IsTree, IsVersioned):
 
         See Also:
 
-            :meth:`lamindb.Collection`
+            :meth:`~lamindb.Collection`
                 Track collections.
-            :class:`lamindb.Feature`
+            :class:`~lamindb.Feature`
                 Track features.
 
         Notes:
@@ -2025,7 +2053,6 @@ class Collection(Registry, Data, IsVersioned):
         meta: `Artifact | None = None` An artifact that defines metadata for the collection.
         reference: `str | None = None` For instance, an external ID or a URL.
         reference_type: `str | None = None` For instance, `"url"`.
-
 
     See Also:
         :class:`~lamindb.Artifact`
