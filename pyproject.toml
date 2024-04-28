@@ -21,7 +21,7 @@ Home = "https://github.com/laminlabs/lnschema-core"
 
 [project.optional-dependencies]
 dev = [
-    "lamindb_setup>=0.64.0",
+    "lamindb_setup@git+https://github.com/laminlabs/lamindb-setup",
     "pre-commit",
     "nox",
     "laminci",
