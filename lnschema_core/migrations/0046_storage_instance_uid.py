@@ -2,6 +2,8 @@
 
 from django.db import migrations, models
 
+import lnschema_core.types
+
 
 class Migration(migrations.Migration):
     dependencies = [
@@ -17,6 +19,22 @@ class Migration(migrations.Migration):
             name="instance_uid",
             field=models.CharField(
                 db_index=True, default=None, max_length=12, null=True
+            ),
+        ),
+        migrations.AlterField(
+            model_name="transform",
+            name="type",
+            field=models.CharField(
+                choices=[
+                    ("pipeline", "pipeline"),
+                    ("notebook", "notebook"),
+                    ("upload", "upload"),
+                    ("script", "script"),
+                    ("function", "function"),
+                ],
+                db_index=True,
+                default=lnschema_core.types.TransformType["pipeline"],
+                max_length=20,
             ),
         ),
     ]

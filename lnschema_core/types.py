@@ -33,6 +33,7 @@ class TransformType(ChoicesMixin, str, Enum):
     notebook = "notebook"
     upload = "upload"
     script = "script"
+    function = "function"
 
 
 class VisibilityChoice(IntegerChoices):
