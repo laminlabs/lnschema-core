@@ -750,18 +750,31 @@ class User(Registry, CanValidate):
 class Storage(Registry):
     """Storage locations.
 
-    A storage location can be a local or remote directory/folder or an entire S3/GCP bucket.
+    A storage location can be local or in cloud and refers to either a
+    directory/folder or an entire S3/GCP bucket.
 
-    This registry is auto-managed and read-only.
+    A LaminDB instance can manage and reference multiple storage locations.
+
+    Admonition: Managed vs. referenced storage locations
+
+        In managed storage locations, you can update & delete artifacts. In
+        referenced storage locations you can only read artifacts.
+
+        When you delete a LaminDB instance, you'll be warned about data in managed
+        storage locations. Data in referenced storage locations will be ignored.
+
+    Note:
+        This registry is auto-managed and read-only.
 
     See Also:
         Default storage: :attr:`~lamindb.core.Settings.storage`
+        Storage settings: :attr:`~lamindb.setup.core.SettingsSettings`
 
     Examples:
 
-        Configure the default storage location upon initiation of a LaminDB instance:
+        Configure the default storage location upon initiation of a LaminDB instance::
 
-        `lamin init --storage ./mydata # or "s3://my-bucket" or "gs://my-bucket"`
+        lamin init --storage ./mydata # or "s3://my-bucket" or "gs://my-bucket"
 
         View the default storage location:
 
@@ -783,9 +796,11 @@ class Storage(Registry):
     description = CharField(max_length=255, db_index=True, null=True, default=None)
     """A description of what the storage location is used for (optional)."""
     type = CharField(max_length=30, db_index=True)
-    """Local vs. s3 vs. gcp etc."""
+    """Can be "local" vs. "s3" vs. "gs"."""
     region = CharField(max_length=64, db_index=True, null=True, default=None)
     """Cloud storage region, if applicable."""
+    instance_uid = CharField(max_length=12, db_index=True, null=True, default=None)
+    """Instance that manages this storage location."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
