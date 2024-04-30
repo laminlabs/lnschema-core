@@ -750,31 +750,37 @@ class User(Registry, CanValidate):
 class Storage(Registry):
     """Storage locations.
 
-    A storage location can be local or in cloud and refers to either a
-    directory/folder or an entire S3/GCP bucket.
+    A storage location is either a directory/folder (local or in the cloud) or
+    an entire S3/GCP bucket.
 
-    A LaminDB instance can manage and reference multiple storage locations.
+    A LaminDB instance can manage and link multiple storage locations. But any
+    storage location is managed by *at most one* LaminDB instance.
 
-    Admonition: Managed vs. referenced storage locations
+    .. dropdown:: Managed vs. linked storage locations
 
-        In managed storage locations, you can update & delete artifacts. In
-        referenced storage locations you can only read artifacts.
+        The LaminDB instance can update & delete artifacts in managed storage
+        locations but merely read artifacts in linked storage locations.
+
+        When you transfer artifacts from another instance, the default is to
+        only copy metadata into the target instance, but merely link the data.
+
+        The `instance_uid` field indicates the managing LaminDB instance of a
+        storage location.
 
         When you delete a LaminDB instance, you'll be warned about data in managed
-        storage locations. Data in referenced storage locations will be ignored.
-
-    Note:
-        This registry is auto-managed and read-only.
+        storage locations while data in linked storage locations is ignored.
 
     See Also:
-        Default storage: :attr:`~lamindb.core.Settings.storage`
-        Storage settings: :attr:`~lamindb.setup.core.SettingsSettings`
+        :attr:`~lamindb.core.Settings.storage`
+            Default storage.
+        :attr:`~lamindb.setup.core.StorageSettings`
+            Storage settings.
 
     Examples:
 
         Configure the default storage location upon initiation of a LaminDB instance::
 
-        lamin init --storage ./mydata # or "s3://my-bucket" or "gs://my-bucket"
+            lamin init --storage ./mydata # or "s3://my-bucket" or "gs://my-bucket"
 
         View the default storage location:
 
