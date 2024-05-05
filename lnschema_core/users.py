@@ -9,8 +9,11 @@ def current_user_id() -> int:
     def query_user_id():
         try:
             return User.objects.get(uid=settings.user.uid).id
-        except Exception:
-            return 1
+        except Exception as error:
+            raise ValueError(
+                "Your user is not yet part of the User registry of this instance.\n"
+                "Call `ln.setup._init_instance.register_user(ln.setup.settings.user)`"
+            ) from error
 
     if settings._instance_exists:
         if settings.instance.slug not in user_id_cache:
