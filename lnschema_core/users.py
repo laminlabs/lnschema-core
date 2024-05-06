@@ -1,3 +1,5 @@
+from lamin_utils import logger
+
 user_id_cache = {}
 
 
@@ -12,6 +14,12 @@ def current_user_id() -> int:
         try:
             return User.objects.get(uid=settings.user.uid).id
         except Exception:
+            logger.warning(
+                "Couldn't retrieve user id (the `created_by` field couldn't be set correctly).\n"
+                "Your user is not yet part of the User registry of this instance. Run\n"
+                "from lamindb_setup._init_instance import register_user\n"
+                "register_user(ln.setup.settings.user)"
+            )
             # This is needed when first creating the instance during migrations
             return 1
 
