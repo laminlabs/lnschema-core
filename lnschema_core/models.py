@@ -553,7 +553,7 @@ class Registry(models.Model):
         query_set = filter(cls)
         if hasattr(cls, "updated_at"):
             query_set = query_set.order_by("-updated_at")
-        return query_set.df()
+        return query_set.df(include=include)
 
     @classmethod
     def search(
