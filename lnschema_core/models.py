@@ -1383,19 +1383,29 @@ class FeatureSet(Registry):
 
     Examples:
 
+        Create a featureset from df with types:
+
         >>> df = pd.DataFrame({"feat1": [1, 2], "feat2": [3.1, 4.2], "feat3": ["cond1", "cond2"]})
         >>> feature_set = ln.FeatureSet.from_df(df)
 
+        Create a featureset from features:
+
         >>> features = ln.Feature.from_values(["feat1", "feat2"], type=float)
-        >>> ln.FeatureSet(features)
+        >>> feature_set = ln.FeatureSet(features)
+
+        Create a featureset from feature values:
 
         >>> import bionty as bt
-        >>> reference = bt.Gene(organism="mouse")
-        >>> feature_set = ln.FeatureSet.from_values(adata.var["ensemble_id"], Gene.ensembl_gene_id)
+        >>> feature_set = ln.FeatureSet.from_values(adata.var["ensemble_id"], Gene.ensembl_gene_id, orgaism="mouse")
         >>> feature_set.save()
-        >>> artifact = ln.Artifact(adata, name="Mouse Lymph Node scRNA-seq")
-        >>> artifact.save()
-        >>> artifact.features.add_feature_st(feature_set, slot="var")
+
+        Link a feature set to an artifact:
+
+        >>> artifact.features.add_feature_set(feature_set, slot="var")
+
+        Link features to an artifact (will create a featureset under the hood):
+
+        >>> artifact.features.add(features)
     """
 
     id = models.AutoField(primary_key=True)
