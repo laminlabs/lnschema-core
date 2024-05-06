@@ -89,28 +89,6 @@ class IsVersioned:
         pass
 
 
-class IsTree:
-    """Base class providing view_tree function."""
-
-    @classmethod
-    def view_tree(
-        cls,
-        level: int = -1,
-        limit_to_directories: bool = False,
-        length_limit: int = 1000,
-        max_files_per_dir_per_type: int = 7,
-    ) -> None:
-        """View the tree structure of the keys.
-
-        Args:
-            level: ``int=-1`` Depth of the tree to be displayed. Default is -1 which means all levels.
-            limit_to_directories: ``bool=False`` If True, only directories will be displayed.
-            length_limit: ``int=1000`` Maximum number of nodes to be displayed.
-            max_files_per_dir_per_type: ``int=7`` Maximum number of files per directory per type.
-        """
-        pass
-
-
 class CanValidate:
     """Base class providing :class:`~lamindb.core.Registry`-based validation."""
 
@@ -1513,7 +1491,7 @@ class FeatureSet(Registry):
         pass
 
 
-class Artifact(Registry, Data, IsTree, IsVersioned):
+class Artifact(Registry, Data, IsVersioned):
     """Artifacts: datasets & models stored as files, folders, or arrays.
 
     Artifacts manage data in local or remote storage.
