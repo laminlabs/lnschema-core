@@ -2,6 +2,8 @@ user_id_cache = {}
 
 
 def current_user_id() -> int:
+    # Internal function, do not use directly due to the try & except block
+    # Instead, use lamindb_setup.settings.user.id
     from lamindb_setup import settings
 
     from lnschema_core.models import User
@@ -10,6 +12,7 @@ def current_user_id() -> int:
         try:
             return User.objects.get(uid=settings.user.uid).id
         except Exception:
+            # This is needed when first creating the instance during migrations
             return 1
 
     if settings._instance_exists:
