@@ -8,7 +8,6 @@ from typing import (
     Iterable,
     Literal,
     NamedTuple,
-    Optional,
     overload,
 )
 
@@ -57,10 +56,22 @@ if TYPE_CHECKING or _INSTANCE_SETUP or RUNNING_SPHINX:
     pass
 
 
-class IsVersioned:
+class IsVersioned(models.Model):
     """Base class for versioned models."""
 
+    class Meta:
+        abstract = True
+
     _len_stem_uid: int
+
+    version = CharField(max_length=10, default=None, null=True, db_index=True)
+    """Version (default `None`).
+
+    Defines version of a family of records characterized by the same `stem_uid`.
+
+    Consider using `semantic versioning <https://semver.org>`__
+    with `Python versioning <https://peps.python.org/pep-0440/>`__.
+    """
 
     @property
     def stem_uid(self) -> str:
@@ -896,6 +907,9 @@ class Transform(Registry, HasParents, IsVersioned):
         >>> transform.view_parents()
     """
 
+    class Meta(Registry.Meta, IsVersioned.Meta):
+        abstract = False
+
     _len_stem_uid: int = 12
     _len_full_uid: int = 16
 
@@ -907,14 +921,6 @@ class Transform(Registry, HasParents, IsVersioned):
     """A name or title. For instance, a pipeline name, notebook title, etc."""
     key = CharField(max_length=120, db_index=True, null=True, default=None)
     """A key for concise reference & versioning (optional)."""
-    version = CharField(max_length=10, default=None, null=True, db_index=True)
-    """Version (default `None`).
-
-    Defines version of a family of records characterized by the same `stem_uid`.
-
-    Consider using `semantic versioning <https://semver.org>`__
-    with `Python versioning <https://peps.python.org/pep-0440/>`__.
-    """
     description = CharField(max_length=255, null=True, default=None)
     """A description (optional)."""
     type = CharField(
@@ -1592,6 +1598,9 @@ class Artifact(Registry, Data, IsVersioned):
 
     """
 
+    class Meta(Registry.Meta, IsVersioned.Meta):
+        abstract = False
+
     _len_full_uid: int = 20
     _len_stem_uid: int = 16
 
@@ -1617,14 +1626,6 @@ class Artifact(Registry, Data, IsVersioned):
     """
     description = CharField(max_length=255, db_index=True, null=True, default=None)
     """A description."""
-    version = CharField(max_length=10, null=True, default=None, db_index=True)
-    """Version (default `None`).
-
-    Defines version of a family of records characterized by the same `stem_uid`.
-
-    Consider using `semantic versioning <https://semver.org>`__
-    with `Python versioning <https://peps.python.org/pep-0440/>`__.
-    """
     size = models.BigIntegerField(null=True, db_index=True)
     """Size in bytes.
 
@@ -2079,6 +2080,9 @@ class Collection(Registry, Data, IsVersioned):
         >>> assert new_collection.version == "2"
     """
 
+    class Meta(Registry.Meta, IsVersioned.Meta):
+        abstract = False
+
     _len_full_uid: int = 20
     _len_stem_uid: int = 16
 
@@ -2092,14 +2096,6 @@ class Collection(Registry, Data, IsVersioned):
     """Name or title of collection (required)."""
     description = TextField(null=True, default=None)
     """A description."""
-    version = CharField(max_length=10, null=True, default=None, db_index=True)
-    """Version (default `None`).
-
-    Defines version of a family of records characterized by the same `stem_uid`.
-
-    Consider using `semantic versioning <https://semver.org>`__
-    with `Python versioning <https://peps.python.org/pep-0440/>`__.
-    """
     hash = CharField(max_length=86, db_index=True, null=True, default=None)
     """Hash of collection content. 86 base64 chars allow to store 64 bytes, 512 bits."""
     reference = CharField(max_length=255, db_index=True, null=True, default=None)
