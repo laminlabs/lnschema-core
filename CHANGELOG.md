@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+Add using docstring | [378](https://github.com/laminlabs/lnschema-core/pull/378) | [Zethson](https://github.com/Zethson) | 2024-05-07 |
 ♻️ Move `version` field into `IsVersioned` base model | [377](https://github.com/laminlabs/lnschema-core/pull/377) | [falexwolf](https://github.com/falexwolf) | 2024-05-07 |
 📝 Better examples for FeatureSet | [375](https://github.com/laminlabs/lnschema-core/pull/375) | [sunnyosun](https://github.com/sunnyosun) | 2024-05-06 |
 ✨ Add an `instance_uid` field to Storage | [374](https://github.com/laminlabs/lnschema-core/pull/374) | [falexwolf](https://github.com/falexwolf) | 2024-04-28 | 0.66.0
