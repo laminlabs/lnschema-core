@@ -588,6 +588,14 @@ class Registry(models.Model):
 
         Args:
             instance: An instance identifier of form "account_handle/instance_name".
+
+        Examples:
+            >>> ln.ULabel.using("account_handle/instance_name").search("ULabel2", field="name")
+                        uid    score
+            name
+            ULabel2  o3FY3c5n  100.0
+            ULabel1  CcFPLmpq   75.0
+            ULabel3  Qi3c4utq   75.0
         """
         pass
 
