@@ -553,40 +553,28 @@ class Registry(models.Model):
         limit: int | None = 20,
         return_queryset: bool = False,
         case_sensitive: bool = False,
-        synonyms_field: StrField | None = "synonyms",  # type: ignore
     ) -> pd.DataFrame | QuerySet:
         """Search.
 
-        Makes reasonable choices of which fields to search.
-
-        For instance, for :class:`~lamindb.Artifact`, searches `key` and
-        `description` fields.
-
         Args:
             string: The input string to match against the field ontology values.
-            field: The field against which the input string is matching.
+            field: The field or fields to search. Search all string fields by default.
             limit: Maximum amount of top results to return.
             return_queryset: Return search result as a sorted QuerySet.
             case_sensitive: Whether the match is case sensitive.
-            synonyms_field: Search synonyms if column is available. If `None`,
-                is ignored.
 
         Returns:
             A sorted `DataFrame` of search results with a score in column `score`.
-            If `return_queryset` is `True`, an ordered `QuerySet`.
+            If `return_queryset` is `True`, a `QuerySet`.
 
         See Also:
             :meth:`~lamindb.core.Registry.filter`
             :meth:`~lamindb.core.Registry.lookup`
 
         Examples:
-            >>> ln.save(ln.ULabel.from_values(["ULabel1", "ULabel2", "ULabel3"], field="name"))
+            >>> ulabels = ln.ULabel.from_values(["ULabel1", "ULabel2", "ULabel3"], field="name")
+            >>> ln.save(ulabels)
             >>> ln.ULabel.search("ULabel2")
-                        uid    score
-            name
-            ULabel2  o3FY3c5n  100.0
-            ULabel1  CcFPLmpq   75.0
-            ULabel3  Qi3c4utq   75.0
         """
         pass
 
