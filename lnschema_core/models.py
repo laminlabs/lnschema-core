@@ -551,16 +551,14 @@ class Registry(models.Model):
         *,
         field: StrField | None = None,
         limit: int | None = 20,
-        return_queryset: bool = False,
         case_sensitive: bool = False,
-    ) -> pd.DataFrame | QuerySet:
+    ) -> QuerySet:
         """Search.
 
         Args:
             string: The input string to match against the field ontology values.
             field: The field or fields to search. Search all string fields by default.
             limit: Maximum amount of top results to return.
-            return_queryset: Return search result as a sorted QuerySet.
             case_sensitive: Whether the match is case sensitive.
 
         Returns:
