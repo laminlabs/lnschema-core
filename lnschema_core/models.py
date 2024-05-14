@@ -1486,6 +1486,7 @@ class FeatureSet(Registry):
         mute: bool = False,
         organism: Registry | str | None = None,
         public_source: Registry | None = None,
+        raise_validation_error: bool = True,
     ) -> FeatureSet:
         """Create feature set for validated features.
 
@@ -1498,6 +1499,7 @@ class FeatureSet(Registry):
             name: A name.
             organism: An organism to resolve gene mapping.
             public_source: A public ontology to resolve feature identifier mapping.
+            raise_validation_error: Whether to raise a validation error if some values are not valid.
 
         Raises:
             ValidationError: If some values are not valid.
