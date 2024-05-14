@@ -1488,18 +1488,21 @@ class FeatureSet(Registry):
         mute: bool = False,
         organism: Registry | str | None = None,
         public_source: Registry | None = None,
-    ) -> FeatureSet | None:
+    ) -> FeatureSet:
         """Create feature set for validated features.
 
         Args:
             values: A list of values, like feature names or ids.
-            field: The field of a reference Registry to
-                map values.
+            field: The field of a reference registry to map values.
             type: The simple type. Defaults to
                 `None` if reference registry is :class:`~lamindb.Feature`, defaults to
                 `"float"` otherwise.
             name: A name.
-            **kwargs: Can contain ``organism`` or other context to interpret values.
+            organism: An organism to resolve gene mapping.
+            public_source: A public ontology to resolve feature identifier mapping.
+
+        Raises:
+            ValidationError: If some values are not valid.
 
         Examples:
 
