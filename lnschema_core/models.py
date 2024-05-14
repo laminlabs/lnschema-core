@@ -977,7 +977,7 @@ class Transform(Registry, HasParents, IsVersioned):
         super().__init__(*args, **kwargs)
 
 
-class Param(models.Model):
+class Param(Registry):
     """Run parameters akin to Feature for artifacts."""
 
     name = models.CharField(max_length=100, db_index=True)
@@ -987,7 +987,7 @@ class Param(models.Model):
     """Time of last update to record."""
 
 
-class ParamValue(models.Model):
+class ParamValue(Registry):
     """Run parameter values akin to FeatureValue for artifacts."""
 
     param = models.ForeignKey(Param, on_delete=models.CASCADE)
@@ -1351,7 +1351,7 @@ class Feature(Registry, CanValidate):
         pass
 
 
-class FeatureValue(models.Model):
+class FeatureValue(Registry):
     """Non-categorical features values.
 
     Categorical feature values are stored in their respective registries:
@@ -2395,7 +2395,7 @@ class CollectionULabel(Registry, LinkORM):
         unique_together = ("collection", "ulabel")
 
 
-class ArtifactFeatureValue(models.Model, LinkORM):
+class ArtifactFeatureValue(Registry, LinkORM):
     id = models.BigAutoField(primary_key=True)
     artifact = models.ForeignKey(Artifact, on_delete=models.CASCADE)
     feature_value = models.ForeignKey(FeatureValue, on_delete=models.CASCADE)
@@ -2404,7 +2404,7 @@ class ArtifactFeatureValue(models.Model, LinkORM):
         unique_together = ("artifact", "feature_value")
 
 
-class RunParamValue(models.Model, LinkORM):
+class RunParamValue(Registry, LinkORM):
     id = models.BigAutoField(primary_key=True)
     run = models.ForeignKey(Run, on_delete=models.CASCADE)
     param_value = models.ForeignKey(ParamValue, on_delete=models.CASCADE)
