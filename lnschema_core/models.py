@@ -1053,8 +1053,6 @@ class Run(Registry):
         ParamValue, through="RunParamValue", related_name="runs"
     )
     """Parameter values."""
-    param_hash = CharField(max_length=20, default=None, db_index=True, null=True)
-    """The hash of the set."""
     # we don't want to make below a OneToOne because there could be the same trivial report
     # generated for many different runs
     report = models.ForeignKey(
