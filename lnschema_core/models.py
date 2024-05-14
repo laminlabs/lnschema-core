@@ -1049,11 +1049,11 @@ class Run(Registry):
     """Creator of run, a :class:`~lamindb.User`."""
     json = models.JSONField(null=True, default=None)
     """JSON field."""
-    param_values = models.ManyToMany(
+    param_values = models.ManyToManyField(
         ParamValue, through="RunParamValue", related_name="runs"
     )
     """Parameter values."""
-    hash = CharField(max_length=20, default=None, db_index=True, null=True)
+    param_hash = CharField(max_length=20, default=None, db_index=True, null=True)
     """The hash of the set."""
     # we don't want to make below a OneToOne because there could be the same trivial report
     # generated for many different runs
@@ -1705,7 +1705,9 @@ class Artifact(Registry, Data, IsVersioned):
         FeatureSet, related_name="artifacts", through="ArtifactFeatureSet"
     )
     """The feature sets measured in the artifact (:class:`~lamindb.FeatureSet`)."""
-    feature_values = models.ManyToMany(FeatureValue, through="ArtifactFeatureValue")
+    feature_values = models.ManyToManyField(
+        FeatureValue, through="ArtifactFeatureValue"
+    )
     """Non-categorical feature values for annotation."""
     visibility = models.SmallIntegerField(
         db_index=True, choices=VisibilityChoice.choices, default=1
