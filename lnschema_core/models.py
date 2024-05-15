@@ -977,6 +977,25 @@ class Transform(Registry, HasParents, IsVersioned):
         super().__init__(*args, **kwargs)
 
 
+class Param(Registry):
+    """Run parameters akin to Feature for artifacts."""
+
+    name = models.CharField(max_length=100, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(User, on_delete=models.PROTECT)
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    """Time of last update to record."""
+
+
+class ParamValue(Registry):
+    """Run parameter values akin to FeatureValue for artifacts."""
+
+    param = models.ForeignKey(Param, on_delete=models.CASCADE)
+    value = models.JSONField()  # stores float, integer, boolean or datetime
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(User, on_delete=models.PROTECT)
+
+
 class Run(Registry):
     """Runs of transforms.
 
@@ -1030,6 +1049,10 @@ class Run(Registry):
     """Creator of run, a :class:`~lamindb.User`."""
     json = models.JSONField(null=True, default=None)
     """JSON field."""
+    param_values = models.ManyToManyField(
+        ParamValue, through="RunParamValue", related_name="runs"
+    )
+    """Parameter values."""
     # we don't want to make below a OneToOne because there could be the same trivial report
     # generated for many different runs
     report = models.ForeignKey(
@@ -1321,9 +1344,27 @@ class Feature(Registry, CanValidate):
         """Create Feature records for columns."""
         pass
 
-    def save(self, *args, **kwargs) -> None:
+    def save(self, *args, **kwargs) -> Feature:
         """Save."""
         pass
+
+
+class FeatureValue(Registry):
+    """Non-categorical features values.
+
+    Categorical feature values are stored in their respective registries:
+    :class:`~lamindb.ULabel`, :class:`~bionty.CellType`, etc.
+
+    Unlike for ULabel, in `FeatureValue`, values are grouped by features, and
+    not by an ontological hierarchy.
+    """
+
+    feature = models.ForeignKey(Feature, CASCADE, null=True, default=None)
+    value = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    created_by = models.ForeignKey(
+        User, PROTECT, default=current_user_id, related_name="created_feature_sets"
+    )
 
 
 class FeatureSet(Registry):
@@ -1445,18 +1486,23 @@ class FeatureSet(Registry):
         mute: bool = False,
         organism: Registry | str | None = None,
         public_source: Registry | None = None,
-    ) -> FeatureSet | None:
+        raise_validation_error: bool = True,
+    ) -> FeatureSet:
         """Create feature set for validated features.
 
         Args:
             values: A list of values, like feature names or ids.
-            field: The field of a reference Registry to
-                map values.
+            field: The field of a reference registry to map values.
             type: The simple type. Defaults to
                 `None` if reference registry is :class:`~lamindb.Feature`, defaults to
                 `"float"` otherwise.
             name: A name.
-            **kwargs: Can contain ``organism`` or other context to interpret values.
+            organism: An organism to resolve gene mapping.
+            public_source: A public ontology to resolve feature identifier mapping.
+            raise_validation_error: Whether to raise a validation error if some values are not valid.
+
+        Raises:
+            ValidationError: If some values are not valid.
 
         Examples:
 
@@ -1644,10 +1690,6 @@ class Artifact(Registry, Data, IsVersioned):
 
     Typically, this denotes the first array dimension.
     """
-    feature_sets = models.ManyToManyField(
-        FeatureSet, related_name="artifacts", through="ArtifactFeatureSet"
-    )
-    """The feature sets measured in the artifact (:class:`~lamindb.FeatureSet`)."""
     ulabels = models.ManyToManyField(
         ULabel, through="ArtifactULabel", related_name="artifacts"
     )
@@ -1662,6 +1704,14 @@ class Artifact(Registry, Data, IsVersioned):
     """:class:`~lamindb.Run` that created the artifact."""
     input_of = models.ManyToManyField(Run, related_name="input_artifacts")
     """Runs that use this artifact as an input."""
+    feature_sets = models.ManyToManyField(
+        FeatureSet, related_name="artifacts", through="ArtifactFeatureSet"
+    )
+    """The feature sets measured in the artifact (:class:`~lamindb.FeatureSet`)."""
+    feature_values = models.ManyToManyField(
+        FeatureValue, through="ArtifactFeatureValue"
+    )
+    """Non-categorical feature values for annotation."""
     visibility = models.SmallIntegerField(
         db_index=True, choices=VisibilityChoice.choices, default=1
     )
@@ -2346,6 +2396,24 @@ class CollectionULabel(Registry, LinkORM):
 
     class Meta:
         unique_together = ("collection", "ulabel")
+
+
+class ArtifactFeatureValue(Registry, LinkORM):
+    id = models.BigAutoField(primary_key=True)
+    artifact = models.ForeignKey(Artifact, on_delete=models.CASCADE)
+    feature_value = models.ForeignKey(FeatureValue, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ("artifact", "feature_value")
+
+
+class RunParamValue(Registry, LinkORM):
+    id = models.BigAutoField(primary_key=True)
+    run = models.ForeignKey(Run, on_delete=models.CASCADE)
+    param_value = models.ForeignKey(ParamValue, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ("run", "param_value")
 
 
 # -------------------------------------------------------------------------------------
