@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+✨ Add `FeatureValue` and `ParamValue` | [379](https://github.com/laminlabs/lnschema-core/pull/379) | [falexwolf](https://github.com/falexwolf) | 2024-05-15 |
 Add using docstring | [378](https://github.com/laminlabs/lnschema-core/pull/378) | [Zethson](https://github.com/Zethson) | 2024-05-07 |
 ♻️ Move `version` field into `IsVersioned` base model | [377](https://github.com/laminlabs/lnschema-core/pull/377) | [falexwolf](https://github.com/falexwolf) | 2024-05-07 |
 📝 Better examples for FeatureSet | [375](https://github.com/laminlabs/lnschema-core/pull/375) | [sunnyosun](https://github.com/sunnyosun) | 2024-05-06 |
