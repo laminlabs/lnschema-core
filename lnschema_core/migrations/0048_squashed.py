@@ -14,6 +14,10 @@ class Migration(migrations.Migration):
     replaces = [
         (
             "lnschema_core",
+            "0037_rename_dataset_to_collection",
+        ),
+        (
+            "lnschema_core",
             "0038_alter_collection_artifact_alter_collection_artifacts_and_more",
         ),
         (
