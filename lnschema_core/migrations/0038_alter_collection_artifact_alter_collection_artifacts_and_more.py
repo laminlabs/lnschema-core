@@ -7,9 +7,7 @@ import lnschema_core.users
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ("lnschema_core", "0037_rename_dataset_to_collection"),
-    ]
+    dependencies = [("lnschema_core", "0037_rename_dataset_to_collection")]
 
     operations = [
         migrations.AlterField(
