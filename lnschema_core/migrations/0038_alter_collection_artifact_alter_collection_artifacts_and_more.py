@@ -7,7 +7,7 @@ import lnschema_core.users
 
 
 class Migration(migrations.Migration):
-    dependencies = []  # type: ignore
+    dependencies = [("lnschema_core", "0001_initial_squashed_0037")]
 
     operations = [
         migrations.AlterField(
