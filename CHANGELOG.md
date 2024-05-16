@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🔥 Delete old migrations and create a new squashed initial migration | [380](https://github.com/laminlabs/lnschema-core/pull/380) | [falexwolf](https://github.com/falexwolf) | 2024-05-16 |
 ✨ Add `FeatureValue` and `ParamValue` | [379](https://github.com/laminlabs/lnschema-core/pull/379) | [falexwolf](https://github.com/falexwolf) | 2024-05-15 |
 Add using docstring | [378](https://github.com/laminlabs/lnschema-core/pull/378) | [Zethson](https://github.com/Zethson) | 2024-05-07 |
 ♻️ Move `version` field into `IsVersioned` base model | [377](https://github.com/laminlabs/lnschema-core/pull/377) | [falexwolf](https://github.com/falexwolf) | 2024-05-07 |
