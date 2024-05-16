@@ -162,10 +162,6 @@ class Migration(migrations.Migration):
 
 
 schemas = lamindb_setup.settings.instance.schema
-if "bionty" in schemas:
-    Migration.dependencies.append(
-        ("lnschema_bionty", "0020_alter_organism_bionty_source")
-    )
 if "lamin1" in schemas:
     Migration.dependencies.append(
         ("lnschema_lamin1", "0014_rename_species_biosample_organism")
