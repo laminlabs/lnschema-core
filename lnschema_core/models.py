@@ -2382,7 +2382,7 @@ class ArtifactULabel(Registry, LinkORM):
     id = models.BigAutoField(primary_key=True)
     artifact = models.ForeignKey(Artifact, on_delete=models.CASCADE)
     ulabel = models.ForeignKey(ULabel, on_delete=models.CASCADE)
-    feature = models.ForeignKey(Feature, CASCADE, null=True, default=None)
+    feature = models.ForeignKey(Feature, PROTECT, null=True, default=None)
 
     class Meta:
         unique_together = ("artifact", "ulabel")
@@ -2392,7 +2392,7 @@ class CollectionULabel(Registry, LinkORM):
     id = models.BigAutoField(primary_key=True)
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE)
     ulabel = models.ForeignKey(ULabel, on_delete=models.CASCADE)
-    feature = models.ForeignKey(Feature, CASCADE, null=True, default=None)
+    feature = models.ForeignKey(Feature, PROTECT, null=True, default=None)
 
     class Meta:
         unique_together = ("collection", "ulabel")
