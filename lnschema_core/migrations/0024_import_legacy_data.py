@@ -77,8 +77,10 @@ class Migration(migrations.Migration):
     ]
 
 
-# SCHEMAS = lamindb_setup.settings.instance.schema
-# if "bionty" in SCHEMAS:
-#     Migration.dependencies.append(("lnschema_bionty", "0022_rename_datasets_cellline_collections_and_more"))
-# if "wetlab" in SCHEMAS:
-#     Migration.dependencies.append(("wetlab", "0001_initial_squashed_0012"))
+SCHEMAS = lamindb_setup.settings.instance.schema
+if "bionty" in SCHEMAS:
+    Migration.dependencies.append(
+        ("lnschema_bionty", "0022_rename_datasets_cellline_collections_and_more")
+    )
+if "wetlab" in SCHEMAS:
+    Migration.dependencies.append(("wetlab", "0001_initial_squashed_0012"))
