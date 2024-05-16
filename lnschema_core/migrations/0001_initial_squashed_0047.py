@@ -55,4 +55,5 @@ class Migration(migrations.Migration):
         ),
         ("lnschema_core", "0046_storage_instance_uid"),
         ("lnschema_core", "0047_featurevalue_artifactfeaturevalue_and_more"),
+        ("lnschema_core", "0048_alter_artifactulabel_feature_and_more"),
     ]
