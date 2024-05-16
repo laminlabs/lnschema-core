@@ -12,27 +12,6 @@ import lnschema_core.users
 
 class Migration(migrations.Migration):
     replaces = [
-        ("lnschema_core", "0001_initial_squashed_0023"),
-        ("lnschema_core", "0024_import_legacy_data"),
-        ("lnschema_core", "0025_remove_user_email"),
-        ("lnschema_core", "0026_dataset_visibility_file_visibility"),
-        ("lnschema_core", "0027_file_key_is_virtual"),
-        ("lnschema_core", "0028_alter_dataset_visibility_alter_file_visibility"),
-        (
-            "lnschema_core",
-            "0029_remove_feature_modality_remove_featureset_modality_and_more",
-        ),
-        ("lnschema_core", "0030_alter_dataset_visibility_alter_file_visibility"),
-        ("lnschema_core", "0031_rename_file_to_artifact"),
-        ("lnschema_core", "0032_remove_dataset_storage"),
-        (
-            "lnschema_core",
-            "0033_alter_artifact_unique_together_artifact_n_objects_and_more",
-        ),
-        ("lnschema_core", "0034_run_environment"),
-        ("lnschema_core", "0035_remove_artifact_initial_version_and_more"),
-        ("lnschema_core", "0036_storage_description"),
-        ("lnschema_core", "0037_rename_dataset_to_collection"),
         (
             "lnschema_core",
             "0038_alter_collection_artifact_alter_collection_artifacts_and_more",
