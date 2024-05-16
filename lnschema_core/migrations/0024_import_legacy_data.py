@@ -75,10 +75,3 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(import_db, reverse_code=migrations.RunPython.noop),
     ]
-
-
-schemas = lamindb_setup.settings.instance.schema
-if "bionty" in schemas:
-    Migration.dependencies.append(("lnschema_bionty", "0016_export_legacy_data"))
-if "lamin1" in schemas:
-    Migration.dependencies.append(("lnschema_lamin1", "0012_export_legacy_data"))
