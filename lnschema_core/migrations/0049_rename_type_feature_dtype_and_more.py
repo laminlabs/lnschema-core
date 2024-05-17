@@ -14,6 +14,14 @@ class Migration(migrations.Migration):
             old_name="type",
             new_name="dtype",
         ),
+        migrations.RunSQL(
+            """
+            -- Update "dtype" where the old value was "category"
+            UPDATE lnschema_core_feature
+            SET dtype = 'cat[' || registries || ']'
+            WHERE dtype = 'category';
+            """
+        ),
         migrations.RenameField(
             model_name="featureset",
             old_name="type",
