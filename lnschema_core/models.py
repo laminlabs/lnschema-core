@@ -1309,7 +1309,7 @@ class Feature(Registry, CanValidate):
     def __init__(
         self,
         name: str,
-        type: str,
+        type: str | list[Type[Registry]],  # noqa
         unit: str | None,
         description: str | None,
         synonyms: str | None,
