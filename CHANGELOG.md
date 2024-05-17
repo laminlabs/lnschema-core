@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚚 Rename `.type` to `.dtype` for `Feature` and `FeatureSet` | [382](https://github.com/laminlabs/lnschema-core/pull/382) | [falexwolf](https://github.com/falexwolf) | 2024-05-17 |
 🔥 Prune migrations | [381](https://github.com/laminlabs/lnschema-core/pull/381) | [falexwolf](https://github.com/falexwolf) | 2024-05-16 |
 🔥 Delete old migrations and create a new squashed initial migration | [380](https://github.com/laminlabs/lnschema-core/pull/380) | [falexwolf](https://github.com/falexwolf) | 2024-05-16 |
 ✨ Add `FeatureValue` and `ParamValue` | [379](https://github.com/laminlabs/lnschema-core/pull/379) | [falexwolf](https://github.com/falexwolf) | 2024-05-15 |
