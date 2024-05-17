@@ -8,6 +8,7 @@ from typing import (
     Iterable,
     Literal,
     NamedTuple,
+    Type,
     overload,
 )
 
@@ -48,6 +49,7 @@ if TYPE_CHECKING:
         QuerySet,
         RecordsList,
     )
+
 
 # determine when it's save to make heavy imports
 _INSTANCE_SETUP = _check_instance_setup()
@@ -1221,16 +1223,13 @@ class ULabel(Registry, HasParents, CanValidate):
 
 
 class Feature(Registry, CanValidate):
-    """Numerical and categorical random variables.
+    """Dataset dimensions.
 
-    A feature denotes a random variable, or, equivalently, a "measured dimension".
+    A feature is a random variable or, equivalently, dimension of a
+    dataset. The `Feature` registry helps to
 
-    A feature that you'd want to track with LaminDB is almost always a column
-    storing observations of numbers or categories in a table or array.
-
-    The `Feature` registry is used to manage the metadata of these columns, most
-    importantly, the column name & the data type. It helps validate column names
-    & annotating datasets by whether they measured a feature.
+    1. manage metadata of features
+    2. annotate datasets by whether they measured a feature
 
     See Also:
         :meth:`~lamindb.Feature.from_df`
@@ -1244,11 +1243,12 @@ class Feature(Registry, CanValidate):
 
     Args:
         name: `str` Name of the feature, typically, a column name.
-        type: `str` Simple type (`"number"`, `"category"`, `"datetime"`), equivalent of `dtype` in numpy.
+        type: `str | list[Type[Registry]]` Data type ("number", "cat", "int", "float", "bool", "datetime").
+            For categorical types, can define from which registry values are
+            sampled, e.g., `cat[ULabel]` or `cat[bionty.CellType]`.
         unit: `str | None = None` Unit of measure, ideally SI (`"m"`, `"s"`, `"kg"`, etc.) or `"normalized"` etc.
         description: `str | None = None` A description.
         synonyms: `str | None = None` Bar-separated synonyms.
-        registries: `str | None = None` Bar-separated registries that provide values for categories.
 
     .. note::
 
@@ -1263,23 +1263,17 @@ class Feature(Registry, CanValidate):
     Notes:
 
         For more control, you can use :mod:`bionty` registries to manage
-        common basic biological entities like genes, proteins & cell markers
-        involved in expression/count measurements.
+        basic biological entities like genes, proteins & cell markers.
 
         Similarly, you can define custom registries to manage high-level derived
-        features like gene sets, malignancy, etc.
+        features like gene sets.
 
     Examples:
 
         >>> df = pd.DataFrame({"feat1": [1, 2], "feat2": [3.1, 4.2], "feat3": ["cond1", "cond2"]})
-        >>> features = ln.Feature.from_df(df)
-        >>> features.save()
+        >>> features = ln.Feature.from_df(df).save()
         >>> # the information from the DataFrame is now available in the Feature table
         >>> ln.Feature.filter().df()
-        id    name    type
-         a   feat1     int
-         b   feat2   float
-         c   feat3     str
 
     """
 
@@ -1289,18 +1283,16 @@ class Feature(Registry, CanValidate):
     """Universal id, valid across DB instances."""
     name = CharField(max_length=150, db_index=True, default=None)
     """Name of feature (required)."""
-    type = CharField(max_length=64, db_index=True, default=None)
-    """Simple type.
+    dtype = CharField(max_length=64, db_index=True, default=None)
+    """Data type ("number", "cat", "int", "float", "bool", "datetime").
 
-    If "category", consider managing categories with :class:`~lamindb.ULabel` or
-    another Registry for managing labels.
+    For categorical types, can define from which registry values are
+    sampled, e.g., `cat[ULabel]` or `cat[bionty.CellType]`.
     """
     unit = CharField(max_length=30, db_index=True, null=True, default=None)
     """Unit of measure, ideally SI (`m`, `s`, `kg`, etc.) or 'normalized' etc. (optional)."""
     description = TextField(db_index=True, null=True, default=None)
     """A description."""
-    registries = CharField(max_length=120, db_index=True, default=None, null=True)
-    """Registries that provide values for labels, bar-separated (|) (optional)."""
     synonyms = TextField(null=True, default=None)
     """Bar-separated (|) synonyms (optional)."""
     feature_sets = models.ManyToManyField("FeatureSet", related_name="features")
@@ -1318,7 +1310,7 @@ class Feature(Registry, CanValidate):
     def __init__(
         self,
         name: str,
-        type: str,  # consider typing with Literal
+        type: str | list[type[Registry]],
         unit: str | None,
         description: str | None,
         synonyms: str | None,
@@ -1435,13 +1427,16 @@ class FeatureSet(Registry):
     """A name (optional)."""
     n = models.IntegerField()
     """Number of features in the set."""
-    type = CharField(max_length=64, null=True, default=None)
-    """Simple type, e.g., "str", "int". Is `None` for :class:`~lamindb.Feature` (optional).
+    dtype = CharField(max_length=64, null=True, default=None)
+    """Data type, e.g., "number", "float", "int". Is `None` for :class:`~lamindb.Feature`.
 
-    For :class:`~lamindb.Feature`, types are expected to be in-homogeneous and defined on a per-feature level.
+    For :class:`~lamindb.Feature`, types are expected to be heterogeneous and defined on a per-feature level.
     """
     registry = CharField(max_length=120, db_index=True)
-    """The registry that stores & validated the feature identifiers, e.g., `'core.Feature'` or `'bt.Gene'`."""
+    """The registry that stores the feature identifiers, e.g., `'core.Feature'` or `'bionty.Gene'`.
+
+    Depending on the registry, `.members` stores, e.g. `Feature` or `Gene` records.
+    """
     hash = CharField(max_length=20, default=None, db_index=True, null=True)
     """The hash of the set."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
