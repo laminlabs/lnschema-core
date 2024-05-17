@@ -50,6 +50,7 @@ if TYPE_CHECKING:
         RecordsList,
     )
 
+
 # determine when it's save to make heavy imports
 _INSTANCE_SETUP = _check_instance_setup()
 RUNNING_SPHINX = "sphinx" in sys.modules
@@ -1242,8 +1243,8 @@ class Feature(Registry, CanValidate):
 
     Args:
         name: `str` Name of the feature, typically, a column name.
-        type: `str | list[type[Registry]]` Data type ("number", "cat", "int", "float", "bool", "datetime").
-            For categorical types, can further specify from which registry values are
+        type: `str | list[Type[Registry]]` Data type ("number", "cat", "int", "float", "bool", "datetime").
+            For categorical types, can define from which registry values are
             sampled, e.g., `cat[ULabel]` or `cat[bionty.CellType]`.
         unit: `str | None = None` Unit of measure, ideally SI (`"m"`, `"s"`, `"kg"`, etc.) or `"normalized"` etc.
         description: `str | None = None` A description.
@@ -1282,10 +1283,10 @@ class Feature(Registry, CanValidate):
     """Universal id, valid across DB instances."""
     name = CharField(max_length=150, db_index=True, default=None)
     """Name of feature (required)."""
-    type = CharField(max_length=150, db_index=True, default=None)
+    dtype = CharField(max_length=150, db_index=True, default=None)
     """Data type ("number", "cat", "int", "float", "bool", "datetime").
 
-    For categorical features, can further specify from which registry values are
+    For categorical types, can define from which registry values are
     sampled, e.g., `cat[ULabel]` or `cat[bionty.CellType]`.
     """
     unit = CharField(max_length=30, db_index=True, null=True, default=None)
@@ -1309,7 +1310,7 @@ class Feature(Registry, CanValidate):
     def __init__(
         self,
         name: str,
-        type: str | list[Type[Registry]],  # noqa
+        type: str | list[type[Registry]],
         unit: str | None,
         description: str | None,
         synonyms: str | None,
@@ -1426,13 +1427,16 @@ class FeatureSet(Registry):
     """A name (optional)."""
     n = models.IntegerField()
     """Number of features in the set."""
-    type = CharField(max_length=64, null=True, default=None)
-    """Simple type, e.g., "str", "int". Is `None` for :class:`~lamindb.Feature` (optional).
+    dtype = CharField(max_length=64, null=True, default=None)
+    """Data type, e.g., "number", "float", "int". Is `None` for :class:`~lamindb.Feature`.
 
-    For :class:`~lamindb.Feature`, types are expected to be in-homogeneous and defined on a per-feature level.
+    For :class:`~lamindb.Feature`, types are expected to be heterogeneous and defined on a per-feature level.
     """
     registry = CharField(max_length=120, db_index=True)
-    """The registry that stores & validated the feature identifiers, e.g., `'core.Feature'` or `'bt.Gene'`."""
+    """The registry that stores the feature identifiers, e.g., `'core.Feature'` or `'bionty.Gene'`.
+
+    Depending on the registry, `.members` stores, e.g. `Feature` or `Gene` records.
+    """
     hash = CharField(max_length=20, default=None, db_index=True, null=True)
     """The hash of the set."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
