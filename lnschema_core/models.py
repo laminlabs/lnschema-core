@@ -1283,7 +1283,7 @@ class Feature(Registry, CanValidate):
     """Universal id, valid across DB instances."""
     name = CharField(max_length=150, db_index=True, default=None)
     """Name of feature (required)."""
-    dtype = CharField(max_length=150, db_index=True, default=None)
+    dtype = CharField(max_length=64, db_index=True, default=None)
     """Data type ("number", "cat", "int", "float", "bool", "datetime").
 
     For categorical types, can define from which registry values are
