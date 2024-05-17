@@ -22,6 +22,13 @@ class Migration(migrations.Migration):
             WHERE dtype = 'category';
             """
         ),
+        migrations.RunSQL(
+            """
+            -- Replace all occurrences of "core." in dtype with an empty string
+            UPDATE your_app_name_feature
+            SET dtype = REPLACE(dtype, 'core.', '');
+            """
+        ),
         migrations.RenameField(
             model_name="featureset",
             old_name="type",
