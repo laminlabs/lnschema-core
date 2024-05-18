@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
         migrations.RunSQL(
             """
             -- Replace all occurrences of "core." in dtype with an empty string
-            UPDATE your_app_name_feature
+            UPDATE lnschema_core_feature
             SET dtype = REPLACE(dtype, 'core.', '');
             """
         ),
