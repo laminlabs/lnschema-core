@@ -983,7 +983,7 @@ class Param(Registry):
 
     name = models.CharField(max_length=100, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(User, on_delete=models.PROTECT)
+    created_by = models.ForeignKey(User, models.PROTECT)
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
 
@@ -991,10 +991,10 @@ class Param(Registry):
 class ParamValue(Registry):
     """Run parameter values akin to FeatureValue for artifacts."""
 
-    param = models.ForeignKey(Param, on_delete=models.CASCADE)
+    param = models.ForeignKey(Param, CASCADE)
     value = models.JSONField()  # stores float, integer, boolean or datetime
     created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(User, on_delete=models.PROTECT)
+    created_by = models.ForeignKey(User, models.PROTECT)
 
 
 class Run(Registry):
@@ -2153,7 +2153,7 @@ class Collection(Registry, Data, IsVersioned):
     input_of = models.ManyToManyField(Run, related_name="input_collections")
     """Runs that use this collection as an input."""
     artifact = models.OneToOneField(
-        "Artifact", on_delete=PROTECT, null=True, unique=True, related_name="collection"
+        "Artifact", PROTECT, null=True, unique=True, related_name="collection"
     )
     """Storage of collection as a one artifact."""
     unordered_artifacts = models.ManyToManyField(
@@ -2338,8 +2338,8 @@ class LinkORM:
 
 class ArtifactFeatureSet(Registry, LinkORM):
     id = models.BigAutoField(primary_key=True)
-    artifact = models.ForeignKey(Artifact, on_delete=models.CASCADE)
-    feature_set = models.ForeignKey(FeatureSet, on_delete=models.CASCADE)
+    artifact = models.ForeignKey(Artifact, CASCADE)
+    feature_set = models.ForeignKey(FeatureSet, CASCADE)
     slot = CharField(max_length=40, null=True, default=None)
 
     class Meta:
@@ -2348,8 +2348,8 @@ class ArtifactFeatureSet(Registry, LinkORM):
 
 class CollectionFeatureSet(Registry, LinkORM):
     id = models.BigAutoField(primary_key=True)
-    collection = models.ForeignKey(Collection, on_delete=models.CASCADE)
-    feature_set = models.ForeignKey(FeatureSet, on_delete=models.CASCADE)
+    collection = models.ForeignKey(Collection, CASCADE)
+    feature_set = models.ForeignKey(FeatureSet, CASCADE)
     slot = CharField(max_length=50, null=True, default=None)
 
     class Meta:
@@ -2358,8 +2358,8 @@ class CollectionFeatureSet(Registry, LinkORM):
 
 class CollectionArtifact(Registry, LinkORM):
     id = models.BigAutoField(primary_key=True)
-    collection = models.ForeignKey(Collection, on_delete=models.CASCADE)
-    artifact = models.ForeignKey(Artifact, on_delete=models.CASCADE)
+    collection = models.ForeignKey(Collection, CASCADE)
+    artifact = models.ForeignKey(Artifact, CASCADE)
 
     class Meta:
         unique_together = ("collection", "artifact")
@@ -2367,8 +2367,8 @@ class CollectionArtifact(Registry, LinkORM):
 
 class ArtifactULabel(Registry, LinkORM):
     id = models.BigAutoField(primary_key=True)
-    artifact = models.ForeignKey(Artifact, on_delete=models.CASCADE)
-    ulabel = models.ForeignKey(ULabel, on_delete=models.CASCADE)
+    artifact = models.ForeignKey(Artifact, CASCADE)
+    ulabel = models.ForeignKey(ULabel, CASCADE)
     feature = models.ForeignKey(Feature, PROTECT, null=True, default=None)
 
     class Meta:
@@ -2377,8 +2377,8 @@ class ArtifactULabel(Registry, LinkORM):
 
 class CollectionULabel(Registry, LinkORM):
     id = models.BigAutoField(primary_key=True)
-    collection = models.ForeignKey(Collection, on_delete=models.CASCADE)
-    ulabel = models.ForeignKey(ULabel, on_delete=models.CASCADE)
+    collection = models.ForeignKey(Collection, CASCADE)
+    ulabel = models.ForeignKey(ULabel, CASCADE)
     feature = models.ForeignKey(Feature, PROTECT, null=True, default=None)
 
     class Meta:
@@ -2387,8 +2387,8 @@ class CollectionULabel(Registry, LinkORM):
 
 class ArtifactFeatureValue(Registry, LinkORM):
     id = models.BigAutoField(primary_key=True)
-    artifact = models.ForeignKey(Artifact, on_delete=models.CASCADE)
-    feature_value = models.ForeignKey(FeatureValue, on_delete=models.CASCADE)
+    artifact = models.ForeignKey(Artifact, CASCADE)
+    feature_value = models.ForeignKey(FeatureValue, CASCADE)
 
     class Meta:
         unique_together = ("artifact", "feature_value")
@@ -2396,8 +2396,8 @@ class ArtifactFeatureValue(Registry, LinkORM):
 
 class RunParamValue(Registry, LinkORM):
     id = models.BigAutoField(primary_key=True)
-    run = models.ForeignKey(Run, on_delete=models.CASCADE)
-    param_value = models.ForeignKey(ParamValue, on_delete=models.CASCADE)
+    run = models.ForeignKey(Run, CASCADE)
+    param_value = models.ForeignKey(ParamValue, CASCADE)
 
     class Meta:
         unique_together = ("run", "param_value")
