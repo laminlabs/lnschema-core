@@ -2368,8 +2368,8 @@ class CollectionFeatureSet(Registry, LinkORM):
 
 class CollectionArtifact(Registry, LinkORM):
     id = models.BigAutoField(primary_key=True)
-    collection = models.ForeignKey(Collection, CASCADE, related_name="+")
-    artifact = models.ForeignKey(Artifact, PROTECT, related_name="+")
+    collection = models.ForeignKey(Collection, CASCADE, related_name="artifact_links")
+    artifact = models.ForeignKey(Artifact, PROTECT, related_name="collection_links")
 
     class Meta:
         unique_together = ("collection", "artifact")
