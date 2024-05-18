@@ -2338,9 +2338,12 @@ class LinkORM:
 
 class ArtifactFeatureSet(Registry, LinkORM):
     id = models.BigAutoField(primary_key=True)
-    artifact = models.ForeignKey(Artifact, CASCADE)
-    feature_set = models.ForeignKey(FeatureSet, CASCADE)
+    artifact = models.ForeignKey(Artifact, CASCADE, related_name="feature_set_links")
+    feature_set = models.ForeignKey(FeatureSet, PROTECT, related_name="artifact_links")
     slot = CharField(max_length=40, null=True, default=None)
+    feature_ref_is_semantic = models.BooleanField(
+        null=True, default=None
+    )  # like Feature name or Gene symbol or CellMarker name
 
     class Meta:
         unique_together = ("artifact", "feature_set")
@@ -2348,9 +2351,16 @@ class ArtifactFeatureSet(Registry, LinkORM):
 
 class CollectionFeatureSet(Registry, LinkORM):
     id = models.BigAutoField(primary_key=True)
-    collection = models.ForeignKey(Collection, CASCADE)
-    feature_set = models.ForeignKey(FeatureSet, CASCADE)
+    collection = models.ForeignKey(
+        Collection, CASCADE, related_name="feature_set_links"
+    )
+    feature_set = models.ForeignKey(
+        FeatureSet, PROTECT, related_name="collection_links"
+    )
     slot = CharField(max_length=50, null=True, default=None)
+    feature_ref_is_semantic = models.BooleanField(
+        null=True, default=None
+    )  # like Feature name or Gene symbol or CellMarker name
 
     class Meta:
         unique_together = ("collection", "feature_set")
@@ -2358,8 +2368,8 @@ class CollectionFeatureSet(Registry, LinkORM):
 
 class CollectionArtifact(Registry, LinkORM):
     id = models.BigAutoField(primary_key=True)
-    collection = models.ForeignKey(Collection, CASCADE)
-    artifact = models.ForeignKey(Artifact, CASCADE)
+    collection = models.ForeignKey(Collection, CASCADE, related_name="+")
+    artifact = models.ForeignKey(Artifact, PROTECT, related_name="+")
 
     class Meta:
         unique_together = ("collection", "artifact")
@@ -2367,9 +2377,13 @@ class CollectionArtifact(Registry, LinkORM):
 
 class ArtifactULabel(Registry, LinkORM):
     id = models.BigAutoField(primary_key=True)
-    artifact = models.ForeignKey(Artifact, CASCADE)
-    ulabel = models.ForeignKey(ULabel, CASCADE)
-    feature = models.ForeignKey(Feature, PROTECT, null=True, default=None)
+    artifact = models.ForeignKey(Artifact, CASCADE, related_name="ulabel_links")
+    ulabel = models.ForeignKey(ULabel, PROTECT, related_name="artifact_links")
+    feature = models.ForeignKey(
+        Feature, PROTECT, null=True, default=None, related_name="artifactulabel_links"
+    )
+    ulabel_ref_is_name = models.BooleanField(null=True, default=None)
+    feature_ref_is_name = models.BooleanField(null=True, default=None)
 
     class Meta:
         unique_together = ("artifact", "ulabel")
@@ -2377,9 +2391,13 @@ class ArtifactULabel(Registry, LinkORM):
 
 class CollectionULabel(Registry, LinkORM):
     id = models.BigAutoField(primary_key=True)
-    collection = models.ForeignKey(Collection, CASCADE)
-    ulabel = models.ForeignKey(ULabel, CASCADE)
-    feature = models.ForeignKey(Feature, PROTECT, null=True, default=None)
+    collection = models.ForeignKey(Collection, CASCADE, related_name="ulabel_links")
+    ulabel = models.ForeignKey(ULabel, PROTECT, related_name="collection_links")
+    feature = models.ForeignKey(
+        Feature, PROTECT, null=True, default=None, related_name="collectionulabel_links"
+    )
+    ulabel_ref_is_name = models.BooleanField(null=True, default=None)
+    feature_ref_is_name = models.BooleanField(null=True, default=None)
 
     class Meta:
         unique_together = ("collection", "ulabel")
@@ -2387,8 +2405,8 @@ class CollectionULabel(Registry, LinkORM):
 
 class ArtifactFeatureValue(Registry, LinkORM):
     id = models.BigAutoField(primary_key=True)
-    artifact = models.ForeignKey(Artifact, CASCADE)
-    feature_value = models.ForeignKey(FeatureValue, CASCADE)
+    artifact = models.ForeignKey(Artifact, CASCADE, related_name="+")
+    feature_value = models.ForeignKey(FeatureValue, PROTECT, related_name="+")
 
     class Meta:
         unique_together = ("artifact", "feature_value")
@@ -2396,8 +2414,8 @@ class ArtifactFeatureValue(Registry, LinkORM):
 
 class RunParamValue(Registry, LinkORM):
     id = models.BigAutoField(primary_key=True)
-    run = models.ForeignKey(Run, CASCADE)
-    param_value = models.ForeignKey(ParamValue, CASCADE)
+    run = models.ForeignKey(Run, CASCADE, related_name="+")
+    param_value = models.ForeignKey(ParamValue, PROTECT, related_name="+")
 
     class Meta:
         unique_together = ("run", "param_value")
