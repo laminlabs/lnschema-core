@@ -1301,7 +1301,12 @@ class Feature(Registry, CanValidate):
     """A description."""
     synonyms = TextField(null=True, default=None)
     """Bar-separated (|) synonyms (optional)."""
-    feature_sets = models.ManyToManyField("FeatureSet", related_name="features")
+    # we define the below ManyToMany on the feature model because it parallels
+    # how other registries (like Gene, Protein, etc.) relate to FeatureSet
+    # it makes the API more consistent
+    feature_sets = models.ManyToManyField(
+        "FeatureSet", through="FeatureSetFeature", related_name="features"
+    )
     """Feature sets linked to this feature."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
@@ -2336,17 +2341,25 @@ class LinkORM:
     pass
 
 
+class FeatureSetFeature(Registry, LinkORM):
+    id = models.BigAutoField(primary_key=True)
+    # we follow the lower() case convention rather than snake case for link models
+    featureset = models.ForeignKey(FeatureSet, CASCADE, related_name="+")
+    feature = models.ForeignKey(Feature, PROTECT, related_name="+")
+
+
 class ArtifactFeatureSet(Registry, LinkORM):
     id = models.BigAutoField(primary_key=True)
     artifact = models.ForeignKey(Artifact, CASCADE, related_name="feature_set_links")
-    feature_set = models.ForeignKey(FeatureSet, PROTECT, related_name="artifact_links")
+    # we follow the lower() case convention rather than snake case for link models
+    featureset = models.ForeignKey(FeatureSet, PROTECT, related_name="artifact_links")
     slot = CharField(max_length=40, null=True, default=None)
     feature_ref_is_semantic = models.BooleanField(
         null=True, default=None
     )  # like Feature name or Gene symbol or CellMarker name
 
     class Meta:
-        unique_together = ("artifact", "feature_set")
+        unique_together = ("artifact", "featureset")
 
 
 class CollectionFeatureSet(Registry, LinkORM):
@@ -2354,16 +2367,15 @@ class CollectionFeatureSet(Registry, LinkORM):
     collection = models.ForeignKey(
         Collection, CASCADE, related_name="feature_set_links"
     )
-    feature_set = models.ForeignKey(
-        FeatureSet, PROTECT, related_name="collection_links"
-    )
+    # we follow the lower() case convention rather than snake case for link models
+    featureset = models.ForeignKey(FeatureSet, PROTECT, related_name="collection_links")
     slot = CharField(max_length=50, null=True, default=None)
     feature_ref_is_semantic = models.BooleanField(
         null=True, default=None
     )  # like Feature name or Gene symbol or CellMarker name
 
     class Meta:
-        unique_together = ("collection", "feature_set")
+        unique_together = ("collection", "featureset")
 
 
 class CollectionArtifact(Registry, LinkORM):
