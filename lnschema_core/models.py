@@ -1301,6 +1301,13 @@ class Feature(Registry, CanValidate):
     """A description."""
     synonyms = TextField(null=True, default=None)
     """Bar-separated (|) synonyms (optional)."""
+    # we define the below ManyToMany on the feature model because it parallels
+    # how other registries (like Gene, Protein, etc.) relate to FeatureSet
+    # it makes the API more consistent
+    feature_sets = models.ManyToManyField(
+        "FeatureSet", through="FeatureSetFeature", related_name="features"
+    )
+    """Feature sets linked to this feature."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
@@ -1441,10 +1448,6 @@ class FeatureSet(Registry):
 
     Depending on the registry, `.members` stores, e.g. `Feature` or `Gene` records.
     """
-    features = models.ManyToManyField(
-        Feature, through="FeatureSetFeature", related_name="feature_sets"
-    )
-    """Features linked to this feature."""
     hash = CharField(max_length=20, default=None, db_index=True, null=True)
     """The hash of the set."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)

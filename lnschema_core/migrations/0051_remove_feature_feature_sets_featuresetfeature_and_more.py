@@ -50,12 +50,12 @@ class Migration(migrations.Migration):
             name="feature_sets",
         ),
         migrations.AddField(
-            model_name="featureset",
-            name="features",
+            model_name="feature",
+            name="feature_sets",
             field=models.ManyToManyField(
-                related_name="feature_sets",
+                related_name="features",
                 through="lnschema_core.FeatureSetFeature",
-                to="lnschema_core.feature",
+                to="lnschema_core.featureset",
             ),
         ),
     ]
