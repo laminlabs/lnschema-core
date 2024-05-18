@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🏗️ Naming conventions for link tables, protecting deletion in link tables, maintaining integrity upon label & feature renames | [383](https://github.com/laminlabs/lnschema-core/pull/383) | [falexwolf](https://github.com/falexwolf) | 2024-05-18 |
 🚚 Rename `.type` to `.dtype` for `Feature` and `FeatureSet` | [382](https://github.com/laminlabs/lnschema-core/pull/382) | [falexwolf](https://github.com/falexwolf) | 2024-05-17 |
 🔥 Prune migrations | [381](https://github.com/laminlabs/lnschema-core/pull/381) | [falexwolf](https://github.com/falexwolf) | 2024-05-16 |
 🔥 Delete old migrations and create a new squashed initial migration | [380](https://github.com/laminlabs/lnschema-core/pull/380) | [falexwolf](https://github.com/falexwolf) | 2024-05-16 |
