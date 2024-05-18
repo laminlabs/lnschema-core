@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
             fields=[
                 ("id", models.BigAutoField(primary_key=True, serialize=False)),
                 (
-                    "feature_set",
+                    "featureset",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="+",
@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
         ),
         migrations.RunSQL(
             """
-            INSERT INTO lnschema_core_featuresetfeature (feature_set_id, feature_id)
+            INSERT INTO lnschema_core_featuresetfeature (featureset_id, feature_id)
             SELECT featureset_id, feature_id
             FROM lnschema_core_feature_feature_sets;
             """
@@ -57,5 +57,15 @@ class Migration(migrations.Migration):
                 through="lnschema_core.FeatureSetFeature",
                 to="lnschema_core.featureset",
             ),
+        ),
+        migrations.RenameField(
+            model_name="artifactfeatureset",
+            old_name="feature_set",
+            new_name="featureset",
+        ),
+        migrations.RenameField(
+            model_name="collectionfeatureset",
+            old_name="feature_set",
+            new_name="featureset",
         ),
     ]

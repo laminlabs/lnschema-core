@@ -2343,14 +2343,16 @@ class LinkORM:
 
 class FeatureSetFeature(Registry, LinkORM):
     id = models.BigAutoField(primary_key=True)
-    feature_set = models.ForeignKey(FeatureSet, CASCADE, related_name="+")
+    # we follow the lower() case convention rather than snake case for link models
+    featureset = models.ForeignKey(FeatureSet, CASCADE, related_name="+")
     feature = models.ForeignKey(Feature, PROTECT, related_name="+")
 
 
 class ArtifactFeatureSet(Registry, LinkORM):
     id = models.BigAutoField(primary_key=True)
     artifact = models.ForeignKey(Artifact, CASCADE, related_name="feature_set_links")
-    feature_set = models.ForeignKey(FeatureSet, PROTECT, related_name="artifact_links")
+    # we follow the lower() case convention rather than snake case for link models
+    featureset = models.ForeignKey(FeatureSet, PROTECT, related_name="artifact_links")
     slot = CharField(max_length=40, null=True, default=None)
     feature_ref_is_semantic = models.BooleanField(
         null=True, default=None
@@ -2365,9 +2367,8 @@ class CollectionFeatureSet(Registry, LinkORM):
     collection = models.ForeignKey(
         Collection, CASCADE, related_name="feature_set_links"
     )
-    feature_set = models.ForeignKey(
-        FeatureSet, PROTECT, related_name="collection_links"
-    )
+    # we follow the lower() case convention rather than snake case for link models
+    featureset = models.ForeignKey(FeatureSet, PROTECT, related_name="collection_links")
     slot = CharField(max_length=50, null=True, default=None)
     feature_ref_is_semantic = models.BooleanField(
         null=True, default=None
