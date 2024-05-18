@@ -58,14 +58,4 @@ class Migration(migrations.Migration):
                 to="lnschema_core.featureset",
             ),
         ),
-        migrations.RenameField(
-            model_name="artifactfeatureset",
-            old_name="feature_set",
-            new_name="featureset",
-        ),
-        migrations.RenameField(
-            model_name="collectionfeatureset",
-            old_name="feature_set",
-            new_name="featureset",
-        ),
     ]
