@@ -1442,9 +1442,9 @@ class FeatureSet(Registry):
     Depending on the registry, `.members` stores, e.g. `Feature` or `Gene` records.
     """
     features = models.ManyToManyField(
-        "FeatureSet", through="FeatureSetFeature", related_name="feature_sets"
+        Feature, through="FeatureSetFeature", related_name="feature_sets"
     )
-    """Feature sets linked to this feature."""
+    """Features linked to this feature."""
     hash = CharField(max_length=20, default=None, db_index=True, null=True)
     """The hash of the set."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)

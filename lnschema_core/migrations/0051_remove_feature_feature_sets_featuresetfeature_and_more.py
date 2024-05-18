@@ -8,7 +8,7 @@ import lnschema_core.models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("lnschema_core", "0049_rename_type_feature_dtype_and_more"),
+        ("lnschema_core", "0050_artifactfeatureset_feature_ref_is_semantic_and_more"),
     ]
 
     operations = [
@@ -55,7 +55,7 @@ class Migration(migrations.Migration):
             field=models.ManyToManyField(
                 related_name="feature_sets",
                 through="lnschema_core.FeatureSetFeature",
-                to="lnschema_core.featureset",
+                to="lnschema_core.feature",
             ),
         ),
     ]
