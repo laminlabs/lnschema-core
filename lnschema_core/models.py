@@ -230,9 +230,9 @@ class CanValidate:
 
         See Also:
             :meth:`~lamindb.core.CanValidate.add_synonym`
-                Add synonyms
+                Add synonyms.
             :meth:`~lamindb.core.CanValidate.remove_synonym`
-                Remove synonyms
+                Remove synonyms.
 
         Examples:
             >>> import bionty as bt
@@ -284,7 +284,7 @@ class CanValidate:
 
         See Also:
             :meth:`~lamindb.core.CanValidate.remove_synonym`
-                Remove synonyms
+                Remove synonyms.
 
         Examples:
             >>> import bionty as bt
@@ -329,7 +329,7 @@ class CanValidate:
 
         See Also:
             :meth:`~lamindb.core.CanValidate.add_synonym`
-                Add synonyms
+                Add synonyms.
 
         Examples:
             >>> import bionty as bt
@@ -692,7 +692,6 @@ class User(Registry, CanValidate):
 
         >>> user = ln.User.filter(handle="testuser1").one()
         >>> user
-        User(id=DzTjkKse, handle=testuser1, name=Test User1, updated_at=2023-07-10 18:37:26)
     """
 
     id = models.AutoField(primary_key=True)
@@ -1004,7 +1003,7 @@ class Run(Registry):
     Args:
         transform: `Transform` A :class:`~lamindb.Transform` record.
         reference: `str | None = None` For instance, an external ID or a download URL.
-        reference_type: `str | N = None` For instance, `redun_id`, `nextflow_id` or `url`.
+        reference_type: `str | None = None` For instance, `redun_id`, `nextflow_id` or `url`.
 
     See Also:
         :meth:`~lamindb.track`
@@ -1145,6 +1144,8 @@ class ULabel(Registry, HasParents, CanValidate):
     See Also:
         :meth:`~lamindb.Feature`
             Dimensions of measurement for artifacts & collections.
+        :attr:`~lamindb.core.Data.labels`
+            Label manager of an artifact or collection.
 
     Examples:
 
@@ -1231,15 +1232,7 @@ class Feature(Registry, CanValidate):
     1. manage metadata of features
     2. annotate datasets by whether they measured a feature
 
-    See Also:
-        :meth:`~lamindb.Feature.from_df`
-            Create feature records from DataFrame.
-        :attr:`~lamindb.core.Data.features`
-            Feature manager of an artifact or collection.
-        :class:`~lamindb.ULabel`
-            Universal labels.
-        :class:`~lamindb.FeatureSet`
-            Feature sets.
+    Learn more: :doc:`tutorial2`.
 
     Args:
         name: `str` Name of the feature, typically, a column name.
@@ -1250,30 +1243,43 @@ class Feature(Registry, CanValidate):
         description: `str | None = None` A description.
         synonyms: `str | None = None` Bar-separated synonyms.
 
-    .. note::
+    Note:
 
-        *Features* and *labels* denote two ways for using entities to organize data:
+        For more control, you can use :mod:`bionty` registries to manage basic
+        biological entities like genes, proteins & cell markers. Or you define
+        custom registries to manage high-level derived features like gene sets.
 
-        1. A feature qualifies *what* is measured (a numerical or categorical random variable)
-        2. A label *is* a measured value (a category)
+    See Also:
+        :meth:`~lamindb.Feature.from_df`
+            Create feature records from DataFrame.
+        :attr:`~lamindb.core.Data.features`
+            Feature manager of an artifact or collection.
+        :class:`~lamindb.ULabel`
+            Universal labels.
+        :class:`~lamindb.FeatureSet`
+            Feature sets.
 
-        If re-shaping data introduced ambiguity, ask yourself what the joint
-        measurement was: a feature qualifies variables in a joint measurement.
+    Example:
 
-    Notes:
+        >>> ln.Feature("cell_type_by_expert", dtype="cat", description="Expert cell type annotation").save()
 
-        For more control, you can use :mod:`bionty` registries to manage
-        basic biological entities like genes, proteins & cell markers.
+    Hint:
 
-        Similarly, you can define custom registries to manage high-level derived
-        features like gene sets.
+        *Features* and *labels* denote two ways of using entities to organize data:
 
-    Examples:
+        1. A feature qualifies *what* is measured, i.e., a numerical or categorical random variable
+        2. A label *is* a measured value, i.e., a category
 
-        >>> df = pd.DataFrame({"feat1": [1, 2], "feat2": [3.1, 4.2], "feat3": ["cond1", "cond2"]})
-        >>> features = ln.Feature.from_df(df).save()
-        >>> # the information from the DataFrame is now available in the Feature table
-        >>> ln.Feature.filter().df()
+        Consider annotating a dataset by that it measured expression of 30k
+        genes: genes relate to the dataset as feature identifiers through a
+        feature set with 30k members. Now consider annotating the artifact by
+        whether that it measured the knock-out of 3 genes: here, the 3 genes act
+        as labels of the dataset.
+
+        Re-shaping data can introduce ambiguity among features & labels. If this
+        happened, ask yourself what the joint measurement was: a feature
+        qualifies variables in a joint measurement. The canonical data matrix
+        lists jointly measured variables in the columns.
 
     """
 
@@ -1366,21 +1372,6 @@ class FeatureSet(Registry):
     that may be used to identify features (e.g., class:`~bionty.Gene` or
     class:`~bionty.Protein`).
 
-    See Also:
-        :meth:`~lamindb.FeatureSet.from_values`
-            Create from values.
-        :meth:`~lamindb.FeatureSet.from_df`
-            Create from dataframe columns.
-
-    Note:
-
-        Feature sets are useful as you likely have many datasets that measure
-        the same features. In LaminDB, they are all linked against the exact
-        same *feature set*. If instead, you'd link each of the datasets against
-        single features (say, genes), you'd face exploding link tables.
-
-        A feature set is identified by the hash of the feature uids in the set.
-
     Args:
         features: `Iterable[Registry]` An iterable of :class:`~lamindb.Feature`
             records to hash, e.g., `[Feature(...), Feature(...)]`. Is turned into
@@ -1391,6 +1382,21 @@ class FeatureSet(Registry):
             `None` for sets of :class:`~lamindb.Feature` records, and otherwise
             defaults to `"number"` (e.g., for sets of :class:`~bionty.Gene`).
         name: `str | None = None` A name.
+
+    Note:
+
+        Feature sets are useful as you likely have many datasets that measure
+        the same features. In LaminDB, they are all linked against the exact
+        same *feature set*. If instead, you'd link each of the datasets against
+        single features (say, genes), you'd face exploding link tables.
+
+        A feature set is identified by the hash of the feature uids in the set.
+
+    See Also:
+        :meth:`~lamindb.FeatureSet.from_values`
+            Create from values.
+        :meth:`~lamindb.FeatureSet.from_df`
+            Create from dataframe columns.
 
     Examples:
 
@@ -1542,6 +1548,8 @@ class Artifact(Registry, Data, IsVersioned):
     Some artifacts are array-like, e.g., when stored as `.parquet`, `.h5ad`,
     `.zarr`, or `.tiledb`.
 
+    For more info, see tutorial: :doc:`/tutorial`.
+
     Args:
         path: `UPathStr` A path to a local or remote folder or file.
         key: `str | None = None` A relative path within default storage,
@@ -1582,9 +1590,6 @@ class Artifact(Registry, Data, IsVersioned):
             Create an artifact from an `AnnData`.
         :meth:`~lamindb.Artifact.from_dir`
             Bulk create file-like artifacts from a directory.
-
-    Notes:
-        For more info, see tutorial: :doc:`/tutorial`.
 
     Examples:
 
@@ -1782,6 +1787,8 @@ class Artifact(Registry, Data, IsVersioned):
     ) -> Artifact:
         """Create from ``DataFrame``, validate & link features.
 
+        For more info, see tutorial: :doc:`/tutorial`.
+
         Args:
             df: A `DataFrame` object.
             key: A relative path within default storage,
@@ -1796,9 +1803,6 @@ class Artifact(Registry, Data, IsVersioned):
                 Track collections.
             :class:`~lamindb.Feature`
                 Track features.
-
-        Notes:
-            For more info, see tutorial: :doc:`/tutorial`.
 
         Examples:
             >>> df = ln.core.datasets.df_iris_in_meter_batch1()
@@ -1843,10 +1847,6 @@ class Artifact(Registry, Data, IsVersioned):
             :class:`~lamindb.Feature`
                 Track features.
 
-        Notes:
-
-            For more info, see tutorial: :doc:`/tutorial`.
-
         Examples:
             >>> import bionty as bt
             >>> bt.settings.organism = "human"
@@ -1879,15 +1879,10 @@ class Artifact(Registry, Data, IsVersioned):
             run: The run that creates the artifact.
 
         See Also:
-
             :meth:`~lamindb.Collection`
                 Track collections.
             :class:`~lamindb.Feature`
                 Track features.
-
-        Notes:
-
-            For more info, see tutorial: :doc:`/tutorial`.
 
         Examples:
             >>> import bionty as bt
@@ -1908,8 +1903,7 @@ class Artifact(Registry, Data, IsVersioned):
     ) -> list[Artifact]:
         """Create a list of artifact objects from a directory.
 
-        .. note::
-
+        Hint:
             If you have a high number of files (several 100k) and don't want to
             track them individually, create a single :class:`~lamindb.Artifact` via
             ``Artifact(path)`` for them. See, e.g., :doc:`docs:rxrx`.
@@ -1943,7 +1937,6 @@ class Artifact(Registry, Data, IsVersioned):
                 auto-linked if ``ln.track()`` was called.
 
         Examples:
-
             Say we made a change to the content of an artifact, e.g., edited the image
             `paradisi05_laminopathic_nuclei.jpg`.
 
@@ -2077,6 +2070,8 @@ class Artifact(Registry, Data, IsVersioned):
 class Collection(Registry, Data, IsVersioned):
     """Collections: collections of artifacts.
 
+    For more info: :doc:`/tutorial`.
+
     Args:
         data: `List[Artifact]` A list of artifacts.
         name: `str` A name.
@@ -2090,9 +2085,6 @@ class Collection(Registry, Data, IsVersioned):
 
     See Also:
         :class:`~lamindb.Artifact`
-
-    Notes:
-        See tutorial: :doc:`/tutorial`.
 
     Examples:
 
