@@ -1711,7 +1711,7 @@ class Artifact(Registry, Data, IsVersioned, TracksRun, TracksUpdates):
     # if the artifact is replicated or update in a new run, we link the previous
     # run in previous_runs
     previous_runs = models.ManyToManyField(
-        "Run", related_name="overwritten_output_artifacts"
+        "Run", related_name="output_artifacts_with_later_updates"
     )
     """Sequence of runs that created or updated the record."""
     feature_sets = models.ManyToManyField(
@@ -2155,7 +2155,7 @@ class Collection(Registry, Data, IsVersioned, TracksRun, TracksUpdates):
     input_of = models.ManyToManyField(Run, related_name="input_collections")
     """Runs that use this collection as an input."""
     previous_runs = models.ManyToManyField(
-        "Run", related_name="overwritten_output_artifacts"
+        "Run", related_name="output_collections_with_later_updates"
     )
     """Sequence of runs that created or updated the record."""
     artifact = models.OneToOneField(
