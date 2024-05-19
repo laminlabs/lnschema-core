@@ -102,6 +102,36 @@ class IsVersioned(models.Model):
         pass
 
 
+def current_run() -> Run:
+    import lamindb.core
+
+    return lamindb.core.run_context.run
+
+
+class TracksRun(models.Model):
+    """Base class adding run, created_at & created_by."""
+
+    class Meta:
+        abstract = True
+
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    """Time of creation of record."""
+    created_by = models.ForeignKey("User", PROTECT, default=current_user_id)
+    """Creator of record, a :class:`~lamindb.User`."""
+    run = models.ForeignKey("Run", PROTECT, null=True, default=current_run)
+    """Last run that created or updated the record, a :class:`~lamindb.Run`."""
+
+
+class TracksUpdates(models.Model):
+    class Meta:
+        abstract = True
+
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    """Time of last update to record."""
+    previous_runs = models.ManyToManyField("Run")
+    """Sequence of runs that created or updated the record."""
+
+
 class CanValidate:
     """Base class providing :class:`~lamindb.core.Registry`-based validation."""
 
@@ -731,7 +761,7 @@ class User(Registry, CanValidate):
         super().__init__(*args, **kwargs)
 
 
-class Storage(Registry):
+class Storage(Registry, TracksRun, TracksUpdates):
     """Storage locations.
 
     A storage location is either a directory/folder (local or in the cloud) or
@@ -776,6 +806,9 @@ class Storage(Registry):
         >>> ln.settings.storage = "./storage_2" # or a cloud bucket
     """
 
+    class Meta(Registry.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
     id = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
     uid = CharField(unique=True, max_length=12, default=base62_12, db_index=True)
@@ -791,14 +824,6 @@ class Storage(Registry):
     """Cloud storage region, if applicable."""
     instance_uid = CharField(max_length=12, db_index=True, null=True, default=None)
     """Instance that manages this storage location."""
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    """Time of creation of record."""
-    updated_at = models.DateTimeField(auto_now=True, db_index=True)
-    """Time of last update to record."""
-    created_by = models.ForeignKey(
-        User, PROTECT, default=current_user_id, related_name="created_storages"
-    )
-    """Creator of record, a :class:`~lamindb.User`."""
 
     @overload
     def __init__(
@@ -978,23 +1003,23 @@ class Transform(Registry, HasParents, IsVersioned):
         super().__init__(*args, **kwargs)
 
 
-class Param(Registry):
+class Param(Registry, TracksRun, TracksUpdates):
     """Run parameters akin to Feature for artifacts."""
 
+    class Meta(Registry.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
     name = models.CharField(max_length=100, db_index=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(User, models.PROTECT)
-    updated_at = models.DateTimeField(auto_now=True, db_index=True)
-    """Time of last update to record."""
 
 
-class ParamValue(Registry):
+class ParamValue(Registry, TracksRun):
     """Run parameter values akin to FeatureValue for artifacts."""
+
+    class Meta(Registry.Meta, TracksRun.Meta):
+        abstract = False
 
     param = models.ForeignKey(Param, CASCADE)
     value = models.JSONField()  # stores float, integer, boolean or datetime
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(User, models.PROTECT)
 
 
 class Run(Registry):
@@ -1048,8 +1073,6 @@ class Run(Registry):
         User, CASCADE, default=current_user_id, related_name="created_runs"
     )
     """Creator of run, a :class:`~lamindb.User`."""
-    json = models.JSONField(null=True, default=None)
-    """JSON field."""
     param_values = models.ManyToManyField(
         ParamValue, through="RunParamValue", related_name="runs"
     )
@@ -1073,14 +1096,6 @@ class Run(Registry):
     """A reference like a URL or external ID (such as from a workflow manager)."""
     reference_type = CharField(max_length=25, db_index=True, null=True, default=None)
     """Type of reference, e.g., a workflow manager execution ID."""
-    replicated_output_artifacts = models.ManyToManyField(
-        "Artifact", related_name="replicating_runs"
-    )
-    """Output artifacts that were replicated in later runs."""
-    replicated_output_collections = models.ManyToManyField(
-        "Collection", related_name="replicating_runs"
-    )
-    """Output collections that were replicated in later runs."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of first creation. Mismatches ``started_at`` if the run is re-run."""
 
@@ -1108,7 +1123,7 @@ class Run(Registry):
         super().__init__(*args, **kwargs)
 
 
-class ULabel(Registry, HasParents, CanValidate):
+class ULabel(Registry, HasParents, CanValidate, TracksRun, TracksUpdates):
     """Universal labels (valid categories).
 
     Args:
@@ -1175,6 +1190,9 @@ class ULabel(Registry, HasParents, CanValidate):
         >>> ln.Artifact.filter(ulabels=project).first()
     """
 
+    class Meta(Registry.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
     id = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
     uid = CharField(unique=True, db_index=True, max_length=8, default=base62_8)
@@ -1189,14 +1207,6 @@ class ULabel(Registry, HasParents, CanValidate):
     """Type of reference, e.g., donor_id from Vendor X."""
     parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
     """Parent labels, useful to hierarchically group labels (optional)."""
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    """Time of creation of record."""
-    updated_at = models.DateTimeField(auto_now=True, db_index=True)
-    """Time of last update to record."""
-    created_by = models.ForeignKey(
-        User, PROTECT, default=current_user_id, related_name="created_ulabels"
-    )
-    """Creator of record, a :class:`~lamindb.User`."""
 
     @overload
     def __init__(
@@ -1223,7 +1233,7 @@ class ULabel(Registry, HasParents, CanValidate):
         pass
 
 
-class Feature(Registry, CanValidate):
+class Feature(Registry, CanValidate, TracksRun, TracksUpdates):
     """Dataset dimensions.
 
     A feature is a random variable or, equivalently, dimension of a
@@ -1283,6 +1293,9 @@ class Feature(Registry, CanValidate):
 
     """
 
+    class Meta(Registry.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
     id = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
     uid = CharField(unique=True, db_index=True, max_length=12, default=base62_12)
@@ -1308,14 +1321,6 @@ class Feature(Registry, CanValidate):
         "FeatureSet", through="FeatureSetFeature", related_name="features"
     )
     """Feature sets linked to this feature."""
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    """Time of creation of record."""
-    updated_at = models.DateTimeField(auto_now=True, db_index=True)
-    """Time of run execution."""
-    created_by = models.ForeignKey(
-        User, PROTECT, default=current_user_id, related_name="created_features"
-    )
-    """Creator of record, a :class:`~lamindb.User`."""
 
     @overload
     def __init__(
@@ -1352,7 +1357,7 @@ class Feature(Registry, CanValidate):
         pass
 
 
-class FeatureValue(Registry):
+class FeatureValue(Registry, TracksRun):
     """Non-categorical features values.
 
     Categorical feature values are stored in their respective registries:
@@ -1362,15 +1367,14 @@ class FeatureValue(Registry):
     not by an ontological hierarchy.
     """
 
+    class Meta(Registry.Meta, TracksRun.Meta):
+        abstract = False
+
     feature = models.ForeignKey(Feature, CASCADE, null=True, default=None)
     value = models.JSONField()
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    created_by = models.ForeignKey(
-        User, PROTECT, default=current_user_id, related_name="created_feature_sets"
-    )
 
 
-class FeatureSet(Registry):
+class FeatureSet(Registry, TracksRun):
     """Feature sets.
 
     Stores references to sets of :class:`~lamindb.Feature` and other registries
@@ -1430,6 +1434,9 @@ class FeatureSet(Registry):
         >>> artifact.features.add(features)
     """
 
+    class Meta(Registry.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
     id = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
     uid = CharField(unique=True, db_index=True, max_length=20, default=None)
@@ -1450,14 +1457,6 @@ class FeatureSet(Registry):
     """
     hash = CharField(max_length=20, default=None, db_index=True, null=True)
     """The hash of the set."""
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    """Time of creation of record."""
-    updated_at = models.DateTimeField(auto_now=True, db_index=True)
-    """Time of last update to record."""
-    created_by = models.ForeignKey(
-        User, PROTECT, default=current_user_id, related_name="created_feature_sets"
-    )
-    """Creator of record, a :class:`~lamindb.User`."""
 
     @overload
     def __init__(
@@ -1543,7 +1542,7 @@ class FeatureSet(Registry):
         pass
 
 
-class Artifact(Registry, Data, IsVersioned):
+class Artifact(Registry, Data, IsVersioned, TracksRun, TracksUpdates):
     """Artifacts: datasets & models stored as files, folders, or arrays.
 
     Artifacts manage data in local or remote storage.
@@ -1643,7 +1642,7 @@ class Artifact(Registry, Data, IsVersioned):
 
     """
 
-    class Meta(Registry.Meta, IsVersioned.Meta):
+    class Meta(Registry.Meta, IsVersioned.Meta, TracksRun.Meta, TracksUpdates.Meta):
         abstract = False
 
     _len_full_uid: int = 20
@@ -1723,14 +1722,6 @@ class Artifact(Registry, Data, IsVersioned):
     """Visibility of artifact record in queries & searches (0 default, 1 hidden, 2 trash)."""
     key_is_virtual = models.BooleanField()
     """Indicates whether `key` is virtual or part of an actual file path."""
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    """Time of creation of record."""
-    updated_at = models.DateTimeField(auto_now=True, db_index=True)
-    """Time of last update to record."""
-    created_by = models.ForeignKey(
-        User, PROTECT, default=current_user_id, related_name="created_artifacts"
-    )
-    """Creator of record, a :class:`~lamindb.User`."""
 
     @overload
     def __init__(
@@ -2072,7 +2063,7 @@ class Artifact(Registry, Data, IsVersioned):
         pass
 
 
-class Collection(Registry, Data, IsVersioned):
+class Collection(Registry, Data, IsVersioned, TracksRun, TracksUpdates):
     """Collections: collections of artifacts.
 
     For more info: :doc:`/tutorial`.
@@ -2116,7 +2107,7 @@ class Collection(Registry, Data, IsVersioned):
         >>> assert new_collection.version == "2"
     """
 
-    class Meta(Registry.Meta, IsVersioned.Meta):
+    class Meta(Registry.Meta, IsVersioned.Meta, TracksRun.Meta, TracksUpdates.Meta):
         abstract = False
 
     _len_full_uid: int = 20
@@ -2169,14 +2160,6 @@ class Collection(Registry, Data, IsVersioned):
         db_index=True, choices=VisibilityChoice.choices, default=1
     )
     """Visibility of record,  0-default, 1-hidden, 2-trash."""
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    """Time of creation of record."""
-    updated_at = models.DateTimeField(auto_now=True, db_index=True)
-    """Time of run execution."""
-    created_by = models.ForeignKey(
-        User, PROTECT, default=current_user_id, related_name="created_collections"
-    )
-    """Creator of record, a :class:`~lamindb.User`."""
 
     @property
     def artifacts(self) -> QuerySet:
