@@ -2446,14 +2446,14 @@ class RunParamValue(Registry, LinkORM):
         unique_together = ("run", "paramvalue")
 
 
-class Migration(Registry):
-    app = models.CharField(max_length=255)
-    name = models.CharField(max_length=255)
-    applied = models.DateTimeField()
+# class Migration(Registry):
+#     app = models.CharField(max_length=255)
+#     name = models.CharField(max_length=255)
+#     applied = models.DateTimeField()
 
-    class Meta:
-        db_table = "django_migrations"
-        managed = False
+#     class Meta:
+#         db_table = "django_migrations"
+#         managed = False
 
 
 # -------------------------------------------------------------------------------------
