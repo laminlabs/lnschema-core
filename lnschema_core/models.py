@@ -2354,7 +2354,7 @@ class FeatureSetFeature(Registry, LinkORM):
     feature = models.ForeignKey(Feature, PROTECT, related_name="+")
 
 
-class ArtifactFeatureSet(Registry, LinkORM):
+class ArtifactFeatureSet(Registry, LinkORM, TracksRun):
     id = models.BigAutoField(primary_key=True)
     artifact = models.ForeignKey(Artifact, CASCADE, related_name="feature_set_links")
     # we follow the lower() case convention rather than snake case for link models
@@ -2368,7 +2368,7 @@ class ArtifactFeatureSet(Registry, LinkORM):
         unique_together = ("artifact", "featureset")
 
 
-class CollectionFeatureSet(Registry, LinkORM):
+class CollectionFeatureSet(Registry, LinkORM, TracksRun):
     id = models.BigAutoField(primary_key=True)
     collection = models.ForeignKey(
         Collection, CASCADE, related_name="feature_set_links"
@@ -2384,7 +2384,7 @@ class CollectionFeatureSet(Registry, LinkORM):
         unique_together = ("collection", "featureset")
 
 
-class CollectionArtifact(Registry, LinkORM):
+class CollectionArtifact(Registry, LinkORM, TracksRun):
     id = models.BigAutoField(primary_key=True)
     collection = models.ForeignKey(Collection, CASCADE, related_name="artifact_links")
     artifact = models.ForeignKey(Artifact, PROTECT, related_name="collection_links")
@@ -2393,7 +2393,7 @@ class CollectionArtifact(Registry, LinkORM):
         unique_together = ("collection", "artifact")
 
 
-class ArtifactULabel(Registry, LinkORM):
+class ArtifactULabel(Registry, LinkORM, TracksRun):
     id = models.BigAutoField(primary_key=True)
     artifact = models.ForeignKey(Artifact, CASCADE, related_name="ulabel_links")
     ulabel = models.ForeignKey(ULabel, PROTECT, related_name="artifact_links")
@@ -2407,7 +2407,7 @@ class ArtifactULabel(Registry, LinkORM):
         unique_together = ("artifact", "ulabel")
 
 
-class CollectionULabel(Registry, LinkORM):
+class CollectionULabel(Registry, LinkORM, TracksRun):
     id = models.BigAutoField(primary_key=True)
     collection = models.ForeignKey(Collection, CASCADE, related_name="ulabel_links")
     ulabel = models.ForeignKey(ULabel, PROTECT, related_name="collection_links")
@@ -2421,7 +2421,7 @@ class CollectionULabel(Registry, LinkORM):
         unique_together = ("collection", "ulabel")
 
 
-class ArtifactFeatureValue(Registry, LinkORM):
+class ArtifactFeatureValue(Registry, LinkORM, TracksRun):
     id = models.BigAutoField(primary_key=True)
     artifact = models.ForeignKey(Artifact, CASCADE, related_name="+")
     # we follow the lower() case convention rather than snake case for link models
