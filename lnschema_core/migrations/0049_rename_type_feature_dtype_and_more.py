@@ -48,7 +48,7 @@ class Migration(migrations.Migration):
             """
             -- Replace all occurrences of "core." in dtype with an empty string
             UPDATE lnschema_core_featureset
-            SET dtype = REPLACE(dtype, 'core.', '');
+            SET registry = REPLACE(registry, 'core.', '');
             """
         ),
         migrations.RemoveField(
