@@ -1020,14 +1020,19 @@ class Param(Registry, TracksRun, TracksUpdates):
     """
 
 
-class ParamValue(Registry, TracksRun):
+class ParamValue(Registry):
     """Run parameter values akin to FeatureValue for artifacts."""
-
-    class Meta(Registry.Meta, TracksRun.Meta):
-        abstract = False
 
     param = models.ForeignKey(Param, CASCADE)
     value = models.JSONField()  # stores float, integer, boolean or datetime
+    # it'd be confusing and hard to populate to have run here because these
+    # values are typically created upon creating a run
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    """Time of creation of record."""
+    created_by = models.ForeignKey(
+        User, PROTECT, default=current_user_id, related_name="created_transforms"
+    )
+    """Creator of record, a :class:`~lamindb.User`."""
 
 
 class Run(Registry):
