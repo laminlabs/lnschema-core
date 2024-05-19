@@ -8,6 +8,7 @@ from typing import (
     Iterable,
     Literal,
     NamedTuple,
+    Union,
     overload,
 )
 
@@ -118,9 +119,13 @@ class TracksRun(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
-    created_by = models.ForeignKey("User", PROTECT, default=current_user_id)
+    created_by = models.ForeignKey(
+        "lnschema_core.User", PROTECT, default=current_user_id
+    )
     """Creator of record, a :class:`~lamindb.User`."""
-    run = models.ForeignKey("Run", PROTECT, null=True, default=current_run)
+    run = models.ForeignKey(
+        "lnschema_core.Run", PROTECT, null=True, default=current_run
+    )
     """Last run that created or updated the record, a :class:`~lamindb.Run`."""
 
 
@@ -130,7 +135,7 @@ class TracksUpdates(models.Model):
 
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
-    previous_runs = models.ManyToManyField("Run")
+    previous_runs = models.ManyToManyField("lnschema_core.Run")
     """Sequence of runs that created or updated the record."""
 
 
