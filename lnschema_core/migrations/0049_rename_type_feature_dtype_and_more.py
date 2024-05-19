@@ -25,7 +25,10 @@ class Migration(migrations.Migration):
             """
             -- Update "dtype" where the old value was "category"
             UPDATE lnschema_core_feature
-            SET dtype = 'cat[' || registries || ']'
+            SET dtype = CASE
+                WHEN registries IS NOT NULL THEN 'cat[' || registries || ']'
+                ELSE 'cat'
+            END
             WHERE dtype = 'category';
             """
         ),
@@ -40,6 +43,13 @@ class Migration(migrations.Migration):
             model_name="featureset",
             old_name="type",
             new_name="dtype",
+        ),
+        migrations.RunSQL(
+            """
+            -- Replace all occurrences of "core." in dtype with an empty string
+            UPDATE lnschema_core_featureset
+            SET dtype = REPLACE(dtype, 'core.', '');
+            """
         ),
         migrations.RemoveField(
             model_name="feature",
