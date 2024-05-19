@@ -1010,6 +1010,12 @@ class Param(Registry, TracksRun, TracksUpdates):
         abstract = False
 
     name = models.CharField(max_length=100, db_index=True)
+    dtype = CharField(max_length=64, db_index=True, default=None)
+    """Data type ("number", "cat", "int", "float", "bool", "datetime").
+
+    For categorical types, can define from which registry values are
+    sampled, e.g., `cat[ULabel]` or `cat[bionty.CellType]`.
+    """
 
 
 class ParamValue(Registry, TracksRun):
@@ -2411,19 +2417,21 @@ class CollectionULabel(Registry, LinkORM):
 class ArtifactFeatureValue(Registry, LinkORM):
     id = models.BigAutoField(primary_key=True)
     artifact = models.ForeignKey(Artifact, CASCADE, related_name="+")
-    feature_value = models.ForeignKey(FeatureValue, PROTECT, related_name="+")
+    # we follow the lower() case convention rather than snake case for link models
+    featurevalue = models.ForeignKey(FeatureValue, PROTECT, related_name="+")
 
     class Meta:
-        unique_together = ("artifact", "feature_value")
+        unique_together = ("artifact", "featurevalue")
 
 
 class RunParamValue(Registry, LinkORM):
     id = models.BigAutoField(primary_key=True)
     run = models.ForeignKey(Run, CASCADE, related_name="+")
-    param_value = models.ForeignKey(ParamValue, PROTECT, related_name="+")
+    # we follow the lower() case convention rather than snake case for link models
+    paramvalue = models.ForeignKey(ParamValue, PROTECT, related_name="+")
 
     class Meta:
-        unique_together = ("run", "param_value")
+        unique_together = ("run", "paramvalue")
 
 
 # -------------------------------------------------------------------------------------

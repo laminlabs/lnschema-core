@@ -229,4 +229,28 @@ class Migration(migrations.Migration):
                 to="lnschema_core.user",
             ),
         ),
+        # next PR
+        migrations.RenameField(
+            model_name="artifactfeaturevalue",
+            old_name="feature_value",
+            new_name="featurevalue",
+        ),
+        migrations.RenameField(
+            model_name="runparamvalue",
+            old_name="param_value",
+            new_name="paramvalue",
+        ),
+        migrations.AddField(
+            model_name="param",
+            name="dtype",
+            field=models.CharField(db_index=True, default=None, max_length=64),
+        ),
+        migrations.AlterUniqueTogether(
+            name="artifactfeaturevalue",
+            unique_together={("artifact", "featurevalue")},
+        ),
+        migrations.AlterUniqueTogether(
+            name="runparamvalue",
+            unique_together={("run", "paramvalue")},
+        ),
     ]
