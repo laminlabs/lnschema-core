@@ -8,7 +8,6 @@ from typing import (
     Iterable,
     Literal,
     NamedTuple,
-    Type,
     overload,
 )
 
@@ -102,10 +101,13 @@ class IsVersioned(models.Model):
         pass
 
 
-def current_run() -> Run:
-    import lamindb.core
+def current_run() -> Run | None:
+    if _INSTANCE_SETUP:
+        import lamindb.core
 
-    return lamindb.core.run_context.run
+        return lamindb.core.run_context.run
+    else:
+        return None
 
 
 class TracksRun(models.Model):
