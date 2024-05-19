@@ -9,6 +9,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunSQL("SET CONSTRAINTS ALL IMMEDIATE;"),
         migrations.RenameField(
             model_name="feature",
             old_name="type",
