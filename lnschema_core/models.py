@@ -1708,6 +1708,12 @@ class Artifact(Registry, Data, IsVersioned, TracksRun, TracksUpdates):
     """:class:`~lamindb.Run` that created the artifact."""
     input_of = models.ManyToManyField(Run, related_name="input_artifacts")
     """Runs that use this artifact as an input."""
+    # if the artifact is replicated or update in a new run, we link the previous
+    # run in previous_runs
+    previous_runs = models.ManyToManyField(
+        "Run", related_name="overwritten_output_artifacts"
+    )
+    """Sequence of runs that created or updated the record."""
     feature_sets = models.ManyToManyField(
         FeatureSet, related_name="artifacts", through="ArtifactFeatureSet"
     )
@@ -2148,6 +2154,10 @@ class Collection(Registry, Data, IsVersioned, TracksRun, TracksUpdates):
     """:class:`~lamindb.Run` that created the `collection`."""
     input_of = models.ManyToManyField(Run, related_name="input_collections")
     """Runs that use this collection as an input."""
+    previous_runs = models.ManyToManyField(
+        "Run", related_name="overwritten_output_artifacts"
+    )
+    """Sequence of runs that created or updated the record."""
     artifact = models.OneToOneField(
         "Artifact", PROTECT, null=True, unique=True, related_name="collection"
     )
