@@ -75,6 +75,24 @@ class IsVersioned(models.Model):
     with `Python versioning <https://peps.python.org/pep-0440/>`__.
     """
 
+    @overload
+    def __init__(self):
+        ...
+
+    @overload
+    def __init__(
+        self,
+        *db_args,
+    ):
+        ...
+
+    def __init__(
+        self,
+        *args,
+        **kwargs,
+    ):
+        super().__init__(*args, **kwargs)
+
     @property
     def stem_uid(self) -> str:
         return self.uid[: self._len_stem_uid]  # type: ignore
@@ -112,7 +130,7 @@ def current_run() -> Run | None:
 
 
 class TracksRun(models.Model):
-    """Base class adding run, created_at & created_by."""
+    """Base class tracking latest run, creating user, and `created_at` timestamp."""
 
     class Meta:
         abstract = True
@@ -128,8 +146,28 @@ class TracksRun(models.Model):
     )
     """Last run that created or updated the record, a :class:`~lamindb.Run`."""
 
+    @overload
+    def __init__(self):
+        ...
+
+    @overload
+    def __init__(
+        self,
+        *db_args,
+    ):
+        ...
+
+    def __init__(
+        self,
+        *args,
+        **kwargs,
+    ):
+        super().__init__(*args, **kwargs)
+
 
 class TracksUpdates(models.Model):
+    """Base class tracking previous runs and `updated_at` timestamp."""
+
     class Meta:
         abstract = True
 
@@ -137,6 +175,24 @@ class TracksUpdates(models.Model):
     """Time of last update to record."""
     previous_runs = models.ManyToManyField("lnschema_core.Run")
     """Sequence of runs that created or updated the record."""
+
+    @overload
+    def __init__(self):
+        ...
+
+    @overload
+    def __init__(
+        self,
+        *db_args,
+    ):
+        ...
+
+    def __init__(
+        self,
+        *args,
+        **kwargs,
+    ):
+        super().__init__(*args, **kwargs)
 
 
 class CanValidate:
@@ -387,7 +443,7 @@ class CanValidate:
 
 
 class HasParents:
-    """Base class for hierarchical methods."""
+    """Base class for hierarchical registries (ontologies)."""
 
     def view_parents(
         self,
