@@ -2520,21 +2520,24 @@ class RunParamValue(Registry, LinkORM):
 
 def format_field_value(value: datetime | str | Any) -> Any:
     if isinstance(value, datetime):
-        return value.strftime("%Y-%m-%d %H:%M:%S %Z")
-    elif isinstance(value, str):
+        value = value.strftime("%Y-%m-%d %H:%M:%S %Z")
+    if isinstance(value, str):
         return f"'{value}'"
     else:
         return value
 
 
-def __repr__(self: Registry, include_foreign_keys: bool = True) -> str:
+def __repr__(
+    self: Registry, include_foreign_keys: bool = True, exclude_field_names=None
+) -> str:
+    if exclude_field_names is None:
+        exclude_field_names = ["id", "created_at"]
     field_names = [
         field.name
         for field in self._meta.fields
         if (
             not isinstance(field, models.ForeignKey)
-            and field.name != "created_at"
-            and field.name != "id"
+            and field.name not in exclude_field_names
         )
     ]
     if include_foreign_keys:
@@ -2543,6 +2546,12 @@ def __repr__(self: Registry, include_foreign_keys: bool = True) -> str:
             for field in self._meta.fields
             if isinstance(field, models.ForeignKey)
         ]
+    if "updated_at" in field_names:
+        field_names.remove("updated_at")
+        field_names.append("updated_at")
+    if field_names[0] != "uid" and "uid" in field_names:
+        field_names.remove("uid")
+        field_names.insert(0, "uid")
     fields_str = {
         k: format_field_value(getattr(self, k)) for k in field_names if hasattr(self, k)
     }
