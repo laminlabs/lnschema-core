@@ -8,7 +8,6 @@ from typing import (
     Iterable,
     Literal,
     NamedTuple,
-    Union,
     overload,
 )
 
@@ -51,11 +50,7 @@ if TYPE_CHECKING:
     )
 
 
-# determine when it's save to make heavy imports
-_INSTANCE_SETUP = _check_instance_setup()
-RUNNING_SPHINX = "sphinx" in sys.modules
-if TYPE_CHECKING or _INSTANCE_SETUP or RUNNING_SPHINX:
-    pass
+_TRACKING_READY: bool | None = None
 
 
 class IsVersioned(models.Model):
@@ -121,7 +116,11 @@ class IsVersioned(models.Model):
 
 
 def current_run() -> Run | None:
-    if _INSTANCE_SETUP:
+    global _TRACKING_READY
+
+    if not _TRACKING_READY:
+        _TRACKING_READY = _check_instance_setup()
+    if _TRACKING_READY:
         import lamindb.core
 
         return lamindb.core.run_context.run
