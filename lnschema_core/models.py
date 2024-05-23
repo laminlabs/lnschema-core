@@ -490,6 +490,7 @@ class Registry(models.Model):
         cls,
         values: ListLike,
         field: StrField | None = None,
+        create: bool = False,
         organism: Registry | str | None = None,
         public_source: Registry | None = None,
         mute: bool = False,
@@ -500,6 +501,7 @@ class Registry(models.Model):
             values: A list of values for an identifier, e.g.
                 `["name1", "name2"]`.
             field: A `Registry` field to look up, e.g., `bt.CellMarker.name`.
+            create: Whether to create records if they don't exist.
             organism: An Organism name or record.
             public_source: A PublicSource record.
 
