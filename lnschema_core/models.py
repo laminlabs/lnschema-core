@@ -1725,6 +1725,8 @@ class Artifact(Registry, Data, IsVersioned, TracksRun, TracksUpdates):
     """Internal id, valid only in one DB instance."""
     uid = CharField(unique=True, db_index=True, max_length=_len_full_uid)
     """A universal random id (20-char base62 ~ UUID), valid across DB instances."""
+    description = CharField(max_length=255, db_index=True, null=True, default=None)
+    """A description."""
     storage = models.ForeignKey(Storage, PROTECT, related_name="artifacts")
     """Storage location (:class:`~lamindb.Storage`), e.g., an S3 or GCP bucket or a local directory."""
     key = CharField(max_length=255, db_index=True, null=True, default=None)
@@ -1741,8 +1743,6 @@ class Artifact(Registry, Data, IsVersioned, TracksRun, TracksUpdates):
 
     Soon, also: SOMA, MuData, zarr.Group, tiledb.Array, etc.
     """
-    description = CharField(max_length=255, db_index=True, null=True, default=None)
-    """A description."""
     size = models.BigIntegerField(null=True, db_index=True)
     """Size in bytes.
 
