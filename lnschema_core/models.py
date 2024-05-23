@@ -1456,6 +1456,17 @@ class FeatureSet(Registry, TracksRun):
     that may be used to identify features (e.g., class:`~bionty.Gene` or
     class:`~bionty.Protein`).
 
+    .. dropdown:: Why does LaminDB model feature sets, not just features?
+
+        1. Performance: Imagine you measure the same panel of 20k transcripts in
+           1M samples. By modeling the panel as a feature set, you can link all
+           your artifacts against one feature set and only need to store 1M
+           instead of 1M x 20k = 20B links.
+        2. Interpretation: Model protein panels, gene panels, etc.
+        3. Data integration: Feature sets provide the currency that determines whether two collections can be easily concatenated.
+
+        These reasons do not hold for label sets. Hence, LaminDB does not model label sets.
+
     Args:
         features: `Iterable[Registry]` An iterable of :class:`~lamindb.Feature`
             records to hash, e.g., `[Feature(...), Feature(...)]`. Is turned into
@@ -1469,12 +1480,10 @@ class FeatureSet(Registry, TracksRun):
 
     Note:
 
-        Feature sets are useful as you likely have many datasets that measure
-        the same features. In LaminDB, they are all linked against the exact
-        same *feature set*. If instead, you'd link each of the datasets against
-        single features (say, genes), you'd face exploding link tables.
-
         A feature set is identified by the hash of the feature uids in the set.
+
+        A `slot` provides a string key to access feature sets. It's typically the accessor within the registered data object, here `pd.DataFrame.columns`.
+
 
     See Also:
         :meth:`~lamindb.FeatureSet.from_values`
