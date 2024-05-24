@@ -502,8 +502,9 @@ class Registry(models.Model):
                 `["name1", "name2"]`.
             field: A `Registry` field to look up, e.g., `bt.CellMarker.name`.
             create: Whether to create records if they don't exist.
-            organism: An Organism name or record.
-            public_source: A PublicSource record.
+            organism: A `bionty.Organism` name or record.
+            public_source: A `bionty.PublicSource` record.
+            mute: Do not show logging.
 
         Returns:
             A list of validated records. For bionty registries, also returns knowledge-coupled records.
