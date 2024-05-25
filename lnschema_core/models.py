@@ -2390,11 +2390,10 @@ class Collection(Registry, Data, IsVersioned, TracksRun, TracksUpdates):
         """
         pass
 
-    def save(self, transfer_labels: bool = False, using: str | None = None) -> None:
+    def save(self, using: str | None = None) -> None:
         """Save the collection and underlying artifacts to database & storage.
 
         Args:
-            transfer_labels: Transfer labels from artifacts to the collection.
             using: The database to which you want to save.
 
         Examples:
