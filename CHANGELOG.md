@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+♻️ Better representation | [386](https://github.com/laminlabs/lnschema-core/pull/386) | [falexwolf](https://github.com/falexwolf) | 2024-05-25 |
 🚚 Reformulate data lineage, remove json field from run | [385](https://github.com/laminlabs/lnschema-core/pull/385) | [falexwolf](https://github.com/falexwolf) | 2024-05-19 | 0.67.0
 ♻️ Protect feature in FeatureSet | [384](https://github.com/laminlabs/lnschema-core/pull/384) | [falexwolf](https://github.com/falexwolf) | 2024-05-18 |
 🏗️ Naming conventions for link tables, protecting deletion in link tables, maintaining integrity upon label & feature renames | [383](https://github.com/laminlabs/lnschema-core/pull/383) | [falexwolf](https://github.com/falexwolf) | 2024-05-18 |
