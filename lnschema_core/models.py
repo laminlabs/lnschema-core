@@ -2572,6 +2572,21 @@ def __repr__(
     return f"{self.__class__.__name__}({fields_joined_str})"
 
 
+# below is code to further format the repr of a record
+#
+# def format_repr(
+#     record: Registry, exclude_field_names: str | list[str] | None = None
+# ) -> str:
+#     if isinstance(exclude_field_names, str):
+#         exclude_field_names = [exclude_field_names]
+#     exclude_field_names_init = ["id", "created_at", "updated_at"]
+#     if exclude_field_names is not None:
+#         exclude_field_names_init += exclude_field_names
+#     return record.__repr__(
+#         include_foreign_keys=False, exclude_field_names=exclude_field_names_init
+#     )
+
+
 Registry.__repr__ = __repr__  # type: ignore
 Registry.__str__ = __repr__  # type: ignore
 
