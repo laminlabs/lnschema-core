@@ -490,6 +490,7 @@ class Registry(models.Model):
         cls,
         values: ListLike,
         field: StrField | None = None,
+        create: bool = False,
         organism: Registry | str | None = None,
         public_source: Registry | None = None,
         mute: bool = False,
@@ -500,8 +501,10 @@ class Registry(models.Model):
             values: A list of values for an identifier, e.g.
                 `["name1", "name2"]`.
             field: A `Registry` field to look up, e.g., `bt.CellMarker.name`.
-            organism: An Organism name or record.
-            public_source: A PublicSource record.
+            create: Whether to create records if they don't exist.
+            organism: A `bionty.Organism` name or record.
+            public_source: A `bionty.PublicSource` record.
+            mute: Do not show logging.
 
         Returns:
             A list of validated records. For bionty registries, also returns knowledge-coupled records.
@@ -1454,6 +1457,17 @@ class FeatureSet(Registry, TracksRun):
     that may be used to identify features (e.g., class:`~bionty.Gene` or
     class:`~bionty.Protein`).
 
+    .. dropdown:: Why does LaminDB model feature sets, not just features?
+
+        1. Performance: Imagine you measure the same panel of 20k transcripts in
+           1M samples. By modeling the panel as a feature set, you can link all
+           your artifacts against one feature set and only need to store 1M
+           instead of 1M x 20k = 20B links.
+        2. Interpretation: Model protein panels, gene panels, etc.
+        3. Data integration: Feature sets provide the currency that determines whether two collections can be easily concatenated.
+
+        These reasons do not hold for label sets. Hence, LaminDB does not model label sets.
+
     Args:
         features: `Iterable[Registry]` An iterable of :class:`~lamindb.Feature`
             records to hash, e.g., `[Feature(...), Feature(...)]`. Is turned into
@@ -1467,12 +1481,10 @@ class FeatureSet(Registry, TracksRun):
 
     Note:
 
-        Feature sets are useful as you likely have many datasets that measure
-        the same features. In LaminDB, they are all linked against the exact
-        same *feature set*. If instead, you'd link each of the datasets against
-        single features (say, genes), you'd face exploding link tables.
-
         A feature set is identified by the hash of the feature uids in the set.
+
+        A `slot` provides a string key to access feature sets. It's typically the accessor within the registered data object, here `pd.DataFrame.columns`.
+
 
     See Also:
         :meth:`~lamindb.FeatureSet.from_values`
@@ -1725,6 +1737,8 @@ class Artifact(Registry, Data, IsVersioned, TracksRun, TracksUpdates):
     """Internal id, valid only in one DB instance."""
     uid = CharField(unique=True, db_index=True, max_length=_len_full_uid)
     """A universal random id (20-char base62 ~ UUID), valid across DB instances."""
+    description = CharField(max_length=255, db_index=True, null=True, default=None)
+    """A description."""
     storage = models.ForeignKey(Storage, PROTECT, related_name="artifacts")
     """Storage location (:class:`~lamindb.Storage`), e.g., an S3 or GCP bucket or a local directory."""
     key = CharField(max_length=255, db_index=True, null=True, default=None)
@@ -1741,8 +1755,6 @@ class Artifact(Registry, Data, IsVersioned, TracksRun, TracksUpdates):
 
     Soon, also: SOMA, MuData, zarr.Group, tiledb.Array, etc.
     """
-    description = CharField(max_length=255, db_index=True, null=True, default=None)
-    """A description."""
     size = models.BigIntegerField(null=True, db_index=True)
     """Size in bytes.
 
@@ -2520,21 +2532,24 @@ class RunParamValue(Registry, LinkORM):
 
 def format_field_value(value: datetime | str | Any) -> Any:
     if isinstance(value, datetime):
-        return value.strftime("%Y-%m-%d %H:%M:%S %Z")
-    elif isinstance(value, str):
+        value = value.strftime("%Y-%m-%d %H:%M:%S %Z")
+    if isinstance(value, str):
         return f"'{value}'"
     else:
         return value
 
 
-def __repr__(self: Registry, include_foreign_keys: bool = True) -> str:
+def __repr__(
+    self: Registry, include_foreign_keys: bool = True, exclude_field_names=None
+) -> str:
+    if exclude_field_names is None:
+        exclude_field_names = ["id", "created_at"]
     field_names = [
         field.name
         for field in self._meta.fields
         if (
             not isinstance(field, models.ForeignKey)
-            and field.name != "created_at"
-            and field.name != "id"
+            and field.name not in exclude_field_names
         )
     ]
     if include_foreign_keys:
@@ -2543,6 +2558,12 @@ def __repr__(self: Registry, include_foreign_keys: bool = True) -> str:
             for field in self._meta.fields
             if isinstance(field, models.ForeignKey)
         ]
+    if "updated_at" in field_names:
+        field_names.remove("updated_at")
+        field_names.append("updated_at")
+    if field_names[0] != "uid" and "uid" in field_names:
+        field_names.remove("uid")
+        field_names.insert(0, "uid")
     fields_str = {
         k: format_field_value(getattr(self, k)) for k in field_names if hasattr(self, k)
     }
