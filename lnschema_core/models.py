@@ -1516,7 +1516,7 @@ class FeatureSet(Registry, TracksRun):
 
         Link features to an artifact (will create a featureset under the hood):
 
-        >>> artifact.features.add(features)
+        >>> artifact.features.add_values(features)
     """
 
     class Meta(Registry.Meta, TracksRun.Meta, TracksUpdates.Meta):
