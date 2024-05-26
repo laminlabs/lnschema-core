@@ -36,7 +36,7 @@ if TYPE_CHECKING:
     import pandas as pd
     from anndata import AnnData
     from lamin_utils._inspect import InspectResult
-    from lamindb.core import FeatureManager, LabelManager
+    from lamindb.core import LabelManager
     from lamindb_setup.core.types import UPathStr
     from mudata import MuData
     from upath import UPath
@@ -707,18 +707,23 @@ class Registry(models.Model):
         abstract = True
 
 
+class FeatureManager:
+    """Feature manager."""
+
+    pass
+
+
 class Data:
     """Base class for :class:`~lamindb.Artifact` & :class:`~lamindb.Collection`."""
 
-    @property
-    def features(self) -> FeatureManager:
-        """Feature manager (:class:`~lamindb.core.FeatureManager`)."""
-        pass
+    features = FeatureManager
 
     @property
     def labels(self) -> LabelManager:
-        """Label manager (:class:`~lamindb.core.LabelManager`)."""
-        pass
+        """Label manager."""
+        from lamindb.core._label_manager import LabelManager
+
+        return LabelManager(self)
 
     def describe(self):
         """Describe relations of data record.
