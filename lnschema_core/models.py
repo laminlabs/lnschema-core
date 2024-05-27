@@ -725,8 +725,8 @@ class FeatureManagerCollection(FeatureManager):
     pass
 
 
-class Data:
-    """Base class for :class:`~lamindb.Artifact` & :class:`~lamindb.Collection`."""
+class HasFeatures:
+    """Base class linking features, in particular, for :class:`~lamindb.Artifact` & :class:`~lamindb.Collection`."""
 
     features = FeatureManager
 
@@ -1644,7 +1644,7 @@ class FeatureSet(Registry, TracksRun):
         pass
 
 
-class Artifact(Registry, Data, IsVersioned, TracksRun, TracksUpdates):
+class Artifact(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
     """Artifacts: datasets & models stored as files, folders, or arrays.
 
     Artifacts manage data in local or remote storage.
@@ -2172,7 +2172,7 @@ class Artifact(Registry, Data, IsVersioned, TracksRun, TracksUpdates):
         pass
 
 
-class Collection(Registry, Data, IsVersioned, TracksRun, TracksUpdates):
+class Collection(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
     """Collections: collections of artifacts.
 
     For more info: :doc:`/tutorial`.
