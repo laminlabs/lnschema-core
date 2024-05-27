@@ -713,6 +713,18 @@ class FeatureManager:
     pass
 
 
+class FeatureManagerArtifact(FeatureManager):
+    """Feature manager."""
+
+    pass
+
+
+class FeatureManagerCollection(FeatureManager):
+    """Feature manager."""
+
+    pass
+
+
 class Data:
     """Base class for :class:`~lamindb.Artifact` & :class:`~lamindb.Collection`."""
 
@@ -1737,6 +1749,7 @@ class Artifact(Registry, Data, IsVersioned, TracksRun, TracksUpdates):
 
     _len_full_uid: int = 20
     _len_stem_uid: int = 16
+    features = FeatureManagerArtifact
 
     id = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
@@ -2208,6 +2221,7 @@ class Collection(Registry, Data, IsVersioned, TracksRun, TracksUpdates):
 
     _len_full_uid: int = 20
     _len_stem_uid: int = 16
+    features = FeatureManagerCollection
 
     id = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
