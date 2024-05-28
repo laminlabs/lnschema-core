@@ -8,7 +8,6 @@ from lamindb_setup import _check_instance_setup
 if _check_instance_setup():
     from . import ids, types
     from .models import (  # type: ignore
-        ORM,  # backward compat
         Artifact,
         CanValidate,
         Collection,

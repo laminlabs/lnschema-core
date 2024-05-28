@@ -1649,6 +1649,7 @@ class Artifact(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
 
     Artifacts manage data in local or remote storage.
 
+
     An artifact stores a dataset or model as either a file or a folder.
 
     Some artifacts are array-like, e.g., when stored as `.parquet`, `.h5ad`,
@@ -2608,8 +2609,6 @@ def __repr__(
 
 Registry.__repr__ = __repr__  # type: ignore
 Registry.__str__ = __repr__  # type: ignore
-
-ORM = Registry  # backward compat
 
 
 def deferred_attribute__repr__(self):
