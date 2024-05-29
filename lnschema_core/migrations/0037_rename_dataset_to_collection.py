@@ -60,7 +60,7 @@ class Migration(migrations.Migration):
             options={
                 "abstract": False,
             },
-            bases=(models.Model, lnschema_core.models.Data),
+            bases=(models.Model, lnschema_core.models.HasFeatures),
         ),
         migrations.CreateModel(
             name="Feature",
@@ -178,7 +178,7 @@ class Migration(migrations.Migration):
                 ("created_at", models.DateTimeField(auto_now_add=True, db_index=True)),
                 ("updated_at", models.DateTimeField(auto_now=True, db_index=True)),
             ],
-            bases=(models.Model, lnschema_core.models.Data),
+            bases=(models.Model, lnschema_core.models.HasFeatures),
         ),
         migrations.CreateModel(
             name="User",

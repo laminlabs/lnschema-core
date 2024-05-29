@@ -36,7 +36,7 @@ if TYPE_CHECKING:
     import pandas as pd
     from anndata import AnnData
     from lamin_utils._inspect import InspectResult
-    from lamindb.core import FeatureManager, LabelManager
+    from lamindb.core import LabelManager
     from lamindb_setup.core.types import UPathStr
     from mudata import MuData
     from upath import UPath
@@ -707,18 +707,35 @@ class Registry(models.Model):
         abstract = True
 
 
-class Data:
-    """Base class for :class:`~lamindb.Artifact` & :class:`~lamindb.Collection`."""
+class FeatureManager:
+    """Feature manager."""
 
-    @property
-    def features(self) -> FeatureManager:
-        """Feature manager (:class:`~lamindb.core.FeatureManager`)."""
-        pass
+    pass
+
+
+class FeatureManagerArtifact(FeatureManager):
+    """Feature manager."""
+
+    pass
+
+
+class FeatureManagerCollection(FeatureManager):
+    """Feature manager."""
+
+    pass
+
+
+class HasFeatures:
+    """Base class linking features, in particular, for :class:`~lamindb.Artifact` & :class:`~lamindb.Collection`."""
+
+    features = FeatureManager
 
     @property
     def labels(self) -> LabelManager:
-        """Label manager (:class:`~lamindb.core.LabelManager`)."""
-        pass
+        """Label manager."""
+        from lamindb.core._label_manager import LabelManager
+
+        return LabelManager(self)
 
     def describe(self):
         """Describe relations of data record.
@@ -1627,10 +1644,11 @@ class FeatureSet(Registry, TracksRun):
         pass
 
 
-class Artifact(Registry, Data, IsVersioned, TracksRun, TracksUpdates):
+class Artifact(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
     """Artifacts: datasets & models stored as files, folders, or arrays.
 
     Artifacts manage data in local or remote storage.
+
 
     An artifact stores a dataset or model as either a file or a folder.
 
@@ -1732,6 +1750,7 @@ class Artifact(Registry, Data, IsVersioned, TracksRun, TracksUpdates):
 
     _len_full_uid: int = 20
     _len_stem_uid: int = 16
+    features = FeatureManagerArtifact
 
     id = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
@@ -2154,7 +2173,7 @@ class Artifact(Registry, Data, IsVersioned, TracksRun, TracksUpdates):
         pass
 
 
-class Collection(Registry, Data, IsVersioned, TracksRun, TracksUpdates):
+class Collection(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
     """Collections: collections of artifacts.
 
     For more info: :doc:`/tutorial`.
@@ -2203,6 +2222,7 @@ class Collection(Registry, Data, IsVersioned, TracksRun, TracksUpdates):
 
     _len_full_uid: int = 20
     _len_stem_uid: int = 16
+    features = FeatureManagerCollection
 
     id = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
@@ -2589,8 +2609,6 @@ def __repr__(
 
 Registry.__repr__ = __repr__  # type: ignore
 Registry.__str__ = __repr__  # type: ignore
-
-ORM = Registry  # backward compat
 
 
 def deferred_attribute__repr__(self):
