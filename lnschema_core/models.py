@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import sys
 from datetime import datetime
 from typing import (
     TYPE_CHECKING,
@@ -793,10 +792,8 @@ class HasFeatures:
 class User(Registry, CanValidate):
     """Users.
 
-    All data in this registry is synced from lamin.ai to ensure a universal user
-    identity, valid across DB instances and user metadata changes.
-
-    There is no need to manually create records.
+    All data in this registry is synched from `lamin.ai` to ensure a universal
+    user identity. There is no need to manually create records.
 
     Examples:
 
@@ -1054,9 +1051,7 @@ class Transform(Registry, HasParents, IsVersioned):
     """Time of creation of record."""
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
-    created_by = models.ForeignKey(
-        User, PROTECT, default=current_user_id, related_name="created_transforms"
-    )
+    created_by = models.ForeignKey(User, PROTECT, default=current_user_id)
     """Creator of record, a :class:`~lamindb.User`."""
 
     @overload
@@ -1103,15 +1098,19 @@ class Param(Registry, TracksRun, TracksUpdates):
 class ParamValue(Registry):
     """Run parameter values akin to FeatureValue for artifacts."""
 
+    class Meta:
+        unique_together = ("param", "value")
+
     param = models.ForeignKey(Param, CASCADE)
     value = models.JSONField()  # stores float, integer, boolean or datetime
-    # it'd be confusing and hard to populate to have run here because these
+    # it'd be confusing and hard to populate a run here because these
     # values are typically created upon creating a run
+    # hence, ParamValue does _not_ inherit from TracksRun but manually
+    # adds created_at & created_by
+    # because ParamValue cannot be updated, we don't need updated_at
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
-    created_by = models.ForeignKey(
-        User, PROTECT, default=current_user_id, related_name="created_transforms"
-    )
+    created_by = models.ForeignKey(User, PROTECT, default=current_user_id)
     """Creator of record, a :class:`~lamindb.User`."""
 
 
@@ -1162,9 +1161,7 @@ class Run(Registry):
     """Start time of run."""
     finished_at = models.DateTimeField(db_index=True, null=True, default=None)
     """Finished time of run."""
-    created_by = models.ForeignKey(
-        User, CASCADE, default=current_user_id, related_name="created_runs"
-    )
+    created_by = models.ForeignKey(User, CASCADE, default=current_user_id)
     """Creator of run, a :class:`~lamindb.User`."""
     param_values = models.ManyToManyField(
         ParamValue, through="RunParamValue", related_name="runs"
@@ -1462,6 +1459,7 @@ class FeatureValue(Registry, TracksRun):
 
     class Meta(Registry.Meta, TracksRun.Meta):
         abstract = False
+        unique_together = ("feature", "value")
 
     feature = models.ForeignKey(Feature, CASCADE, null=True, default=None)
     value = models.JSONField()
@@ -1557,7 +1555,7 @@ class FeatureSet(Registry, TracksRun):
 
     Depending on the registry, `.members` stores, e.g. `Feature` or `Gene` records.
     """
-    hash = CharField(max_length=20, default=None, db_index=True, null=True)
+    hash = CharField(max_length=20, default=None, db_index=True, null=True, unique=True)
     """The hash of the set."""
 
     @overload
