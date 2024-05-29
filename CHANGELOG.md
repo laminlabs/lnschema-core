@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
-♻️ Add constraints & simple schema fixes | [388](https://github.com/laminlabs/lnschema-core/pull/388) | [falexwolf](https://github.com/falexwolf) | 2024-05-29 |
+♻️ Add constraints & simple schema fixes | [388](https://github.com/laminlabs/lnschema-core/pull/388) | [falexwolf](https://github.com/falexwolf) | 2024-05-29 | 0.68.0
 ♻️ Migrate featuremanager to being available on the class level | [387](https://github.com/laminlabs/lnschema-core/pull/387) | [falexwolf](https://github.com/falexwolf) | 2024-05-29 |
 ♻️ Better representation | [386](https://github.com/laminlabs/lnschema-core/pull/386) | [falexwolf](https://github.com/falexwolf) | 2024-05-25 |
 🚚 Reformulate data lineage, remove json field from run | [385](https://github.com/laminlabs/lnschema-core/pull/385) | [falexwolf](https://github.com/falexwolf) | 2024-05-19 | 0.67.0
