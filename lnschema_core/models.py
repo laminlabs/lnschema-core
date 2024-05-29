@@ -1249,7 +1249,7 @@ class ULabel(Registry, HasParents, CanValidate, TracksRun, TracksUpdates):
     See Also:
         :meth:`~lamindb.Feature`
             Dimensions of measurement for artifacts & collections.
-        :attr:`~lamindb.core.Data.labels`
+        :attr:`~lamindb.core.HasFeatures.labels`
             Label manager of an artifact or collection.
 
     Examples:
@@ -1352,7 +1352,7 @@ class Feature(Registry, CanValidate, TracksRun, TracksUpdates):
     See Also:
         :meth:`~lamindb.Feature.from_df`
             Create feature records from DataFrame.
-        :attr:`~lamindb.core.Data.features`
+        :attr:`~lamindb.core.HasFeatures.features`
             Feature manager of an artifact or collection.
         :class:`~lamindb.ULabel`
             Universal labels.
