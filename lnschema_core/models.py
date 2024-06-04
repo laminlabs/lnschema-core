@@ -702,6 +702,21 @@ class Registry(models.Model):
         super().save(*args, **kwargs)
         return self
 
+    @classmethod
+    def __get_schema_name__(cls) -> str:
+        schema_module_name = cls.__module__.split(".")[0]
+        schema_name = schema_module_name.replace("lnschema_", "")
+        return schema_name
+
+    @classmethod
+    def __get_name_with_schema__(cls) -> str:
+        schema_name = cls.__get_schema_name__()
+        if schema_name == "core":
+            schema_prefix = ""
+        else:
+            schema_prefix = f"{schema_name}."
+        return f"{schema_prefix}{cls.__name__}"
+
     class Meta:
         abstract = True
 
