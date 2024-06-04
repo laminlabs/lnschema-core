@@ -1671,7 +1671,7 @@ class Artifact(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
     For more info, see tutorial: :doc:`/tutorial`.
 
     Args:
-        path: `UPathStr` A path to a local or remote folder or file.
+        data: `UPathStr` A path to a local or remote folder or file.
         key: `str | None = None` A relative path within default storage,
             e.g., `"myfolder/myfile.fcs"`.
         description: `str | None = None` A description.
