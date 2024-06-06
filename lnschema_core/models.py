@@ -12,6 +12,7 @@ from typing import (
 
 from django.db import models
 from django.db.models import CASCADE, PROTECT
+from django.db.models.base import ModelBase
 from lamin_utils import logger
 from lamindb_setup import _check_instance_setup
 
@@ -475,8 +476,8 @@ class HasParents:
         pass
 
 
-class Registry(models.Model):
-    """Registry base class.
+class RegistryMeta(ModelBase):
+    """RegistryMeta base class.
 
     Extends ``django.db.models.Model``.
 
@@ -716,6 +717,16 @@ class Registry(models.Model):
         else:
             schema_prefix = f"{schema_name}."
         return f"{schema_prefix}{cls.__name__}"
+
+
+class Registry(models.Model, metaclass=RegistryMeta):
+    """Registry base class.
+
+    Extends ``django.db.models.Model``.
+
+    Why does LaminDB call it `Registry` and not `Model`? The term "Registry" can't lead to
+    confusion with statistical, machine learning or biological models.
+    """
 
     class Meta:
         abstract = True
