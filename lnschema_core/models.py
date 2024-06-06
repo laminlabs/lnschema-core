@@ -485,7 +485,6 @@ class RegistryMeta(ModelBase):
     confusion with statistical, machine learning or biological models.
     """
 
-    @classmethod
     def from_values(
         cls,
         values: ListLike,
@@ -533,7 +532,6 @@ class RegistryMeta(ModelBase):
         """
         pass
 
-    @classmethod
     def lookup(
         cls,
         field: StrField | None = None,
@@ -566,7 +564,6 @@ class RegistryMeta(ModelBase):
         """
         pass
 
-    @classmethod
     def filter(cls, **expressions) -> QuerySet:
         """Query records (see :doc:`meta`).
 
@@ -588,7 +585,6 @@ class RegistryMeta(ModelBase):
 
         return filter(cls, **expressions)
 
-    @classmethod
     def get(cls, idlike: int | str) -> Registry:
         """Get a single record.
 
@@ -616,7 +612,6 @@ class RegistryMeta(ModelBase):
             else:
                 return qs.one()
 
-    @classmethod
     def df(cls, include: str | list[str] | None = None) -> pd.DataFrame:
         """Convert to ``pd.DataFrame``.
 
@@ -641,7 +636,6 @@ class RegistryMeta(ModelBase):
             query_set = query_set.order_by("-updated_at")
         return query_set.df(include=include)
 
-    @classmethod
     def search(
         cls,
         string: str,
@@ -673,7 +667,6 @@ class RegistryMeta(ModelBase):
         """
         pass
 
-    @classmethod
     def using(
         cls,
         instance: str,
@@ -693,23 +686,11 @@ class RegistryMeta(ModelBase):
         """
         pass
 
-    def save(self, *args, **kwargs) -> Registry:
-        """Save.
-
-        Always saves to the default database.
-        """
-        # we need this here because we're using models also from plain
-        # django outside of lamindb
-        super().save(*args, **kwargs)
-        return self
-
-    @classmethod
     def __get_schema_name__(cls) -> str:
         schema_module_name = cls.__module__.split(".")[0]
         schema_name = schema_module_name.replace("lnschema_", "")
         return schema_name
 
-    @classmethod
     def __get_name_with_schema__(cls) -> str:
         schema_name = cls.__get_schema_name__()
         if schema_name == "core":
@@ -727,6 +708,16 @@ class Registry(models.Model, metaclass=RegistryMeta):
     Why does LaminDB call it `Registry` and not `Model`? The term "Registry" can't lead to
     confusion with statistical, machine learning or biological models.
     """
+
+    def save(self, *args, **kwargs) -> Registry:
+        """Save.
+
+        Saves to the default database.
+        """
+        # we need this here because we're using models also from plain
+        # django outside of lamindb
+        super().save(*args, **kwargs)
+        return self
 
     class Meta:
         abstract = True
