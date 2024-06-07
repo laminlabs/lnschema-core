@@ -25,7 +25,7 @@ from lnschema_core.types import (
 )
 
 from .ids import base62_8, base62_12, base62_20
-from .types import TransformType
+from .types import ArtifactType, TransformType
 from .users import current_user_id
 
 if TYPE_CHECKING:
@@ -1782,6 +1782,13 @@ class Artifact(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
 
     This is either a file suffix (`".csv"`, `".h5ad"`, etc.) or the empty string "".
     """
+    type = CharField(
+        max_length=20,
+        choices=ArtifactType.choices(),
+        db_index=True,
+        default=ArtifactType.dataset,
+    )
+    """Artifact type (default `"dataset"`)."""
     accessor = CharField(max_length=64, db_index=True, null=True, default=None)
     """Default backed or memory accessor, e.g., DataFrame, AnnData.
 
@@ -1839,6 +1846,10 @@ class Artifact(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
         FeatureValue, through="ArtifactFeatureValue"
     )
     """Non-categorical feature values for annotation."""
+    param_values = models.ManyToManyField(
+        ParamValue, through="ArtifactParamValue", related_name="artifacts"
+    )
+    """Parameter values."""
     visibility = models.SmallIntegerField(
         db_index=True, choices=VisibilityChoice.choices, default=1
     )
@@ -2543,6 +2554,16 @@ class RunParamValue(Registry, LinkORM):
 
     class Meta:
         unique_together = ("run", "paramvalue")
+
+
+class ArtifactParamValue(Registry, LinkORM):
+    id = models.BigAutoField(primary_key=True)
+    artifact = models.ForeignKey(Artifact, CASCADE, related_name="+")
+    # we follow the lower() case convention rather than snake case for link models
+    paramvalue = models.ForeignKey(ParamValue, PROTECT, related_name="+")
+
+    class Meta:
+        unique_together = ("artifact", "paramvalue")
 
 
 # class Migration(Registry):
