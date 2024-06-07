@@ -727,6 +727,12 @@ class FeatureManager:
     pass
 
 
+class ParamManager:
+    """Param manager."""
+
+    pass
+
+
 class FeatureManagerArtifact(FeatureManager):
     """Feature manager."""
 
@@ -763,6 +769,12 @@ class HasFeatures:
             >>> artifact.describe()
         """
         pass
+
+
+class HasParams:
+    """Base class linking features, in particular, for :class:`~lamindb.Artifact` & :class:`~lamindb.Collection`."""
+
+    params = ParamManager
 
 
 # -------------------------------------------------------------------------------------
@@ -1129,7 +1141,7 @@ class ParamValue(Registry):
     """Creator of record, a :class:`~lamindb.User`."""
 
 
-class Run(Registry):
+class Run(Registry, HasParams):
     """Runs of transforms.
 
     Args:
@@ -1657,7 +1669,7 @@ class FeatureSet(Registry, TracksRun):
         pass
 
 
-class Artifact(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
+class Artifact(Registry, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpdates):
     """Artifacts: datasets & models stored as files, folders, or arrays.
 
     Artifacts manage data in local or remote storage.
