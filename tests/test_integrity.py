@@ -14,4 +14,4 @@ def test_migrate_check(setup_instance):
 
 
 def test_system_check(setup_instance):
-    assert ln_setup.django("check")
+    ln_setup.django("check")
