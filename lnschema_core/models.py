@@ -747,6 +747,18 @@ class FeatureManagerCollection(FeatureManager):
     pass
 
 
+class ParamManagerArtifact(ParamManager):
+    """Feature manager."""
+
+    pass
+
+
+class ParamManagerRun(ParamManager):
+    """Feature manager."""
+
+    pass
+
+
 class HasFeatures:
     """Base class linking features, in particular, for :class:`~lamindb.Artifact` & :class:`~lamindb.Collection`."""
 
@@ -1179,6 +1191,8 @@ class Run(Registry, HasParams):
         >>> ln.track()  # Jupyter notebook metadata is automatically parsed
         >>> ln.core.context.run
     """
+
+    params = ParamManagerRun
 
     id = models.BigAutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
@@ -1778,6 +1792,7 @@ class Artifact(Registry, HasFeatures, HasParams, IsVersioned, TracksRun, TracksU
     _len_full_uid: int = 20
     _len_stem_uid: int = 16
     features = FeatureManagerArtifact
+    params = ParamManagerArtifact
 
     id = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
