@@ -171,7 +171,9 @@ class TracksUpdates(models.Model):
 
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
-    previous_runs = models.ManyToManyField("lnschema_core.Run")
+    # no default related_name below because it'd clash with the reverse accessor
+    # of the .run field
+    previous_runs = models.ManyToManyField("lnschema_core.Run", related_name="+")
     """Sequence of runs that created or updated the record."""
 
     @overload
