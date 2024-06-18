@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
     dependencies = [
         (
             "lnschema_core",
-            "0053_alter_featureset_hash_alter_paramvalue_created_by_and_more",
+            "0054_alter_feature_previous_runs_and_more",
         ),
     ]
 
