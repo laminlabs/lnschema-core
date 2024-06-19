@@ -89,16 +89,24 @@ class IsVersioned(models.Model):
 
     @property
     def stem_uid(self) -> str:
+        """Universal id characterizing the version family. `str`.
+
+        The full uid of a record is obtained via concatenating the stem uid and version information::
+
+            stem_uid = random_base62(n_char)  # a random base62 sequence of length n_char
+            version_uid = encode_base62(md5_hash(version))[:4]  # version is, e.g., "1" or "2.1.0" or "2022-03-01"
+            uid = f"{stem_uid}{version_uid}"  # concatenate the stem_uid & version_uid
+
+        """
         return self.uid[: self._len_stem_uid]  # type: ignore
 
     @property
     def versions(self) -> QuerySet:
-        """Lists all records of the same version family.
+        """Lists all records of the same version family. :class:`~lamindb.core.QuerySet`.
 
-        Examples:
-            >>> new_artifact = ln.Artifact(df2, is_new_version_of=artifact)
-            >>> new_artifact.save()
-            >>> new_artifact.versions()
+        >>> new_artifact = ln.Artifact(df2, is_new_version_of=artifact)
+        >>> new_artifact.save()
+        >>> new_artifact.versions()
         """
         return self.__class__.filter(uid__startswith=self.stem_uid)  # type: ignore
 
@@ -128,7 +136,7 @@ def current_run() -> Run | None:
 
 
 class TracksRun(models.Model):
-    """Base class tracking latest run, creating user, and `created_at` timestamp."""
+    """Base class tracking latest run, creating user. nd `created_at` timestamp."""
 
     class Meta:
         abstract = True
@@ -138,11 +146,11 @@ class TracksRun(models.Model):
     created_by = models.ForeignKey(
         "lnschema_core.User", PROTECT, default=current_user_id
     )
-    """Creator of record, a :class:`~lamindb.User`."""
+    """Creator of record. :class:`~lamindb.User`"""
     run = models.ForeignKey(
         "lnschema_core.Run", PROTECT, null=True, default=current_run
     )
-    """Last run that created or updated the record, a :class:`~lamindb.Run`."""
+    """Last run that created or updated the record. :class:`~lamindb.Run`"""
 
     @overload
     def __init__(self):
@@ -496,7 +504,7 @@ class Registry(models.Model):
         public_source: Registry | None = None,
         mute: bool = False,
     ) -> list[Registry]:
-        """Bulk create validated records by parsing values for an identifier (a name, an id, etc.).
+        """Bulk create validated records by parsing values for an identifier (a name. n id, etc.).
 
         Args:
             values: A list of values for an identifier, e.g.
@@ -508,7 +516,7 @@ class Registry(models.Model):
             mute: Do not show logging.
 
         Returns:
-            A list of validated records. For bionty registries, also returns knowledge-coupled records.
+            A list of validated records. For bionty registries. lso returns knowledge-coupled records.
 
         Notes:
             For more info, see tutorial: :doc:`bio-registries`.
@@ -594,7 +602,7 @@ class Registry(models.Model):
         """Get a single record.
 
         Args:
-            idlike: Either a uid stub, a uid or an integer id.
+            idlike: Either a uid stub.  uid or an integer id.
 
         Returns:
             A record.
@@ -661,7 +669,7 @@ class Registry(models.Model):
 
         Returns:
             A sorted `DataFrame` of search results with a score in column `score`.
-            If `return_queryset` is `True`, a `QuerySet`.
+            If `return_queryset` is `True`.  `QuerySet`.
 
         See Also:
             :meth:`~lamindb.core.Registry.filter`
@@ -748,13 +756,13 @@ class FeatureManagerCollection(FeatureManager):
 
 
 class ParamManagerArtifact(ParamManager):
-    """Feature manager."""
+    """Param manager."""
 
     pass
 
 
 class ParamManagerRun(ParamManager):
-    """Feature manager."""
+    """Param manager."""
 
     pass
 
@@ -763,10 +771,11 @@ class HasFeatures:
     """Base class linking features, in particular, for :class:`~lamindb.Artifact` & :class:`~lamindb.Collection`."""
 
     features = FeatureManager
+    """Feature manager. :class:`~lamindb.core.FeatureManager`"""
 
     @property
     def labels(self) -> LabelManager:
-        """Label manager."""
+        """Label manager. :class:`~lamindb.core.LabelManager`."""
         from lamindb.core._label_manager import LabelManager
 
         return LabelManager(self)
@@ -789,6 +798,7 @@ class HasParams:
     """Base class linking features, in particular, for :class:`~lamindb.Artifact` & :class:`~lamindb.Collection`."""
 
     params = ParamManager
+    """Param manager. :class:`~lamindb.core.ParamManager`"""
 
 
 # -------------------------------------------------------------------------------------
@@ -935,7 +945,7 @@ class Storage(Registry, TracksRun, TracksUpdates):
     """Universal id, valid across DB instances."""
     # we are very conservative here with 255 characters
     root = CharField(max_length=255, db_index=True, unique=True, default=None)
-    """Root path of storage, an s3 path, a local path, etc. (required)."""
+    """Root path of storage. n s3 path.  local path, etc. (required)."""
     description = CharField(max_length=255, db_index=True, null=True, default=None)
     """A description of what the storage location is used for (optional)."""
     type = CharField(max_length=30, db_index=True)
@@ -970,21 +980,19 @@ class Storage(Registry, TracksRun, TracksUpdates):
 
     @property
     def path(self) -> Path | UPath:
-        """Bucket or folder path (`Path`, `UPath`).
+        """Bucket or folder path. :class:`~lamindb.UPath`.
 
-        Examples:
+        Cloud storage bucket:
 
-            Cloud storage bucket:
+        >>> ln.Storage("s3://my-bucket").save()
 
-            >>> ln.Storage("s3://my-bucket").save()
+        Directory/folder in cloud storage:
 
-            Directory/folder in cloud storage:
+        >>> ln.Storage("s3://my-bucket/my-directory").save()
 
-            >>> ln.Storage("s3://my-bucket/my-directory").save()
+        Local directory/folder:
 
-            Local directory/folder:
-
-            >>> ln.Storage("./my-directory").save()
+        >>> ln.Storage("./my-directory").save()
         """
         pass
 
@@ -992,7 +1000,7 @@ class Storage(Registry, TracksRun, TracksUpdates):
 class Transform(Registry, HasParents, IsVersioned):
     """Data transformations.
 
-    A transform can refer to a simple Python function, script, a notebook, or a
+    A transform can refer to a simple Python function, script.  notebook, or a
     pipeline. If you execute a transform, you generate a run of a transform
     (:class:`~lamindb.Run`). A run has input and output data.
 
@@ -1002,7 +1010,7 @@ class Transform(Registry, HasParents, IsVersioned):
 
     Transforms are versioned so that a given transform maps 1:1 to a specific
     version of code. If you switch on
-    :attr:`~lamindb.core.Settings.sync_git_repo`, any script-like transform is
+    :attr:`~lamindb.core.Settings.sync_git_repo`. ny script-like transform is
     synced its hashed state in a git repository.
 
     If you execute a transform, you generate a :class:`~lamindb.Run` record. The
@@ -1058,7 +1066,7 @@ class Transform(Registry, HasParents, IsVersioned):
     uid = CharField(unique=True, db_index=True, max_length=_len_full_uid, default=None)
     """Universal id."""
     name = CharField(max_length=150, db_index=True, null=True, default=None)
-    """A name or title. For instance, a pipeline name, notebook title, etc."""
+    """A name or title. For instance.  pipeline name, notebook title, etc."""
     key = CharField(max_length=120, db_index=True, null=True, default=None)
     """A key for concise reference & versioning (optional)."""
     description = CharField(max_length=255, null=True, default=None)
@@ -1079,7 +1087,7 @@ class Transform(Registry, HasParents, IsVersioned):
     )
     """Source of the transform if stored as artifact within LaminDB."""
     reference = CharField(max_length=255, db_index=True, null=True, default=None)
-    """Reference for the transform, e.g., a URL."""
+    """Reference for the transform, e.g..  URL."""
     reference_type = CharField(max_length=25, db_index=True, null=True, default=None)
     """Type of reference, e.g., 'url' or 'doi'."""
     ulabels = models.ManyToManyField("ULabel", related_name="transforms")
@@ -1093,7 +1101,7 @@ class Transform(Registry, HasParents, IsVersioned):
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
     created_by = models.ForeignKey(User, PROTECT, default=current_user_id)
-    """Creator of record, a :class:`~lamindb.User`."""
+    """Creator of record. :class:`~lamindb.User`"""
 
     @overload
     def __init__(
@@ -1152,7 +1160,7 @@ class ParamValue(Registry):
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     created_by = models.ForeignKey(User, PROTECT, default=current_user_id)
-    """Creator of record, a :class:`~lamindb.User`."""
+    """Creator of record. :class:`~lamindb.User`"""
 
 
 class Run(Registry, HasParams):
@@ -1160,7 +1168,7 @@ class Run(Registry, HasParams):
 
     Args:
         transform: `Transform` A :class:`~lamindb.Transform` record.
-        reference: `str | None = None` For instance, an external ID or a download URL.
+        reference: `str | None = None` For instance. n external ID or a download URL.
         reference_type: `str | None = None` For instance, `redun_id`, `nextflow_id` or `url`.
 
     See Also:
@@ -1170,10 +1178,10 @@ class Run(Registry, HasParams):
     Notes:
         See guide: :doc:`docs:data-flow`.
 
-        Typically, a run has inputs (`run.inputs`) and outputs (`run.outputs`):
+        A run can have inputs and outputs:
 
-            - References to outputs are also stored in the `run` field of :class:`~lamindb.Artifact` and :class:`~lamindb.Collection`.
-            - References to inputs are also stored in the `input_of` field of :class:`~lamindb.Artifact` and :class:`~lamindb.Collection`.
+        - References to outputs are stored in the `run` field of registries.
+        - References to inputs are stored in the `input_of` field of :class:`~lamindb.Artifact` and :class:`~lamindb.Collection`.
 
     Examples:
 
@@ -1205,7 +1213,7 @@ class Run(Registry, HasParams):
     finished_at = models.DateTimeField(db_index=True, null=True, default=None)
     """Finished time of run."""
     created_by = models.ForeignKey(User, CASCADE, default=current_user_id)
-    """Creator of run, a :class:`~lamindb.User`."""
+    """Creator of run. :class:`~lamindb.User`"""
     param_values = models.ManyToManyField(
         ParamValue, through="RunParamValue", related_name="runs"
     )
@@ -1215,20 +1223,20 @@ class Run(Registry, HasParams):
     report = models.ForeignKey(
         "Artifact", PROTECT, default=None, null=True, related_name="report_of"
     )
-    """Report of run, e.g., an html file."""
+    """Report of run, e.g.. n html file."""
     environment = models.ForeignKey(
         "Artifact", PROTECT, default=None, null=True, related_name="environment_of"
     )
     """Computational environment for the run.
 
-    For instance, a `Dockerfile`, a docker image, a `requirements.txt`, an `environment.yml`, etc.
+    For instance.  `Dockerfile`.  docker image.  `requirements.txt`. n `environment.yml`, etc.
     """
     is_consecutive = models.BooleanField(null=True, default=None)
     """Indicates whether code was consecutively executed. Is relevant for notebooks."""
     reference = CharField(max_length=255, db_index=True, null=True, default=None)
     """A reference like a URL or external ID (such as from a workflow manager)."""
     reference_type = CharField(max_length=25, db_index=True, null=True, default=None)
-    """Type of reference, e.g., a workflow manager execution ID."""
+    """Type of reference, e.g..  workflow manager execution ID."""
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of first creation. Mismatches ``started_at`` if the run is re-run."""
 
@@ -1262,7 +1270,7 @@ class ULabel(Registry, HasParents, CanValidate, TracksRun, TracksUpdates):
     Args:
         name: `str` A name.
         description: `str` A description.
-        reference: `str | None = None` For instance, an external ID or a URL.
+        reference: `str | None = None` For instance. n external ID or a URL.
         reference_type: `str | None = None` For instance, `"url"`.
 
 
@@ -1273,7 +1281,7 @@ class ULabel(Registry, HasParents, CanValidate, TracksRun, TracksUpdates):
         >>> my_project.save()
         >>> collection.ulabels.add(my_project)
 
-    In some cases, a label is measured *within* an artifact or collection a feature (a
+    In some cases.  label is measured *within* an artifact or collection a feature (a
     :class:`~lamindb.Feature` record) denotes the column name in which the label
     is stored. For instance, the collection might contain measurements across 2
     organism of the Iris flower: `"setosa"` & `"versicolor"`.
@@ -1378,7 +1386,7 @@ class Feature(Registry, CanValidate, TracksRun, TracksUpdates):
     Learn more: :doc:`tutorial2`.
 
     Args:
-        name: `str` Name of the feature, typically, a column name.
+        name: `str` Name of the feature, typically.  column name.
         type: `str | list[Type[Registry]]` Data type ("number", "cat", "int", "float", "bool", "datetime").
             For categorical types, can define from which registry values are
             sampled, e.g., `cat[ULabel]` or `cat[bionty.CellType]`.
@@ -1410,8 +1418,8 @@ class Feature(Registry, CanValidate, TracksRun, TracksUpdates):
 
         *Features* and *labels* denote two ways of using entities to organize data:
 
-        1. A feature qualifies *what* is measured, i.e., a numerical or categorical random variable
-        2. A label *is* a measured value, i.e., a category
+        1. A feature qualifies *what* is measured, i.e..  numerical or categorical random variable
+        2. A label *is* a measured value, i.e..  category
 
         Consider annotating a dataset by that it measured expression of 30k
         genes: genes relate to the dataset as feature identifiers through a
@@ -1420,7 +1428,7 @@ class Feature(Registry, CanValidate, TracksRun, TracksUpdates):
         as labels of the dataset.
 
         Re-shaping data can introduce ambiguity among features & labels. If this
-        happened, ask yourself what the joint measurement was: a feature
+        happened. sk yourself what the joint measurement was: a feature
         qualifies variables in a joint measurement. The canonical data matrix
         lists jointly measured variables in the columns.
 
@@ -1496,7 +1504,7 @@ class FeatureValue(Registry, TracksRun):
     Categorical feature values are stored in their respective registries:
     :class:`~lamindb.ULabel`, :class:`~bionty.CellType`, etc.
 
-    Unlike for ULabel, in `FeatureValue`, values are grouped by features, and
+    Unlike for ULabel, in `FeatureValue`, values are grouped by features. nd
     not by an ontological hierarchy.
     """
 
@@ -1533,7 +1541,7 @@ class FeatureSet(Registry, TracksRun):
             :meth:`~lamindb.FeatureSet.from_values` or
             :meth:`~lamindb.FeatureSet.from_df`.
         type: `str | None = None` The simple type. Defaults to
-            `None` for sets of :class:`~lamindb.Feature` records, and otherwise
+            `None` for sets of :class:`~lamindb.Feature` records. nd otherwise
             defaults to `"number"` (e.g., for sets of :class:`~bionty.Gene`).
         name: `str | None = None` A name.
 
@@ -1801,7 +1809,7 @@ class Artifact(Registry, HasFeatures, HasParams, IsVersioned, TracksRun, TracksU
     description = CharField(max_length=255, db_index=True, null=True, default=None)
     """A description."""
     storage = models.ForeignKey(Storage, PROTECT, related_name="artifacts")
-    """Storage location (:class:`~lamindb.Storage`), e.g., an S3 or GCP bucket or a local directory."""
+    """Storage location (:class:`~lamindb.Storage`), e.g.. n S3 or GCP bucket or a local directory."""
     key = CharField(max_length=255, db_index=True, null=True, default=None)
     """Storage key, the relative path within the storage location."""
     suffix = CharField(max_length=30, db_index=True, default=None)
@@ -1820,10 +1828,7 @@ class Artifact(Registry, HasFeatures, HasParams, IsVersioned, TracksRun, TracksU
     )
     """Artifact type (default `None`)."""
     accessor = CharField(max_length=64, db_index=True, null=True, default=None)
-    """Default backed or memory accessor, e.g., DataFrame, AnnData.
-
-    Soon, also: SOMA, MuData, zarr.Group, tiledb.Array, etc.
-    """
+    """Default backed or memory accessor, e.g., DataFrame, AnnData."""
     size = models.BigIntegerField(null=True, db_index=True)
     """Size in bytes.
 
@@ -1915,23 +1920,20 @@ class Artifact(Registry, HasFeatures, HasParams, IsVersioned, TracksRun, TracksU
 
     @property
     def path(self) -> Path:
-        """Path.
+        """Path. :class:`~lamindb.UPath`.
 
-        Examples:
+        File in cloud storage, here AWS S3:
 
-            File in cloud storage:
+        >>> artifact = ln.Artifact("s3://my-bucket/my-file.csv").save()
+        >>> artifact.path
+        S3Path('s3://my-bucket/my-file.csv')
 
-            >>> ln.Artifact("s3://lamindb-ci/lndb-storage/pbmc68k.h5ad").save()
-            >>> artifact = ln.Artifact.filter(key="lndb-storage/pbmc68k.h5ad").one()
-            >>> artifact.path
-            S3Path('s3://lamindb-ci/lndb-storage/pbmc68k.h5ad')
+        File in local storage:
 
-            File in local storage:
-
-            >>> ln.Artifact("./myfile.csv", description="myfile").save()
-            >>> artifact = ln.Artifact.filter(description="myfile").one()
-            >>> artifact.path
-            PosixPath('/home/runner/work/lamindb/lamindb/docs/guide/mydata/myfile.csv')
+        >>> ln.Artifact("./myfile.csv", description="myfile").save()
+        >>> artifact = ln.Artifact.filter(description="myfile").one()
+        >>> artifact.path
+        PosixPath('/home/runner/work/lamindb/lamindb/docs/guide/mydata/myfile.csv')
         """
         pass
 
@@ -2072,7 +2074,7 @@ class Artifact(Registry, HasFeatures, HasParams, IsVersioned, TracksRun, TracksU
         Args:
             path: Source path of folder.
             key: Key for storage destination. If `None` and
-                directory is in a registered location, an inferred `key` will
+                directory is in a registered location. n inferred `key` will
                 reflect the relative position. If `None` and directory is outside
                 of a registered storage location, the inferred key defaults to `path.name`.
             run: A `Run` object.
@@ -2135,7 +2137,7 @@ class Artifact(Registry, HasFeatures, HasParams, IsVersioned, TracksRun, TracksU
     ) -> Any:
         """Stage and load to memory.
 
-        Returns in-memory representation if possible, e.g., an `AnnData` object for an `h5ad` file.
+        Returns in-memory representation if possible, e.g.. n `AnnData` object for an `h5ad` file.
 
         Examples:
 
@@ -2169,7 +2171,7 @@ class Artifact(Registry, HasFeatures, HasParams, IsVersioned, TracksRun, TracksU
 
         Follows synching logic: only caches an artifact if it's outdated in the local cache.
 
-        Returns a path to a locally cached on-disk object (say, a `.jpg` file).
+        Returns a path to a locally cached on-disk object (say.  `.jpg` file).
 
         Examples:
 
@@ -2241,7 +2243,7 @@ class Collection(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
         is_new_version_of: `Collection | None = None` An old version of the collection.
         run: `Run | None = None` The run that creates the collection.
         meta: `Artifact | None = None` An artifact that defines metadata for the collection.
-        reference: `str | None = None` For instance, an external ID or a URL.
+        reference: `str | None = None` For instance. n external ID or a URL.
         reference_type: `str | None = None` For instance, `"url"`.
 
     See Also:
@@ -2251,7 +2253,7 @@ class Collection(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
 
         Create a collection from a collection of :class:`~lamindb.Artifact` objects:
 
-        >>> collection = ln.Collection([artifact1, artifact2], name="My collection")
+        >>> collection = ln.Collection([artifact1. rtifact2], name="My collection")
         >>> collection.save()
 
         If you have more than 100k artifacts, consider creating a collection directly from the
@@ -2447,7 +2449,7 @@ class Collection(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
     ) -> Any:
         """Stage and load to memory.
 
-        Returns in-memory representation if possible, e.g., a concatenated `DataFrame` or `AnnData` object.
+        Returns in-memory representation if possible, e.g..  concatenated `DataFrame` or `AnnData` object.
         """
         pass
 
