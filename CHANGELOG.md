@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🚚 Add type field to Artifact, and allow linking artifacts against params | [390](https://github.com/laminlabs/lnschema-core/pull/390) | [falexwolf](https://github.com/falexwolf) | 2024-06-19 |
 🐛 Fix clashing reverse accessors between `.previous_runs` and `.run` | [391](https://github.com/laminlabs/lnschema-core/pull/391) | [falexwolf](https://github.com/falexwolf) | 2024-06-13 | 0.69.0
 ♻️ Add constraints & simple schema fixes | [388](https://github.com/laminlabs/lnschema-core/pull/388) | [falexwolf](https://github.com/falexwolf) | 2024-05-29 | 0.68.0
 ♻️ Migrate featuremanager to being available on the class level | [387](https://github.com/laminlabs/lnschema-core/pull/387) | [falexwolf](https://github.com/falexwolf) | 2024-05-29 |
