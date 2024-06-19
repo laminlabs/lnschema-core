@@ -1690,7 +1690,6 @@ class Artifact(Registry, HasFeatures, HasParams, IsVersioned, TracksRun, TracksU
 
     Artifacts manage data in local or remote storage.
 
-
     An artifact stores a dataset or model as either a file or a folder.
 
     Some artifacts are array-like, e.g., when stored as `.parquet`, `.h5ad`,
@@ -1700,6 +1699,7 @@ class Artifact(Registry, HasFeatures, HasParams, IsVersioned, TracksRun, TracksU
 
     Args:
         data: `UPathStr` A path to a local or remote folder or file.
+        type: `Literal["dataset", "model", "code"] | None = None` The artifact type.
         key: `str | None = None` A relative path within default storage,
             e.g., `"myfolder/myfile.fcs"`.
         description: `str | None = None` A description.
@@ -1815,9 +1815,10 @@ class Artifact(Registry, HasFeatures, HasParams, IsVersioned, TracksRun, TracksU
         max_length=20,
         choices=ArtifactType.choices(),
         db_index=True,
-        default=ArtifactType.dataset,
+        default=None,
+        null=True,
     )
-    """Artifact type (default `"dataset"`)."""
+    """Artifact type (default `None`)."""
     accessor = CharField(max_length=64, db_index=True, null=True, default=None)
     """Default backed or memory accessor, e.g., DataFrame, AnnData.
 
@@ -1890,6 +1891,7 @@ class Artifact(Registry, HasFeatures, HasParams, IsVersioned, TracksRun, TracksU
     def __init__(
         self,
         data: UPathStr,
+        type: Literal["dataset", "model", "code"] = "dataset",
         key: str | None = None,
         description: str | None = None,
         is_new_version_of: Artifact | None = None,
