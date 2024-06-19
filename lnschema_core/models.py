@@ -1121,8 +1121,8 @@ class Transform(Registry, HasParents, IsVersioned):
         super().__init__(*args, **kwargs)
 
 
-class Param(Registry, TracksRun, TracksUpdates):
-    """Run parameters akin to Feature for artifacts."""
+class Param(Registry, CanValidate, TracksRun, TracksUpdates):
+    """Parameters of runs & models akin to Feature for datasets."""
 
     class Meta(Registry.Meta, TracksRun.Meta, TracksUpdates.Meta):
         abstract = False
