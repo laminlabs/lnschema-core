@@ -25,7 +25,7 @@ from lnschema_core.types import (
 )
 
 from .ids import base62_8, base62_12, base62_20
-from .types import TransformType
+from .types import ArtifactType, TransformType
 from .users import current_user_id
 
 if TYPE_CHECKING:
@@ -729,6 +729,12 @@ class FeatureManager:
     pass
 
 
+class ParamManager:
+    """Param manager."""
+
+    pass
+
+
 class FeatureManagerArtifact(FeatureManager):
     """Feature manager."""
 
@@ -736,6 +742,18 @@ class FeatureManagerArtifact(FeatureManager):
 
 
 class FeatureManagerCollection(FeatureManager):
+    """Feature manager."""
+
+    pass
+
+
+class ParamManagerArtifact(ParamManager):
+    """Feature manager."""
+
+    pass
+
+
+class ParamManagerRun(ParamManager):
     """Feature manager."""
 
     pass
@@ -765,6 +783,12 @@ class HasFeatures:
             >>> artifact.describe()
         """
         pass
+
+
+class HasParams:
+    """Base class linking features, in particular, for :class:`~lamindb.Artifact` & :class:`~lamindb.Collection`."""
+
+    params = ParamManager
 
 
 # -------------------------------------------------------------------------------------
@@ -1097,8 +1121,8 @@ class Transform(Registry, HasParents, IsVersioned):
         super().__init__(*args, **kwargs)
 
 
-class Param(Registry, TracksRun, TracksUpdates):
-    """Run parameters akin to Feature for artifacts."""
+class Param(Registry, CanValidate, TracksRun, TracksUpdates):
+    """Parameters of runs & models akin to Feature for datasets."""
 
     class Meta(Registry.Meta, TracksRun.Meta, TracksUpdates.Meta):
         abstract = False
@@ -1131,7 +1155,7 @@ class ParamValue(Registry):
     """Creator of record, a :class:`~lamindb.User`."""
 
 
-class Run(Registry):
+class Run(Registry, HasParams):
     """Runs of transforms.
 
     Args:
@@ -1167,6 +1191,8 @@ class Run(Registry):
         >>> ln.track()  # Jupyter notebook metadata is automatically parsed
         >>> ln.core.context.run
     """
+
+    params = ParamManagerRun
 
     id = models.BigAutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
@@ -1659,11 +1685,10 @@ class FeatureSet(Registry, TracksRun):
         pass
 
 
-class Artifact(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
+class Artifact(Registry, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpdates):
     """Artifacts: datasets & models stored as files, folders, or arrays.
 
     Artifacts manage data in local or remote storage.
-
 
     An artifact stores a dataset or model as either a file or a folder.
 
@@ -1674,6 +1699,7 @@ class Artifact(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
 
     Args:
         data: `UPathStr` A path to a local or remote folder or file.
+        type: `Literal["dataset", "model", "code"] | None = None` The artifact type.
         key: `str | None = None` A relative path within default storage,
             e.g., `"myfolder/myfile.fcs"`.
         description: `str | None = None` A description.
@@ -1766,6 +1792,7 @@ class Artifact(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
     _len_full_uid: int = 20
     _len_stem_uid: int = 16
     features = FeatureManagerArtifact
+    params = ParamManagerArtifact
 
     id = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
@@ -1784,6 +1811,14 @@ class Artifact(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
 
     This is either a file suffix (`".csv"`, `".h5ad"`, etc.) or the empty string "".
     """
+    type = CharField(
+        max_length=20,
+        choices=ArtifactType.choices(),
+        db_index=True,
+        default=None,
+        null=True,
+    )
+    """Artifact type (default `None`)."""
     accessor = CharField(max_length=64, db_index=True, null=True, default=None)
     """Default backed or memory accessor, e.g., DataFrame, AnnData.
 
@@ -1841,6 +1876,10 @@ class Artifact(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
         FeatureValue, through="ArtifactFeatureValue"
     )
     """Non-categorical feature values for annotation."""
+    param_values = models.ManyToManyField(
+        ParamValue, through="ArtifactParamValue", related_name="artifacts"
+    )
+    """Parameter values."""
     visibility = models.SmallIntegerField(
         db_index=True, choices=VisibilityChoice.choices, default=1
     )
@@ -1852,6 +1891,7 @@ class Artifact(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
     def __init__(
         self,
         data: UPathStr,
+        type: Literal["dataset", "model", "code"] = "dataset",
         key: str | None = None,
         description: str | None = None,
         is_new_version_of: Artifact | None = None,
@@ -2545,6 +2585,16 @@ class RunParamValue(Registry, LinkORM):
 
     class Meta:
         unique_together = ("run", "paramvalue")
+
+
+class ArtifactParamValue(Registry, LinkORM):
+    id = models.BigAutoField(primary_key=True)
+    artifact = models.ForeignKey(Artifact, CASCADE, related_name="+")
+    # we follow the lower() case convention rather than snake case for link models
+    paramvalue = models.ForeignKey(ParamValue, PROTECT, related_name="+")
+
+    class Meta:
+        unique_together = ("artifact", "paramvalue")
 
 
 # class Migration(Registry):
