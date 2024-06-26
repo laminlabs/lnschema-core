@@ -626,7 +626,9 @@ class Registry(models.Model):
                 return qs.one()
 
     @classmethod
-    def df(cls, include: str | list[str] | None = None, join: str = "inner") -> pd.DataFrame:
+    def df(
+        cls, include: str | list[str] | None = None, join: str = "inner"
+    ) -> pd.DataFrame:
         """Convert to ``pd.DataFrame``.
 
         By default, shows all direct fields, except ``created_at``.
