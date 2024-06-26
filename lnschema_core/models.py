@@ -626,7 +626,9 @@ class Registry(models.Model):
                 return qs.one()
 
     @classmethod
-    def df(cls, include: str | list[str] | None = None) -> pd.DataFrame:
+    def df(
+        cls, include: str | list[str] | None = None, join: str = "inner"
+    ) -> pd.DataFrame:
         """Convert to ``pd.DataFrame``.
 
         By default, shows all direct fields, except ``created_at``.
@@ -637,6 +639,7 @@ class Registry(models.Model):
             include: Related fields to include as columns. Takes strings of
                 form ``"labels__name"``, ``"cell_types__name"``, etc. or a list
                 of such strings.
+            join: The `join` parameter of `pandas`.
 
         Examples:
             >>> labels = [ln.ULabel(name="Label {i}") for i in range(3)]
@@ -648,7 +651,7 @@ class Registry(models.Model):
         query_set = filter(cls)
         if hasattr(cls, "updated_at"):
             query_set = query_set.order_by("-updated_at")
-        return query_set.df(include=include)
+        return query_set.df(include=include, join=join)
 
     @classmethod
     def search(
