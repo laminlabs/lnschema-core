@@ -639,6 +639,7 @@ class Registry(models.Model):
             include: Related fields to include as columns. Takes strings of
                 form ``"labels__name"``, ``"cell_types__name"``, etc. or a list
                 of such strings.
+            join: The `join` parameter of `pandas`.
 
         Examples:
             >>> labels = [ln.ULabel(name="Label {i}") for i in range(3)]
