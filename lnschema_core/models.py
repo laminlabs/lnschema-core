@@ -146,7 +146,7 @@ class TracksRun(models.Model):
     created_by: User = models.ForeignKey(
         "lnschema_core.User", PROTECT, default=current_user_id
     )
-    """Creator of record. :class:`~lamindb.User`"""
+    """Creator of record."""
     run: Run = models.ForeignKey(
         "lnschema_core.Run", PROTECT, null=True, default=current_run
     )
