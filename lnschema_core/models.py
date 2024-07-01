@@ -147,10 +147,10 @@ class TracksRun(models.Model):
         "lnschema_core.User", PROTECT, default=current_user_id
     )
     """Creator of record. :class:`~lamindb.User`"""
-    run = models.ForeignKey(
+    run: Run = models.ForeignKey(
         "lnschema_core.Run", PROTECT, null=True, default=current_run
     )
-    """Last run that created or updated the record. :class:`~lamindb.Run`"""
+    """Last run that created or updated the record."""
 
     @overload
     def __init__(self):
@@ -838,10 +838,21 @@ class HasFeatures:
 
 
 class HasParams:
-    """Base class linking features, in particular, for :class:`~lamindb.Artifact` & :class:`~lamindb.Collection`."""
+    """Base class linking params."""
 
     params: ParamManager = ParamManager  # type: ignore
-    """Param manager."""
+    """Param manager.
+
+    What `.features` is to dataset-like artifacts, `.params` is to model-like artifacts.
+
+    Annotate with params & values::
+
+        artifact.params.add_values({
+            "hidden_size": 32,
+            "bottleneck_size": 16,
+            "batch_size": 32
+        })
+    """
 
 
 # -------------------------------------------------------------------------------------
