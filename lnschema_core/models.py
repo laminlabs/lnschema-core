@@ -1916,7 +1916,7 @@ class Artifact(Registry, HasFeatures, HasParams, IsVersioned, TracksRun, TracksU
         Transform, PROTECT, related_name="output_artifacts", null=True, default=None
     )
     """:class:`~lamindb.Transform` whose run created the artifact."""
-    run = models.ForeignKey(
+    run: Run = models.ForeignKey(
         Run, PROTECT, related_name="output_artifacts", null=True, default=None
     )
     """:class:`~lamindb.Run` that created the artifact."""
