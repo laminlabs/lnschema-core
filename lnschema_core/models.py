@@ -1206,8 +1206,8 @@ class ParamValue(Registry):
     class Meta:
         unique_together = ("param", "value")
 
-    param = models.ForeignKey(Param, CASCADE)
-    value = models.JSONField()  # stores float, integer, boolean or datetime
+    param: Param = models.ForeignKey(Param, CASCADE)
+    value: Any = models.JSONField()  # stores float, integer, boolean or datetime
     # it'd be confusing and hard to populate a run here because these
     # values are typically created upon creating a run
     # hence, ParamValue does _not_ inherit from TracksRun but manually
@@ -1256,9 +1256,9 @@ class Run(Registry, HasParams):
         >>> ln.core.context.run
     """
 
-    params = ParamManagerRun  # type: ignore
+    params: ParamManager = ParamManagerRun  # type: ignore
 
-    id = models.BigAutoField(primary_key=True)
+    id: int = models.BigAutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
     uid: str = CharField(unique=True, db_index=True, max_length=20, default=base62_20)
     """Universal id, valid across DB instances."""
@@ -1405,7 +1405,9 @@ class ULabel(Registry, HasParents, CanValidate, TracksRun, TracksUpdates):
         max_length=25, db_index=True, null=True, default=None
     )
     """Type of reference, e.g., donor_id from Vendor X."""
-    parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
+    parents: ULabel = models.ManyToManyField(
+        "self", symmetrical=False, related_name="children"
+    )
     """Parent labels, useful to hierarchically group labels (optional)."""
 
     @overload
@@ -1573,8 +1575,8 @@ class FeatureValue(Registry, TracksRun):
         abstract = False
         unique_together = ("feature", "value")
 
-    feature = models.ForeignKey(Feature, CASCADE, null=True, default=None)
-    value = models.JSONField()
+    feature: Feature = models.ForeignKey(Feature, CASCADE, null=True, default=None)
+    value: Any = models.JSONField()
 
 
 class FeatureSet(Registry, TracksRun):
@@ -2385,11 +2387,11 @@ class Collection(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
         "Run", related_name="output_collections_with_later_updates"
     )
     """Sequence of runs that created or updated the record."""
-    artifact = models.OneToOneField(
+    artifact: Artifact = models.OneToOneField(
         "Artifact", PROTECT, null=True, unique=True, related_name="collection"
     )
     """Storage of collection as a one artifact."""
-    unordered_artifacts = models.ManyToManyField(
+    unordered_artifacts: Artifact = models.ManyToManyField(
         "Artifact", related_name="collections", through="CollectionArtifact"
     )
     """Storage of collection as multiple artifacts."""
@@ -2561,17 +2563,21 @@ class LinkORM:
 
 
 class FeatureSetFeature(Registry, LinkORM):
-    id = models.BigAutoField(primary_key=True)
+    id: int = models.BigAutoField(primary_key=True)
     # we follow the lower() case convention rather than snake case for link models
-    featureset = models.ForeignKey(FeatureSet, CASCADE, related_name="+")
-    feature = models.ForeignKey(Feature, PROTECT, related_name="+")
+    featureset: FeatureSet = models.ForeignKey(FeatureSet, CASCADE, related_name="+")
+    feature: Feature = models.ForeignKey(Feature, PROTECT, related_name="+")
 
 
 class ArtifactFeatureSet(Registry, LinkORM, TracksRun):
-    id = models.BigAutoField(primary_key=True)
-    artifact = models.ForeignKey(Artifact, CASCADE, related_name="feature_set_links")
+    id: int = models.BigAutoField(primary_key=True)
+    artifact: Artifact = models.ForeignKey(
+        Artifact, CASCADE, related_name="feature_set_links"
+    )
     # we follow the lower() case convention rather than snake case for link models
-    featureset = models.ForeignKey(FeatureSet, PROTECT, related_name="artifact_links")
+    featureset: FeatureSet = models.ForeignKey(
+        FeatureSet, PROTECT, related_name="artifact_links"
+    )
     slot: str = CharField(max_length=40, null=True, default=None)
     feature_ref_is_semantic: bool = models.BooleanField(
         null=True, default=None
@@ -2582,12 +2588,14 @@ class ArtifactFeatureSet(Registry, LinkORM, TracksRun):
 
 
 class CollectionFeatureSet(Registry, LinkORM, TracksRun):
-    id = models.BigAutoField(primary_key=True)
+    id: int = models.BigAutoField(primary_key=True)
     collection = models.ForeignKey(
         Collection, CASCADE, related_name="feature_set_links"
     )
     # we follow the lower() case convention rather than snake case for link models
-    featureset = models.ForeignKey(FeatureSet, PROTECT, related_name="collection_links")
+    featureset: FeatureSet = models.ForeignKey(
+        FeatureSet, PROTECT, related_name="collection_links"
+    )
     slot: str = CharField(max_length=50, null=True, default=None)
     feature_ref_is_semantic: bool = models.BooleanField(
         null=True, default=None
@@ -2598,17 +2606,23 @@ class CollectionFeatureSet(Registry, LinkORM, TracksRun):
 
 
 class CollectionArtifact(Registry, LinkORM, TracksRun):
-    id = models.BigAutoField(primary_key=True)
-    collection = models.ForeignKey(Collection, CASCADE, related_name="artifact_links")
-    artifact = models.ForeignKey(Artifact, PROTECT, related_name="collection_links")
+    id: int = models.BigAutoField(primary_key=True)
+    collection: Collection = models.ForeignKey(
+        Collection, CASCADE, related_name="artifact_links"
+    )
+    artifact: Artifact = models.ForeignKey(
+        Artifact, PROTECT, related_name="collection_links"
+    )
 
     class Meta:
         unique_together = ("collection", "artifact")
 
 
 class ArtifactULabel(Registry, LinkORM, TracksRun):
-    id = models.BigAutoField(primary_key=True)
-    artifact = models.ForeignKey(Artifact, CASCADE, related_name="ulabel_links")
+    id: int = models.BigAutoField(primary_key=True)
+    artifact: Artifact = models.ForeignKey(
+        Artifact, CASCADE, related_name="ulabel_links"
+    )
     ulabel = models.ForeignKey(ULabel, PROTECT, related_name="artifact_links")
     feature = models.ForeignKey(
         Feature, PROTECT, null=True, default=None, related_name="artifactulabel_links"
@@ -2621,10 +2635,12 @@ class ArtifactULabel(Registry, LinkORM, TracksRun):
 
 
 class CollectionULabel(Registry, LinkORM, TracksRun):
-    id = models.BigAutoField(primary_key=True)
-    collection = models.ForeignKey(Collection, CASCADE, related_name="ulabel_links")
-    ulabel = models.ForeignKey(ULabel, PROTECT, related_name="collection_links")
-    feature = models.ForeignKey(
+    id: int = models.BigAutoField(primary_key=True)
+    collection: Collection = models.ForeignKey(
+        Collection, CASCADE, related_name="ulabel_links"
+    )
+    ulabel: ULabel = models.ForeignKey(ULabel, PROTECT, related_name="collection_links")
+    feature: Feature = models.ForeignKey(
         Feature, PROTECT, null=True, default=None, related_name="collectionulabel_links"
     )
     ulabel_ref_is_name: bool = models.BooleanField(null=True, default=None)
@@ -2635,8 +2651,8 @@ class CollectionULabel(Registry, LinkORM, TracksRun):
 
 
 class ArtifactFeatureValue(Registry, LinkORM, TracksRun):
-    id = models.BigAutoField(primary_key=True)
-    artifact = models.ForeignKey(Artifact, CASCADE, related_name="+")
+    id: int = models.BigAutoField(primary_key=True)
+    artifact: Artifact = models.ForeignKey(Artifact, CASCADE, related_name="+")
     # we follow the lower() case convention rather than snake case for link models
     featurevalue = models.ForeignKey(FeatureValue, PROTECT, related_name="+")
 
@@ -2645,20 +2661,20 @@ class ArtifactFeatureValue(Registry, LinkORM, TracksRun):
 
 
 class RunParamValue(Registry, LinkORM):
-    id = models.BigAutoField(primary_key=True)
-    run = models.ForeignKey(Run, CASCADE, related_name="+")
+    id: int = models.BigAutoField(primary_key=True)
+    run: Run = models.ForeignKey(Run, CASCADE, related_name="+")
     # we follow the lower() case convention rather than snake case for link models
-    paramvalue = models.ForeignKey(ParamValue, PROTECT, related_name="+")
+    paramvalue: ParamValue = models.ForeignKey(ParamValue, PROTECT, related_name="+")
 
     class Meta:
         unique_together = ("run", "paramvalue")
 
 
 class ArtifactParamValue(Registry, LinkORM):
-    id = models.BigAutoField(primary_key=True)
-    artifact = models.ForeignKey(Artifact, CASCADE, related_name="+")
+    id: int = models.BigAutoField(primary_key=True)
+    artifact: Artifact = models.ForeignKey(Artifact, CASCADE, related_name="+")
     # we follow the lower() case convention rather than snake case for link models
-    paramvalue = models.ForeignKey(ParamValue, PROTECT, related_name="+")
+    paramvalue: ParamValue = models.ForeignKey(ParamValue, PROTECT, related_name="+")
 
     class Meta:
         unique_together = ("artifact", "paramvalue")
