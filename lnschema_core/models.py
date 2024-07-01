@@ -89,7 +89,7 @@ class IsVersioned(models.Model):
 
     @property
     def stem_uid(self) -> str:
-        """Universal id characterizing the version family. `str`.
+        """Universal id characterizing the version family.
 
         The full uid of a record is obtained via concatenating the stem uid and version information::
 
@@ -102,7 +102,7 @@ class IsVersioned(models.Model):
 
     @property
     def versions(self) -> QuerySet:
-        """Lists all records of the same version family. :class:`~lamindb.core.QuerySet`.
+        """Lists all records of the same version family.
 
         >>> new_artifact = ln.Artifact(df2, is_new_version_of=artifact)
         >>> new_artifact.save()
@@ -147,10 +147,10 @@ class TracksRun(models.Model):
         "lnschema_core.User", PROTECT, default=current_user_id
     )
     """Creator of record. :class:`~lamindb.User`"""
-    run = models.ForeignKey(
+    run: Run = models.ForeignKey(
         "lnschema_core.Run", PROTECT, null=True, default=current_run
     )
-    """Last run that created or updated the record. :class:`~lamindb.Run`"""
+    """Last run that created or updated the record."""
 
     @overload
     def __init__(self):
@@ -773,12 +773,52 @@ class ParamManagerRun(ParamManager):
 class HasFeatures:
     """Base class linking features, in particular, for :class:`~lamindb.Artifact` & :class:`~lamindb.Collection`."""
 
-    features = FeatureManager
-    """Feature manager. :class:`~lamindb.core.FeatureManager`"""
+    features: FeatureManager = FeatureManager  # type: ignore
+    """Feature manager.
+
+    Features denote dataset dimensions, i.e., the variables that measure labels
+    & numbers.
+
+    Annotate with features & values::
+
+       artifact.features.add_values({
+            "species": organism,  # here, organism is an Organism record
+            "scientist": ['Barbara McClintock', 'Edgar Anderson'],
+            "temperature": 27.6,
+            "study": "Study 0: initial plant gathering"
+       })
+
+    Query for features & values::
+
+        ln.Artifact.features.filter(scientist="Barbara McClintock")
+
+    Features may or may not be part of the artifact content in storage. For
+    instance, the :class:`~lamindb.Annotate` flow validates the columns of a
+    `DataFrame`-like artifact and annotates it with features corresponding to
+    these columns. `artifact.features.add_values`, by contrast, does not
+    validate the content of the artifact.
+
+    """
 
     @property
     def labels(self) -> LabelManager:
-        """Label manager. :class:`~lamindb.core.LabelManager`."""
+        """Label manager.
+
+        To annotate with labels, you typically use the registry-specific accessors,
+        for instance :attr:`~lamindb.Artifact.ulabels`::
+
+            candidate_marker_study = ln.ULabel(name="Candidate marker study").save()
+            artifact.ulabels.add(candidate_marker_study)
+
+        Similarly, you query based on these accessors::
+
+            ln.Artifact.filter(ulabels__name="Candidate marker study").all()
+
+        The `.labels` accessor allows you to associate labels of any registry with features::
+
+            study = ln.Feature(name="study", dtype="cat").save()
+            artifact.labels.add(candidate_marker_study, study)
+        """
         from lamindb.core._label_manager import LabelManager
 
         return LabelManager(self)
@@ -798,10 +838,21 @@ class HasFeatures:
 
 
 class HasParams:
-    """Base class linking features, in particular, for :class:`~lamindb.Artifact` & :class:`~lamindb.Collection`."""
+    """Base class linking params."""
 
-    params = ParamManager
-    """Param manager. :class:`~lamindb.core.ParamManager`"""
+    params: ParamManager = ParamManager  # type: ignore
+    """Param manager.
+
+    What `.features` is to dataset-like artifacts, `.params` is to model-like artifacts.
+
+    Annotate with params & values::
+
+        artifact.params.add_values({
+            "hidden_size": 32,
+            "bottleneck_size": 16,
+            "batch_size": 32
+        })
+    """
 
 
 # -------------------------------------------------------------------------------------
@@ -983,7 +1034,7 @@ class Storage(Registry, TracksRun, TracksUpdates):
 
     @property
     def path(self) -> Path | UPath:
-        """Bucket or folder path. :class:`~lamindb.UPath`.
+        """Bucket or folder path.
 
         Cloud storage bucket:
 
@@ -1203,7 +1254,7 @@ class Run(Registry, HasParams):
         >>> ln.core.context.run
     """
 
-    params = ParamManagerRun
+    params = ParamManagerRun  # type: ignore
 
     id = models.BigAutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
@@ -1268,7 +1319,7 @@ class Run(Registry, HasParams):
 
 
 class ULabel(Registry, HasParents, CanValidate, TracksRun, TracksUpdates):
-    """Universal labels (valid categories).
+    """Universal labels.
 
     Args:
         name: `str` A name.
@@ -1276,18 +1327,19 @@ class ULabel(Registry, HasParents, CanValidate, TracksRun, TracksUpdates):
         reference: `str | None = None` For instance. n external ID or a URL.
         reference_type: `str | None = None` For instance, `"url"`.
 
-
-    A `ULabel` record provides the easiest way to annotate an artifact or collection
+    A `ULabel` record provides the easiest way to annotate a dataset
     with a label: `"My project"`, `"curated"`, or `"Batch X"`:
 
         >>> my_project = ULabel(name="My project")
         >>> my_project.save()
-        >>> collection.ulabels.add(my_project)
+        >>> artifact.ulabels.add(my_project)
 
-    In some cases.  label is measured *within* an artifact or collection a feature (a
-    :class:`~lamindb.Feature` record) denotes the column name in which the label
-    is stored. For instance, the collection might contain measurements across 2
-    organism of the Iris flower: `"setosa"` & `"versicolor"`.
+    Often, a ulabel is measured *within* a dataset. For instance, an artifact
+    might characterize 2 species of the Iris flower (`"setosa"` &
+    `"versicolor"`) measured by a `"species"` feature. Use the
+    :class:`~lamindb.Annotate` flow to automatically parse, validate, and
+    annotate with labels that are contained in `DataFrame` or `AnnData`
+    artifacts.
 
     See :doc:`tutorial2` to learn more.
 
@@ -1319,8 +1371,6 @@ class ULabel(Registry, HasParents, CanValidate, TracksRun, TracksUpdates):
         >>> artifact = ln.Artifact("./myfile.csv")
         >>> artifact.save()
         >>> artifact.ulabels.add(ulabel)
-        >>> artifact.ulabels.list("name")
-        ['My project']
 
         Organize labels in a hierarchy:
 
@@ -1380,8 +1430,10 @@ class ULabel(Registry, HasParents, CanValidate, TracksRun, TracksUpdates):
 class Feature(Registry, CanValidate, TracksRun, TracksUpdates):
     """Dataset dimensions.
 
-    A feature is a random variable or, equivalently, dimension of a
-    dataset. The `Feature` registry helps to
+    Features denote dataset dimensions, i.e., the variables that measure labels &
+    numbers.
+
+    The `Feature` registry helps to
 
     1. manage metadata of features
     2. annotate datasets by whether they measured a feature
@@ -1802,8 +1854,8 @@ class Artifact(Registry, HasFeatures, HasParams, IsVersioned, TracksRun, TracksU
 
     _len_full_uid: int = 20
     _len_stem_uid: int = 16
-    features = FeatureManagerArtifact
-    params = ParamManagerArtifact
+    features = FeatureManagerArtifact  # type: ignore
+    params = ParamManagerArtifact  # type: ignore
 
     id = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
@@ -1923,7 +1975,7 @@ class Artifact(Registry, HasFeatures, HasParams, IsVersioned, TracksRun, TracksU
 
     @property
     def path(self) -> Path:
-        """Path. :class:`~lamindb.UPath`.
+        """Path.
 
         File in cloud storage, here AWS S3:
 
@@ -2234,7 +2286,7 @@ class Artifact(Registry, HasFeatures, HasParams, IsVersioned, TracksRun, TracksU
 
 
 class Collection(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
-    """Collections: collections of artifacts.
+    """Collections of artifacts.
 
     For more info: :doc:`/tutorial`.
 
@@ -2282,7 +2334,7 @@ class Collection(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
 
     _len_full_uid: int = 20
     _len_stem_uid: int = 16
-    features = FeatureManagerCollection
+    features = FeatureManagerCollection  # type: ignore
 
     id = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
