@@ -2627,7 +2627,7 @@ class ArtifactULabel(Registry, LinkORM, TracksRun):
     feature = models.ForeignKey(
         Feature, PROTECT, null=True, default=None, related_name="artifactulabel_links"
     )
-    ulabel_ref_is_name: bool = models.BooleanField(null=True, default=None)
+    label_ref_is_name: bool = models.BooleanField(null=True, default=None)
     feature_ref_is_name: bool = models.BooleanField(null=True, default=None)
 
     class Meta:
@@ -2643,7 +2643,7 @@ class CollectionULabel(Registry, LinkORM, TracksRun):
     feature: Feature = models.ForeignKey(
         Feature, PROTECT, null=True, default=None, related_name="collectionulabel_links"
     )
-    ulabel_ref_is_name: bool = models.BooleanField(null=True, default=None)
+    label_ref_is_name: bool = models.BooleanField(null=True, default=None)
     feature_ref_is_name: bool = models.BooleanField(null=True, default=None)
 
     class Meta:
