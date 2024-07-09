@@ -12,6 +12,7 @@ from typing import (
 
 from django.db import models
 from django.db.models import CASCADE, PROTECT
+from django.db.models.base import ModelBase
 from lamin_utils import logger
 from lamindb_setup import _check_instance_setup
 
@@ -481,7 +482,21 @@ class HasParents:
         pass
 
 
-class Registry(models.Model):
+class RegistryMeta(ModelBase):
+    def __new__(cls, name, bases, attrs, **kwargs):
+        new_class = super().__new__(cls, name, bases, attrs, **kwargs)
+        # eliminate addition of unnecessary fields in the context of lamindb
+        to_be_removed = [
+            name
+            for name in ["DoesNotExist", "MultipleObjectsReturned"]
+            if name in new_class.__dict__
+        ]
+        for name in to_be_removed:
+            delattr(new_class, name)
+        return new_class
+
+
+class Registry(models.Model, metaclass=RegistryMeta):
     """Registry base class.
 
     Extends ``django.db.models.Model``.
@@ -1050,8 +1065,8 @@ class Storage(Registry, TracksRun, TracksUpdates):
 class Transform(Registry, HasParents, IsVersioned):
     """Data transformations.
 
-    A transform can refer to a simple Python function, script.  notebook, or a
-    pipeline. If you execute a transform, you generate a run of a transform
+    A transform can refer to a Python function, a script, notebook, or a
+    pipeline. If you execute a transform, you generate a run
     (:class:`~lamindb.Run`). A run has input and output data.
 
     A pipeline is typically created with a workflow tool (Nextflow, Snakemake,
@@ -1059,12 +1074,15 @@ class Transform(Registry, HasParents, IsVersioned):
     repository.
 
     Transforms are versioned so that a given transform maps 1:1 to a specific
-    version of code. If you switch on
-    :attr:`~lamindb.core.Settings.sync_git_repo`. ny script-like transform is
-    synced its hashed state in a git repository.
+    version of code.
 
-    If you execute a transform, you generate a :class:`~lamindb.Run` record. The
-    definition of transforms and runs is consistent the OpenLineage
+    .. dropdown:: Can I sync transforms to git?
+
+        If you switch on
+        :attr:`~lamindb.core.Settings.sync_git_repo` a script-like transform is
+        synched to its hashed state in a git repository upon calling `ln.track()`.
+
+    The definition of transforms and runs is consistent the OpenLineage
     specification where a :class:`~lamindb.Transform` record would be called a
     "job" and a :class:`~lamindb.Run` record a "run".
 
@@ -2295,6 +2313,11 @@ class Artifact(Registry, HasFeatures, HasParams, IsVersioned, TracksRun, TracksU
         pass
 
 
+# auto-generated through choices()
+delattr(Artifact, "get_visibility_display")
+delattr(Artifact, "get_type_display")
+
+
 class Collection(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
     """Collections of artifacts.
 
@@ -2558,6 +2581,14 @@ class Collection(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
         pass
 
 
+# auto-generated through choices()
+delattr(Collection, "get_visibility_display")
+
+
+# -------------------------------------------------------------------------------------
+# Link models
+
+
 class LinkORM:
     pass
 
@@ -2764,3 +2795,11 @@ def deferred_attribute__repr__(self):
 
 
 FieldAttr.__repr__ = deferred_attribute__repr__  # type: ignore
+
+
+# -------------------------------------------------------------------------------------
+# Clean-up registry
+# Here is why: https://claude.ai/share/16c4f1aa-e0f3-4093-aa45-37705177d5fa
+
+
+# delattr(Artifact, "DoesNotExist")
