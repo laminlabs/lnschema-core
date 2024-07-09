@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🏷️ Add types to core fields | [394](https://github.com/laminlabs/lnschema-core/pull/394) | [falexwolf](https://github.com/falexwolf) | 2024-07-01 |
 📝 Better docstrings | [393](https://github.com/laminlabs/lnschema-core/pull/393) | [falexwolf](https://github.com/falexwolf) | 2024-07-01 |
 🚸 Added support for different join types in QuerySet.df() | [392](https://github.com/laminlabs/lnschema-core/pull/392) | [insavchuk](https://github.com/insavchuk) | 2024-06-26 | 0.70.1
 🚚 Add type field to Artifact, and allow linking artifacts against params | [390](https://github.com/laminlabs/lnschema-core/pull/390) | [falexwolf](https://github.com/falexwolf) | 2024-06-19 | 0.70.0
