@@ -62,11 +62,11 @@ DELETE_ATTRS_STATIC = [
     "date_error_message",
     "full_clean",
     "get_constraints",
-    "get_deferred_fields",
+    # "get_deferred_fields",  # needed during migration
     "prepare_database_save",
     "refresh_from_db",
-    # "pk",
-    #  "save_base",
+    # "pk",  # needed in a few places
+    # "save_base",  # called only during save()
     "serializable_value",
     "unique_error_message",
     "validate_constraints",
