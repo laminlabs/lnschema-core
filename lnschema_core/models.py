@@ -53,6 +53,33 @@ if TYPE_CHECKING:
 _TRACKING_READY: bool | None = None
 
 
+DELETE_ATTRS_STATIC = [
+    "adelete",
+    "arefresh_from_db",
+    "asave",
+    "clean",
+    "clean_fields",
+    "date_error_message",
+    "full_clean",
+    "get_constraints",
+    "get_deferred_fields",
+    "prepare_database_save",
+    "refresh_from_db",
+    "pk",
+    "save_base",
+    "serializable_value",
+    "unique_error_message",
+    "validate_constraints",
+    "validate_unique",
+]
+
+
+for name in DELETE_ATTRS_STATIC:
+    if hasattr(models.Model, name):
+        delattr(models.Model, name)
+        print(name)
+
+
 class IsVersioned(models.Model):
     """Base class for versioned models."""
 
@@ -488,28 +515,6 @@ DELETE_ATTRS_DYNAMIC = [
 ]
 
 
-DELETE_ATTRS_STATIC = [
-    "adelete",
-    "arefresh_from_db",
-    "asave",
-    "clean",
-    "add_to_class",
-    "clean_fields",
-    "date_error_message",
-    "full_clean",
-    "get_constraints",
-    "get_deferred_fields",
-    "prepare_database_save",
-    "refresh_from_db",
-    "pk",
-    "save_base",
-    "serializable_value",
-    "unique_error_message",
-    "validate_constraints",
-    "validate_unique",
-]
-
-
 class RegistryMeta(ModelBase):
     def __new__(cls, name, bases, attrs, **kwargs):
         new_class = super().__new__(cls, name, bases, attrs, **kwargs)
@@ -522,6 +527,7 @@ class RegistryMeta(ModelBase):
             if name == keep_private:
                 setattr(new_class, f"_{name}", getattr(new_class, name))
             delattr(new_class, name)
+            print(name)
         return new_class
 
 
@@ -2842,8 +2848,4 @@ FieldAttr.__repr__ = deferred_attribute__repr__  # type: ignore
 
 
 # for name in DELETE_ATTRS:
-#     delattr(Artifact, name)
-
-
-# for name in DELETE_ATTRS_STATIC:
 #     delattr(Artifact, name)
