@@ -51,32 +51,37 @@ if TYPE_CHECKING:
 
 
 _TRACKING_READY: bool | None = None
+CLEAN_DJANGO_API: bool = True
 
-
-DELETE_ATTRS_STATIC = [
-    "adelete",
-    "arefresh_from_db",
-    "asave",
-    "clean",
-    "clean_fields",
-    "date_error_message",
-    "full_clean",
-    "get_constraints",
-    # "get_deferred_fields",  # needed during migration
-    "prepare_database_save",
-    "refresh_from_db",
-    # "pk",  # needed in a few places
-    # "save_base",  # called only during save()
-    "serializable_value",
-    "unique_error_message",
-    "validate_constraints",
-    "validate_unique",
-]
-
-
-for name in DELETE_ATTRS_STATIC:
-    if hasattr(models.Model, name):
-        delattr(models.Model, name)
+if CLEAN_DJANGO_API:
+    DELETE_ATTRS_DYNAMIC = [
+        # "DoesNotExist",
+        "MultipleObjectsReturned",
+    ]
+    DELETE_ATTRS_STATIC = [
+        "adelete",
+        "arefresh_from_db",
+        "asave",
+        "clean",
+        "clean_fields",
+        "date_error_message",
+        "full_clean",
+        "get_constraints",
+        # "get_deferred_fields",  # needed during migration
+        "prepare_database_save",
+        "refresh_from_db",
+        # "pk",  # needed in a few places
+        # "save_base",  # called only during save()
+        "serializable_value",
+        "unique_error_message",
+        "validate_constraints",
+        "validate_unique",
+    ]
+    for name in DELETE_ATTRS_STATIC:
+        if hasattr(models.Model, name):
+            delattr(models.Model, name)
+else:
+    DELETE_ATTRS_DYNAMIC = []
 
 
 class IsVersioned(models.Model):
@@ -506,12 +511,6 @@ class HasParents:
             >>> tissue.view_parents(with_children=True)
         """
         pass
-
-
-DELETE_ATTRS_DYNAMIC = [
-    # "DoesNotExist",
-    "MultipleObjectsReturned",
-]
 
 
 class RegistryMeta(ModelBase):
