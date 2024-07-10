@@ -14,7 +14,7 @@ from django.db import models
 from django.db.models import CASCADE, PROTECT
 from django.db.models.base import ModelBase
 from lamin_utils import logger
-from lamindb_setup import _check_instance_setup
+from lamindb_setup import _check_instance_setup, settings
 
 from lnschema_core.types import (
     CharField,
@@ -51,9 +51,8 @@ if TYPE_CHECKING:
 
 
 _TRACKING_READY: bool | None = None
-CLEAN_DJANGO_API: bool = True
 
-if CLEAN_DJANGO_API:
+if settings.strip_django_api:
     DELETE_ATTRS_DYNAMIC = [
         # "DoesNotExist",
         "MultipleObjectsReturned",
@@ -2837,22 +2836,3 @@ def deferred_attribute__repr__(self):
 
 
 FieldAttr.__repr__ = deferred_attribute__repr__  # type: ignore
-
-
-# -------------------------------------------------------------------------------------
-# Clean-up registry
-# Here is why: https://claude.ai/share/16c4f1aa-e0f3-4093-aa45-37705177d5fa
-
-# DELETE_ATTRS = ["adelete", "arefresh_from_db", "asave", "clean"]
-
-# REMOVE_ATTRS = [
-#     "get_next_by_created_at",
-#     "get_previous_by_created_at",
-#     "get_next_by_updated_at",
-#     "get_previous_by_updated_at",
-#     "objects",
-# ]
-
-
-# for name in DELETE_ATTRS:
-#     delattr(Artifact, name)
