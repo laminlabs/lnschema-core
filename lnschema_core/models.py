@@ -527,17 +527,6 @@ class RegistryMeta(ModelBase):
             delattr(new_class, name)
         return new_class
 
-
-class Registry(models.Model, metaclass=RegistryMeta):
-    """Registry base class.
-
-    Extends ``django.db.models.Model``.
-
-    Why does LaminDB call it `Registry` and not `Model`? The term "Registry" can't lead to
-    confusion with statistical, machine learning or biological models.
-    """
-
-    @classmethod
     def from_values(
         cls,
         values: ListLike,
@@ -585,7 +574,6 @@ class Registry(models.Model, metaclass=RegistryMeta):
         """
         pass
 
-    @classmethod
     def lookup(
         cls,
         field: StrField | None = None,
@@ -618,7 +606,6 @@ class Registry(models.Model, metaclass=RegistryMeta):
         """
         pass
 
-    @classmethod
     def filter(cls, **expressions) -> QuerySet:
         """Query records (see :doc:`meta`).
 
@@ -640,7 +627,6 @@ class Registry(models.Model, metaclass=RegistryMeta):
 
         return filter(cls, **expressions)
 
-    @classmethod
     def get(cls, idlike: int | str) -> Registry:
         """Get a single record.
 
@@ -668,7 +654,6 @@ class Registry(models.Model, metaclass=RegistryMeta):
             else:
                 return qs.one()
 
-    @classmethod
     def df(
         cls, include: str | list[str] | None = None, join: str = "inner"
     ) -> pd.DataFrame:
@@ -696,7 +681,6 @@ class Registry(models.Model, metaclass=RegistryMeta):
             query_set = query_set.order_by("-updated_at")
         return query_set.df(include=include, join=join)
 
-    @classmethod
     def search(
         cls,
         string: str,
@@ -728,7 +712,6 @@ class Registry(models.Model, metaclass=RegistryMeta):
         """
         pass
 
-    @classmethod
     def using(
         cls,
         instance: str,
@@ -748,6 +731,29 @@ class Registry(models.Model, metaclass=RegistryMeta):
         """
         pass
 
+    def __get_schema_name__(cls) -> str:
+        schema_module_name = cls.__module__.split(".")[0]
+        schema_name = schema_module_name.replace("lnschema_", "")
+        return schema_name
+
+    def __get_name_with_schema__(cls) -> str:
+        schema_name = cls.__get_schema_name__()
+        if schema_name == "core":
+            schema_prefix = ""
+        else:
+            schema_prefix = f"{schema_name}."
+        return f"{schema_prefix}{cls.__name__}"
+
+
+class Registry(models.Model, metaclass=RegistryMeta):
+    """Registry base class.
+
+    Extends ``django.db.models.Model``.
+
+    Why does LaminDB call it `Registry` and not `Model`? The term "Registry" can't lead to
+    confusion with statistical, machine learning or biological models.
+    """
+
     def save(self, *args, **kwargs) -> Registry:
         """Save.
 
@@ -757,21 +763,6 @@ class Registry(models.Model, metaclass=RegistryMeta):
         # django outside of lamindb
         super().save(*args, **kwargs)
         return self
-
-    @classmethod
-    def __get_schema_name__(cls) -> str:
-        schema_module_name = cls.__module__.split(".")[0]
-        schema_name = schema_module_name.replace("lnschema_", "")
-        return schema_name
-
-    @classmethod
-    def __get_name_with_schema__(cls) -> str:
-        schema_name = cls.__get_schema_name__()
-        if schema_name == "core":
-            schema_prefix = ""
-        else:
-            schema_prefix = f"{schema_name}."
-        return f"{schema_prefix}{cls.__name__}"
 
     class Meta:
         abstract = True
