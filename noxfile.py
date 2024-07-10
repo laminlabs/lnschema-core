@@ -1,5 +1,5 @@
 import nox
-from laminci.nox import login_testuser1, run_pre_commit, run_pytest
+from laminci.nox import login_testuser1, run, run_pre_commit, run_pytest
 
 nox.options.default_venv_backend = "none"
 
@@ -11,5 +11,8 @@ def lint(session: nox.Session) -> None:
 
 @nox.session
 def test(session: nox.Session) -> None:
-    session.run(*"pip install -e .[dev]".split())
+    run("pip install -e .[dev]")
+    run(
+        "pip install 'lamindb_setup@git+https://github.com/laminlabs/lamindb-setup@cleanupdjango'"
+    )
     run_pytest(session, coverage=False)

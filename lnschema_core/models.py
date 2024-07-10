@@ -491,7 +491,10 @@ class RegistryMeta(ModelBase):
             for name in ["DoesNotExist", "MultipleObjectsReturned"]
             if name in new_class.__dict__
         ]
+        keep_private = "DoesNotExist"
         for name in to_be_removed:
+            if name == keep_private:
+                setattr(new_class, f"_{name}")
             delattr(new_class, name)
         return new_class
 

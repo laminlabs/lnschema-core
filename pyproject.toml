@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "lnschema_core"
-authors = [{name = "Lamin Labs", email = "laminlabs@gmail.com"}]
+authors = [{name = "Lamin Labs", email = "open-source@lamin.ai"}]
 readme = "README.md"
 dynamic = ["version", "description"]
 classifiers = [
@@ -13,6 +13,7 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
 ]
+# mandate zero dependencies
 dependencies = [
 ]
 
@@ -21,7 +22,6 @@ Home = "https://github.com/laminlabs/lnschema-core"
 
 [project.optional-dependencies]
 dev = [
-    "lamindb_setup",
     "pre-commit",
     "nox",
     "laminci",
