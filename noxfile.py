@@ -11,8 +11,9 @@ def lint(session: nox.Session) -> None:
 
 @nox.session
 def test(session: nox.Session) -> None:
-    run("pip install -e .[dev]")
+    run(session, "pip install -e .[dev]")
     run(
-        "pip install 'lamindb_setup@git+https://github.com/laminlabs/lamindb-setup@cleanupdjango'"
+        session,
+        "pip install lamindb_setup@git+https://github.com/laminlabs/lamindb-setup@cleanupdjango",
     )
     run_pytest(session, coverage=False)
