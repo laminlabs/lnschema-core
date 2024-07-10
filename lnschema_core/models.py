@@ -482,17 +482,37 @@ class HasParents:
         pass
 
 
+DELETE_ATTRS = [
+    "adelete",
+    "arefresh_from_db",
+    "asave",
+    "clean",
+    "DoesNotExist",
+    "MultipleObjectsReturned",
+    "add_to_class",
+    "clean_fields",
+    "date_error_message",
+    "full_clean",
+    "get_constraints",
+    "get_deferred_fields",
+    "prepare_database_save",
+    "refresh_from_db",
+    "pk",
+    "save_base",
+    "serializable_value",
+    "unique_error_message",
+    "validate_constraints",
+    "validate_unique",
+]
+
+
 class RegistryMeta(ModelBase):
     def __new__(cls, name, bases, attrs, **kwargs):
         new_class = super().__new__(cls, name, bases, attrs, **kwargs)
         # eliminate addition of unnecessary fields in the context of lamindb
-        to_be_removed = [
-            name
-            for name in ["DoesNotExist", "MultipleObjectsReturned"]
-            if name in new_class.__dict__
-        ]
+        to_be_deleted = [name for name in DELETE_ATTRS if name in new_class.__dict__]
         keep_private = "DoesNotExist"
-        for name in to_be_removed:
+        for name in to_be_deleted:
             if name == keep_private:
                 setattr(new_class, f"_{name}", getattr(new_class, name))
             delattr(new_class, name)
@@ -2804,5 +2824,16 @@ FieldAttr.__repr__ = deferred_attribute__repr__  # type: ignore
 # Clean-up registry
 # Here is why: https://claude.ai/share/16c4f1aa-e0f3-4093-aa45-37705177d5fa
 
+# DELETE_ATTRS = ["adelete", "arefresh_from_db", "asave", "clean"]
 
-# delattr(Artifact, "DoesNotExist")
+# REMOVE_ATTRS = [
+#     "get_next_by_created_at",
+#     "get_previous_by_created_at",
+#     "get_next_by_updated_at",
+#     "get_previous_by_updated_at",
+#     "objects",
+# ]
+
+
+# for name in DELETE_ATTRS:
+#     delattr(Artifact, name)
