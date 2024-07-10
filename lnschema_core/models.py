@@ -527,6 +527,13 @@ class RegistryMeta(ModelBase):
             delattr(new_class, name)
         return new_class
 
+    # def __dir__(cls):
+    #     result = type.__dir__(cls)
+    #     for attr in dir(cls):
+    #         if not attr.startswith("__"):
+    #             result.append(attr)
+    #     return result
+
     def from_values(
         cls,
         values: ListLike,
