@@ -77,7 +77,6 @@ DELETE_ATTRS_STATIC = [
 for name in DELETE_ATTRS_STATIC:
     if hasattr(models.Model, name):
         delattr(models.Model, name)
-        print(name)
 
 
 class IsVersioned(models.Model):
@@ -510,7 +509,7 @@ class HasParents:
 
 
 DELETE_ATTRS_DYNAMIC = [
-    "DoesNotExist",
+    # "DoesNotExist",
     "MultipleObjectsReturned",
 ]
 
@@ -527,7 +526,6 @@ class RegistryMeta(ModelBase):
             if name == keep_private:
                 setattr(new_class, f"_{name}", getattr(new_class, name))
             delattr(new_class, name)
-            print(name)
         return new_class
 
 
