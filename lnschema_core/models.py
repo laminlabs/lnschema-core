@@ -482,13 +482,17 @@ class HasParents:
         pass
 
 
-DELETE_ATTRS = [
+DELETE_ATTRS_DYNAMIC = [
+    "DoesNotExist",
+    "MultipleObjectsReturned",
+]
+
+
+DELETE_ATTRS_STATIC = [
     "adelete",
     "arefresh_from_db",
     "asave",
     "clean",
-    "DoesNotExist",
-    "MultipleObjectsReturned",
     "add_to_class",
     "clean_fields",
     "date_error_message",
@@ -510,7 +514,9 @@ class RegistryMeta(ModelBase):
     def __new__(cls, name, bases, attrs, **kwargs):
         new_class = super().__new__(cls, name, bases, attrs, **kwargs)
         # eliminate addition of unnecessary fields in the context of lamindb
-        to_be_deleted = [name for name in DELETE_ATTRS if name in new_class.__dict__]
+        to_be_deleted = [
+            name for name in DELETE_ATTRS_DYNAMIC if name in new_class.__dict__
+        ]
         keep_private = "DoesNotExist"
         for name in to_be_deleted:
             if name == keep_private:
@@ -2836,4 +2842,8 @@ FieldAttr.__repr__ = deferred_attribute__repr__  # type: ignore
 
 
 # for name in DELETE_ATTRS:
+#     delattr(Artifact, name)
+
+
+# for name in DELETE_ATTRS_STATIC:
 #     delattr(Artifact, name)
