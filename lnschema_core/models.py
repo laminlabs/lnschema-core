@@ -904,6 +904,8 @@ class User(Registry, CanValidate):
         >>> user
     """
 
+    _name_field: str = "handle"
+
     id: int = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
     uid: str = CharField(unique=True, db_index=True, max_length=8, default=None)
@@ -988,6 +990,8 @@ class Storage(Registry, TracksRun, TracksUpdates):
 
     class Meta(Registry.Meta, TracksRun.Meta, TracksUpdates.Meta):
         abstract = False
+
+    _name_field: str = "root"
 
     id: int = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
@@ -1110,6 +1114,7 @@ class Transform(Registry, HasParents, IsVersioned):
 
     _len_stem_uid: int = 12
     _len_full_uid: int = 16
+    _name_field: str = "name"
 
     id: int = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
@@ -1191,6 +1196,8 @@ class Param(Registry, CanValidate, TracksRun, TracksUpdates):
     class Meta(Registry.Meta, TracksRun.Meta, TracksUpdates.Meta):
         abstract = False
 
+    _name_field: str = "name"
+
     name: str = CharField(max_length=100, db_index=True)
     dtype: str = CharField(max_length=64, db_index=True, default=None)
     """Data type ("number", "cat", "int", "float", "bool", "datetime").
@@ -1205,6 +1212,8 @@ class ParamValue(Registry):
 
     class Meta:
         unique_together = ("param", "value")
+
+    _name_field: str = "value"
 
     param: Param = models.ForeignKey(Param, CASCADE)
     value: Any = models.JSONField()  # stores float, integer, boolean or datetime
@@ -1256,6 +1265,7 @@ class Run(Registry, HasParams):
         >>> ln.core.context.run
     """
 
+    _name_field: str = "started_at"
     params: ParamManager = ParamManagerRun  # type: ignore
 
     id: int = models.BigAutoField(primary_key=True)
@@ -1391,6 +1401,8 @@ class ULabel(Registry, HasParents, CanValidate, TracksRun, TracksUpdates):
     class Meta(Registry.Meta, TracksRun.Meta, TracksUpdates.Meta):
         abstract = False
 
+    _name_field: str = "name"
+
     id: int = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
     uid: str = CharField(unique=True, db_index=True, max_length=8, default=base62_8)
@@ -1500,6 +1512,8 @@ class Feature(Registry, CanValidate, TracksRun, TracksUpdates):
     class Meta(Registry.Meta, TracksRun.Meta, TracksUpdates.Meta):
         abstract = False
 
+    _name_field: str = "name"
+
     id: int = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
     uid: str = CharField(unique=True, db_index=True, max_length=12, default=base62_12)
@@ -1574,6 +1588,8 @@ class FeatureValue(Registry, TracksRun):
     class Meta(Registry.Meta, TracksRun.Meta):
         abstract = False
         unique_together = ("feature", "value")
+
+    _name_field: str = "value"
 
     feature: Feature = models.ForeignKey(Feature, CASCADE, null=True, default=None)
     value: Any = models.JSONField()
@@ -1650,6 +1666,8 @@ class FeatureSet(Registry, TracksRun):
 
     class Meta(Registry.Meta, TracksRun.Meta, TracksUpdates.Meta):
         abstract = False
+
+    _name_field: str = "name"
 
     id: int = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
@@ -1864,6 +1882,7 @@ class Artifact(Registry, HasFeatures, HasParams, IsVersioned, TracksRun, TracksU
 
     _len_full_uid: int = 20
     _len_stem_uid: int = 16
+    _name_field: str = "description"
     features: FeatureManager = FeatureManagerArtifact  # type: ignore
     params: ParamManager = ParamManagerArtifact  # type: ignore
 
@@ -2344,6 +2363,7 @@ class Collection(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
 
     _len_full_uid: int = 20
     _len_stem_uid: int = 16
+    _name_field: str = "name"
     features = FeatureManagerCollection  # type: ignore
 
     id: int = models.AutoField(primary_key=True)
