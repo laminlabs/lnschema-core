@@ -26,7 +26,7 @@ from lnschema_core.types import (
 )
 
 from .ids import base62_8, base62_12, base62_20
-from .types import TransformType
+from .types import ArtifactType, TransformType
 from .users import current_user_id
 
 if TYPE_CHECKING:
@@ -61,7 +61,7 @@ class IsVersioned(models.Model):
 
     _len_stem_uid: int
 
-    version = CharField(max_length=10, default=None, null=True, db_index=True)
+    version: str = CharField(max_length=10, default=None, null=True, db_index=True)
     """Version (default `None`).
 
     Defines version of a family of records characterized by the same `stem_uid`.
@@ -90,16 +90,24 @@ class IsVersioned(models.Model):
 
     @property
     def stem_uid(self) -> str:
+        """Universal id characterizing the version family.
+
+        The full uid of a record is obtained via concatenating the stem uid and version information::
+
+            stem_uid = random_base62(n_char)  # a random base62 sequence of length n_char
+            version_uid = encode_base62(md5_hash(version))[:4]  # version is, e.g., "1" or "2.1.0" or "2022-03-01"
+            uid = f"{stem_uid}{version_uid}"  # concatenate the stem_uid & version_uid
+
+        """
         return self.uid[: self._len_stem_uid]  # type: ignore
 
     @property
     def versions(self) -> QuerySet:
         """Lists all records of the same version family.
 
-        Examples:
-            >>> new_artifact = ln.Artifact(df2, is_new_version_of=artifact)
-            >>> new_artifact.save()
-            >>> new_artifact.versions()
+        >>> new_artifact = ln.Artifact(df2, is_new_version_of=artifact)
+        >>> new_artifact.save()
+        >>> new_artifact.versions()
         """
         return self.__class__.filter(uid__startswith=self.stem_uid)  # type: ignore
 
@@ -129,21 +137,21 @@ def current_run() -> Run | None:
 
 
 class TracksRun(models.Model):
-    """Base class tracking latest run, creating user, and `created_at` timestamp."""
+    """Base class tracking latest run, creating user. nd `created_at` timestamp."""
 
     class Meta:
         abstract = True
 
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    created_at: datetime = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
-    created_by = models.ForeignKey(
+    created_by: User = models.ForeignKey(
         "lnschema_core.User", PROTECT, default=current_user_id
     )
-    """Creator of record, a :class:`~lamindb.User`."""
-    run = models.ForeignKey(
+    """Creator of record."""
+    run: Run = models.ForeignKey(
         "lnschema_core.Run", PROTECT, null=True, default=current_run
     )
-    """Last run that created or updated the record, a :class:`~lamindb.Run`."""
+    """Last run that created or updated the record."""
 
     @overload
     def __init__(self):
@@ -170,9 +178,11 @@ class TracksUpdates(models.Model):
     class Meta:
         abstract = True
 
-    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    updated_at: datetime = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
-    previous_runs = models.ManyToManyField("lnschema_core.Run")
+    # no default related_name below because it'd clash with the reverse accessor
+    # of the .run field
+    previous_runs: Run = models.ManyToManyField("lnschema_core.Run", related_name="+")
     """Sequence of runs that created or updated the record."""
 
     @overload
@@ -230,10 +240,6 @@ class CanValidate:
             >>> ln.save(bt.Gene.from_values(["A1CF", "A1BG", "BRCA2"], field="symbol"))
             >>> gene_symbols = ["A1CF", "A1BG", "FANCD1", "FANCD20"]
             >>> result = bt.Gene.inspect(gene_symbols, field=bt.Gene.symbol)
-            ✅ 2 terms (50.00%) are validated
-            🔶 2 terms (50.00%) are not validated
-                🟠 detected synonyms
-                to increase validated terms, standardize them via .standardize()
             >>> result.validated
             ['A1CF', 'A1BG']
             >>> result.non_validated
@@ -494,7 +500,7 @@ class RegistryMeta(ModelBase):
         public_source: Registry | None = None,
         mute: bool = False,
     ) -> list[Registry]:
-        """Bulk create validated records by parsing values for an identifier (a name, an id, etc.).
+        """Bulk create validated records by parsing values for an identifier (a name. n id, etc.).
 
         Args:
             values: A list of values for an identifier, e.g.
@@ -506,7 +512,7 @@ class RegistryMeta(ModelBase):
             mute: Do not show logging.
 
         Returns:
-            A list of validated records. For bionty registries, also returns knowledge-coupled records.
+            A list of validated records. For bionty registries. lso returns knowledge-coupled records.
 
         Notes:
             For more info, see tutorial: :doc:`bio-registries`.
@@ -589,7 +595,7 @@ class RegistryMeta(ModelBase):
         """Get a single record.
 
         Args:
-            idlike: Either a uid stub, a uid or an integer id.
+            idlike: Either a uid stub.  uid or an integer id.
 
         Returns:
             A record.
@@ -612,7 +618,10 @@ class RegistryMeta(ModelBase):
             else:
                 return qs.one()
 
-    def df(cls, include: str | list[str] | None = None) -> pd.DataFrame:
+    @classmethod
+    def df(
+        cls, include: str | list[str] | None = None, join: str = "inner"
+    ) -> pd.DataFrame:
         """Convert to ``pd.DataFrame``.
 
         By default, shows all direct fields, except ``created_at``.
@@ -623,6 +632,7 @@ class RegistryMeta(ModelBase):
             include: Related fields to include as columns. Takes strings of
                 form ``"labels__name"``, ``"cell_types__name"``, etc. or a list
                 of such strings.
+            join: The `join` parameter of `pandas`.
 
         Examples:
             >>> labels = [ln.ULabel(name="Label {i}") for i in range(3)]
@@ -634,7 +644,7 @@ class RegistryMeta(ModelBase):
         query_set = filter(cls)
         if hasattr(cls, "updated_at"):
             query_set = query_set.order_by("-updated_at")
-        return query_set.df(include=include)
+        return query_set.df(include=include, join=join)
 
     def search(
         cls,
@@ -654,7 +664,7 @@ class RegistryMeta(ModelBase):
 
         Returns:
             A sorted `DataFrame` of search results with a score in column `score`.
-            If `return_queryset` is `True`, a `QuerySet`.
+            If `return_queryset` is `True`.  `QuerySet`.
 
         See Also:
             :meth:`~lamindb.core.Registry.filter`
@@ -729,6 +739,12 @@ class FeatureManager:
     pass
 
 
+class ParamManager:
+    """Param manager."""
+
+    pass
+
+
 class FeatureManagerArtifact(FeatureManager):
     """Feature manager."""
 
@@ -741,19 +757,72 @@ class FeatureManagerCollection(FeatureManager):
     pass
 
 
+class ParamManagerArtifact(ParamManager):
+    """Param manager."""
+
+    pass
+
+
+class ParamManagerRun(ParamManager):
+    """Param manager."""
+
+    pass
+
+
 class HasFeatures:
     """Base class linking features, in particular, for :class:`~lamindb.Artifact` & :class:`~lamindb.Collection`."""
 
-    features = FeatureManager
+    features: FeatureManager = FeatureManager  # type: ignore
+    """Feature manager.
+
+    Features denote dataset dimensions, i.e., the variables that measure labels
+    & numbers.
+
+    Annotate with features & values::
+
+       artifact.features.add_values({
+            "species": organism,  # here, organism is an Organism record
+            "scientist": ['Barbara McClintock', 'Edgar Anderson'],
+            "temperature": 27.6,
+            "study": "Study 0: initial plant gathering"
+       })
+
+    Query for features & values::
+
+        ln.Artifact.features.filter(scientist="Barbara McClintock")
+
+    Features may or may not be part of the artifact content in storage. For
+    instance, the :class:`~lamindb.Annotate` flow validates the columns of a
+    `DataFrame`-like artifact and annotates it with features corresponding to
+    these columns. `artifact.features.add_values`, by contrast, does not
+    validate the content of the artifact.
+
+    """
 
     @property
     def labels(self) -> LabelManager:
-        """Label manager."""
+        """Label manager.
+
+        To annotate with labels, you typically use the registry-specific accessors,
+        for instance :attr:`~lamindb.Artifact.ulabels`::
+
+            candidate_marker_study = ln.ULabel(name="Candidate marker study").save()
+            artifact.ulabels.add(candidate_marker_study)
+
+        Similarly, you query based on these accessors::
+
+            ln.Artifact.filter(ulabels__name="Candidate marker study").all()
+
+        The `.labels` accessor allows you to associate labels of any registry with features::
+
+            study = ln.Feature(name="study", dtype="cat").save()
+            artifact.labels.add(candidate_marker_study, study)
+        """
         from lamindb.core._label_manager import LabelManager
 
         return LabelManager(self)
 
-    def describe(self):
+    def describe(self) -> None:
         """Describe relations of data record.
 
         Examples:
@@ -765,6 +834,24 @@ class HasFeatures:
             >>> artifact.describe()
         """
         pass
+
+
+class HasParams:
+    """Base class linking params."""
+
+    params: ParamManager = ParamManager  # type: ignore
+    """Param manager.
+
+    What `.features` is to dataset-like artifacts, `.params` is to model-like artifacts.
+
+    Annotate with params & values::
+
+        artifact.params.add_values({
+            "hidden_size": 32,
+            "bottleneck_size": 16,
+            "batch_size": 32
+        })
+    """
 
 
 # -------------------------------------------------------------------------------------
@@ -820,17 +907,17 @@ class User(Registry, CanValidate):
         >>> user
     """
 
-    id = models.AutoField(primary_key=True)
+    id: int = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
-    uid = CharField(unique=True, db_index=True, max_length=8, default=None)
+    uid: str = CharField(unique=True, db_index=True, max_length=8, default=None)
     """Universal id, valid across DB instances."""
-    handle = CharField(max_length=30, unique=True, db_index=True, default=None)
+    handle: str = CharField(max_length=30, unique=True, db_index=True, default=None)
     """Universal handle, valid across DB instances (required)."""
-    name = CharField(max_length=150, db_index=True, null=True, default=None)
+    name: str = CharField(max_length=150, db_index=True, null=True, default=None)
     """Name (optional)."""  # has to match hub specification, where it's also optional
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    created_at: datetime = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
-    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    updated_at: datetime = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
 
     @overload
@@ -905,20 +992,20 @@ class Storage(Registry, TracksRun, TracksUpdates):
     class Meta(Registry.Meta, TracksRun.Meta, TracksUpdates.Meta):
         abstract = False
 
-    id = models.AutoField(primary_key=True)
+    id: int = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
-    uid = CharField(unique=True, max_length=12, default=base62_12, db_index=True)
+    uid: str = CharField(unique=True, max_length=12, default=base62_12, db_index=True)
     """Universal id, valid across DB instances."""
     # we are very conservative here with 255 characters
-    root = CharField(max_length=255, db_index=True, unique=True, default=None)
-    """Root path of storage, an s3 path, a local path, etc. (required)."""
-    description = CharField(max_length=255, db_index=True, null=True, default=None)
+    root: str = CharField(max_length=255, db_index=True, unique=True, default=None)
+    """Root path of storage. n s3 path.  local path, etc. (required)."""
+    description: str = CharField(max_length=255, db_index=True, null=True, default=None)
     """A description of what the storage location is used for (optional)."""
-    type = CharField(max_length=30, db_index=True)
+    type: str = CharField(max_length=30, db_index=True)
     """Can be "local" vs. "s3" vs. "gs"."""
-    region = CharField(max_length=64, db_index=True, null=True, default=None)
+    region: str = CharField(max_length=64, db_index=True, null=True, default=None)
     """Cloud storage region, if applicable."""
-    instance_uid = CharField(max_length=12, db_index=True, null=True, default=None)
+    instance_uid: str = CharField(max_length=12, db_index=True, null=True, default=None)
     """Instance that manages this storage location."""
 
     @overload
@@ -946,21 +1033,19 @@ class Storage(Registry, TracksRun, TracksUpdates):
 
     @property
     def path(self) -> Path | UPath:
-        """Bucket or folder path (`Path`, `UPath`).
+        """Bucket or folder path.
 
-        Examples:
+        Cloud storage bucket:
 
-            Cloud storage bucket:
+        >>> ln.Storage("s3://my-bucket").save()
 
-            >>> ln.Storage("s3://my-bucket").save()
+        Directory/folder in cloud storage:
 
-            Directory/folder in cloud storage:
+        >>> ln.Storage("s3://my-bucket/my-directory").save()
 
-            >>> ln.Storage("s3://my-bucket/my-directory").save()
+        Local directory/folder:
 
-            Local directory/folder:
-
-            >>> ln.Storage("./my-directory").save()
+        >>> ln.Storage("./my-directory").save()
         """
         pass
 
@@ -968,7 +1053,7 @@ class Storage(Registry, TracksRun, TracksUpdates):
 class Transform(Registry, HasParents, IsVersioned):
     """Data transformations.
 
-    A transform can refer to a simple Python function, script, a notebook, or a
+    A transform can refer to a simple Python function, script.  notebook, or a
     pipeline. If you execute a transform, you generate a run of a transform
     (:class:`~lamindb.Run`). A run has input and output data.
 
@@ -978,7 +1063,7 @@ class Transform(Registry, HasParents, IsVersioned):
 
     Transforms are versioned so that a given transform maps 1:1 to a specific
     version of code. If you switch on
-    :attr:`~lamindb.core.Settings.sync_git_repo`, any script-like transform is
+    :attr:`~lamindb.core.Settings.sync_git_repo`. ny script-like transform is
     synced its hashed state in a git repository.
 
     If you execute a transform, you generate a :class:`~lamindb.Run` record. The
@@ -1029,47 +1114,53 @@ class Transform(Registry, HasParents, IsVersioned):
     _len_stem_uid: int = 12
     _len_full_uid: int = 16
 
-    id = models.AutoField(primary_key=True)
+    id: int = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
-    uid = CharField(unique=True, db_index=True, max_length=_len_full_uid, default=None)
+    uid: str = CharField(
+        unique=True, db_index=True, max_length=_len_full_uid, default=None
+    )
     """Universal id."""
-    name = CharField(max_length=150, db_index=True, null=True, default=None)
-    """A name or title. For instance, a pipeline name, notebook title, etc."""
-    key = CharField(max_length=120, db_index=True, null=True, default=None)
+    name: str = CharField(max_length=150, db_index=True, null=True, default=None)
+    """A name or title. For instance.  pipeline name, notebook title, etc."""
+    key: str = CharField(max_length=120, db_index=True, null=True, default=None)
     """A key for concise reference & versioning (optional)."""
-    description = CharField(max_length=255, null=True, default=None)
+    description: str = CharField(max_length=255, null=True, default=None)
     """A description (optional)."""
-    type = CharField(
+    type: str = CharField(
         max_length=20,
         choices=TransformType.choices(),
         db_index=True,
         default=TransformType.pipeline,
     )
     """Transform type (default `"pipeline"`)."""
-    latest_report = models.ForeignKey(
+    latest_report: Artifact = models.ForeignKey(
         "Artifact", PROTECT, default=None, null=True, related_name="latest_report_of"
     )
     """Latest run report."""
-    source_code = models.ForeignKey(
+    source_code: Artifact = models.ForeignKey(
         "Artifact", PROTECT, default=None, null=True, related_name="source_code_of"
     )
     """Source of the transform if stored as artifact within LaminDB."""
-    reference = CharField(max_length=255, db_index=True, null=True, default=None)
-    """Reference for the transform, e.g., a URL."""
-    reference_type = CharField(max_length=25, db_index=True, null=True, default=None)
+    reference: str = CharField(max_length=255, db_index=True, null=True, default=None)
+    """Reference for the transform, e.g..  URL."""
+    reference_type: str = CharField(
+        max_length=25, db_index=True, null=True, default=None
+    )
     """Type of reference, e.g., 'url' or 'doi'."""
-    ulabels = models.ManyToManyField("ULabel", related_name="transforms")
-    parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
+    ulabels: ULabel = models.ManyToManyField("ULabel", related_name="transforms")
+    parents: Transform = models.ManyToManyField(
+        "self", symmetrical=False, related_name="children"
+    )
     """Parent transforms (predecessors) in data flow.
 
     These are auto-populated whenever a transform loads an artifact or collection as run input.
     """
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    created_at: datetime = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
-    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    updated_at: datetime = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
-    created_by = models.ForeignKey(User, PROTECT, default=current_user_id)
-    """Creator of record, a :class:`~lamindb.User`."""
+    created_by: User = models.ForeignKey(User, PROTECT, default=current_user_id)
+    """Creator of record. :class:`~lamindb.User`"""
 
     @overload
     def __init__(
@@ -1097,14 +1188,14 @@ class Transform(Registry, HasParents, IsVersioned):
         super().__init__(*args, **kwargs)
 
 
-class Param(Registry, TracksRun, TracksUpdates):
-    """Run parameters akin to Feature for artifacts."""
+class Param(Registry, CanValidate, TracksRun, TracksUpdates):
+    """Parameters of runs & models akin to Feature for datasets."""
 
     class Meta(Registry.Meta, TracksRun.Meta, TracksUpdates.Meta):
         abstract = False
 
-    name = models.CharField(max_length=100, db_index=True)
-    dtype = CharField(max_length=64, db_index=True, default=None)
+    name: str = CharField(max_length=100, db_index=True)
+    dtype: str = CharField(max_length=64, db_index=True, default=None)
     """Data type ("number", "cat", "int", "float", "bool", "datetime").
 
     For categorical types, can define from which registry values are
@@ -1118,25 +1209,25 @@ class ParamValue(Registry):
     class Meta:
         unique_together = ("param", "value")
 
-    param = models.ForeignKey(Param, CASCADE)
-    value = models.JSONField()  # stores float, integer, boolean or datetime
+    param: Param = models.ForeignKey(Param, CASCADE)
+    value: Any = models.JSONField()  # stores float, integer, boolean or datetime
     # it'd be confusing and hard to populate a run here because these
     # values are typically created upon creating a run
     # hence, ParamValue does _not_ inherit from TracksRun but manually
     # adds created_at & created_by
     # because ParamValue cannot be updated, we don't need updated_at
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    created_at: datetime = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
-    created_by = models.ForeignKey(User, PROTECT, default=current_user_id)
-    """Creator of record, a :class:`~lamindb.User`."""
+    created_by: User = models.ForeignKey(User, PROTECT, default=current_user_id)
+    """Creator of record. :class:`~lamindb.User`"""
 
 
-class Run(Registry):
+class Run(Registry, HasParams):
     """Runs of transforms.
 
     Args:
         transform: `Transform` A :class:`~lamindb.Transform` record.
-        reference: `str | None = None` For instance, an external ID or a download URL.
+        reference: `str | None = None` For instance. n external ID or a download URL.
         reference_type: `str | None = None` For instance, `redun_id`, `nextflow_id` or `url`.
 
     See Also:
@@ -1146,10 +1237,10 @@ class Run(Registry):
     Notes:
         See guide: :doc:`docs:data-flow`.
 
-        Typically, a run has inputs (`run.inputs`) and outputs (`run.outputs`):
+        A run can have inputs and outputs:
 
-            - References to outputs are also stored in the `run` field of :class:`~lamindb.Artifact` and :class:`~lamindb.Collection`.
-            - References to inputs are also stored in the `input_of` field of :class:`~lamindb.Artifact` and :class:`~lamindb.Collection`.
+        - References to outputs are stored in the `run` field of registries.
+        - References to inputs are stored in the `input_of` field of :class:`~lamindb.Artifact` and :class:`~lamindb.Collection`.
 
     Examples:
 
@@ -1168,42 +1259,46 @@ class Run(Registry):
         >>> ln.core.context.run
     """
 
-    id = models.BigAutoField(primary_key=True)
+    params: ParamManager = ParamManagerRun  # type: ignore
+
+    id: int = models.BigAutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
-    uid = CharField(unique=True, db_index=True, max_length=20, default=base62_20)
+    uid: str = CharField(unique=True, db_index=True, max_length=20, default=base62_20)
     """Universal id, valid across DB instances."""
     transform = models.ForeignKey(Transform, CASCADE, related_name="runs")
     """The transform :class:`~lamindb.Transform` that is being run."""
-    started_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    started_at: datetime = models.DateTimeField(auto_now_add=True, db_index=True)
     """Start time of run."""
-    finished_at = models.DateTimeField(db_index=True, null=True, default=None)
+    finished_at: datetime = models.DateTimeField(db_index=True, null=True, default=None)
     """Finished time of run."""
-    created_by = models.ForeignKey(User, CASCADE, default=current_user_id)
-    """Creator of run, a :class:`~lamindb.User`."""
-    param_values = models.ManyToManyField(
+    created_by: User = models.ForeignKey(User, CASCADE, default=current_user_id)
+    """Creator of run. :class:`~lamindb.User`"""
+    param_values: ParamValue = models.ManyToManyField(
         ParamValue, through="RunParamValue", related_name="runs"
     )
     """Parameter values."""
     # we don't want to make below a OneToOne because there could be the same trivial report
     # generated for many different runs
-    report = models.ForeignKey(
+    report: Artifact = models.ForeignKey(
         "Artifact", PROTECT, default=None, null=True, related_name="report_of"
     )
-    """Report of run, e.g., an html file."""
-    environment = models.ForeignKey(
+    """Report of run, e.g.. n html file."""
+    environment: Artifact = models.ForeignKey(
         "Artifact", PROTECT, default=None, null=True, related_name="environment_of"
     )
     """Computational environment for the run.
 
-    For instance, a `Dockerfile`, a docker image, a `requirements.txt`, an `environment.yml`, etc.
+    For instance.  `Dockerfile`.  docker image.  `requirements.txt`. n `environment.yml`, etc.
     """
-    is_consecutive = models.BooleanField(null=True, default=None)
+    is_consecutive: bool = models.BooleanField(null=True, default=None)
     """Indicates whether code was consecutively executed. Is relevant for notebooks."""
-    reference = CharField(max_length=255, db_index=True, null=True, default=None)
+    reference: str = CharField(max_length=255, db_index=True, null=True, default=None)
     """A reference like a URL or external ID (such as from a workflow manager)."""
-    reference_type = CharField(max_length=25, db_index=True, null=True, default=None)
-    """Type of reference, e.g., a workflow manager execution ID."""
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    reference_type: str = CharField(
+        max_length=25, db_index=True, null=True, default=None
+    )
+    """Type of reference, e.g..  workflow manager execution ID."""
+    created_at: datetime = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of first creation. Mismatches ``started_at`` if the run is re-run."""
 
     @overload
@@ -1231,26 +1326,27 @@ class Run(Registry):
 
 
 class ULabel(Registry, HasParents, CanValidate, TracksRun, TracksUpdates):
-    """Universal labels (valid categories).
+    """Universal labels.
 
     Args:
         name: `str` A name.
         description: `str` A description.
-        reference: `str | None = None` For instance, an external ID or a URL.
+        reference: `str | None = None` For instance. n external ID or a URL.
         reference_type: `str | None = None` For instance, `"url"`.
 
-
-    A `ULabel` record provides the easiest way to annotate an artifact or collection
+    A `ULabel` record provides the easiest way to annotate a dataset
     with a label: `"My project"`, `"curated"`, or `"Batch X"`:
 
         >>> my_project = ULabel(name="My project")
         >>> my_project.save()
-        >>> collection.ulabels.add(my_project)
+        >>> artifact.ulabels.add(my_project)
 
-    In some cases, a label is measured *within* an artifact or collection a feature (a
-    :class:`~lamindb.Feature` record) denotes the column name in which the label
-    is stored. For instance, the collection might contain measurements across 2
-    organism of the Iris flower: `"setosa"` & `"versicolor"`.
+    Often, a ulabel is measured *within* a dataset. For instance, an artifact
+    might characterize 2 species of the Iris flower (`"setosa"` &
+    `"versicolor"`) measured by a `"species"` feature. Use the
+    :class:`~lamindb.Annotate` flow to automatically parse, validate, and
+    annotate with labels that are contained in `DataFrame` or `AnnData`
+    artifacts.
 
     See :doc:`tutorial2` to learn more.
 
@@ -1282,8 +1378,6 @@ class ULabel(Registry, HasParents, CanValidate, TracksRun, TracksUpdates):
         >>> artifact = ln.Artifact("./myfile.csv")
         >>> artifact.save()
         >>> artifact.ulabels.add(ulabel)
-        >>> artifact.ulabels.list("name")
-        ['My project']
 
         Organize labels in a hierarchy:
 
@@ -1300,19 +1394,23 @@ class ULabel(Registry, HasParents, CanValidate, TracksRun, TracksUpdates):
     class Meta(Registry.Meta, TracksRun.Meta, TracksUpdates.Meta):
         abstract = False
 
-    id = models.AutoField(primary_key=True)
+    id: int = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
-    uid = CharField(unique=True, db_index=True, max_length=8, default=base62_8)
+    uid: str = CharField(unique=True, db_index=True, max_length=8, default=base62_8)
     """A universal random id, valid across DB instances."""
-    name = CharField(max_length=150, db_index=True, unique=True, default=None)
+    name: str = CharField(max_length=150, db_index=True, unique=True, default=None)
     """Name or title of ulabel (required)."""
-    description = TextField(null=True, default=None)
+    description: str = TextField(null=True, default=None)
     """A description (optional)."""
-    reference = CharField(max_length=255, db_index=True, null=True, default=None)
+    reference: str = CharField(max_length=255, db_index=True, null=True, default=None)
     """A reference like URL or external ID."""
-    reference_type = CharField(max_length=25, db_index=True, null=True, default=None)
+    reference_type: str = CharField(
+        max_length=25, db_index=True, null=True, default=None
+    )
     """Type of reference, e.g., donor_id from Vendor X."""
-    parents = models.ManyToManyField("self", symmetrical=False, related_name="children")
+    parents: ULabel = models.ManyToManyField(
+        "self", symmetrical=False, related_name="children"
+    )
     """Parent labels, useful to hierarchically group labels (optional)."""
 
     @overload
@@ -1343,8 +1441,10 @@ class ULabel(Registry, HasParents, CanValidate, TracksRun, TracksUpdates):
 class Feature(Registry, CanValidate, TracksRun, TracksUpdates):
     """Dataset dimensions.
 
-    A feature is a random variable or, equivalently, dimension of a
-    dataset. The `Feature` registry helps to
+    Features denote dataset dimensions, i.e., the variables that measure labels &
+    numbers.
+
+    The `Feature` registry helps to
 
     1. manage metadata of features
     2. annotate datasets by whether they measured a feature
@@ -1352,7 +1452,7 @@ class Feature(Registry, CanValidate, TracksRun, TracksUpdates):
     Learn more: :doc:`tutorial2`.
 
     Args:
-        name: `str` Name of the feature, typically, a column name.
+        name: `str` Name of the feature, typically.  column name.
         type: `str | list[Type[Registry]]` Data type ("number", "cat", "int", "float", "bool", "datetime").
             For categorical types, can define from which registry values are
             sampled, e.g., `cat[ULabel]` or `cat[bionty.CellType]`.
@@ -1384,8 +1484,8 @@ class Feature(Registry, CanValidate, TracksRun, TracksUpdates):
 
         *Features* and *labels* denote two ways of using entities to organize data:
 
-        1. A feature qualifies *what* is measured, i.e., a numerical or categorical random variable
-        2. A label *is* a measured value, i.e., a category
+        1. A feature qualifies *what* is measured, i.e..  numerical or categorical random variable
+        2. A label *is* a measured value, i.e..  category
 
         Consider annotating a dataset by that it measured expression of 30k
         genes: genes relate to the dataset as feature identifiers through a
@@ -1394,7 +1494,7 @@ class Feature(Registry, CanValidate, TracksRun, TracksUpdates):
         as labels of the dataset.
 
         Re-shaping data can introduce ambiguity among features & labels. If this
-        happened, ask yourself what the joint measurement was: a feature
+        happened. sk yourself what the joint measurement was: a feature
         qualifies variables in a joint measurement. The canonical data matrix
         lists jointly measured variables in the columns.
 
@@ -1403,28 +1503,28 @@ class Feature(Registry, CanValidate, TracksRun, TracksUpdates):
     class Meta(Registry.Meta, TracksRun.Meta, TracksUpdates.Meta):
         abstract = False
 
-    id = models.AutoField(primary_key=True)
+    id: int = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
-    uid = CharField(unique=True, db_index=True, max_length=12, default=base62_12)
+    uid: str = CharField(unique=True, db_index=True, max_length=12, default=base62_12)
     """Universal id, valid across DB instances."""
-    name = CharField(max_length=150, db_index=True, default=None)
+    name: str = CharField(max_length=150, db_index=True, default=None)
     """Name of feature (required)."""
-    dtype = CharField(max_length=64, db_index=True, default=None)
+    dtype: str = CharField(max_length=64, db_index=True, default=None)
     """Data type ("number", "cat", "int", "float", "bool", "datetime").
 
     For categorical types, can define from which registry values are
     sampled, e.g., `cat[ULabel]` or `cat[bionty.CellType]`.
     """
-    unit = CharField(max_length=30, db_index=True, null=True, default=None)
+    unit: str = CharField(max_length=30, db_index=True, null=True, default=None)
     """Unit of measure, ideally SI (`m`, `s`, `kg`, etc.) or 'normalized' etc. (optional)."""
-    description = TextField(db_index=True, null=True, default=None)
+    description: str = TextField(db_index=True, null=True, default=None)
     """A description."""
-    synonyms = TextField(null=True, default=None)
+    synonyms: str = TextField(null=True, default=None)
     """Bar-separated (|) synonyms (optional)."""
     # we define the below ManyToMany on the feature model because it parallels
     # how other registries (like Gene, Protein, etc.) relate to FeatureSet
     # it makes the API more consistent
-    feature_sets = models.ManyToManyField(
+    feature_sets: FeatureSet = models.ManyToManyField(
         "FeatureSet", through="FeatureSetFeature", related_name="features"
     )
     """Feature sets linked to this feature."""
@@ -1470,7 +1570,7 @@ class FeatureValue(Registry, TracksRun):
     Categorical feature values are stored in their respective registries:
     :class:`~lamindb.ULabel`, :class:`~bionty.CellType`, etc.
 
-    Unlike for ULabel, in `FeatureValue`, values are grouped by features, and
+    Unlike for ULabel, in `FeatureValue`, values are grouped by features. nd
     not by an ontological hierarchy.
     """
 
@@ -1478,8 +1578,8 @@ class FeatureValue(Registry, TracksRun):
         abstract = False
         unique_together = ("feature", "value")
 
-    feature = models.ForeignKey(Feature, CASCADE, null=True, default=None)
-    value = models.JSONField()
+    feature: Feature = models.ForeignKey(Feature, CASCADE, null=True, default=None)
+    value: Any = models.JSONField()
 
 
 class FeatureSet(Registry, TracksRun):
@@ -1507,7 +1607,7 @@ class FeatureSet(Registry, TracksRun):
             :meth:`~lamindb.FeatureSet.from_values` or
             :meth:`~lamindb.FeatureSet.from_df`.
         type: `str | None = None` The simple type. Defaults to
-            `None` for sets of :class:`~lamindb.Feature` records, and otherwise
+            `None` for sets of :class:`~lamindb.Feature` records. nd otherwise
             defaults to `"number"` (e.g., for sets of :class:`~bionty.Gene`).
         name: `str | None = None` A name.
 
@@ -1554,25 +1654,27 @@ class FeatureSet(Registry, TracksRun):
     class Meta(Registry.Meta, TracksRun.Meta, TracksUpdates.Meta):
         abstract = False
 
-    id = models.AutoField(primary_key=True)
+    id: int = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
-    uid = CharField(unique=True, db_index=True, max_length=20, default=None)
+    uid: str = CharField(unique=True, db_index=True, max_length=20, default=None)
     """A universal id (hash of the set of feature values)."""
-    name = CharField(max_length=150, null=True, default=None)
+    name: str = CharField(max_length=150, null=True, default=None)
     """A name (optional)."""
     n = models.IntegerField()
     """Number of features in the set."""
-    dtype = CharField(max_length=64, null=True, default=None)
+    dtype: str = CharField(max_length=64, null=True, default=None)
     """Data type, e.g., "number", "float", "int". Is `None` for :class:`~lamindb.Feature`.
 
     For :class:`~lamindb.Feature`, types are expected to be heterogeneous and defined on a per-feature level.
     """
-    registry = CharField(max_length=120, db_index=True)
+    registry: str = CharField(max_length=120, db_index=True)
     """The registry that stores the feature identifiers, e.g., `'core.Feature'` or `'bionty.Gene'`.
 
     Depending on the registry, `.members` stores, e.g. `Feature` or `Gene` records.
     """
-    hash = CharField(max_length=20, default=None, db_index=True, null=True, unique=True)
+    hash: str = CharField(
+        max_length=20, default=None, db_index=True, null=True, unique=True
+    )
     """The hash of the set."""
 
     @overload
@@ -1659,11 +1761,10 @@ class FeatureSet(Registry, TracksRun):
         pass
 
 
-class Artifact(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
+class Artifact(Registry, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpdates):
     """Artifacts: datasets & models stored as files, folders, or arrays.
 
     Artifacts manage data in local or remote storage.
-
 
     An artifact stores a dataset or model as either a file or a folder.
 
@@ -1674,6 +1775,7 @@ class Artifact(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
 
     Args:
         data: `UPathStr` A path to a local or remote folder or file.
+        type: `Literal["dataset", "model", "code"] | None = None` The artifact type.
         key: `str | None = None` A relative path within default storage,
             e.g., `"myfolder/myfile.fcs"`.
         description: `str | None = None` A description.
@@ -1765,93 +1867,104 @@ class Artifact(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
 
     _len_full_uid: int = 20
     _len_stem_uid: int = 16
-    features = FeatureManagerArtifact
+    features: FeatureManager = FeatureManagerArtifact  # type: ignore
+    params: ParamManager = ParamManagerArtifact  # type: ignore
 
-    id = models.AutoField(primary_key=True)
+    id: int = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
-    uid = CharField(unique=True, db_index=True, max_length=_len_full_uid)
+    uid: str = CharField(unique=True, db_index=True, max_length=_len_full_uid)
     """A universal random id (20-char base62 ~ UUID), valid across DB instances."""
-    description = CharField(max_length=255, db_index=True, null=True, default=None)
+    description: str = CharField(max_length=255, db_index=True, null=True, default=None)
     """A description."""
-    storage = models.ForeignKey(Storage, PROTECT, related_name="artifacts")
-    """Storage location (:class:`~lamindb.Storage`), e.g., an S3 or GCP bucket or a local directory."""
-    key = CharField(max_length=255, db_index=True, null=True, default=None)
+    storage: Storage = models.ForeignKey(Storage, PROTECT, related_name="artifacts")
+    """Storage location (:class:`~lamindb.Storage`), e.g.. n S3 or GCP bucket or a local directory."""
+    key: str = CharField(max_length=255, db_index=True, null=True, default=None)
     """Storage key, the relative path within the storage location."""
-    suffix = CharField(max_length=30, db_index=True, default=None)
+    suffix: str = CharField(max_length=30, db_index=True, default=None)
     # Initially, we thought about having this be nullable to indicate folders
     # But, for instance, .zarr is stored in a folder that ends with a .zarr suffix
     """Path suffix or empty string if no canonical suffix exists.
 
     This is either a file suffix (`".csv"`, `".h5ad"`, etc.) or the empty string "".
     """
-    accessor = CharField(max_length=64, db_index=True, null=True, default=None)
-    """Default backed or memory accessor, e.g., DataFrame, AnnData.
-
-    Soon, also: SOMA, MuData, zarr.Group, tiledb.Array, etc.
-    """
-    size = models.BigIntegerField(null=True, db_index=True)
+    type: str = CharField(
+        max_length=20,
+        choices=ArtifactType.choices(),
+        db_index=True,
+        default=None,
+        null=True,
+    )
+    """Artifact type (default `None`)."""
+    accessor: str = CharField(max_length=64, db_index=True, null=True, default=None)
+    """Default backed or memory accessor, e.g., DataFrame, AnnData."""
+    size: int = models.BigIntegerField(null=True, db_index=True)
     """Size in bytes.
 
     Examples: 1KB is 1e3 bytes, 1MB is 1e6, 1GB is 1e9, 1TB is 1e12 etc.
     """
-    hash = CharField(
+    hash: str = CharField(
         max_length=86, db_index=True, null=True, default=None
     )  # 86 base64 chars allow to store 64 bytes, 512 bits
     """Hash or pseudo-hash of artifact content.
 
     Useful to ascertain integrity and avoid duplication.
     """
-    hash_type = CharField(max_length=30, db_index=True, null=True, default=None)
+    hash_type: str = CharField(max_length=30, db_index=True, null=True, default=None)
     """Type of hash."""
-    n_objects = models.BigIntegerField(default=None, null=True, db_index=True)
+    n_objects: int = models.BigIntegerField(default=None, null=True, db_index=True)
     """Number of objects.
 
     Typically, this denotes the number of files in an artifact.
     """
-    n_observations = models.BigIntegerField(default=None, null=True, db_index=True)
+    n_observations: int = models.BigIntegerField(default=None, null=True, db_index=True)
     """Number of observations.
 
     Typically, this denotes the first array dimension.
     """
-    ulabels = models.ManyToManyField(
+    ulabels: ULabel = models.ManyToManyField(
         ULabel, through="ArtifactULabel", related_name="artifacts"
     )
     """The ulabels measured in the artifact (:class:`~lamindb.ULabel`)."""
-    transform = models.ForeignKey(
+    transform: Transform = models.ForeignKey(
         Transform, PROTECT, related_name="output_artifacts", null=True, default=None
     )
     """:class:`~lamindb.Transform` whose run created the artifact."""
-    run = models.ForeignKey(
+    run: Run = models.ForeignKey(
         Run, PROTECT, related_name="output_artifacts", null=True, default=None
     )
     """:class:`~lamindb.Run` that created the artifact."""
-    input_of = models.ManyToManyField(Run, related_name="input_artifacts")
+    input_of: Run = models.ManyToManyField(Run, related_name="input_artifacts")
     """Runs that use this artifact as an input."""
     # if the artifact is replicated or update in a new run, we link the previous
     # run in previous_runs
-    previous_runs = models.ManyToManyField(
+    previous_runs: Run = models.ManyToManyField(
         "Run", related_name="output_artifacts_with_later_updates"
     )
     """Sequence of runs that created or updated the record."""
-    feature_sets = models.ManyToManyField(
+    feature_sets: FeatureSet = models.ManyToManyField(
         FeatureSet, related_name="artifacts", through="ArtifactFeatureSet"
     )
     """The feature sets measured in the artifact (:class:`~lamindb.FeatureSet`)."""
-    feature_values = models.ManyToManyField(
+    feature_values: FeatureValue = models.ManyToManyField(
         FeatureValue, through="ArtifactFeatureValue"
     )
     """Non-categorical feature values for annotation."""
-    visibility = models.SmallIntegerField(
+    param_values: ParamValue = models.ManyToManyField(
+        ParamValue, through="ArtifactParamValue", related_name="artifacts"
+    )
+    """Parameter values."""
+    visibility: int = models.SmallIntegerField(
         db_index=True, choices=VisibilityChoice.choices, default=1
     )
     """Visibility of artifact record in queries & searches (0 default, 1 hidden, 2 trash)."""
-    key_is_virtual = models.BooleanField()
+    key_is_virtual: bool = models.BooleanField()
     """Indicates whether `key` is virtual or part of an actual file path."""
 
     @overload
     def __init__(
         self,
         data: UPathStr,
+        type: Literal["dataset", "model", "code"] = "dataset",
         key: str | None = None,
         description: str | None = None,
         is_new_version_of: Artifact | None = None,
@@ -1877,21 +1990,18 @@ class Artifact(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
     def path(self) -> Path:
         """Path.
 
-        Examples:
+        File in cloud storage, here AWS S3:
 
-            File in cloud storage:
+        >>> artifact = ln.Artifact("s3://my-bucket/my-file.csv").save()
+        >>> artifact.path
+        S3Path('s3://my-bucket/my-file.csv')
 
-            >>> ln.Artifact("s3://lamindb-ci/lndb-storage/pbmc68k.h5ad").save()
-            >>> artifact = ln.Artifact.filter(key="lndb-storage/pbmc68k.h5ad").one()
-            >>> artifact.path
-            S3Path('s3://lamindb-ci/lndb-storage/pbmc68k.h5ad')
+        File in local storage:
 
-            File in local storage:
-
-            >>> ln.Artifact("./myfile.csv", description="myfile").save()
-            >>> artifact = ln.Artifact.filter(description="myfile").one()
-            >>> artifact.path
-            PosixPath('/home/runner/work/lamindb/lamindb/docs/guide/mydata/myfile.csv')
+        >>> ln.Artifact("./myfile.csv", description="myfile").save()
+        >>> artifact = ln.Artifact.filter(description="myfile").one()
+        >>> artifact.path
+        PosixPath('/home/runner/work/lamindb/lamindb/docs/guide/mydata/myfile.csv')
         """
         pass
 
@@ -2032,7 +2142,7 @@ class Artifact(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
         Args:
             path: Source path of folder.
             key: Key for storage destination. If `None` and
-                directory is in a registered location, an inferred `key` will
+                directory is in a registered location. n inferred `key` will
                 reflect the relative position. If `None` and directory is outside
                 of a registered storage location, the inferred key defaults to `path.name`.
             run: A `Run` object.
@@ -2095,7 +2205,7 @@ class Artifact(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
     ) -> Any:
         """Stage and load to memory.
 
-        Returns in-memory representation if possible, e.g., an `AnnData` object for an `h5ad` file.
+        Returns in-memory representation if possible, e.g.. n `AnnData` object for an `h5ad` file.
 
         Examples:
 
@@ -2129,7 +2239,7 @@ class Artifact(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
 
         Follows synching logic: only caches an artifact if it's outdated in the local cache.
 
-        Returns a path to a locally cached on-disk object (say, a `.jpg` file).
+        Returns a path to a locally cached on-disk object (say.  `.jpg` file).
 
         Examples:
 
@@ -2189,7 +2299,7 @@ class Artifact(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
 
 
 class Collection(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
-    """Collections: collections of artifacts.
+    """Collections of artifacts.
 
     For more info: :doc:`/tutorial`.
 
@@ -2201,7 +2311,7 @@ class Collection(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
         is_new_version_of: `Collection | None = None` An old version of the collection.
         run: `Run | None = None` The run that creates the collection.
         meta: `Artifact | None = None` An artifact that defines metadata for the collection.
-        reference: `str | None = None` For instance, an external ID or a URL.
+        reference: `str | None = None` For instance. n external ID or a URL.
         reference_type: `str | None = None` For instance, `"url"`.
 
     See Also:
@@ -2211,7 +2321,7 @@ class Collection(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
 
         Create a collection from a collection of :class:`~lamindb.Artifact` objects:
 
-        >>> collection = ln.Collection([artifact1, artifact2], name="My collection")
+        >>> collection = ln.Collection([artifact1. rtifact2], name="My collection")
         >>> collection.save()
 
         If you have more than 100k artifacts, consider creating a collection directly from the
@@ -2237,56 +2347,58 @@ class Collection(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
 
     _len_full_uid: int = 20
     _len_stem_uid: int = 16
-    features = FeatureManagerCollection
+    features = FeatureManagerCollection  # type: ignore
 
-    id = models.AutoField(primary_key=True)
+    id: int = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
-    uid = CharField(
+    uid: str = CharField(
         unique=True, db_index=True, max_length=_len_full_uid, default=base62_20
     )
     """Universal id, valid across DB instances."""
-    name = CharField(max_length=150, db_index=True, default=None)
+    name: str = CharField(max_length=150, db_index=True, default=None)
     """Name or title of collection (required)."""
-    description = TextField(null=True, default=None)
+    description: str = TextField(null=True, default=None)
     """A description."""
-    hash = CharField(max_length=86, db_index=True, null=True, default=None)
+    hash: str = CharField(max_length=86, db_index=True, null=True, default=None)
     """Hash of collection content. 86 base64 chars allow to store 64 bytes, 512 bits."""
-    reference = CharField(max_length=255, db_index=True, null=True, default=None)
+    reference: str = CharField(max_length=255, db_index=True, null=True, default=None)
     """A reference like URL or external ID."""
     # also for reference_type here, we allow an extra long max_length
-    reference_type = CharField(max_length=25, db_index=True, null=True, default=None)
+    reference_type: str = CharField(
+        max_length=25, db_index=True, null=True, default=None
+    )
     """Type of reference, e.g., cellxgene Census collection_id."""
-    feature_sets = models.ManyToManyField(
+    feature_sets: FeatureSet = models.ManyToManyField(
         "FeatureSet", related_name="collections", through="CollectionFeatureSet"
     )
     """The feature sets measured in this collection (see :class:`~lamindb.FeatureSet`)."""
-    ulabels = models.ManyToManyField(
+    ulabels: ULabel = models.ManyToManyField(
         "ULabel", through="CollectionULabel", related_name="collections"
     )
     """ULabels sampled in the collection (see :class:`~lamindb.Feature`)."""
-    transform = models.ForeignKey(
+    transform: Transform = models.ForeignKey(
         Transform, PROTECT, related_name="output_collections", null=True, default=None
     )
     """:class:`~lamindb.Transform` whose run created the collection."""
-    run = models.ForeignKey(
+    run: Run = models.ForeignKey(
         Run, PROTECT, related_name="output_collections", null=True, default=None
     )
     """:class:`~lamindb.Run` that created the `collection`."""
-    input_of = models.ManyToManyField(Run, related_name="input_collections")
+    input_of: Run = models.ManyToManyField(Run, related_name="input_collections")
     """Runs that use this collection as an input."""
-    previous_runs = models.ManyToManyField(
+    previous_runs: Run = models.ManyToManyField(
         "Run", related_name="output_collections_with_later_updates"
     )
     """Sequence of runs that created or updated the record."""
-    artifact = models.OneToOneField(
+    artifact: Artifact = models.OneToOneField(
         "Artifact", PROTECT, null=True, unique=True, related_name="collection"
     )
     """Storage of collection as a one artifact."""
-    unordered_artifacts = models.ManyToManyField(
+    unordered_artifacts: Artifact = models.ManyToManyField(
         "Artifact", related_name="collections", through="CollectionArtifact"
     )
     """Storage of collection as multiple artifacts."""
-    visibility = models.SmallIntegerField(
+    visibility: int = models.SmallIntegerField(
         db_index=True, choices=VisibilityChoice.choices, default=1
     )
     """Visibility of record,  0-default, 1-hidden, 2-trash."""
@@ -2407,7 +2519,7 @@ class Collection(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
     ) -> Any:
         """Stage and load to memory.
 
-        Returns in-memory representation if possible, e.g., a concatenated `DataFrame` or `AnnData` object.
+        Returns in-memory representation if possible, e.g..  concatenated `DataFrame` or `AnnData` object.
         """
         pass
 
@@ -2454,19 +2566,23 @@ class LinkORM:
 
 
 class FeatureSetFeature(Registry, LinkORM):
-    id = models.BigAutoField(primary_key=True)
+    id: int = models.BigAutoField(primary_key=True)
     # we follow the lower() case convention rather than snake case for link models
-    featureset = models.ForeignKey(FeatureSet, CASCADE, related_name="+")
-    feature = models.ForeignKey(Feature, PROTECT, related_name="+")
+    featureset: FeatureSet = models.ForeignKey(FeatureSet, CASCADE, related_name="+")
+    feature: Feature = models.ForeignKey(Feature, PROTECT, related_name="+")
 
 
 class ArtifactFeatureSet(Registry, LinkORM, TracksRun):
-    id = models.BigAutoField(primary_key=True)
-    artifact = models.ForeignKey(Artifact, CASCADE, related_name="feature_set_links")
+    id: int = models.BigAutoField(primary_key=True)
+    artifact: Artifact = models.ForeignKey(
+        Artifact, CASCADE, related_name="feature_set_links"
+    )
     # we follow the lower() case convention rather than snake case for link models
-    featureset = models.ForeignKey(FeatureSet, PROTECT, related_name="artifact_links")
-    slot = CharField(max_length=40, null=True, default=None)
-    feature_ref_is_semantic = models.BooleanField(
+    featureset: FeatureSet = models.ForeignKey(
+        FeatureSet, PROTECT, related_name="artifact_links"
+    )
+    slot: str = CharField(max_length=40, null=True, default=None)
+    feature_ref_is_semantic: bool = models.BooleanField(
         null=True, default=None
     )  # like Feature name or Gene symbol or CellMarker name
 
@@ -2475,14 +2591,16 @@ class ArtifactFeatureSet(Registry, LinkORM, TracksRun):
 
 
 class CollectionFeatureSet(Registry, LinkORM, TracksRun):
-    id = models.BigAutoField(primary_key=True)
+    id: int = models.BigAutoField(primary_key=True)
     collection = models.ForeignKey(
         Collection, CASCADE, related_name="feature_set_links"
     )
     # we follow the lower() case convention rather than snake case for link models
-    featureset = models.ForeignKey(FeatureSet, PROTECT, related_name="collection_links")
-    slot = CharField(max_length=50, null=True, default=None)
-    feature_ref_is_semantic = models.BooleanField(
+    featureset: FeatureSet = models.ForeignKey(
+        FeatureSet, PROTECT, related_name="collection_links"
+    )
+    slot: str = CharField(max_length=50, null=True, default=None)
+    feature_ref_is_semantic: bool = models.BooleanField(
         null=True, default=None
     )  # like Feature name or Gene symbol or CellMarker name
 
@@ -2491,45 +2609,53 @@ class CollectionFeatureSet(Registry, LinkORM, TracksRun):
 
 
 class CollectionArtifact(Registry, LinkORM, TracksRun):
-    id = models.BigAutoField(primary_key=True)
-    collection = models.ForeignKey(Collection, CASCADE, related_name="artifact_links")
-    artifact = models.ForeignKey(Artifact, PROTECT, related_name="collection_links")
+    id: int = models.BigAutoField(primary_key=True)
+    collection: Collection = models.ForeignKey(
+        Collection, CASCADE, related_name="artifact_links"
+    )
+    artifact: Artifact = models.ForeignKey(
+        Artifact, PROTECT, related_name="collection_links"
+    )
 
     class Meta:
         unique_together = ("collection", "artifact")
 
 
 class ArtifactULabel(Registry, LinkORM, TracksRun):
-    id = models.BigAutoField(primary_key=True)
-    artifact = models.ForeignKey(Artifact, CASCADE, related_name="ulabel_links")
+    id: int = models.BigAutoField(primary_key=True)
+    artifact: Artifact = models.ForeignKey(
+        Artifact, CASCADE, related_name="ulabel_links"
+    )
     ulabel = models.ForeignKey(ULabel, PROTECT, related_name="artifact_links")
     feature = models.ForeignKey(
         Feature, PROTECT, null=True, default=None, related_name="artifactulabel_links"
     )
-    ulabel_ref_is_name = models.BooleanField(null=True, default=None)
-    feature_ref_is_name = models.BooleanField(null=True, default=None)
+    ulabel_ref_is_name: bool = models.BooleanField(null=True, default=None)
+    feature_ref_is_name: bool = models.BooleanField(null=True, default=None)
 
     class Meta:
         unique_together = ("artifact", "ulabel")
 
 
 class CollectionULabel(Registry, LinkORM, TracksRun):
-    id = models.BigAutoField(primary_key=True)
-    collection = models.ForeignKey(Collection, CASCADE, related_name="ulabel_links")
-    ulabel = models.ForeignKey(ULabel, PROTECT, related_name="collection_links")
-    feature = models.ForeignKey(
+    id: int = models.BigAutoField(primary_key=True)
+    collection: Collection = models.ForeignKey(
+        Collection, CASCADE, related_name="ulabel_links"
+    )
+    ulabel: ULabel = models.ForeignKey(ULabel, PROTECT, related_name="collection_links")
+    feature: Feature = models.ForeignKey(
         Feature, PROTECT, null=True, default=None, related_name="collectionulabel_links"
     )
-    ulabel_ref_is_name = models.BooleanField(null=True, default=None)
-    feature_ref_is_name = models.BooleanField(null=True, default=None)
+    ulabel_ref_is_name: bool = models.BooleanField(null=True, default=None)
+    feature_ref_is_name: bool = models.BooleanField(null=True, default=None)
 
     class Meta:
         unique_together = ("collection", "ulabel")
 
 
 class ArtifactFeatureValue(Registry, LinkORM, TracksRun):
-    id = models.BigAutoField(primary_key=True)
-    artifact = models.ForeignKey(Artifact, CASCADE, related_name="+")
+    id: int = models.BigAutoField(primary_key=True)
+    artifact: Artifact = models.ForeignKey(Artifact, CASCADE, related_name="+")
     # we follow the lower() case convention rather than snake case for link models
     featurevalue = models.ForeignKey(FeatureValue, PROTECT, related_name="+")
 
@@ -2538,19 +2664,29 @@ class ArtifactFeatureValue(Registry, LinkORM, TracksRun):
 
 
 class RunParamValue(Registry, LinkORM):
-    id = models.BigAutoField(primary_key=True)
-    run = models.ForeignKey(Run, CASCADE, related_name="+")
+    id: int = models.BigAutoField(primary_key=True)
+    run: Run = models.ForeignKey(Run, CASCADE, related_name="+")
     # we follow the lower() case convention rather than snake case for link models
-    paramvalue = models.ForeignKey(ParamValue, PROTECT, related_name="+")
+    paramvalue: ParamValue = models.ForeignKey(ParamValue, PROTECT, related_name="+")
 
     class Meta:
         unique_together = ("run", "paramvalue")
 
 
+class ArtifactParamValue(Registry, LinkORM):
+    id: int = models.BigAutoField(primary_key=True)
+    artifact: Artifact = models.ForeignKey(Artifact, CASCADE, related_name="+")
+    # we follow the lower() case convention rather than snake case for link models
+    paramvalue: ParamValue = models.ForeignKey(ParamValue, PROTECT, related_name="+")
+
+    class Meta:
+        unique_together = ("artifact", "paramvalue")
+
+
 # class Migration(Registry):
-#     app = models.CharField(max_length=255)
-#     name = models.CharField(max_length=255)
-#     applied = models.DateTimeField()
+#     app = CharField(max_length=255)
+#     name = CharField(max_length=255)
+#     applied: datetime = models.DateTimeField()
 
 #     class Meta:
 #         db_table = "django_migrations"

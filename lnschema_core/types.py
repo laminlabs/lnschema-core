@@ -36,6 +36,12 @@ class TransformType(ChoicesMixin, str, Enum):
     function = "function"
 
 
+class ArtifactType(ChoicesMixin, str, Enum):
+    dataset = "dataset"
+    model = "model"
+    code = "code"
+
+
 class VisibilityChoice(IntegerChoices):
     default = 1
     hidden = 0

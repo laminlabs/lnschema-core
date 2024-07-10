@@ -3,6 +3,11 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+🏷️ Add types to core fields | [394](https://github.com/laminlabs/lnschema-core/pull/394) | [falexwolf](https://github.com/falexwolf) | 2024-07-01 |
+📝 Better docstrings | [393](https://github.com/laminlabs/lnschema-core/pull/393) | [falexwolf](https://github.com/falexwolf) | 2024-07-01 |
+🚸 Added support for different join types in QuerySet.df() | [392](https://github.com/laminlabs/lnschema-core/pull/392) | [insavchuk](https://github.com/insavchuk) | 2024-06-26 | 0.70.1
+🚚 Add type field to Artifact, and allow linking artifacts against params | [390](https://github.com/laminlabs/lnschema-core/pull/390) | [falexwolf](https://github.com/falexwolf) | 2024-06-19 | 0.70.0
+🐛 Fix clashing reverse accessors between `.previous_runs` and `.run` | [391](https://github.com/laminlabs/lnschema-core/pull/391) | [falexwolf](https://github.com/falexwolf) | 2024-06-13 | 0.69.0
 ♻️ Add constraints & simple schema fixes | [388](https://github.com/laminlabs/lnschema-core/pull/388) | [falexwolf](https://github.com/falexwolf) | 2024-05-29 | 0.68.0
 ♻️ Migrate featuremanager to being available on the class level | [387](https://github.com/laminlabs/lnschema-core/pull/387) | [falexwolf](https://github.com/falexwolf) | 2024-05-29 |
 ♻️ Better representation | [386](https://github.com/laminlabs/lnschema-core/pull/386) | [falexwolf](https://github.com/falexwolf) | 2024-05-25 |
