@@ -66,7 +66,7 @@ DELETE_ATTRS_STATIC = [
     "prepare_database_save",
     "refresh_from_db",
     "pk",
-    "save_base",
+    #     "save_base",
     "serializable_value",
     "unique_error_message",
     "validate_constraints",
