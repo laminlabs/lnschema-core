@@ -530,7 +530,11 @@ class RegistryMeta(ModelBase):
     def __dir__(cls):
         # this is needed to bring auto-complete on the class-level back
         # https://laminlabs.slack.com/archives/C04FPE8V01W/p1717535625268849
-        return dir(RegistryMeta)
+        res = type.__dir__(cls)
+        for slot in dir(RegistryMeta):
+            if not slot.startswith("__"):
+                res.append(slot)
+        return res
 
     def from_values(
         cls,
