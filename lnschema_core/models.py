@@ -494,7 +494,7 @@ class RegistryMeta(ModelBase):
         keep_private = "DoesNotExist"
         for name in to_be_removed:
             if name == keep_private:
-                setattr(new_class, f"_{name}")
+                setattr(new_class, f"_{name}", getattr(new_class, name))
             delattr(new_class, name)
         return new_class
 
