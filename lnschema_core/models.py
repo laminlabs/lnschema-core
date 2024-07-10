@@ -530,11 +530,21 @@ class RegistryMeta(ModelBase):
     def __dir__(cls):
         # this is needed to bring auto-complete on the class-level back
         # https://laminlabs.slack.com/archives/C04FPE8V01W/p1717535625268849
-        res = type.__dir__(cls)
-        for slot in dir(RegistryMeta):
-            if not slot.startswith("__"):
-                res.append(slot)
-        return res
+        # Filter class attributes, excluding instance methods
+        result = [
+            attr
+            for attr in cls.__dict__.keys()
+            if not attr.startswith("__")
+            and not (
+                callable(cls.__dict__[attr])
+                and not isinstance(cls.__dict__[attr], (classmethod, staticmethod))
+            )
+        ]
+        # Add non-dunder attributes from RegistryMeta
+        for attr in dir(RegistryMeta):
+            if not attr.startswith("__") and attr not in result:
+                result.append(attr)
+        return result
 
     def from_values(
         cls,
