@@ -52,36 +52,6 @@ if TYPE_CHECKING:
 
 _TRACKING_READY: bool | None = None
 
-if settings.strip_django_api:
-    DELETE_ATTRS_DYNAMIC = [
-        # "DoesNotExist",
-        "MultipleObjectsReturned",
-    ]
-    DELETE_ATTRS_STATIC = [
-        "adelete",
-        "arefresh_from_db",
-        "asave",
-        "clean",
-        "clean_fields",
-        "date_error_message",
-        "full_clean",
-        "get_constraints",
-        # "get_deferred_fields",  # needed during migration
-        "prepare_database_save",
-        "refresh_from_db",
-        # "pk",  # needed in a few places
-        # "save_base",  # called only during save()
-        "serializable_value",
-        "unique_error_message",
-        "validate_constraints",
-        "validate_unique",
-    ]
-    for name in DELETE_ATTRS_STATIC:
-        if hasattr(models.Model, name):
-            delattr(models.Model, name)
-else:
-    DELETE_ATTRS_DYNAMIC = []
-
 
 class IsVersioned(models.Model):
     """Base class for versioned models."""
@@ -515,15 +485,6 @@ class HasParents:
 class RegistryMeta(ModelBase):
     def __new__(cls, name, bases, attrs, **kwargs):
         new_class = super().__new__(cls, name, bases, attrs, **kwargs)
-        # eliminate addition of unnecessary fields in the context of lamindb
-        to_be_deleted = [
-            name for name in DELETE_ATTRS_DYNAMIC if name in new_class.__dict__
-        ]
-        keep_private = "DoesNotExist"
-        for name in to_be_deleted:
-            if name == keep_private:
-                setattr(new_class, f"_{name}", getattr(new_class, name))
-            delattr(new_class, name)
         return new_class
 
     def __dir__(cls):
@@ -536,7 +497,9 @@ class RegistryMeta(ModelBase):
             if not attr.startswith("__")
             and not (
                 callable(cls.__dict__[attr])
-                and not isinstance(cls.__dict__[attr], (classmethod, staticmethod))
+                and not isinstance(
+                    cls.__dict__[attr], (classmethod, staticmethod, type)
+                )
             )
         ]
         # Add non-dunder attributes from RegistryMeta
