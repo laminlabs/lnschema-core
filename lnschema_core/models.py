@@ -111,7 +111,7 @@ class IsVersioned(models.Model):
         """
         return self.__class__.filter(uid__startswith=self.stem_uid)  # type: ignore
 
-    def add_to_version_family(
+    def _add_to_version_family(
         self, is_new_version_of: IsVersioned, version: str | None = None
     ):
         """Add current record to a version family.
