@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+📝 Update types of backed returns | [397](https://github.com/laminlabs/lnschema-core/pull/397) | [Koncopd](https://github.com/Koncopd) | 2024-07-15 |
 🚸  Cleaner API | [396](https://github.com/laminlabs/lnschema-core/pull/396) | [falexwolf](https://github.com/falexwolf) | 2024-07-15 |
 🏷️ Add types to core fields | [394](https://github.com/laminlabs/lnschema-core/pull/394) | [falexwolf](https://github.com/falexwolf) | 2024-07-01 |
 📝 Better docstrings | [393](https://github.com/laminlabs/lnschema-core/pull/393) | [falexwolf](https://github.com/falexwolf) | 2024-07-01 |
