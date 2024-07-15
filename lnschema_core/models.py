@@ -12,8 +12,9 @@ from typing import (
 
 from django.db import models
 from django.db.models import CASCADE, PROTECT
+from django.db.models.base import ModelBase
 from lamin_utils import logger
-from lamindb_setup import _check_instance_setup
+from lamindb_setup import _check_instance_setup, settings
 
 from lnschema_core.types import (
     CharField,
@@ -110,7 +111,7 @@ class IsVersioned(models.Model):
         """
         return self.__class__.filter(uid__startswith=self.stem_uid)  # type: ignore
 
-    def add_to_version_family(
+    def _add_to_version_family(
         self, is_new_version_of: IsVersioned, version: str | None = None
     ):
         """Add current record to a version family.
@@ -481,16 +482,32 @@ class HasParents:
         pass
 
 
-class Registry(models.Model):
-    """Registry base class.
+class RegistryMeta(ModelBase):
+    def __new__(cls, name, bases, attrs, **kwargs):
+        new_class = super().__new__(cls, name, bases, attrs, **kwargs)
+        return new_class
 
-    Extends ``django.db.models.Model``.
+    def __dir__(cls):
+        # this is needed to bring auto-complete on the class-level back
+        # https://laminlabs.slack.com/archives/C04FPE8V01W/p1717535625268849
+        # Filter class attributes, excluding instance methods
+        result = [
+            attr
+            for attr in cls.__dict__.keys()
+            if not attr.startswith("__")
+            and not (
+                callable(cls.__dict__[attr])
+                and not isinstance(
+                    cls.__dict__[attr], (classmethod, staticmethod, type)
+                )
+            )
+        ]
+        # Add non-dunder attributes from RegistryMeta
+        for attr in dir(RegistryMeta):
+            if not attr.startswith("__") and attr not in result:
+                result.append(attr)
+        return result
 
-    Why does LaminDB call it `Registry` and not `Model`? The term "Registry" can't lead to
-    confusion with statistical, machine learning or biological models.
-    """
-
-    @classmethod
     def from_values(
         cls,
         values: ListLike,
@@ -538,7 +555,6 @@ class Registry(models.Model):
         """
         pass
 
-    @classmethod
     def lookup(
         cls,
         field: StrField | None = None,
@@ -571,7 +587,6 @@ class Registry(models.Model):
         """
         pass
 
-    @classmethod
     def filter(cls, **expressions) -> QuerySet:
         """Query records (see :doc:`meta`).
 
@@ -593,7 +608,6 @@ class Registry(models.Model):
 
         return filter(cls, **expressions)
 
-    @classmethod
     def get(cls, idlike: int | str) -> Registry:
         """Get a single record.
 
@@ -621,7 +635,6 @@ class Registry(models.Model):
             else:
                 return qs.one()
 
-    @classmethod
     def df(
         cls, include: str | list[str] | None = None, join: str = "inner"
     ) -> pd.DataFrame:
@@ -649,7 +662,6 @@ class Registry(models.Model):
             query_set = query_set.order_by("-updated_at")
         return query_set.df(include=include, join=join)
 
-    @classmethod
     def search(
         cls,
         string: str,
@@ -681,7 +693,6 @@ class Registry(models.Model):
         """
         pass
 
-    @classmethod
     def using(
         cls,
         instance: str,
@@ -701,6 +712,29 @@ class Registry(models.Model):
         """
         pass
 
+    def __get_schema_name__(cls) -> str:
+        schema_module_name = cls.__module__.split(".")[0]
+        schema_name = schema_module_name.replace("lnschema_", "")
+        return schema_name
+
+    def __get_name_with_schema__(cls) -> str:
+        schema_name = cls.__get_schema_name__()
+        if schema_name == "core":
+            schema_prefix = ""
+        else:
+            schema_prefix = f"{schema_name}."
+        return f"{schema_prefix}{cls.__name__}"
+
+
+class Registry(models.Model, metaclass=RegistryMeta):
+    """Registry base class.
+
+    Extends ``django.db.models.Model``.
+
+    Why does LaminDB call it `Registry` and not `Model`? The term "Registry" can't lead to
+    confusion with statistical, machine learning or biological models.
+    """
+
     def save(self, *args, **kwargs) -> Registry:
         """Save.
 
@@ -710,21 +744,6 @@ class Registry(models.Model):
         # django outside of lamindb
         super().save(*args, **kwargs)
         return self
-
-    @classmethod
-    def __get_schema_name__(cls) -> str:
-        schema_module_name = cls.__module__.split(".")[0]
-        schema_name = schema_module_name.replace("lnschema_", "")
-        return schema_name
-
-    @classmethod
-    def __get_name_with_schema__(cls) -> str:
-        schema_name = cls.__get_schema_name__()
-        if schema_name == "core":
-            schema_prefix = ""
-        else:
-            schema_prefix = f"{schema_name}."
-        return f"{schema_prefix}{cls.__name__}"
 
     class Meta:
         abstract = True
@@ -1054,8 +1073,8 @@ class Storage(Registry, TracksRun, TracksUpdates):
 class Transform(Registry, HasParents, IsVersioned):
     """Data transformations.
 
-    A transform can refer to a simple Python function, script.  notebook, or a
-    pipeline. If you execute a transform, you generate a run of a transform
+    A transform can refer to a Python function, a script, notebook, or a
+    pipeline. If you execute a transform, you generate a run
     (:class:`~lamindb.Run`). A run has input and output data.
 
     A pipeline is typically created with a workflow tool (Nextflow, Snakemake,
@@ -1063,12 +1082,15 @@ class Transform(Registry, HasParents, IsVersioned):
     repository.
 
     Transforms are versioned so that a given transform maps 1:1 to a specific
-    version of code. If you switch on
-    :attr:`~lamindb.core.Settings.sync_git_repo`. ny script-like transform is
-    synced its hashed state in a git repository.
+    version of code.
 
-    If you execute a transform, you generate a :class:`~lamindb.Run` record. The
-    definition of transforms and runs is consistent the OpenLineage
+    .. dropdown:: Can I sync transforms to git?
+
+        If you switch on
+        :attr:`~lamindb.core.Settings.sync_git_repo` a script-like transform is
+        synched to its hashed state in a git repository upon calling `ln.track()`.
+
+    The definition of transforms and runs is consistent the OpenLineage
     specification where a :class:`~lamindb.Transform` record would be called a
     "job" and a :class:`~lamindb.Run` record a "run".
 
@@ -1619,7 +1641,7 @@ class FeatureSet(Registry, TracksRun):
             a set upon instantiation. If you'd like to pass values, use
             :meth:`~lamindb.FeatureSet.from_values` or
             :meth:`~lamindb.FeatureSet.from_df`.
-        type: `str | None = None` The simple type. Defaults to
+        dtype: `str | None = None` The simple type. Defaults to
             `None` for sets of :class:`~lamindb.Feature` records. nd otherwise
             defaults to `"number"` (e.g., for sets of :class:`~bionty.Gene`).
         name: `str | None = None` A name.
@@ -1696,7 +1718,7 @@ class FeatureSet(Registry, TracksRun):
     def __init__(
         self,
         features: Iterable[Registry],
-        type: str | None = None,
+        dtype: str | None = None,
         name: str | None = None,
     ):
         ...
@@ -2314,6 +2336,11 @@ class Artifact(Registry, HasFeatures, HasParams, IsVersioned, TracksRun, TracksU
         pass
 
 
+# auto-generated through choices()
+delattr(Artifact, "get_visibility_display")
+delattr(Artifact, "get_type_display")
+
+
 class Collection(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
     """Collections of artifacts.
 
@@ -2576,6 +2603,14 @@ class Collection(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
             >>> collection.restore()
         """
         pass
+
+
+# auto-generated through choices()
+delattr(Collection, "get_visibility_display")
+
+
+# -------------------------------------------------------------------------------------
+# Link models
 
 
 class LinkORM:
