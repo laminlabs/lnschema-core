@@ -1625,7 +1625,7 @@ class FeatureSet(Registry, TracksRun):
             a set upon instantiation. If you'd like to pass values, use
             :meth:`~lamindb.FeatureSet.from_values` or
             :meth:`~lamindb.FeatureSet.from_df`.
-        type: `str | None = None` The simple type. Defaults to
+        dtype: `str | None = None` The simple type. Defaults to
             `None` for sets of :class:`~lamindb.Feature` records. nd otherwise
             defaults to `"number"` (e.g., for sets of :class:`~bionty.Gene`).
         name: `str | None = None` A name.
@@ -1700,7 +1700,7 @@ class FeatureSet(Registry, TracksRun):
     def __init__(
         self,
         features: Iterable[Registry],
-        type: str | None = None,
+        dtype: str | None = None,
         name: str | None = None,
     ):
         ...
