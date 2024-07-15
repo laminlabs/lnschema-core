@@ -39,6 +39,8 @@ if TYPE_CHECKING:
     from lamindb.core import LabelManager
     from lamindb_setup.core.types import UPathStr
     from mudata import MuData
+    from tiledbsoma import Collection as SOMACollection
+    from tiledbsoma import Experiment as SOMAExperiment
     from upath import UPath
 
     from lnschema_core.mocks import (
@@ -2203,7 +2205,7 @@ class Artifact(Registry, HasFeatures, HasParams, IsVersioned, TracksRun, TracksU
 
     def backed(
         self, is_run_input: bool | None = None
-    ) -> AnnDataAccessor | BackedAccessor:
+    ) -> AnnDataAccessor | BackedAccessor | SOMACollection | SOMAExperiment:
         """Return a cloud-backed data object.
 
         Notes:
