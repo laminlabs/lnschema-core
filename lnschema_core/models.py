@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import builtins
 from datetime import datetime
 from typing import (
     TYPE_CHECKING,
@@ -53,6 +54,7 @@ if TYPE_CHECKING:
 
 
 _TRACKING_READY: bool | None = None
+IS_RUN_FROM_IPYTHON = getattr(builtins, "__IPYTHON__", False)
 
 
 class IsVersioned(models.Model):
@@ -489,31 +491,34 @@ class RegistryMeta(ModelBase):
         new_class = super().__new__(cls, name, bases, attrs, **kwargs)
         return new_class
 
-    # this breaks the method documentation in the docs silently
-    # it also doesn't have any effect for static type analyzer like pylance
-    # used in VSCode
-    # this only solves the problem for Jupyter Editors
-    #
-    # def __dir__(cls):
-    #     # this is needed to bring auto-complete on the class-level back
-    #     # https://laminlabs.slack.com/archives/C04FPE8V01W/p1717535625268849
-    #     # Filter class attributes, excluding instance methods
-    #     result = [
-    #         attr
-    #         for attr in cls.__dict__.keys()
-    #         if not attr.startswith("__")
-    #         and not (
-    #             callable(cls.__dict__[attr])
-    #             and not isinstance(
-    #                 cls.__dict__[attr], (classmethod, staticmethod, type)
-    #             )
-    #         )
-    #     ]
-    #     # Add non-dunder attributes from RegistryMeta
-    #     for attr in dir(RegistryMeta):
-    #         if not attr.startswith("__") and attr not in result:
-    #             result.append(attr)
-    #     return result
+    # below creates a sensible auto-complete behavior that differs across the
+    # class and instance level in Jupyter Editors it doesn't have any effect for
+    # static type analyzer like pylance used in VSCode
+    def __dir__(cls):
+        # this is needed to bring auto-complete on the class-level back
+        # https://laminlabs.slack.com/archives/C04FPE8V01W/p1717535625268849
+        # Filter class attributes, excluding instance methods
+
+        exclude_instance_methods = IS_RUN_FROM_IPYTHON
+        # https://laminlabs.slack.com/archives/C04FPE8V01W/p1721134595920959
+
+        def include_attribute(attr_name, attr_value):
+            if attr_name.startswith("__"):
+                return False
+            if exclude_instance_methods and callable(attr_value):
+                return isinstance(attr_value, (classmethod, staticmethod, type))
+            return True
+
+        result = [
+            attr_name
+            for attr_name, attr_value in cls.__dict__.items()
+            if include_attribute(attr_name, attr_value)
+        ]
+        # Add non-dunder attributes from RegistryMeta
+        for attr in dir(RegistryMeta):
+            if not attr.startswith("__") and attr not in result:
+                result.append(attr)
+        return result
 
     def from_values(
         cls,
