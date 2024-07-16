@@ -489,26 +489,31 @@ class RegistryMeta(ModelBase):
         new_class = super().__new__(cls, name, bases, attrs, **kwargs)
         return new_class
 
-    def __dir__(cls):
-        # this is needed to bring auto-complete on the class-level back
-        # https://laminlabs.slack.com/archives/C04FPE8V01W/p1717535625268849
-        # Filter class attributes, excluding instance methods
-        result = [
-            attr
-            for attr in cls.__dict__.keys()
-            if not attr.startswith("__")
-            and not (
-                callable(cls.__dict__[attr])
-                and not isinstance(
-                    cls.__dict__[attr], (classmethod, staticmethod, type)
-                )
-            )
-        ]
-        # Add non-dunder attributes from RegistryMeta
-        for attr in dir(RegistryMeta):
-            if not attr.startswith("__") and attr not in result:
-                result.append(attr)
-        return result
+    # this breaks the method documentation in the docs silently
+    # it also doesn't have any effect for static type analyzer like pylance
+    # used in VSCode
+    # this only solves the problem for Jupyter Editors
+    #
+    # def __dir__(cls):
+    #     # this is needed to bring auto-complete on the class-level back
+    #     # https://laminlabs.slack.com/archives/C04FPE8V01W/p1717535625268849
+    #     # Filter class attributes, excluding instance methods
+    #     result = [
+    #         attr
+    #         for attr in cls.__dict__.keys()
+    #         if not attr.startswith("__")
+    #         and not (
+    #             callable(cls.__dict__[attr])
+    #             and not isinstance(
+    #                 cls.__dict__[attr], (classmethod, staticmethod, type)
+    #             )
+    #         )
+    #     ]
+    #     # Add non-dunder attributes from RegistryMeta
+    #     for attr in dir(RegistryMeta):
+    #         if not attr.startswith("__") and attr not in result:
+    #             result.append(attr)
+    #     return result
 
     def from_values(
         cls,
