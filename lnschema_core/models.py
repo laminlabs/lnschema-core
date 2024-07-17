@@ -14,9 +14,14 @@ from typing import (
 from django.db import models
 from django.db.models import CASCADE, PROTECT
 from django.db.models.base import ModelBase
+from django.db.models.fields.related import (
+    ForeignKey,
+    ManyToManyField,
+    ManyToManyRel,
+    ManyToOneRel,
+)
 from lamin_utils import colors, logger
 from lamindb_setup import _check_instance_setup
-from django.db.models.fields.related import ForeignKey, ManyToManyField
 
 from lnschema_core.types import (
     CharField,
@@ -520,33 +525,34 @@ class RecordMeta(ModelBase):
             if not attr.startswith("__") and attr not in result:
                 result.append(attr)
         return result
-    
+
     def __repr__(cls) -> str:
         repr_str = f"{colors.green(cls.__name__)}\n"
-        
+
         fields = cls._meta.fields
-        direct_fields = []
         foreign_key_fields = []
         for f in fields:
             if f.is_relation:
                 foreign_key_fields.append(f.name)
-            else:
-                direct_fields.append(f.name)
-                
-        # Get all many-to-many relationships
-        # many_to_many = [
-        #     field.name for field in cls._meta.get_fields()
-        #     if isinstance(field, ManyToManyField)
-        # ]
-        
+
         foreign_key_fields = [
-            field.name for field in cls._meta.get_fields()
+            field.name
+            for field in cls._meta.get_fields()
             if isinstance(field, ForeignKey)
         ]
-        
 
-        
-        
+        many_to_one_rel = [
+            field.name
+            for field in cls._meta.get_fields()
+            if isinstance(field, ManyToOneRel)
+        ]
+
+        many_to_many_rel = [
+            field.name
+            for field in cls._meta.get_fields()
+            if isinstance(field, ManyToManyRel)
+        ]
+
         # Provenance
         repr_str += f"  {colors.italic('Provenance')}\n"
         if foreign_key_fields:
@@ -559,21 +565,26 @@ class RecordMeta(ModelBase):
                     for field_name in foreign_key_fields
                 ]
             )
-        repr_str += related_msg
-        
-        # Linked fields
-        all_fields = set([f.name for f in cls._meta.get_fields()])
-        link_fields = all_fields - set(foreign_key_fields)
-        
-        print(link_fields)
-        
+            repr_str += related_msg
 
-        # 2. Define a blacklist of things that we don't want to show -> remove them
-        # 3. Divide into provenance related fields and Link fields -> print them
-        
-        
-        # repr_str += f"<{cls.__name__}({', '.join(all_fields)})>"
-        
+        # Relationships
+        # We do not want to duplicate relationship fields so we remove all *_links fields.
+        many_to_one_rel = list(
+            filter(lambda field: not field.endswith("_links"), many_to_one_rel)
+        )
+
+        if many_to_one_rel:
+            repr_str += f"  {colors.italic('Many-to-one relationships')}\n"
+            many_to_one_msg = "".join(f"    .{field}\n" for field in many_to_one_rel)
+            repr_str += many_to_one_msg
+
+        if many_to_many_rel:
+            repr_str += f"  {colors.italic('Many-to-many relationships')}\n"
+            many_to_many_msg = "".join(f"    .{field}\n" for field in many_to_many_rel)
+            repr_str += many_to_many_msg
+
+        repr_str = repr_str.rstrip("\n")
+
         return repr_str
 
     def from_values(
@@ -799,7 +810,8 @@ class Record(models.Model, metaclass=RecordMeta):
 
     class Meta:
         abstract = True
-    
+
+
 class FeatureManager:
     """Feature manager."""
 
