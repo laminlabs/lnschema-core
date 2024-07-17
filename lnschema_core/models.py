@@ -486,7 +486,7 @@ class HasParents:
         pass
 
 
-class Registry(ModelBase):
+class RecordMeta(ModelBase):
     def __new__(cls, name, bases, attrs, **kwargs):
         new_class = super().__new__(cls, name, bases, attrs, **kwargs)
         return new_class
@@ -514,8 +514,8 @@ class Registry(ModelBase):
             for attr_name, attr_value in cls.__dict__.items()
             if include_attribute(attr_name, attr_value)
         ]
-        # Add non-dunder attributes from Registry
-        for attr in dir(Registry):
+        # Add non-dunder attributes from RecordMeta
+        for attr in dir(RecordMeta):
             if not attr.startswith("__") and attr not in result:
                 result.append(attr)
         return result
@@ -738,7 +738,7 @@ class Registry(ModelBase):
         return f"{schema_prefix}{cls.__name__}"
 
 
-class Record(models.Model, metaclass=Registry):
+class Record(models.Model, metaclass=RecordMeta):
     """Record base class.
 
     Extends ``django.db.models.Model``.
