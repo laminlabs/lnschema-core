@@ -13,8 +13,9 @@ from typing import (
 from django.db import models
 from django.db.models import CASCADE, PROTECT
 from django.db.models.base import ModelBase
-from lamin_utils import logger
-from lamindb_setup import _check_instance_setup, settings
+from lamin_utils import colors, logger
+from lamindb_setup import _check_instance_setup
+from django.db.models.fields.related import ForeignKey, ManyToManyField
 
 from lnschema_core.types import (
     CharField,
@@ -509,6 +510,61 @@ class RegistryMeta(ModelBase):
             if not attr.startswith("__") and attr not in result:
                 result.append(attr)
         return result
+    
+    def __repr__(cls) -> str:
+        repr_str = f"{colors.green(cls.__name__)}\n"
+        
+        fields = cls._meta.fields
+        direct_fields = []
+        foreign_key_fields = []
+        for f in fields:
+            if f.is_relation:
+                foreign_key_fields.append(f.name)
+            else:
+                direct_fields.append(f.name)
+                
+        # Get all many-to-many relationships
+        # many_to_many = [
+        #     field.name for field in cls._meta.get_fields()
+        #     if isinstance(field, ManyToManyField)
+        # ]
+        
+        foreign_key_fields = [
+            field.name for field in cls._meta.get_fields()
+            if isinstance(field, ForeignKey)
+        ]
+        
+
+        
+        
+        # Provenance
+        repr_str += f"  {colors.italic('Provenance')}\n"
+        if foreign_key_fields:
+            type_str = (
+                lambda field: f": {cls._meta.get_field(field).related_model.__name__}"
+            )
+            related_msg = "".join(
+                [
+                    f"    .{field_name}{type_str(field_name)}\n"
+                    for field_name in foreign_key_fields
+                ]
+            )
+        repr_str += related_msg
+        
+        # Linked fields
+        all_fields = set([f.name for f in cls._meta.get_fields()])
+        link_fields = all_fields - set(foreign_key_fields)
+        
+        print(link_fields)
+        
+
+        # 2. Define a blacklist of things that we don't want to show -> remove them
+        # 3. Divide into provenance related fields and Link fields -> print them
+        
+        
+        # repr_str += f"<{cls.__name__}({', '.join(all_fields)})>"
+        
+        return repr_str
 
     def from_values(
         cls,
@@ -749,8 +805,7 @@ class Registry(models.Model, metaclass=RegistryMeta):
 
     class Meta:
         abstract = True
-
-
+    
 class FeatureManager:
     """Feature manager."""
 
