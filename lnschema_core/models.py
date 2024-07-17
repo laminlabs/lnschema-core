@@ -209,7 +209,7 @@ class TracksUpdates(models.Model):
 
 
 class CanValidate:
-    """Base class providing :class:`~lamindb.core.Registry`-based validation."""
+    """Base class providing :class:`~lamindb.core.Record`-based validation."""
 
     @classmethod
     def inspect(
@@ -218,8 +218,8 @@ class CanValidate:
         field: str | StrField | None = None,
         *,
         mute: bool = False,
-        organism: str | Registry | None = None,
-        public_source: Registry | None = None,
+        organism: str | Record | None = None,
+        public_source: Record | None = None,
     ) -> InspectResult:
         """Inspect if values are mappable to a field.
 
@@ -258,7 +258,7 @@ class CanValidate:
         field: str | StrField | None = None,
         *,
         mute: bool = False,
-        organism: str | Registry | None = None,
+        organism: str | Record | None = None,
     ) -> np.ndarray:
         """Validate values against existing values of a string field.
 
@@ -302,7 +302,7 @@ class CanValidate:
         public_aware: bool = True,
         keep: Literal["first", "last", False] = "first",
         synonyms_field: str = "synonyms",
-        organism: str | Registry | None = None,
+        organism: str | Record | None = None,
     ) -> list[str] | dict[str, str]:
         """Maps input synonyms to standardized names.
 
@@ -486,7 +486,7 @@ class HasParents:
         pass
 
 
-class RegistryMeta(ModelBase):
+class RecordMeta(ModelBase):
     def __new__(cls, name, bases, attrs, **kwargs):
         new_class = super().__new__(cls, name, bases, attrs, **kwargs)
         return new_class
@@ -514,8 +514,8 @@ class RegistryMeta(ModelBase):
             for attr_name, attr_value in cls.__dict__.items()
             if include_attribute(attr_name, attr_value)
         ]
-        # Add non-dunder attributes from RegistryMeta
-        for attr in dir(RegistryMeta):
+        # Add non-dunder attributes from RecordMeta
+        for attr in dir(RecordMeta):
             if not attr.startswith("__") and attr not in result:
                 result.append(attr)
         return result
@@ -525,16 +525,16 @@ class RegistryMeta(ModelBase):
         values: ListLike,
         field: StrField | None = None,
         create: bool = False,
-        organism: Registry | str | None = None,
-        public_source: Registry | None = None,
+        organism: Record | str | None = None,
+        public_source: Record | None = None,
         mute: bool = False,
-    ) -> list[Registry]:
+    ) -> list[Record]:
         """Bulk create validated records by parsing values for an identifier (a name. n id, etc.).
 
         Args:
             values: A list of values for an identifier, e.g.
                 `["name1", "name2"]`.
-            field: A `Registry` field to look up, e.g., `bt.CellMarker.name`.
+            field: A `Record` field to look up, e.g., `bt.CellMarker.name`.
             create: Whether to create records if they don't exist.
             organism: A `bionty.Organism` name or record.
             public_source: A `bionty.PublicSource` record.
@@ -583,7 +583,7 @@ class RegistryMeta(ModelBase):
             dictionary converter.
 
         See Also:
-            :meth:`~lamindb.core.Registry.search`
+            :meth:`~lamindb.core.Record.search`
 
         Examples:
             >>> import bionty as bt
@@ -616,11 +616,9 @@ class RegistryMeta(ModelBase):
             >>> ln.ULabel(name="my ulabel").save()
             >>> ulabel = ln.ULabel.filter(name="my ulabel").one()
         """
-        from lamindb._filter import filter
+        pass
 
-        return filter(cls, **expressions)
-
-    def get(cls, idlike: int | str) -> Registry:
+    def get(cls, idlike: int | str) -> Record:
         """Get a single record.
 
         Args:
@@ -636,16 +634,7 @@ class RegistryMeta(ModelBase):
         Examples:
             >>> ulabel = ln.ULabel.get("2riu039")
         """
-        from lamindb._filter import filter
-
-        if isinstance(idlike, int):
-            return filter(cls, id=idlike).one()
-        else:
-            qs = filter(cls, uid__startswith=idlike)
-            if issubclass(cls, IsVersioned):
-                return qs.latest_version().one()
-            else:
-                return qs.one()
+        pass
 
     def df(
         cls, include: str | list[str] | None = None, join: str = "inner"
@@ -667,12 +656,7 @@ class RegistryMeta(ModelBase):
             >>> ln.save(labels)
             >>> ln.ULabel.filter().df(include=["created_by__name"])
         """
-        from lamindb._filter import filter
-
-        query_set = filter(cls)
-        if hasattr(cls, "updated_at"):
-            query_set = query_set.order_by("-updated_at")
-        return query_set.df(include=include, join=join)
+        pass
 
     def search(
         cls,
@@ -695,8 +679,8 @@ class RegistryMeta(ModelBase):
             If `return_queryset` is `True`.  `QuerySet`.
 
         See Also:
-            :meth:`~lamindb.core.Registry.filter`
-            :meth:`~lamindb.core.Registry.lookup`
+            :meth:`~lamindb.core.Record.filter`
+            :meth:`~lamindb.core.Record.lookup`
 
         Examples:
             >>> ulabels = ln.ULabel.from_values(["ULabel1", "ULabel2", "ULabel3"], field="name")
@@ -738,16 +722,16 @@ class RegistryMeta(ModelBase):
         return f"{schema_prefix}{cls.__name__}"
 
 
-class Registry(models.Model, metaclass=RegistryMeta):
-    """Registry base class.
+class Record(models.Model, metaclass=RecordMeta):
+    """Record base class.
 
     Extends ``django.db.models.Model``.
 
-    Why does LaminDB call it `Registry` and not `Model`? The term "Registry" can't lead to
+    Why does LaminDB call it `Record` and not `Model`? The term "Record" can't lead to
     confusion with statistical, machine learning or biological models.
     """
 
-    def save(self, *args, **kwargs) -> Registry:
+    def save(self, *args, **kwargs) -> Record:
         """Save.
 
         Always saves to the default database.
@@ -883,13 +867,13 @@ class HasParams:
 
 
 # -------------------------------------------------------------------------------------
-# A note on required fields at the Registry level
+# A note on required fields at the Record level
 #
 # As Django does most of its validation on the Form-level, it doesn't offer functionality
-# for validating the integrity of an Registry object upon instantation (similar to pydantic)
+# for validating the integrity of an Record object upon instantation (similar to pydantic)
 #
 # For required fields, we define them as commonly done on the SQL level together
-# with a validator in Registry (validate_required_fields)
+# with a validator in Record (validate_required_fields)
 #
 # This goes against the Django convention, but goes with the SQLModel convention
 # (Optional fields can be null on the SQL level, non-optional fields cannot)
@@ -899,7 +883,7 @@ class HasParams:
 # an error at the SQL-level, with it, it triggers it at instantiation
 
 # -------------------------------------------------------------------------------------
-# A note on class and instance methods of core Registry
+# A note on class and instance methods of core Record
 #
 # All of these are defined and tested within lamindb, in files starting with _{orm_name}.py
 
@@ -921,7 +905,7 @@ class HasParams:
 # This is a good maximal length for a description field.
 
 
-class User(Registry, CanValidate):
+class User(Record, CanValidate):
     """Users.
 
     All data in this registry is synched from `lamin.ai` to ensure a universal
@@ -972,7 +956,7 @@ class User(Registry, CanValidate):
         super().__init__(*args, **kwargs)
 
 
-class Storage(Registry, TracksRun, TracksUpdates):
+class Storage(Record, TracksRun, TracksUpdates):
     """Storage locations.
 
     A storage location is either a directory/folder (local or in the cloud) or
@@ -1017,7 +1001,7 @@ class Storage(Registry, TracksRun, TracksUpdates):
         >>> ln.settings.storage = "./storage_2" # or a cloud bucket
     """
 
-    class Meta(Registry.Meta, TracksRun.Meta, TracksUpdates.Meta):
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
         abstract = False
 
     id: int = models.AutoField(primary_key=True)
@@ -1078,7 +1062,7 @@ class Storage(Registry, TracksRun, TracksUpdates):
         pass
 
 
-class Transform(Registry, HasParents, IsVersioned):
+class Transform(Record, HasParents, IsVersioned):
     """Data transformations.
 
     A transform can refer to a Python function, a script, notebook, or a
@@ -1139,7 +1123,7 @@ class Transform(Registry, HasParents, IsVersioned):
         >>> transform.view_parents()
     """
 
-    class Meta(Registry.Meta, IsVersioned.Meta):
+    class Meta(Record.Meta, IsVersioned.Meta):
         abstract = False
 
     _len_stem_uid: int = 12
@@ -1219,10 +1203,10 @@ class Transform(Registry, HasParents, IsVersioned):
         super().__init__(*args, **kwargs)
 
 
-class Param(Registry, CanValidate, TracksRun, TracksUpdates):
+class Param(Record, CanValidate, TracksRun, TracksUpdates):
     """Parameters of runs & models akin to Feature for datasets."""
 
-    class Meta(Registry.Meta, TracksRun.Meta, TracksUpdates.Meta):
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
         abstract = False
 
     name: str = CharField(max_length=100, db_index=True)
@@ -1234,7 +1218,7 @@ class Param(Registry, CanValidate, TracksRun, TracksUpdates):
     """
 
 
-class ParamValue(Registry):
+class ParamValue(Record):
     """Run parameter values akin to FeatureValue for artifacts."""
 
     class Meta:
@@ -1253,7 +1237,7 @@ class ParamValue(Registry):
     """Creator of record. :class:`~lamindb.User`"""
 
 
-class Run(Registry, HasParams):
+class Run(Record, HasParams):
     """Runs of transforms.
 
     Args:
@@ -1356,7 +1340,7 @@ class Run(Registry, HasParams):
         super().__init__(*args, **kwargs)
 
 
-class ULabel(Registry, HasParents, CanValidate, TracksRun, TracksUpdates):
+class ULabel(Record, HasParents, CanValidate, TracksRun, TracksUpdates):
     """Universal labels.
 
     Args:
@@ -1422,7 +1406,7 @@ class ULabel(Registry, HasParents, CanValidate, TracksRun, TracksUpdates):
         >>> ln.Artifact.filter(ulabels=project).first()
     """
 
-    class Meta(Registry.Meta, TracksRun.Meta, TracksUpdates.Meta):
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
         abstract = False
 
     id: int = models.AutoField(primary_key=True)
@@ -1469,7 +1453,7 @@ class ULabel(Registry, HasParents, CanValidate, TracksRun, TracksUpdates):
         pass
 
 
-class Feature(Registry, CanValidate, TracksRun, TracksUpdates):
+class Feature(Record, CanValidate, TracksRun, TracksUpdates):
     """Dataset dimensions.
 
     Features denote dataset dimensions, i.e., the variables that measure labels &
@@ -1484,7 +1468,7 @@ class Feature(Registry, CanValidate, TracksRun, TracksUpdates):
 
     Args:
         name: `str` Name of the feature, typically.  column name.
-        type: `str | list[Type[Registry]]` Data type ("number", "cat", "int", "float", "bool", "datetime").
+        type: `str | list[Type[Record]]` Data type ("number", "cat", "int", "float", "bool", "datetime").
             For categorical types, can define from which registry values are
             sampled, e.g., `cat[ULabel]` or `cat[bionty.CellType]`.
         unit: `str | None = None` Unit of measure, ideally SI (`"m"`, `"s"`, `"kg"`, etc.) or `"normalized"` etc.
@@ -1531,7 +1515,7 @@ class Feature(Registry, CanValidate, TracksRun, TracksUpdates):
 
     """
 
-    class Meta(Registry.Meta, TracksRun.Meta, TracksUpdates.Meta):
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
         abstract = False
 
     id: int = models.AutoField(primary_key=True)
@@ -1564,7 +1548,7 @@ class Feature(Registry, CanValidate, TracksRun, TracksUpdates):
     def __init__(
         self,
         name: str,
-        type: str | list[type[Registry]],
+        type: str | list[type[Record]],
         unit: str | None,
         description: str | None,
         synonyms: str | None,
@@ -1595,7 +1579,7 @@ class Feature(Registry, CanValidate, TracksRun, TracksUpdates):
         pass
 
 
-class FeatureValue(Registry, TracksRun):
+class FeatureValue(Record, TracksRun):
     """Non-categorical features values.
 
     Categorical feature values are stored in their respective registries:
@@ -1605,7 +1589,7 @@ class FeatureValue(Registry, TracksRun):
     not by an ontological hierarchy.
     """
 
-    class Meta(Registry.Meta, TracksRun.Meta):
+    class Meta(Record.Meta, TracksRun.Meta):
         abstract = False
         unique_together = ("feature", "value")
 
@@ -1613,7 +1597,7 @@ class FeatureValue(Registry, TracksRun):
     value: Any = models.JSONField()
 
 
-class FeatureSet(Registry, TracksRun):
+class FeatureSet(Record, TracksRun):
     """Feature sets.
 
     Stores references to sets of :class:`~lamindb.Feature` and other registries
@@ -1632,7 +1616,7 @@ class FeatureSet(Registry, TracksRun):
         These reasons do not hold for label sets. Hence, LaminDB does not model label sets.
 
     Args:
-        features: `Iterable[Registry]` An iterable of :class:`~lamindb.Feature`
+        features: `Iterable[Record]` An iterable of :class:`~lamindb.Feature`
             records to hash, e.g., `[Feature(...), Feature(...)]`. Is turned into
             a set upon instantiation. If you'd like to pass values, use
             :meth:`~lamindb.FeatureSet.from_values` or
@@ -1682,7 +1666,7 @@ class FeatureSet(Registry, TracksRun):
         >>> artifact.features.add_values(features)
     """
 
-    class Meta(Registry.Meta, TracksRun.Meta, TracksUpdates.Meta):
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
         abstract = False
 
     id: int = models.AutoField(primary_key=True)
@@ -1711,7 +1695,7 @@ class FeatureSet(Registry, TracksRun):
     @overload
     def __init__(
         self,
-        features: Iterable[Registry],
+        features: Iterable[Record],
         dtype: str | None = None,
         name: str | None = None,
     ):
@@ -1739,8 +1723,8 @@ class FeatureSet(Registry, TracksRun):
         type: str | None = None,
         name: str | None = None,
         mute: bool = False,
-        organism: Registry | str | None = None,
-        public_source: Registry | None = None,
+        organism: Record | str | None = None,
+        public_source: Record | None = None,
         raise_validation_error: bool = True,
     ) -> FeatureSet:
         """Create feature set for validated features.
@@ -1776,8 +1760,8 @@ class FeatureSet(Registry, TracksRun):
         field: FieldAttr = Feature.name,
         name: str | None = None,
         mute: bool = False,
-        organism: Registry | str | None = None,
-        public_source: Registry | None = None,
+        organism: Record | str | None = None,
+        public_source: Record | None = None,
     ) -> FeatureSet | None:
         """Create feature set for validated features."""
         pass
@@ -1792,7 +1776,7 @@ class FeatureSet(Registry, TracksRun):
         pass
 
 
-class Artifact(Registry, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpdates):
+class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpdates):
     """Artifacts: datasets & models stored as files, folders, or arrays.
 
     Artifacts manage data in local or remote storage.
@@ -1893,7 +1877,7 @@ class Artifact(Registry, HasFeatures, HasParams, IsVersioned, TracksRun, TracksU
 
     """
 
-    class Meta(Registry.Meta, IsVersioned.Meta, TracksRun.Meta, TracksUpdates.Meta):
+    class Meta(Record.Meta, IsVersioned.Meta, TracksRun.Meta, TracksUpdates.Meta):
         abstract = False
 
     _len_full_uid: int = 20
@@ -2334,7 +2318,7 @@ delattr(Artifact, "get_visibility_display")
 delattr(Artifact, "get_type_display")
 
 
-class Collection(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
+class Collection(Record, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
     """Collections of artifacts.
 
     For more info: :doc:`/tutorial`.
@@ -2378,7 +2362,7 @@ class Collection(Registry, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
         >>> assert new_collection.version == "2"
     """
 
-    class Meta(Registry.Meta, IsVersioned.Meta, TracksRun.Meta, TracksUpdates.Meta):
+    class Meta(Record.Meta, IsVersioned.Meta, TracksRun.Meta, TracksUpdates.Meta):
         abstract = False
 
     _len_full_uid: int = 20
@@ -2609,14 +2593,14 @@ class LinkORM:
     pass
 
 
-class FeatureSetFeature(Registry, LinkORM):
+class FeatureSetFeature(Record, LinkORM):
     id: int = models.BigAutoField(primary_key=True)
     # we follow the lower() case convention rather than snake case for link models
     featureset: FeatureSet = models.ForeignKey(FeatureSet, CASCADE, related_name="+")
     feature: Feature = models.ForeignKey(Feature, PROTECT, related_name="+")
 
 
-class ArtifactFeatureSet(Registry, LinkORM, TracksRun):
+class ArtifactFeatureSet(Record, LinkORM, TracksRun):
     id: int = models.BigAutoField(primary_key=True)
     artifact: Artifact = models.ForeignKey(
         Artifact, CASCADE, related_name="feature_set_links"
@@ -2634,7 +2618,7 @@ class ArtifactFeatureSet(Registry, LinkORM, TracksRun):
         unique_together = ("artifact", "featureset")
 
 
-class CollectionFeatureSet(Registry, LinkORM, TracksRun):
+class CollectionFeatureSet(Record, LinkORM, TracksRun):
     id: int = models.BigAutoField(primary_key=True)
     collection = models.ForeignKey(
         Collection, CASCADE, related_name="feature_set_links"
@@ -2652,7 +2636,7 @@ class CollectionFeatureSet(Registry, LinkORM, TracksRun):
         unique_together = ("collection", "featureset")
 
 
-class CollectionArtifact(Registry, LinkORM, TracksRun):
+class CollectionArtifact(Record, LinkORM, TracksRun):
     id: int = models.BigAutoField(primary_key=True)
     collection: Collection = models.ForeignKey(
         Collection, CASCADE, related_name="artifact_links"
@@ -2665,7 +2649,7 @@ class CollectionArtifact(Registry, LinkORM, TracksRun):
         unique_together = ("collection", "artifact")
 
 
-class ArtifactULabel(Registry, LinkORM, TracksRun):
+class ArtifactULabel(Record, LinkORM, TracksRun):
     id: int = models.BigAutoField(primary_key=True)
     artifact: Artifact = models.ForeignKey(
         Artifact, CASCADE, related_name="ulabel_links"
@@ -2681,7 +2665,7 @@ class ArtifactULabel(Registry, LinkORM, TracksRun):
         unique_together = ("artifact", "ulabel")
 
 
-class CollectionULabel(Registry, LinkORM, TracksRun):
+class CollectionULabel(Record, LinkORM, TracksRun):
     id: int = models.BigAutoField(primary_key=True)
     collection: Collection = models.ForeignKey(
         Collection, CASCADE, related_name="ulabel_links"
@@ -2697,7 +2681,7 @@ class CollectionULabel(Registry, LinkORM, TracksRun):
         unique_together = ("collection", "ulabel")
 
 
-class ArtifactFeatureValue(Registry, LinkORM, TracksRun):
+class ArtifactFeatureValue(Record, LinkORM, TracksRun):
     id: int = models.BigAutoField(primary_key=True)
     artifact: Artifact = models.ForeignKey(Artifact, CASCADE, related_name="+")
     # we follow the lower() case convention rather than snake case for link models
@@ -2707,7 +2691,7 @@ class ArtifactFeatureValue(Registry, LinkORM, TracksRun):
         unique_together = ("artifact", "featurevalue")
 
 
-class RunParamValue(Registry, LinkORM):
+class RunParamValue(Record, LinkORM):
     id: int = models.BigAutoField(primary_key=True)
     run: Run = models.ForeignKey(Run, CASCADE, related_name="+")
     # we follow the lower() case convention rather than snake case for link models
@@ -2717,7 +2701,7 @@ class RunParamValue(Registry, LinkORM):
         unique_together = ("run", "paramvalue")
 
 
-class ArtifactParamValue(Registry, LinkORM):
+class ArtifactParamValue(Record, LinkORM):
     id: int = models.BigAutoField(primary_key=True)
     artifact: Artifact = models.ForeignKey(Artifact, CASCADE, related_name="+")
     # we follow the lower() case convention rather than snake case for link models
@@ -2727,7 +2711,7 @@ class ArtifactParamValue(Registry, LinkORM):
         unique_together = ("artifact", "paramvalue")
 
 
-# class Migration(Registry):
+# class Migration(Record):
 #     app = CharField(max_length=255)
 #     name = CharField(max_length=255)
 #     applied: datetime = models.DateTimeField()
@@ -2754,7 +2738,7 @@ def format_field_value(value: datetime | str | Any) -> Any:
 
 
 def __repr__(
-    self: Registry, include_foreign_keys: bool = True, exclude_field_names=None
+    self: Record, include_foreign_keys: bool = True, exclude_field_names=None
 ) -> str:
     if exclude_field_names is None:
         exclude_field_names = ["id", "created_at"]
@@ -2790,7 +2774,7 @@ def __repr__(
 # below is code to further format the repr of a record
 #
 # def format_repr(
-#     record: Registry, exclude_field_names: str | list[str] | None = None
+#     record: Record, exclude_field_names: str | list[str] | None = None
 # ) -> str:
 #     if isinstance(exclude_field_names, str):
 #         exclude_field_names = [exclude_field_names]
@@ -2802,8 +2786,8 @@ def __repr__(
 #     )
 
 
-Registry.__repr__ = __repr__  # type: ignore
-Registry.__str__ = __repr__  # type: ignore
+Record.__repr__ = __repr__  # type: ignore
+Record.__str__ = __repr__  # type: ignore
 
 
 def deferred_attribute__repr__(self):
@@ -2811,3 +2795,6 @@ def deferred_attribute__repr__(self):
 
 
 FieldAttr.__repr__ = deferred_attribute__repr__  # type: ignore
+
+
+Registry = Record  # backward compat
