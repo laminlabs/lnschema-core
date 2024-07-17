@@ -616,9 +616,7 @@ class RecordMeta(ModelBase):
             >>> ln.ULabel(name="my ulabel").save()
             >>> ulabel = ln.ULabel.filter(name="my ulabel").one()
         """
-        from lamindb._filter import filter
-
-        return filter(cls, **expressions)
+        pass
 
     def get(cls, idlike: int | str) -> Record:
         """Get a single record.
@@ -636,16 +634,7 @@ class RecordMeta(ModelBase):
         Examples:
             >>> ulabel = ln.ULabel.get("2riu039")
         """
-        from lamindb._filter import filter
-
-        if isinstance(idlike, int):
-            return filter(cls, id=idlike).one()
-        else:
-            qs = filter(cls, uid__startswith=idlike)
-            if issubclass(cls, IsVersioned):
-                return qs.latest_version().one()
-            else:
-                return qs.one()
+        pass
 
     def df(
         cls, include: str | list[str] | None = None, join: str = "inner"
@@ -667,12 +656,7 @@ class RecordMeta(ModelBase):
             >>> ln.save(labels)
             >>> ln.ULabel.filter().df(include=["created_by__name"])
         """
-        from lamindb._filter import filter
-
-        query_set = filter(cls)
-        if hasattr(cls, "updated_at"):
-            query_set = query_set.order_by("-updated_at")
-        return query_set.df(include=include, join=join)
+        pass
 
     def search(
         cls,
