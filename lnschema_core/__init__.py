@@ -1,6 +1,6 @@
 """LaminDB's core registries."""
 
-__version__ = "0.70.1"
+__version__ = "0.70.2"
 
 
 from lamindb_setup import _check_instance_setup
@@ -14,10 +14,12 @@ if _check_instance_setup():
         Feature,
         FeatureSet,
         HasParents,
-        Registry,
+        Record,
         Run,
         Storage,
         Transform,
         ULabel,
         User,
     )
+
+    Registry = Record  # backward compat
