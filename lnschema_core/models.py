@@ -553,7 +553,18 @@ class RecordMeta(ModelBase):
             for field in cls._meta.get_fields()
             if not (isinstance(field, ManyToOneRel) or isinstance(field, ManyToManyRel))
         ]
-        non_relational_fields = sorted(non_relational_fields)
+
+        # We prefer having the provenance fields at the end just like we do in the docs
+        provenance_fields = {"created_at", "created_by", "updated_at"}
+        non_relational_fields = non_relational_fields[:] = [
+            s
+            for s in non_relational_fields
+            if not any(field in s for field in provenance_fields)
+        ] + [
+            s
+            for s in non_relational_fields
+            if any(field in s for field in provenance_fields)
+        ]
 
         repr_str += f"  {colors.italic('Primitive fields')}\n"
         if non_relational_fields:
@@ -592,7 +603,7 @@ class RecordMeta(ModelBase):
             for field in cls._meta.get_fields()
             if isinstance(field, ManyToManyRel)
         ]
-        relational_fields = sorted(many_to_one_rel + many_to_many_rel)
+        relational_fields = many_to_one_rel + many_to_many_rel
 
         non_bionty_fields = [
             field for field in relational_fields if "bionty" not in field
