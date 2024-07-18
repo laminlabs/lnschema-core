@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import builtins
+import re
 from datetime import datetime
 from typing import (
     TYPE_CHECKING,
@@ -541,8 +542,8 @@ class RecordMeta(ModelBase):
             if isinstance(field, ForeignKey)
         ]
 
-        get_type_str = (
-            lambda field: f": {cls._meta.get_field(field).related_model.__name__}"
+        _get_type_for_field = (
+            lambda field: f"{cls._meta.get_field(field).related_model.__name__}"
         )
 
         # Provenance
@@ -550,45 +551,46 @@ class RecordMeta(ModelBase):
         if foreign_key_fields:
             related_msg = "".join(
                 [
-                    f"    .{field_name}{get_type_str(field_name)}\n"
+                    f"    .{field_name}: {_get_type_for_field(field_name)}\n"
                     for field_name in foreign_key_fields
                 ]
             )
             repr_str += related_msg
 
         # Relationships
+        def _get_related_field_type(field) -> str:
+            field_type = (
+                field.related_model.__get_name_with_schema__()
+                .replace("Artifact", "")
+                .replace("Collection", "")
+            )
+            return (
+                _get_type_for_field(field.name)
+                if not field_type.strip()
+                else field_type
+            )
+
         many_to_one_rel = [
-            field.name
+            f"    .{field.name.replace('_links', '')}: {_get_related_field_type(field)}\n"
             for field in cls._meta.get_fields()
             if isinstance(field, ManyToOneRel)
+            and not field.name.endswith(
+                "_links"
+            )  # we're filtering the _links out to not clutter with duplications
         ]
 
-        # We do not want to duplicate relationship fields so we remove all *_links fields.
-        many_to_one_rel = list(
-            filter(lambda field: not field.endswith("_links"), many_to_one_rel)
-        )
-
         if many_to_one_rel:
-            repr_str += f"  {colors.italic('Many-to-one relationships')}\n"
-            many_to_one_msg = "".join(
-                f"    .{field_name}{get_type_str(field_name)}\n"
-                for field_name in many_to_one_rel
-            )
-            repr_str += many_to_one_msg
+            repr_str += f"  {colors.italic('Relational fields')}\n"
+            repr_str += "".join(many_to_one_rel)
 
         many_to_many_rel = [
-            field.name
+            f"    .{field.name.replace('_links', '')}: {_get_related_field_type(field)}\n"
             for field in cls._meta.get_fields()
             if isinstance(field, ManyToManyRel)
         ]
 
         if many_to_many_rel:
-            repr_str += f"  {colors.italic('Many-to-many relationships')}\n"
-            many_to_many_msg = "".join(
-                f"    .{field_name}{get_type_str(field_name)}\n"
-                for field_name in many_to_many_rel
-            )
-            repr_str += many_to_many_msg
+            repr_str += "".join(many_to_many_rel)
 
         repr_str = repr_str.rstrip("\n")
 
