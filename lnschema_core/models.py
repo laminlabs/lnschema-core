@@ -586,21 +586,26 @@ class RecordMeta(ModelBase):
                 "_links"
             )  # we're filtering the _links out to not clutter with duplications
         ]
-        many_to_one_rel = sorted(many_to_one_rel)
-
-        if many_to_one_rel:
-            repr_str += f"  {colors.italic('Relational fields')}\n"
-            repr_str += "".join(many_to_one_rel)
 
         many_to_many_rel = [
             f"    .{field.name.replace('_links', '')}: {_get_related_field_type(field)}\n"
             for field in cls._meta.get_fields()
             if isinstance(field, ManyToManyRel)
         ]
-        many_to_many_rel = sorted(many_to_many_rel)
+        relational_fields = sorted(many_to_one_rel + many_to_many_rel)
 
-        if many_to_many_rel:
-            repr_str += "".join(many_to_many_rel)
+        non_bionty_fields = [
+            field for field in relational_fields if "bionty" not in field
+        ]
+        bionty_fields = [field for field in relational_fields if "bionty" in field]
+
+        if non_bionty_fields:
+            repr_str += f"  {colors.italic('Relational fields')}\n"
+            repr_str += "".join(non_bionty_fields)
+
+        if bionty_fields:
+            repr_str += f"  {colors.italic('Bionty fields')}\n"
+            repr_str += "".join(bionty_fields)
 
         repr_str = repr_str.rstrip("\n")
 
