@@ -551,11 +551,15 @@ class RecordMeta(ModelBase):
         non_relational_fields = [
             field.name
             for field in cls._meta.get_fields()
-            if not (isinstance(field, ManyToOneRel) or isinstance(field, ManyToManyRel))
+            if not (
+                isinstance(field, ManyToOneRel)
+                or isinstance(field, ManyToManyRel)
+                or isinstance(field, ForeignKey)
+            )
         ]
 
         # We prefer having the provenance fields at the end just like we do in the docs
-        provenance_fields = {"created_at", "created_by", "updated_at"}
+        provenance_fields = {"created_at", "updated_at"}
         non_relational_fields = non_relational_fields[:] = [
             s
             for s in non_relational_fields
@@ -589,32 +593,23 @@ class RecordMeta(ModelBase):
                 else field_type
             )
 
-        many_to_one_rel_fields = [
+        relational_fields = [
             field
             for field in cls._meta.get_fields()
-            if isinstance(field, ManyToOneRel)
+            if (
+                isinstance(field, ManyToOneRel)
+                or isinstance(field, ManyToManyRel)
+                or isinstance(field, ForeignKey)
+            )
             and not field.name.endswith(
                 "_links"
             )  # we're filtering the _links out to not clutter with duplications
         ]
-        many_to_one_rel_formatted = [
-            f"    .{field.name.replace('_links', '')}: {_get_related_field_type(field)}\n"
-            for field in many_to_one_rel_fields
-        ]
 
-        many_to_many_rel_fields = [
-            field
-            for field in cls._meta.get_fields()
-            if isinstance(field, ManyToManyRel)
-        ]
-        many_to_many_rel_formatted = [
+        relational_fields_formatted = [
             f"    .{field.name.replace('_links', '')}: {_get_related_field_type(field)}\n"
-            for field in many_to_many_rel_fields
+            for field in relational_fields
         ]
-
-        relational_fields_formatted = (
-            many_to_one_rel_formatted + many_to_many_rel_formatted
-        )
 
         external_schemas = set()
         for field in relational_fields_formatted:
@@ -629,18 +624,21 @@ class RecordMeta(ModelBase):
             if len(field.split(":")[1].split(".")) < 2
         ]
 
-        if relational_fields_formatted:
+        if non_external_schema_fields:
             repr_str += f"  {colors.italic('Relational fields')}\n"
             repr_str += "".join(non_external_schema_fields)
 
-        for ext_schema in external_schemas:
-            ext_schema_fields = [
-                field for field in relational_fields_formatted if ext_schema in field
-            ]
+        if external_schemas:
+            for ext_schema in external_schemas:
+                ext_schema_fields = [
+                    field
+                    for field in relational_fields_formatted
+                    if ext_schema in field
+                ]
 
-            if ext_schema_fields:
-                repr_str += f"  {colors.italic(f'{ext_schema} fields')}\n"
-                repr_str += "".join(ext_schema_fields)
+                if ext_schema_fields:
+                    repr_str += f"  {colors.italic(f'{ext_schema} fields')}\n"
+                    repr_str += "".join(ext_schema_fields)
 
         repr_str = repr_str.rstrip("\n")
 
