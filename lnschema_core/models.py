@@ -1766,7 +1766,7 @@ class FeatureSet(Record, TracksRun):
         """Create feature set for validated features."""
         pass
 
-    def save(self, *args, **kwargs) -> None:
+    def save(self, *args, **kwargs) -> FeatureSet:
         """Save."""
         pass
 
@@ -2288,7 +2288,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
         """
         pass
 
-    def save(self, upload: bool | None = None, **kwargs) -> None:
+    def save(self, upload: bool | None = None, **kwargs) -> Artifact:
         """Save to database & storage.
 
         Args:
@@ -2557,7 +2557,7 @@ class Collection(Record, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
         """
         pass
 
-    def save(self, using: str | None = None) -> None:
+    def save(self, using: str | None = None) -> Collection:
         """Save the collection and underlying artifacts to database & storage.
 
         Args:
