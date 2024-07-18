@@ -530,34 +530,42 @@ class RecordMeta(ModelBase):
     def __repr__(cls) -> str:
         repr_str = f"{colors.green(cls.__name__)}\n"
 
+        def _get_type_for_field(field_name: str) -> str:
+            field = cls._meta.get_field(field_name)
+            related_model_name = (
+                field.related_model.__name__
+                if hasattr(field, "related_model") and field.related_model
+                else None
+            )
+            return (
+                related_model_name if related_model_name else field.get_internal_type()
+            )
+
+        # Primitive fields
         fields = cls._meta.fields
-        foreign_key_fields = []
+        non_relational_fields = []
         for field in fields:
             if field.is_relation:
-                foreign_key_fields.append(field.name)
+                non_relational_fields.append(field.name)
 
-        foreign_key_fields = [
+        non_relational_fields = [
             field.name
             for field in cls._meta.get_fields()
-            if isinstance(field, ForeignKey)
+            if not (isinstance(field, ManyToOneRel) or isinstance(field, ManyToManyRel))
         ]
+        non_relational_fields = sorted(non_relational_fields)
 
-        _get_type_for_field = (
-            lambda field: f"{cls._meta.get_field(field).related_model.__name__}"
-        )
-
-        # Provenance
-        repr_str += f"  {colors.italic('Provenance')}\n"
-        if foreign_key_fields:
+        repr_str += f"  {colors.italic('Primitive fields')}\n"
+        if non_relational_fields:
             related_msg = "".join(
                 [
                     f"    .{field_name}: {_get_type_for_field(field_name)}\n"
-                    for field_name in foreign_key_fields
+                    for field_name in non_relational_fields
                 ]
             )
             repr_str += related_msg
 
-        # Relationships
+        # Relational fields
         def _get_related_field_type(field) -> str:
             field_type = (
                 field.related_model.__get_name_with_schema__()
@@ -578,6 +586,7 @@ class RecordMeta(ModelBase):
                 "_links"
             )  # we're filtering the _links out to not clutter with duplications
         ]
+        many_to_one_rel = sorted(many_to_one_rel)
 
         if many_to_one_rel:
             repr_str += f"  {colors.italic('Relational fields')}\n"
@@ -588,6 +597,7 @@ class RecordMeta(ModelBase):
             for field in cls._meta.get_fields()
             if isinstance(field, ManyToManyRel)
         ]
+        many_to_many_rel = sorted(many_to_many_rel)
 
         if many_to_many_rel:
             repr_str += "".join(many_to_many_rel)
