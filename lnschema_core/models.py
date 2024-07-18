@@ -589,34 +589,58 @@ class RecordMeta(ModelBase):
                 else field_type
             )
 
-        many_to_one_rel = [
-            f"    .{field.name.replace('_links', '')}: {_get_related_field_type(field)}\n"
+        many_to_one_rel_fields = [
+            field
             for field in cls._meta.get_fields()
             if isinstance(field, ManyToOneRel)
             and not field.name.endswith(
                 "_links"
             )  # we're filtering the _links out to not clutter with duplications
         ]
-
-        many_to_many_rel = [
+        many_to_one_rel_formatted = [
             f"    .{field.name.replace('_links', '')}: {_get_related_field_type(field)}\n"
+            for field in many_to_one_rel_fields
+        ]
+
+        many_to_many_rel_fields = [
+            field
             for field in cls._meta.get_fields()
             if isinstance(field, ManyToManyRel)
         ]
-        relational_fields = many_to_one_rel + many_to_many_rel
-
-        non_bionty_fields = [
-            field for field in relational_fields if "bionty" not in field
+        many_to_many_rel_formatted = [
+            f"    .{field.name.replace('_links', '')}: {_get_related_field_type(field)}\n"
+            for field in many_to_many_rel_fields
         ]
-        bionty_fields = [field for field in relational_fields if "bionty" in field]
 
-        if non_bionty_fields:
+        relational_fields_formatted = (
+            many_to_one_rel_formatted + many_to_many_rel_formatted
+        )
+
+        external_schemas = set()
+        for field in relational_fields_formatted:
+            # There is an external schema
+            field_type = field.split(":")[1].split()[0]
+            if len(field_type.split(".")) >= 2:
+                external_schemas.add(field_type.split(".")[0])
+
+        non_external_schema_fields = [
+            field
+            for field in relational_fields_formatted
+            if len(field.split(":")[1].split(".")) < 2
+        ]
+
+        if relational_fields_formatted:
             repr_str += f"  {colors.italic('Relational fields')}\n"
-            repr_str += "".join(non_bionty_fields)
+            repr_str += "".join(non_external_schema_fields)
 
-        if bionty_fields:
-            repr_str += f"  {colors.italic('Bionty fields')}\n"
-            repr_str += "".join(bionty_fields)
+        for ext_schema in external_schemas:
+            ext_schema_fields = [
+                field for field in relational_fields_formatted if ext_schema in field
+            ]
+
+            if ext_schema_fields:
+                repr_str += f"  {colors.italic(f'{ext_schema} fields')}\n"
+                repr_str += "".join(ext_schema_fields)
 
         repr_str = repr_str.rstrip("\n")
 
