@@ -583,7 +583,7 @@ class RecordMeta(ModelBase):
 
         non_relational_fields = _reorder_fields_by_class(non_relational_fields)
 
-        repr_str += f"  {colors.italic('Primitive fields')}\n"
+        repr_str += f"  {colors.italic('Basic fields')}\n"
         if non_relational_fields:
             related_msg = "".join(
                 [
