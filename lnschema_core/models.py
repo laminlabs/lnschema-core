@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import builtins
-import re
 from datetime import datetime
 from typing import (
     TYPE_CHECKING,
@@ -13,7 +12,7 @@ from typing import (
 )
 
 from django.db import models
-from django.db.models import CASCADE, PROTECT
+from django.db.models import CASCADE, PROTECT, Field
 from django.db.models.base import ModelBase
 from django.db.models.fields.related import (
     ForeignKey,
@@ -541,6 +540,29 @@ class RecordMeta(ModelBase):
                 related_model_name if related_model_name else field.get_internal_type()
             )
 
+        def _get_base_class_fields(cls: models.Model) -> list[str]:
+            base_fields = []
+            for base in cls.__bases__:
+                if hasattr(base, "_meta"):
+                    base_fields.extend(
+                        [field.name for field in base._meta.get_fields()]
+                    )
+            return base_fields
+
+        def _reorder_fields_by_class(fields_to_order: list[Field]) -> list[Field]:
+            """Reorders the fields so that base class fields come last."""
+            non_base_class_fields = [
+                field
+                for field in fields_to_order
+                if field.name not in _get_base_class_fields(cls)
+            ]
+            found_base_class_fields = [
+                field
+                for field in fields_to_order
+                if field.name in _get_base_class_fields(cls)
+            ]
+            return non_base_class_fields + found_base_class_fields
+
         # Primitive fields
         fields = cls._meta.fields
         non_relational_fields = []
@@ -549,32 +571,23 @@ class RecordMeta(ModelBase):
                 non_relational_fields.append(field.name)
 
         non_relational_fields = [
-            field.name
+            field
             for field in cls._meta.get_fields()
             if not (
                 isinstance(field, ManyToOneRel)
                 or isinstance(field, ManyToManyRel)
+                or isinstance(field, ManyToManyField)
                 or isinstance(field, ForeignKey)
             )
         ]
 
-        # We prefer having the provenance fields at the end just like we do in the docs
-        provenance_fields = {"created_at", "updated_at"}
-        non_relational_fields = non_relational_fields[:] = [
-            s
-            for s in non_relational_fields
-            if not any(field in s for field in provenance_fields)
-        ] + [
-            s
-            for s in non_relational_fields
-            if any(field in s for field in provenance_fields)
-        ]
+        non_relational_fields = _reorder_fields_by_class(non_relational_fields)
 
         repr_str += f"  {colors.italic('Primitive fields')}\n"
         if non_relational_fields:
             related_msg = "".join(
                 [
-                    f"    .{field_name}: {_get_type_for_field(field_name)}\n"
+                    f"    .{field_name.name}: {_get_type_for_field(field_name.name)}\n"
                     for field_name in non_relational_fields
                 ]
             )
@@ -593,22 +606,49 @@ class RecordMeta(ModelBase):
                 else field_type
             )
 
-        relational_fields = [
+        class_specific_relational_fields = [
             field
-            for field in cls._meta.get_fields()
+            for field in cls._meta.fields + cls._meta.many_to_many
             if (
                 isinstance(field, ManyToOneRel)
                 or isinstance(field, ManyToManyRel)
+                or isinstance(field, ManyToManyField)
                 or isinstance(field, ForeignKey)
             )
             and not field.name.endswith(
                 "_links"
             )  # we're filtering the _links out to not clutter with duplications
         ]
+        non_class_specific_relational_fields = [
+            field
+            for field in cls._meta.get_fields()
+            if (
+                isinstance(field, ManyToOneRel)
+                or isinstance(field, ManyToManyRel)
+                or isinstance(field, ManyToManyField)
+                or isinstance(field, ForeignKey)
+            )
+            and not field.name.endswith(
+                "_links"
+            )  # we're filtering the _links out to not clutter with duplications
+        ]
+        non_class_specific_relational_fields = _reorder_fields_by_class(
+            non_class_specific_relational_fields
+        )
+
+        # Ensure that class specific fields (e.g. Artifact) come before non-class specific fields (e.g. collection)
+        filtered_non_class_specific = [
+            field
+            for field in non_class_specific_relational_fields
+            if field not in class_specific_relational_fields
+        ]
+        ordered_relational_fields = (
+            class_specific_relational_fields + filtered_non_class_specific
+        )
 
         relational_fields_formatted = [
             f"    .{field.name.replace('_links', '')}: {_get_related_field_type(field)}\n"
-            for field in relational_fields
+            for field in ordered_relational_fields
         ]
 
         external_schemas = set()
@@ -629,6 +669,12 @@ class RecordMeta(ModelBase):
             repr_str += "".join(non_external_schema_fields)
 
         if external_schemas:
+            # We want Bionty to show up before other schemas
+            external_schemas = (
+                ["bionty"] + sorted(external_schemas - {"bionty"})  # type: ignore
+                if "bionty" in external_schemas
+                else sorted(external_schemas)
+            )
             for ext_schema in external_schemas:
                 ext_schema_fields = [
                     field
@@ -637,7 +683,9 @@ class RecordMeta(ModelBase):
                 ]
 
                 if ext_schema_fields:
-                    repr_str += f"  {colors.italic(f'{ext_schema} fields')}\n"
+                    repr_str += (
+                        f"  {colors.italic(f'{ext_schema.capitalize()} fields')}\n"
+                    )
                     repr_str += "".join(ext_schema_fields)
 
         repr_str = repr_str.rstrip("\n")
