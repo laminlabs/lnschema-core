@@ -353,30 +353,6 @@ class CanValidate:
         """
         pass
 
-    @classmethod
-    def map_synonyms(
-        cls,
-        synonyms: Iterable,
-        *,
-        return_mapper: bool = False,
-        case_sensitive: bool = False,
-        keep: Literal["first", "last", False] = "first",
-        synonyms_field: str = "synonyms",
-        field: str | None = None,
-        **kwargs,
-    ) -> list[str] | dict[str, str]:
-        """{}."""
-        logger.warning("`map_synonyms()` is deprecated, use `.standardize()`!'")
-        return cls.standardize(
-            values=synonyms,
-            return_mapper=return_mapper,
-            case_sensitive=case_sensitive,
-            keep=keep,
-            synonyms_field=synonyms_field,
-            field=field,
-            **kwargs,
-        )
-
     def add_synonym(
         self,
         synonym: str | ListLike,
@@ -2370,7 +2346,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
         """
         pass
 
-    def backed(
+    def open(
         self, is_run_input: bool | None = None
     ) -> AnnDataAccessor | BackedAccessor | SOMACollection | SOMAExperiment:
         """Return a cloud-backed data object.
@@ -2383,7 +2359,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
             Read AnnData in backed mode from cloud:
 
             >>> artifact = ln.Artifact.filter(key="lndb-storage/pbmc68k.h5ad").one()
-            >>> artifact.backed()
+            >>> artifact.open()
             AnnData object with n_obs × n_vars = 70 × 765 backed at 's3://lamindb-ci/lndb-storage/pbmc68k.h5ad'
         """
         pass
