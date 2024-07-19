@@ -624,6 +624,15 @@ class RecordMeta(ModelBase):
             class_specific_relational_fields + filtered_non_class_specific
         )
 
+        non_external_schema_fields = []
+        external_schema_fields = []
+        for field in ordered_relational_fields:
+            field_name = repr(field).split(": ")[1][:-1]
+            if field_name.count(".") == 1 and "lnschema_core" not in field_name:
+                external_schema_fields.append(field)
+            else:
+                non_external_schema_fields.append(field)
+
         def _get_related_field_type(field) -> str:
             field_type = (
                 field.related_model.__get_name_with_schema__()
@@ -640,30 +649,25 @@ class RecordMeta(ModelBase):
                 else field_type
             )
 
-        relational_fields_formatted = [
+        non_external_schema_fields_formatted = [
             f"    .{field.name.replace('_links', '')}: {_get_related_field_type(field)}\n"
-            for field in ordered_relational_fields
+            for field in non_external_schema_fields
+        ]
+        external_schema_fields_formatted = [
+            f"    .{field.name.replace('_links', '')}: {_get_related_field_type(field)}\n"
+            for field in external_schema_fields
         ]
 
         # Non-external relational fields
-        non_external_schema_fields = [
-            field
-            for field in relational_fields_formatted
-            # Non-external schemas do not have a prefix -> the split has less than
-            if len(field.split(":")[1].split(".")) < 2
-        ]
-
         if non_external_schema_fields:
             repr_str += f"  {colors.italic('Relational fields')}\n"
-            repr_str += "".join(non_external_schema_fields)
+            repr_str += "".join(non_external_schema_fields_formatted)
 
         # External relational fields
         external_schemas = set()
-        for field in relational_fields_formatted:
+        for field in external_schema_fields_formatted:
             field_type = field.split(":")[1].split()[0]
-            # External schemas have a prefix -> the split has at least two values
-            if len(field_type.split(".")) >= 2:
-                external_schemas.add(field_type.split(".")[0])
+            external_schemas.add(field_type.split(".")[0])
 
         if external_schemas:
             # We want Bionty to show up before other schemas
@@ -675,7 +679,7 @@ class RecordMeta(ModelBase):
             for ext_schema in external_schemas:
                 ext_schema_fields = [
                     field
-                    for field in relational_fields_formatted
+                    for field in external_schema_fields_formatted
                     if ext_schema in field
                 ]
 
