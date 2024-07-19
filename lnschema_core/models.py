@@ -569,10 +569,10 @@ class RecordMeta(ModelBase):
             ]
             return non_base_class_fields + found_base_class_fields
 
-        # Header
+        # ---Header---
         repr_str = f"{colors.green(cls.__name__)}\n"
 
-        # Basic fields
+        # ---Basic fields---
         basic_fields = [
             field
             for field in cls._meta.get_fields()
@@ -594,7 +594,7 @@ class RecordMeta(ModelBase):
                 ]
             )
 
-        # Relational fields
+        # ---Relational fields---
         relational_fields = (ManyToOneRel, ManyToManyRel, ManyToManyField, ForeignKey)
 
         class_specific_relational_fields = [
@@ -649,6 +649,7 @@ class RecordMeta(ModelBase):
         non_external_schema_fields = [
             field
             for field in relational_fields_formatted
+            # Non-external schemas do not have a prefix -> the split has less than
             if len(field.split(":")[1].split(".")) < 2
         ]
 
