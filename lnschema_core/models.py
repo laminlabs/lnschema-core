@@ -527,7 +527,14 @@ class RecordMeta(ModelBase):
         return result
 
     def __repr__(cls) -> str:
-        repr_str = f"{colors.green(cls.__name__)}\n"
+        """Designed to show schema version when Records are called directly.
+
+        Divided into several parts:
+        1. Header
+        2. Basic fields where we first show class specific fields and then base class fields
+        3. Relational fields where we show class specific relational fields and then base class fields
+        4. External schema fields where we show loaded schemas such as Bionty, wetlab and others
+        """
 
         def _get_type_for_field(field_name: str) -> str:
             field = cls._meta.get_field(field_name)
@@ -541,13 +548,12 @@ class RecordMeta(ModelBase):
             )
 
         def _get_base_class_fields(cls: models.Model) -> list[str]:
-            base_fields = []
-            for base in cls.__bases__:
-                if hasattr(base, "_meta"):
-                    base_fields.extend(
-                        [field.name for field in base._meta.get_fields()]
-                    )
-            return base_fields
+            return [
+                field.name
+                for base in cls.__bases__
+                if hasattr(base, "_meta")
+                for field in base._meta.get_fields()
+            ]
 
         def _reorder_fields_by_class(fields_to_order: list[Field]) -> list[Field]:
             """Reorders the fields so that base class fields come last."""
@@ -563,14 +569,11 @@ class RecordMeta(ModelBase):
             ]
             return non_base_class_fields + found_base_class_fields
 
-        # Primitive fields
-        fields = cls._meta.fields
-        non_relational_fields = []
-        for field in fields:
-            if field.is_relation:
-                non_relational_fields.append(field.name)
+        # Header
+        repr_str = f"{colors.green(cls.__name__)}\n"
 
-        non_relational_fields = [
+        # Basic fields
+        basic_fields = [
             field
             for field in cls._meta.get_fields()
             if not (
@@ -580,57 +583,32 @@ class RecordMeta(ModelBase):
                 or isinstance(field, ForeignKey)
             )
         ]
-
-        non_relational_fields = _reorder_fields_by_class(non_relational_fields)
+        basic_fields = _reorder_fields_by_class(basic_fields)
 
         repr_str += f"  {colors.italic('Basic fields')}\n"
-        if non_relational_fields:
-            related_msg = "".join(
+        if basic_fields:
+            repr_str += "".join(
                 [
                     f"    .{field_name.name}: {_get_type_for_field(field_name.name)}\n"
-                    for field_name in non_relational_fields
+                    for field_name in basic_fields
                 ]
             )
-            repr_str += related_msg
 
         # Relational fields
-        def _get_related_field_type(field) -> str:
-            field_type = (
-                field.related_model.__get_name_with_schema__()
-                .replace("Artifact", "")
-                .replace("Collection", "")
-            )
-            return (
-                _get_type_for_field(field.name)
-                if not field_type.strip()
-                else field_type
-            )
+        relational_fields = (ManyToOneRel, ManyToManyRel, ManyToManyField, ForeignKey)
 
         class_specific_relational_fields = [
             field
             for field in cls._meta.fields + cls._meta.many_to_many
-            if (
-                isinstance(field, ManyToOneRel)
-                or isinstance(field, ManyToManyRel)
-                or isinstance(field, ManyToManyField)
-                or isinstance(field, ForeignKey)
-            )
-            and not field.name.endswith(
-                "_links"
-            )  # we're filtering the _links out to not clutter with duplications
+            if isinstance(field, relational_fields)
+            and not field.name.endswith("_links")
         ]
+
         non_class_specific_relational_fields = [
             field
             for field in cls._meta.get_fields()
-            if (
-                isinstance(field, ManyToOneRel)
-                or isinstance(field, ManyToManyRel)
-                or isinstance(field, ManyToManyField)
-                or isinstance(field, ForeignKey)
-            )
-            and not field.name.endswith(
-                "_links"
-            )  # we're filtering the _links out to not clutter with duplications
+            if isinstance(field, relational_fields)
+            and not field.name.endswith("_links")
         ]
         non_class_specific_relational_fields = _reorder_fields_by_class(
             non_class_specific_relational_fields
@@ -646,18 +624,28 @@ class RecordMeta(ModelBase):
             class_specific_relational_fields + filtered_non_class_specific
         )
 
+        def _get_related_field_type(field) -> str:
+            field_type = (
+                field.related_model.__get_name_with_schema__()
+                .replace(
+                    "Artifact", ""
+                )  # some fields have an unnecessary 'Artifact' in their name
+                .replace(
+                    "Collection", ""
+                )  # some fields have an unnecessary 'Collection' in their name
+            )
+            return (
+                _get_type_for_field(field.name)
+                if not field_type.strip()
+                else field_type
+            )
+
         relational_fields_formatted = [
             f"    .{field.name.replace('_links', '')}: {_get_related_field_type(field)}\n"
             for field in ordered_relational_fields
         ]
 
-        external_schemas = set()
-        for field in relational_fields_formatted:
-            # There is an external schema
-            field_type = field.split(":")[1].split()[0]
-            if len(field_type.split(".")) >= 2:
-                external_schemas.add(field_type.split(".")[0])
-
+        # Non-external relational fields
         non_external_schema_fields = [
             field
             for field in relational_fields_formatted
@@ -667,6 +655,14 @@ class RecordMeta(ModelBase):
         if non_external_schema_fields:
             repr_str += f"  {colors.italic('Relational fields')}\n"
             repr_str += "".join(non_external_schema_fields)
+
+        # External relational fields
+        external_schemas = set()
+        for field in relational_fields_formatted:
+            field_type = field.split(":")[1].split()[0]
+            # External schemas have a prefix -> the split has at least two values
+            if len(field_type.split(".")) >= 2:
+                external_schemas.add(field_type.split(".")[0])
 
         if external_schemas:
             # We want Bionty to show up before other schemas
