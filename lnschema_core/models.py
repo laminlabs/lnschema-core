@@ -750,7 +750,7 @@ class RecordMeta(ModelBase):
         pass
 
     def filter(cls, **expressions) -> QuerySet:
-        """Query records (see :doc:`meta`).
+        """Query records (see :doc:`records`).
 
         Args:
             expressions: Fields and values passed as Django query expressions.
@@ -759,7 +759,7 @@ class RecordMeta(ModelBase):
             A :class:`~lamindb.core.QuerySet`.
 
         See Also:
-            - Guide: :doc:`meta`
+            - Guide: :doc:`records`
             - Django documentation: `Queries <https://docs.djangoproject.com/en/4.2/topics/db/queries/>`__
 
         Examples:
@@ -778,7 +778,7 @@ class RecordMeta(ModelBase):
             A record.
 
         See Also:
-            - Guide: :doc:`meta`
+            - Guide: :doc:`records`
             - Django documentation: `Queries <https://docs.djangoproject.com/en/4.2/topics/db/queries/>`__
 
         Examples:
@@ -2353,7 +2353,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
         """Return a cloud-backed data object.
 
         Notes:
-            For more info, see tutorial: :doc:`/data`.
+            For more info, see tutorial: :doc:`/arrays`.
 
         Examples:
 
