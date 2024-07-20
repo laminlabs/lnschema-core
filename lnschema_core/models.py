@@ -468,6 +468,7 @@ class HasParents:
         pass
 
 
+# rename to Registry once we're through a transition period starting 2024-07-20
 class RecordMeta(ModelBase):
     def __new__(cls, name, bases, attrs, **kwargs):
         new_class = super().__new__(cls, name, bases, attrs, **kwargs)
