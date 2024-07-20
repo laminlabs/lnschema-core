@@ -940,7 +940,7 @@ class HasFeatures:
     Features denote dataset dimensions, i.e., the variables that measure labels
     & numbers.
 
-    Annotate with features & values::
+    Curate with features & values::
 
        artifact.features.add_values({
             "species": organism,  # here, organism is an Organism record
@@ -954,7 +954,7 @@ class HasFeatures:
         ln.Artifact.features.filter(scientist="Barbara McClintock")
 
     Features may or may not be part of the artifact content in storage. For
-    instance, the :class:`~lamindb.Annotate` flow validates the columns of a
+    instance, the :class:`~lamindb.Curate` flow validates the columns of a
     `DataFrame`-like artifact and annotates it with features corresponding to
     these columns. `artifact.features.add_values`, by contrast, does not
     validate the content of the artifact.
@@ -1006,7 +1006,7 @@ class HasParams:
 
     What `.features` is to dataset-like artifacts, `.params` is to model-like artifacts.
 
-    Annotate with params & values::
+    Curate with params & values::
 
         artifact.params.add_values({
             "hidden_size": 32,
@@ -1509,7 +1509,7 @@ class ULabel(Record, HasParents, CanValidate, TracksRun, TracksUpdates):
     Often, a ulabel is measured *within* a dataset. For instance, an artifact
     might characterize 2 species of the Iris flower (`"setosa"` &
     `"versicolor"`) measured by a `"species"` feature. Use the
-    :class:`~lamindb.Annotate` flow to automatically parse, validate, and
+    :class:`~lamindb.Curate` flow to automatically parse, validate, and
     annotate with labels that are contained in `DataFrame` or `AnnData`
     artifacts.
 
@@ -1953,7 +1953,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
         Arrays:
 
         - Table: `.csv`, `.tsv`, `.parquet`, `.ipc` ⟷ `DataFrame`, `pyarrow.Table`
-        - Annotated matrix: `.h5ad`, `.h5mu`, `.zrad` ⟷ `AnnData`, `MuData`
+        - Curated matrix: `.h5ad`, `.h5mu`, `.zrad` ⟷ `AnnData`, `MuData`
         - Generic array: HDF5 group, zarr group, TileDB store ⟷ HDF5, zarr, TileDB loaders
 
         Non-arrays:
