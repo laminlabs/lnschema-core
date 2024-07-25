@@ -225,7 +225,7 @@ class CanValidate:
         *,
         mute: bool = False,
         organism: str | Record | None = None,
-        public_source: Record | None = None,
+        source: Record | None = None,
     ) -> InspectResult:
         """Inspect if values are mappable to a field.
 
@@ -239,7 +239,7 @@ class CanValidate:
                 field names.
             mute: Mute logging.
             organism: An Organism name or record.
-            public_source: A PublicSource record.
+            source: A Source record.
 
         See Also:
             :meth:`~lamindb.core.CanValidate.validate`
@@ -676,7 +676,7 @@ class RecordMeta(ModelBase):
         field: StrField | None = None,
         create: bool = False,
         organism: Record | str | None = None,
-        public_source: Record | None = None,
+        source: Record | None = None,
         mute: bool = False,
     ) -> list[Record]:
         """Bulk create validated records by parsing values for an identifier (a name. n id, etc.).
@@ -687,7 +687,7 @@ class RecordMeta(ModelBase):
             field: A `Record` field to look up, e.g., `bt.CellMarker.name`.
             create: Whether to create records if they don't exist.
             organism: A `bionty.Organism` name or record.
-            public_source: A `bionty.PublicSource` record.
+            source: A `bionty.Source` record.
             mute: Do not show logging.
 
         Returns:
@@ -1874,7 +1874,7 @@ class FeatureSet(Record, TracksRun):
         name: str | None = None,
         mute: bool = False,
         organism: Record | str | None = None,
-        public_source: Record | None = None,
+        source: Record | None = None,
         raise_validation_error: bool = True,
     ) -> FeatureSet:
         """Create feature set for validated features.
@@ -1887,7 +1887,7 @@ class FeatureSet(Record, TracksRun):
                 `"float"` otherwise.
             name: A name.
             organism: An organism to resolve gene mapping.
-            public_source: A public ontology to resolve feature identifier mapping.
+            source: A public ontology to resolve feature identifier mapping.
             raise_validation_error: Whether to raise a validation error if some values are not valid.
 
         Raises:
@@ -1911,7 +1911,7 @@ class FeatureSet(Record, TracksRun):
         name: str | None = None,
         mute: bool = False,
         organism: Record | str | None = None,
-        public_source: Record | None = None,
+        source: Record | None = None,
     ) -> FeatureSet | None:
         """Create feature set for validated features."""
         pass
