@@ -1069,6 +1069,8 @@ class User(Record, CanValidate):
         >>> user
     """
 
+    _name_field: str = "handle"
+
     id: int = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
     uid: str = CharField(unique=True, db_index=True, max_length=8, default=None)
@@ -1153,6 +1155,8 @@ class Storage(Record, TracksRun, TracksUpdates):
 
     class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
         abstract = False
+
+    _name_field: str = "root"
 
     id: int = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
@@ -1278,6 +1282,7 @@ class Transform(Record, HasParents, IsVersioned):
 
     _len_stem_uid: int = 12
     _len_full_uid: int = 16
+    _name_field: str = "name"
 
     id: int = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
@@ -1359,6 +1364,8 @@ class Param(Record, CanValidate, TracksRun, TracksUpdates):
     class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
         abstract = False
 
+    _name_field: str = "name"
+
     name: str = CharField(max_length=100, db_index=True)
     dtype: str = CharField(max_length=64, db_index=True, default=None)
     """Data type ("number", "cat", "int", "float", "bool", "datetime").
@@ -1373,6 +1380,8 @@ class ParamValue(Record):
 
     class Meta:
         unique_together = ("param", "value")
+
+    _name_field: str = "value"
 
     param: Param = models.ForeignKey(Param, CASCADE)
     value: Any = models.JSONField()  # stores float, integer, boolean or datetime
@@ -1423,6 +1432,8 @@ class Run(Record, HasParams):
         >>> ln.track()  # Jupyter notebook metadata is automatically parsed
         >>> ln.core.context.run
     """
+
+    _name_field: str = "started_at"
 
     params: ParamManager = ParamManagerRun  # type: ignore
 
@@ -1559,6 +1570,8 @@ class ULabel(Record, HasParents, CanValidate, TracksRun, TracksUpdates):
     class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
         abstract = False
 
+    _name_field: str = "name"
+
     id: int = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
     uid: str = CharField(unique=True, db_index=True, max_length=8, default=base62_8)
@@ -1668,6 +1681,8 @@ class Feature(Record, CanValidate, TracksRun, TracksUpdates):
     class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
         abstract = False
 
+    _name_field: str = "name"
+
     id: int = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
     uid: str = CharField(unique=True, db_index=True, max_length=12, default=base62_12)
@@ -1742,6 +1757,8 @@ class FeatureValue(Record, TracksRun):
     class Meta(Record.Meta, TracksRun.Meta):
         abstract = False
         unique_together = ("feature", "value")
+
+    _name_field: str = "value"
 
     feature: Feature = models.ForeignKey(Feature, CASCADE, null=True, default=None)
     value: Any = models.JSONField()
@@ -1818,6 +1835,8 @@ class FeatureSet(Record, TracksRun):
 
     class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
         abstract = False
+
+    _name_field: str = "name"
 
     id: int = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
@@ -2034,6 +2053,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
     _len_stem_uid: int = 16
     features: FeatureManager = FeatureManagerArtifact  # type: ignore
     params: ParamManager = ParamManagerArtifact  # type: ignore
+    _name_field: str = "description"
 
     id: int = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
@@ -2518,6 +2538,7 @@ class Collection(Record, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
     _len_full_uid: int = 20
     _len_stem_uid: int = 16
     features = FeatureManagerCollection  # type: ignore
+    _name_field: str = "name"
 
     id: int = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
@@ -2808,7 +2829,7 @@ class ArtifactULabel(Record, LinkORM, TracksRun):
     feature = models.ForeignKey(
         Feature, PROTECT, null=True, default=None, related_name="artifactulabel_links"
     )
-    ulabel_ref_is_name: bool = models.BooleanField(null=True, default=None)
+    label_ref_is_name: bool = models.BooleanField(null=True, default=None)
     feature_ref_is_name: bool = models.BooleanField(null=True, default=None)
 
     class Meta:
@@ -2824,7 +2845,7 @@ class CollectionULabel(Record, LinkORM, TracksRun):
     feature: Feature = models.ForeignKey(
         Feature, PROTECT, null=True, default=None, related_name="collectionulabel_links"
     )
-    ulabel_ref_is_name: bool = models.BooleanField(null=True, default=None)
+    label_ref_is_name: bool = models.BooleanField(null=True, default=None)
     feature_ref_is_name: bool = models.BooleanField(null=True, default=None)
 
     class Meta:
