@@ -125,4 +125,8 @@ class Migration(migrations.Migration):
                 to="lnschema_core.ulabel",
             ),
         ),
+        migrations.RemoveField(
+            model_name="transform",
+            name="latest_report",
+        ),
     ]

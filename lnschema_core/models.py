@@ -1303,10 +1303,6 @@ class Transform(Record, HasParents, IsVersioned):
         default=TransformType.pipeline,
     )
     """Transform type (default `"pipeline"`)."""
-    latest_report: Artifact = models.ForeignKey(
-        "Artifact", PROTECT, default=None, null=True, related_name="latest_report_of"
-    )
-    """Latest run report."""
     source_code: Artifact = models.ForeignKey(
         "Artifact", PROTECT, default=None, null=True, related_name="source_code_of"
     )
