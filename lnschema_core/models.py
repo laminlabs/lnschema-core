@@ -2137,7 +2137,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
     visibility: int = models.SmallIntegerField(
         db_index=True, choices=VisibilityChoice.choices, default=1
     )
-    """Visibility of artifact record in queries & searches (0 default, 1 hidden, 2 trash)."""
+    """Visibility of artifact record in queries & searches (1 default, 1 hidden, -1 trash)."""
     key_is_virtual: bool = models.BooleanField()
     """Indicates whether `key` is virtual or part of an actual file path."""
 
