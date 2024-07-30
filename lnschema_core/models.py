@@ -940,7 +940,7 @@ class HasFeatures:
     Features denote dataset dimensions, i.e., the variables that measure labels
     & numbers.
 
-    Curate with features & values::
+    Annotate with features & values::
 
        artifact.features.add_values({
             "species": organism,  # here, organism is an Organism record
@@ -1006,7 +1006,7 @@ class HasParams:
 
     What `.features` is to dataset-like artifacts, `.params` is to model-like artifacts.
 
-    Curate with params & values::
+    Annotate with params & values::
 
         artifact.params.add_values({
             "hidden_size": 32,
