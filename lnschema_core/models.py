@@ -2774,11 +2774,11 @@ class FeatureSetFeature(Record, LinkORM):
 class ArtifactFeatureSet(Record, LinkORM, TracksRun):
     id: int = models.BigAutoField(primary_key=True)
     artifact: Artifact = models.ForeignKey(
-        Artifact, CASCADE, related_name="feature_set_links"
+        Artifact, CASCADE, related_name="links_feature_set"
     )
     # we follow the lower() case convention rather than snake case for link models
     featureset: FeatureSet = models.ForeignKey(
-        FeatureSet, PROTECT, related_name="artifact_links"
+        FeatureSet, PROTECT, related_name="links_artifact"
     )
     slot: str = CharField(max_length=40, null=True, default=None)
     feature_ref_is_semantic: bool = models.BooleanField(
@@ -2792,11 +2792,11 @@ class ArtifactFeatureSet(Record, LinkORM, TracksRun):
 class CollectionFeatureSet(Record, LinkORM, TracksRun):
     id: int = models.BigAutoField(primary_key=True)
     collection = models.ForeignKey(
-        Collection, CASCADE, related_name="feature_set_links"
+        Collection, CASCADE, related_name="links_feature_set"
     )
     # we follow the lower() case convention rather than snake case for link models
     featureset: FeatureSet = models.ForeignKey(
-        FeatureSet, PROTECT, related_name="collection_links"
+        FeatureSet, PROTECT, related_name="links_collection"
     )
     slot: str = CharField(max_length=50, null=True, default=None)
     feature_ref_is_semantic: bool = models.BooleanField(
@@ -2810,10 +2810,10 @@ class CollectionFeatureSet(Record, LinkORM, TracksRun):
 class CollectionArtifact(Record, LinkORM, TracksRun):
     id: int = models.BigAutoField(primary_key=True)
     collection: Collection = models.ForeignKey(
-        Collection, CASCADE, related_name="artifact_links"
+        Collection, CASCADE, related_name="links_artifact"
     )
     artifact: Artifact = models.ForeignKey(
-        Artifact, PROTECT, related_name="collection_links"
+        Artifact, PROTECT, related_name="links_collection"
     )
 
     class Meta:
@@ -2823,11 +2823,11 @@ class CollectionArtifact(Record, LinkORM, TracksRun):
 class ArtifactULabel(Record, LinkORM, TracksRun):
     id: int = models.BigAutoField(primary_key=True)
     artifact: Artifact = models.ForeignKey(
-        Artifact, CASCADE, related_name="ulabel_links"
+        Artifact, CASCADE, related_name="links_ulabel"
     )
-    ulabel = models.ForeignKey(ULabel, PROTECT, related_name="artifact_links")
+    ulabel = models.ForeignKey(ULabel, PROTECT, related_name="links_artifact")
     feature = models.ForeignKey(
-        Feature, PROTECT, null=True, default=None, related_name="artifactulabel_links"
+        Feature, PROTECT, null=True, default=None, related_name="links_artifactulabel"
     )
     label_ref_is_name: bool = models.BooleanField(null=True, default=None)
     feature_ref_is_name: bool = models.BooleanField(null=True, default=None)
@@ -2839,11 +2839,11 @@ class ArtifactULabel(Record, LinkORM, TracksRun):
 class CollectionULabel(Record, LinkORM, TracksRun):
     id: int = models.BigAutoField(primary_key=True)
     collection: Collection = models.ForeignKey(
-        Collection, CASCADE, related_name="ulabel_links"
+        Collection, CASCADE, related_name="links_ulabel"
     )
-    ulabel: ULabel = models.ForeignKey(ULabel, PROTECT, related_name="collection_links")
+    ulabel: ULabel = models.ForeignKey(ULabel, PROTECT, related_name="links_collection")
     feature: Feature = models.ForeignKey(
-        Feature, PROTECT, null=True, default=None, related_name="collectionulabel_links"
+        Feature, PROTECT, null=True, default=None, related_name="links_collectionulabel"
     )
     label_ref_is_name: bool = models.BooleanField(null=True, default=None)
     feature_ref_is_name: bool = models.BooleanField(null=True, default=None)
