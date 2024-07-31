@@ -46,7 +46,6 @@ def test_registry__repr__artifact(setup_instance):
         .key: CharField
         .suffix: CharField
         .type: CharField
-        ._accessor: CharField
         .size: BigIntegerField
         .hash: CharField
         .hash_type: CharField

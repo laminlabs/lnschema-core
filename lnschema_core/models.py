@@ -552,6 +552,7 @@ class RecordMeta(ModelBase):
                 or isinstance(field, ManyToManyRel)
                 or isinstance(field, ManyToManyField)
                 or isinstance(field, ForeignKey)
+                or field.name.startswith("_")
             )
         ]
         basic_fields = _reorder_fields_by_class(basic_fields)
