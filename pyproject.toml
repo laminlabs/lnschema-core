@@ -12,6 +12,7 @@ classifiers = [
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
 ]
 # mandate zero dependencies
 dependencies = [
@@ -44,7 +45,7 @@ omit = [
 [tool.ruff]
 src = ["src"]
 line-length = 88
-select = [
+lint.select = [
     "F",  # Errors detected by Pyflakes
     "E",  # Error detected by Pycodestyle
     "W",  # Warning detected by Pycodestyle
@@ -60,7 +61,7 @@ select = [
     "NPY",  # Numpy specific rules
     "PTH"  # Use pathlib
 ]
-ignore = [
+lint.ignore = [
     # Do not catch blind exception: `Exception`
     "BLE001",
     # Errors from function calls in argument defaults. These are fine when the result is immutable.
@@ -129,10 +130,10 @@ ignore = [
     "PTH123",
 ]
 
-[tool.ruff.pydocstyle]
+[tool.ruff.lint.pydocstyle]
 convention = "google"
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "docs/*" = ["I"]
 "tests/*" = ["D"]
 "*/__init__.py" = ["F401"]

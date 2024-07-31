@@ -3,15 +3,15 @@ import pytest
 
 
 @pytest.fixture(scope="module")
-def setup_instance():
-    ln_setup.init(storage="./testdb")
+def setup_bionty_instance():
+    ln_setup.init(storage="./test-bionty-db", schema="bionty")
     yield
-    ln_setup.delete("testdb", force=True)
+    ln_setup.delete("test-bionty-db", force=True)
 
 
-def test_migrate_check(setup_instance):
+def test_migrate_check(setup_bionty_instance):
     assert ln_setup.migrate.check()
 
 
-def test_system_check(setup_instance):
+def test_system_check(setup_bionty_instance):
     ln_setup.django("check")
