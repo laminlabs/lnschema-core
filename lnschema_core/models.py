@@ -1947,16 +1947,12 @@ class FeatureSet(Record, TracksRun):
 
 
 class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpdates):
-    """Artifacts: datasets & models stored as files, folders, or arrays.
+    """Datasets & models stored as files, folders, or arrays.
 
-    Artifacts manage data in local or remote storage.
-
-    An artifact stores a dataset or model as either a file or a folder.
+    Artifacts manage data in local or remote storage (:doc:`/tutorial`).
 
     Some artifacts are array-like, e.g., when stored as `.parquet`, `.h5ad`,
     `.zarr`, or `.tiledb`.
-
-    For more info, see tutorial: :doc:`/tutorial`.
 
     Args:
         data: `UPathStr` A path to a local or remote folder or file.
@@ -1997,20 +1993,15 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
             Create an artifact from a `DataFrame`.
         :meth:`~lamindb.Artifact.from_anndata`
             Create an artifact from an `AnnData`.
-        :meth:`~lamindb.Artifact.from_dir`
-            Bulk create file-like artifacts from a directory.
 
     Examples:
 
-        Create an artifact from a file in the cloud:
+        Create an artifact from a path to a file or folder:
 
-        >>> artifact = ln.Artifact("s3://my-bucket/my-folder/my-file.csv", description="My file")
-        >>> artifact.save()  # only metadata is saved
-
-        Create an artifact from a local filepath:
-
-        >>> artifact = ln.Artifact("./my_file.jpg", description="My image")
-        >>> artifact.save()
+        >>> artifact = ln.Artifact("s3://my_bucket/my_folder/my_file.csv", description="My file")
+        >>> artifact = ln.Artifact("./my_local_file.jpg", description="My image")
+        >>> artifact = ln.Artifact("s3://my_bucket/my_folder", description="My folder")
+        >>> artifact = ln.Artifact("./my_local_folder", description="My local folder")
 
         .. dropdown:: Why does the API look this way?
 
