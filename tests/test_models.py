@@ -2,6 +2,14 @@ import re
 import textwrap
 
 import lamindb as ln
+import pytest
+
+
+@pytest.fixture(scope="module")
+def setup_instance():
+    ln.setup.init(storage="./testdb", schema="bionty")
+    yield
+    ln.setup.delete("testdb", force=True)
 
 
 def strip_ansi(text: str) -> str:
@@ -10,7 +18,7 @@ def strip_ansi(text: str) -> str:
     return ansi_escape.sub("", text)
 
 
-def test_registry__repr__param():
+def test_registry__repr__param(setup_instance):
     param = ln.Param
     expected_repr = textwrap.dedent("""\
     Param
@@ -31,7 +39,7 @@ def test_registry__repr__param():
     assert actual_repr.strip() == expected_repr.strip()
 
 
-def test_registry__repr__artifact():
+def test_registry__repr__artifact(setup_instance):
     artifact = ln.Artifact
     expected_repr = textwrap.dedent("""\
     Artifact
@@ -70,10 +78,6 @@ def test_registry__repr__artifact():
         .environment_of: Run
         .collection: Collection
         .collections: Collection
-    """).strip()
-
-    # TODO these fields should also be tested for but they require an instance with Bionty
-    """
       Bionty fields
         .organisms: bionty.Organism
         .genes: bionty.Gene
@@ -90,7 +94,7 @@ def test_registry__repr__artifact():
         .ethnicities: bionty.Ethnicity
         .reference_of_source: bionty.Source
         .reference_of_sources: bionty.Source
-    """
+    """).strip()
 
     actual_repr = strip_ansi(repr(artifact))
     assert actual_repr.strip() == expected_repr.strip()
