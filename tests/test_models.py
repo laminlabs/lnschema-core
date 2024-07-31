@@ -2,14 +2,6 @@ import re
 import textwrap
 
 import lamindb as ln
-import pytest
-
-
-@pytest.fixture(scope="function")
-def setup_bionty_instance():
-    ln.setup.init(storage="./test-bionty-db", schema="bionty")
-    yield
-    ln.setup.delete("test-bionty-db", force=True)
 
 
 def _strip_ansi(text: str) -> str:
@@ -18,7 +10,7 @@ def _strip_ansi(text: str) -> str:
     return ansi_escape.sub("", text)
 
 
-def test_registry__repr__param(setup_bionty_instance):
+def test_registry__repr__param():
     param = ln.Param
     expected_repr = textwrap.dedent("""\
     Param
@@ -39,7 +31,7 @@ def test_registry__repr__param(setup_bionty_instance):
     assert actual_repr.strip() == expected_repr.strip()
 
 
-def test_registry__repr__artifact(setup_bionty_instance):
+def test_registry__repr__artifact():
     artifact = ln.Artifact
     expected_repr = textwrap.dedent("""\
     Artifact
