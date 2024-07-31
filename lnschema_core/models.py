@@ -2714,6 +2714,11 @@ class Collection(Record, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
         """
         pass
 
+    @property
+    def ordered_artifacts(self) -> QuerySet:
+        """Ordered `QuerySet` of `.artifacts`."""
+        pass
+
 
 # auto-generated through choices()
 delattr(Collection, "get_visibility_display")
