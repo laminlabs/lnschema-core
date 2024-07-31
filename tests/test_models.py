@@ -7,9 +7,9 @@ import pytest
 
 @pytest.fixture(scope="module")
 def setup_bionty_instance():
-    ln.setup.init(storage="./testdb", schema="bionty")
+    ln.setup.init(storage="./test-bionty-db", schema="bionty")
     yield
-    ln.setup.delete("testdb", force=True)
+    ln.setup.delete("test-bionty-db", force=True)
 
 
 def _strip_ansi(text: str) -> str:

@@ -2,7 +2,7 @@ import lamindb_setup as ln_setup
 import pytest
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def setup_instance():
     ln_setup.init(storage="./testdb")
     yield
