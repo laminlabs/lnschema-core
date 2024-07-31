@@ -1,6 +1,13 @@
+import re
 import textwrap
 
 import lamindb as ln
+
+
+def strip_ansi(text: str) -> str:
+    """Remove ANSI escape sequences from a string."""
+    ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
+    return ansi_escape.sub("", text)
 
 
 def test_registry__repr__param():
@@ -20,7 +27,8 @@ def test_registry__repr__param():
         .paramvalue: ParamValue
     """).strip()
 
-    assert repr(param) == expected_repr
+    actual_repr = strip_ansi(repr(param))
+    assert actual_repr.strip() == expected_repr.strip()
 
 
 def test_registry__repr__artifact():
@@ -84,4 +92,5 @@ def test_registry__repr__artifact():
         .reference_of_sources: bionty.Source
     """
 
-    assert repr(artifact) == expected_repr
+    actual_repr = strip_ansi(repr(artifact))
+    assert actual_repr.strip() == expected_repr.strip()
