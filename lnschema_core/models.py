@@ -2567,7 +2567,7 @@ class Collection(Record, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
         Run, PROTECT, related_name="output_collections", null=True, default=None
     )
     """:class:`~lamindb.Run` that created the `collection`."""
-    input_of: Run = models.ManyToManyField(Run, related_name="input_collections")
+    input_of_runs: Run = models.ManyToManyField(Run, related_name="input_collections")
     """Runs that use this collection as an input."""
     previous_runs: Run = models.ManyToManyField(
         "Run", related_name="output_collections_with_later_updates"

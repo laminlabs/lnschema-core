@@ -134,4 +134,9 @@ class Migration(migrations.Migration):
             old_name="input_of",
             new_name="input_of_runs",
         ),
+        migrations.RenameField(
+            model_name="collection",
+            old_name="input_of",
+            new_name="input_of_runs",
+        ),
     ]
