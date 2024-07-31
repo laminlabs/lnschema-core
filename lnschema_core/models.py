@@ -1672,7 +1672,7 @@ class Feature(Record, CanValidate, TracksRun, TracksUpdates):
     """Internal id, valid only in one DB instance."""
     uid: str = CharField(unique=True, db_index=True, max_length=12, default=base62_12)
     """Universal id, valid across DB instances."""
-    name: str = CharField(max_length=150, db_index=True, default=None)
+    name: str = CharField(max_length=150, db_index=True, default=None, unique=True)
     """Name of feature (required)."""
     dtype: str = CharField(max_length=64, db_index=True, default=None)
     """Data type ("number", "cat", "int", "float", "bool", "datetime").

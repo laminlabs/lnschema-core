@@ -186,4 +186,11 @@ class Migration(migrations.Migration):
             old_name="accessor",
             new_name="_accessor",
         ),
+        migrations.AlterField(
+            model_name="feature",
+            name="name",
+            field=models.CharField(
+                db_index=True, default=None, max_length=150, unique=True
+            ),
+        ),
     ]
