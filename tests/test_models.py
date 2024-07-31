@@ -6,19 +6,19 @@ import pytest
 
 
 @pytest.fixture(scope="module")
-def setup_instance():
+def setup_bionty_instance():
     ln.setup.init(storage="./testdb", schema="bionty")
     yield
     ln.setup.delete("testdb", force=True)
 
 
-def strip_ansi(text: str) -> str:
+def _strip_ansi(text: str) -> str:
     """Remove ANSI escape sequences from a string."""
     ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
     return ansi_escape.sub("", text)
 
 
-def test_registry__repr__param(setup_instance):
+def test_registry__repr__param(setup_bionty_instance):
     param = ln.Param
     expected_repr = textwrap.dedent("""\
     Param
@@ -35,11 +35,11 @@ def test_registry__repr__param(setup_instance):
         .paramvalue: ParamValue
     """).strip()
 
-    actual_repr = strip_ansi(repr(param))
+    actual_repr = _strip_ansi(repr(param))
     assert actual_repr.strip() == expected_repr.strip()
 
 
-def test_registry__repr__artifact(setup_instance):
+def test_registry__repr__artifact(setup_bionty_instance):
     artifact = ln.Artifact
     expected_repr = textwrap.dedent("""\
     Artifact
@@ -96,5 +96,5 @@ def test_registry__repr__artifact(setup_instance):
         .reference_of_sources: bionty.Source
     """).strip()
 
-    actual_repr = strip_ansi(repr(artifact))
+    actual_repr = _strip_ansi(repr(artifact))
     assert actual_repr.strip() == expected_repr.strip()
