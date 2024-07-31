@@ -36,6 +36,7 @@ n       p_collision
 ======= ===========
 
 """
+
 import secrets
 import string
 

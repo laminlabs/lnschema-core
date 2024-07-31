@@ -81,15 +81,13 @@ class IsVersioned(models.Model):
     """
 
     @overload
-    def __init__(self):
-        ...
+    def __init__(self): ...
 
     @overload
     def __init__(
         self,
         *db_args,
-    ):
-        ...
+    ): ...
 
     def __init__(
         self,
@@ -164,15 +162,13 @@ class TracksRun(models.Model):
     """Last run that created or updated the record."""
 
     @overload
-    def __init__(self):
-        ...
+    def __init__(self): ...
 
     @overload
     def __init__(
         self,
         *db_args,
-    ):
-        ...
+    ): ...
 
     def __init__(
         self,
@@ -196,15 +192,13 @@ class TracksUpdates(models.Model):
     """Sequence of runs that created or updated the record."""
 
     @overload
-    def __init__(self):
-        ...
+    def __init__(self): ...
 
     @overload
     def __init__(
         self,
         *db_args,
-    ):
-        ...
+    ): ...
 
     def __init__(
         self,
@@ -1090,15 +1084,13 @@ class User(Record, CanValidate):
         handle: str,
         email: str,
         name: str | None,
-    ):
-        ...
+    ): ...
 
     @overload
     def __init__(
         self,
         *db_args,
-    ):
-        ...
+    ): ...
 
     def __init__(
         self,
@@ -1180,15 +1172,13 @@ class Storage(Record, TracksRun, TracksUpdates):
         root: str,
         type: str,
         region: str | None,
-    ):
-        ...
+    ): ...
 
     @overload
     def __init__(
         self,
         *db_args,
-    ):
-        ...
+    ): ...
 
     def __init__(
         self,
@@ -1340,15 +1330,13 @@ class Transform(Record, HasParents, IsVersioned):
         version: str | None = None,
         type: TransformType | None = None,
         is_new_version_of: Transform | None = None,
-    ):
-        ...
+    ): ...
 
     @overload
     def __init__(
         self,
         *db_args,
-    ):
-        ...
+    ): ...
 
     def __init__(
         self,
@@ -1483,15 +1471,13 @@ class Run(Record, HasParams):
         transform: Transform,
         reference: str | None = None,
         reference_type: str | None = None,
-    ):
-        ...
+    ): ...
 
     @overload
     def __init__(
         self,
         *db_args,
-    ):
-        ...
+    ): ...
 
     def __init__(
         self,
@@ -1598,15 +1584,13 @@ class ULabel(Record, HasParents, CanValidate, TracksRun, TracksUpdates):
         description: str | None = None,
         reference: str | None = None,
         reference_type: str | None = None,
-    ):
-        ...
+    ): ...
 
     @overload
     def __init__(
         self,
         *db_args,
-    ):
-        ...
+    ): ...
 
     def __init__(
         self,
@@ -1717,15 +1701,13 @@ class Feature(Record, CanValidate, TracksRun, TracksUpdates):
         unit: str | None,
         description: str | None,
         synonyms: str | None,
-    ):
-        ...
+    ): ...
 
     @overload
     def __init__(
         self,
         *db_args,
-    ):
-        ...
+    ): ...
 
     def __init__(
         self,
@@ -1867,15 +1849,13 @@ class FeatureSet(Record, TracksRun):
         features: Iterable[Record],
         dtype: str | None = None,
         name: str | None = None,
-    ):
-        ...
+    ): ...
 
     @overload
     def __init__(
         self,
         *db_args,
-    ):
-        ...
+    ): ...
 
     def __init__(
         self,
@@ -2154,15 +2134,13 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
         description: str | None = None,
         is_new_version_of: Artifact | None = None,
         run: Run | None = None,
-    ):
-        ...
+    ): ...
 
     @overload
     def __init__(
         self,
         *db_args,
-    ):
-        ...
+    ): ...
 
     def __init__(
         self,
@@ -2611,15 +2589,13 @@ class Collection(Record, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
         reference_type: str | None = None,
         run: Run | None = None,
         is_new_version_of: Collection | None = None,
-    ):
-        ...
+    ): ...
 
     @overload
     def __init__(
         self,
         *db_args,
-    ):
-        ...
+    ): ...
 
     def __init__(
         self,
