@@ -1,8 +1,6 @@
 import re
 import textwrap
 
-import lamindb as ln
-
 # The tests defined in this script use the lamindb instance defined in test_integrity
 
 
@@ -12,7 +10,9 @@ def _strip_ansi(text: str) -> str:
     return ansi_escape.sub("", text)
 
 
-def test_registry__repr__param():
+def test_registry__repr__param(setup_instance):
+    import lnschema_core.models as ln
+
     param = ln.Param
     expected_repr = textwrap.dedent("""\
     Param
@@ -33,7 +33,9 @@ def test_registry__repr__param():
     assert actual_repr.strip() == expected_repr.strip()
 
 
-def test_registry__repr__artifact():
+def test_registry__repr__artifact(setup_instance):
+    import lnschema_core.models as ln
+
     artifact = ln.Artifact
     expected_repr = textwrap.dedent("""\
     Artifact
@@ -72,22 +74,6 @@ def test_registry__repr__artifact():
         .environment_of: Run
         .collection: Collection
         .collections: Collection
-      Bionty fields
-        .organisms: bionty.Organism
-        .genes: bionty.Gene
-        .proteins: bionty.Protein
-        .cell_markers: bionty.CellMarker
-        .tissues: bionty.Tissue
-        .cell_types: bionty.CellType
-        .diseases: bionty.Disease
-        .cell_lines: bionty.CellLine
-        .phenotypes: bionty.Phenotype
-        .pathways: bionty.Pathway
-        .experimental_factors: bionty.ExperimentalFactor
-        .developmental_stages: bionty.DevelopmentalStage
-        .ethnicities: bionty.Ethnicity
-        .reference_of_source: bionty.Source
-        .reference_of_sources: bionty.Source
     """).strip()
 
     actual_repr = _strip_ansi(repr(artifact))
