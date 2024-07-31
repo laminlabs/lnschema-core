@@ -1,7 +1,7 @@
 import re
 import textwrap
 
-import lamindb as ln
+import lnschema_core.models as ln
 
 # The tests defined in this script use the lamindb instance defined in test_integrity
 
