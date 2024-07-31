@@ -621,11 +621,11 @@ class RecordMeta(ModelBase):
             )
 
         non_external_schema_fields_formatted = [
-            f"    .{field.name.replace('_links', '')}: {_get_related_field_type(field)}\n"
+            f"    .{field.name}: {_get_related_field_type(field)}\n"
             for field in non_external_schema_fields
         ]
         external_schema_fields_formatted = [
-            f"    .{field.name.replace('_links', '')}: {_get_related_field_type(field)}\n"
+            f"    .{field.name}: {_get_related_field_type(field)}\n"
             for field in external_schema_fields
         ]
 
