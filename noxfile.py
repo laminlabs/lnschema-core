@@ -16,5 +16,4 @@ def test(session: nox.Session) -> None:
         session,
         "pip install lamindb_setup@git+https://github.com/laminlabs/lamindb-setup",
     )
-    login_testuser1(session)
     run_pytest(session, coverage=False)
