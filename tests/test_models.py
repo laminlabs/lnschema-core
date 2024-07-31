@@ -46,7 +46,7 @@ def test_registry__repr__artifact(setup_instance):
         .key: CharField
         .suffix: CharField
         .type: CharField
-        .accessor: CharField
+        ._accessor: CharField
         .size: BigIntegerField
         .hash: CharField
         .hash_type: CharField
@@ -63,16 +63,15 @@ def test_registry__repr__artifact(setup_instance):
         .transform: Transform
         .run: Run
         .ulabels: ULabel
-        .input_of: Run
+        .input_of_runs: Run
         .previous_runs: Run
         .feature_sets: FeatureSet
         .feature_values: FeatureValue
         .param_values: ParamValue
-        .latest_report_of: Transform
         .source_code_of: Transform
         .report_of: Run
         .environment_of: Run
-        .collection: Collection
+        .meta_of_collection: Collection
         .collections: Collection
     """).strip()
 
