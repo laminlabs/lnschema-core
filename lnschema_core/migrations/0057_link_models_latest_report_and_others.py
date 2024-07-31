@@ -139,4 +139,35 @@ class Migration(migrations.Migration):
             old_name="input_of",
             new_name="input_of_runs",
         ),
+        migrations.RenameField(
+            model_name="collection",
+            old_name="unordered_artifacts",
+            new_name="artifacts",
+        ),
+        migrations.AlterField(
+            model_name="collection",
+            name="artifact",
+            field=models.OneToOneField(
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="meta_of_collection",
+                to="lnschema_core.artifact",
+            ),
+        ),
+        migrations.RenameField(
+            model_name="collection",
+            old_name="artifact",
+            new_name="meta_artifact",
+        ),
+        migrations.AlterField(
+            model_name="artifact",
+            name="type",
+            field=models.CharField(
+                choices=[("dataset", "dataset"), ("model", "model")],
+                db_index=True,
+                default=None,
+                max_length=20,
+                null=True,
+            ),
+        ),
     ]

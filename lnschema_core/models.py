@@ -81,15 +81,13 @@ class IsVersioned(models.Model):
     """
 
     @overload
-    def __init__(self):
-        ...
+    def __init__(self): ...
 
     @overload
     def __init__(
         self,
         *db_args,
-    ):
-        ...
+    ): ...
 
     def __init__(
         self,
@@ -164,15 +162,13 @@ class TracksRun(models.Model):
     """Last run that created or updated the record."""
 
     @overload
-    def __init__(self):
-        ...
+    def __init__(self): ...
 
     @overload
     def __init__(
         self,
         *db_args,
-    ):
-        ...
+    ): ...
 
     def __init__(
         self,
@@ -196,15 +192,13 @@ class TracksUpdates(models.Model):
     """Sequence of runs that created or updated the record."""
 
     @overload
-    def __init__(self):
-        ...
+    def __init__(self): ...
 
     @overload
     def __init__(
         self,
         *db_args,
-    ):
-        ...
+    ): ...
 
     def __init__(
         self,
@@ -1090,15 +1084,13 @@ class User(Record, CanValidate):
         handle: str,
         email: str,
         name: str | None,
-    ):
-        ...
+    ): ...
 
     @overload
     def __init__(
         self,
         *db_args,
-    ):
-        ...
+    ): ...
 
     def __init__(
         self,
@@ -1180,15 +1172,13 @@ class Storage(Record, TracksRun, TracksUpdates):
         root: str,
         type: str,
         region: str | None,
-    ):
-        ...
+    ): ...
 
     @overload
     def __init__(
         self,
         *db_args,
-    ):
-        ...
+    ): ...
 
     def __init__(
         self,
@@ -1336,15 +1326,13 @@ class Transform(Record, HasParents, IsVersioned):
         version: str | None = None,
         type: TransformType | None = None,
         is_new_version_of: Transform | None = None,
-    ):
-        ...
+    ): ...
 
     @overload
     def __init__(
         self,
         *db_args,
-    ):
-        ...
+    ): ...
 
     def __init__(
         self,
@@ -1484,15 +1472,13 @@ class Run(Record, HasParams):
         transform: Transform,
         reference: str | None = None,
         reference_type: str | None = None,
-    ):
-        ...
+    ): ...
 
     @overload
     def __init__(
         self,
         *db_args,
-    ):
-        ...
+    ): ...
 
     def __init__(
         self,
@@ -1599,15 +1585,13 @@ class ULabel(Record, HasParents, CanValidate, TracksRun, TracksUpdates):
         description: str | None = None,
         reference: str | None = None,
         reference_type: str | None = None,
-    ):
-        ...
+    ): ...
 
     @overload
     def __init__(
         self,
         *db_args,
-    ):
-        ...
+    ): ...
 
     def __init__(
         self,
@@ -1718,15 +1702,13 @@ class Feature(Record, CanValidate, TracksRun, TracksUpdates):
         unit: str | None,
         description: str | None,
         synonyms: str | None,
-    ):
-        ...
+    ): ...
 
     @overload
     def __init__(
         self,
         *db_args,
-    ):
-        ...
+    ): ...
 
     def __init__(
         self,
@@ -1868,15 +1850,13 @@ class FeatureSet(Record, TracksRun):
         features: Iterable[Record],
         dtype: str | None = None,
         name: str | None = None,
-    ):
-        ...
+    ): ...
 
     @overload
     def __init__(
         self,
         *db_args,
-    ):
-        ...
+    ): ...
 
     def __init__(
         self,
@@ -2064,7 +2044,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
 
     This is either a file suffix (`".csv"`, `".h5ad"`, etc.) or the empty string "".
     """
-    type: str = CharField(
+    type: Literal["dataset", "model"] | None = CharField(
         max_length=20,
         choices=ArtifactType.choices(),
         db_index=True,
@@ -2141,20 +2121,18 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
     def __init__(
         self,
         data: UPathStr,
-        type: Literal["dataset", "model", "code"] = "dataset",
+        type: Literal["dataset", "model"] | None = None,
         key: str | None = None,
         description: str | None = None,
         is_new_version_of: Artifact | None = None,
         run: Run | None = None,
-    ):
-        ...
+    ): ...
 
     @overload
     def __init__(
         self,
         *db_args,
-    ):
-        ...
+    ): ...
 
     def __init__(
         self,
@@ -2573,23 +2551,18 @@ class Collection(Record, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
         "Run", related_name="output_collections_with_later_updates"
     )
     """Sequence of runs that created or updated the record."""
-    artifact: Artifact = models.OneToOneField(
-        "Artifact", PROTECT, null=True, unique=True, related_name="collection"
-    )
-    """Storage of collection as a one artifact."""
-    unordered_artifacts: Artifact = models.ManyToManyField(
+    artifacts: Artifact = models.ManyToManyField(
         "Artifact", related_name="collections", through="CollectionArtifact"
     )
-    """Storage of collection as multiple artifacts."""
+    """Artifacts in collection."""
+    meta_artifact: Artifact | None = models.OneToOneField(
+        "Artifact", PROTECT, null=True, unique=True, related_name="meta_of_collection"
+    )
+    """An artifact that stores metadata that indexes the collection."""
     visibility: int = models.SmallIntegerField(
         db_index=True, choices=VisibilityChoice.choices, default=1
     )
-    """Visibility of record,  0-default, 1-hidden, 2-trash."""
-
-    @property
-    def artifacts(self) -> QuerySet:
-        """Ordered QuerySet of artifacts."""
-        pass
+    """Visibility of collection record in queries & searches (1 default, 1 hidden, -1 trash)."""
 
     @overload
     def __init__(
@@ -2603,15 +2576,13 @@ class Collection(Record, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
         reference_type: str | None = None,
         run: Run | None = None,
         is_new_version_of: Collection | None = None,
-    ):
-        ...
+    ): ...
 
     @overload
     def __init__(
         self,
         *db_args,
-    ):
-        ...
+    ): ...
 
     def __init__(
         self,

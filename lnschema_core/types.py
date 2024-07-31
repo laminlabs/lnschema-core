@@ -39,7 +39,6 @@ class TransformType(ChoicesMixin, str, Enum):
 class ArtifactType(ChoicesMixin, str, Enum):
     dataset = "dataset"
     model = "model"
-    code = "code"
 
 
 class VisibilityChoice(IntegerChoices):
