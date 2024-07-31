@@ -2058,7 +2058,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
     description: str = CharField(max_length=255, db_index=True, null=True, default=None)
     """A description."""
     storage: Storage = models.ForeignKey(Storage, PROTECT, related_name="artifacts")
-    """Storage location (:class:`~lamindb.Storage`), e.g. an S3 or GCP bucket or a local directory."""
+    """Storage location, e.g. an S3 or GCP bucket or a local directory."""
     key: str = CharField(max_length=255, db_index=True, null=True, default=None)
     """Storage key, the relative path within the storage location."""
     suffix: str = CharField(max_length=30, db_index=True, default=None)
