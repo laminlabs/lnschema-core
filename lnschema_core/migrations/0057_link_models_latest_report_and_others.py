@@ -170,4 +170,20 @@ class Migration(migrations.Migration):
                 null=True,
             ),
         ),
+        migrations.AlterField(
+            model_name="artifact",
+            name="accessor",
+            field=models.CharField(
+                db_column="accessor",
+                db_index=True,
+                default=None,
+                max_length=64,
+                null=True,
+            ),
+        ),
+        migrations.RenameField(
+            model_name="artifact",
+            old_name="accessor",
+            new_name="_accessor",
+        ),
     ]

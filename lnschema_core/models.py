@@ -2052,7 +2052,9 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
         null=True,
     )
     """Artifact type (default `None`)."""
-    accessor: str = CharField(max_length=64, db_index=True, null=True, default=None)
+    _accessor: str = CharField(
+        max_length=64, db_index=True, null=True, default=None, db_column="accessor"
+    )
     """Default backed or memory accessor, e.g., DataFrame, AnnData."""
     size: int = models.BigIntegerField(null=True, db_index=True)
     """Size in bytes.
