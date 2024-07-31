@@ -14,6 +14,6 @@ def test(session: nox.Session) -> None:
     run(session, "uv pip install --system -e .[dev]")
     run(
         session,
-        "uv pip install --system lamindb@git+https://github.com/laminlabs/lamindb[bionty]",
+        "uv pip install --system lamindb[bionty]@git+https://github.com/laminlabs/lamindb",
     )
     run_pytest(session, coverage=False)
