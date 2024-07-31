@@ -9,9 +9,9 @@ def setup_bionty_instance():
     ln_setup.delete("test-bionty-db", force=True)
 
 
-def test_migrate_check(setup_instance):
+def test_migrate_check(setup_bionty_instance):
     assert ln_setup.migrate.check()
 
 
-def test_system_check(setup_instance):
+def test_system_check(setup_bionty_instance):
     ln_setup.django("check")
