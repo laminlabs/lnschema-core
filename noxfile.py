@@ -11,6 +11,7 @@ def lint(session: nox.Session) -> None:
 
 @nox.session
 def test(session: nox.Session) -> None:
+    login_testuser1()
     run(session, "pip install -e .[dev]")
     run(
         session,
