@@ -5,7 +5,7 @@ import lamindb as ln
 import pytest
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def setup_bionty_instance():
     ln.setup.init(storage="./test-bionty-db", schema="bionty")
     yield
