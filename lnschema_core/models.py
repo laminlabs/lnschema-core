@@ -1353,6 +1353,11 @@ class Transform(Record, HasParents, IsVersioned):
     ):
         super().__init__(*args, **kwargs)
 
+    @property
+    def latest_run(self) -> Run:
+        """The latest run of this transform."""
+        pass
+
 
 class Param(Record, CanValidate, TracksRun, TracksUpdates):
     """Parameters of runs & models akin to Feature for datasets."""
