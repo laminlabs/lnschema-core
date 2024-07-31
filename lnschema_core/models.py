@@ -498,7 +498,7 @@ class RecordMeta(ModelBase):
         return result
 
     def __repr__(cls) -> str:
-        """Designed to show schema version when Records are called directly.
+        """Shows fields.
 
         Divided into several parts:
         1. Header
@@ -572,14 +572,14 @@ class RecordMeta(ModelBase):
             field
             for field in cls._meta.fields + cls._meta.many_to_many
             if isinstance(field, relational_fields)
-            and not field.name.endswith("_links")
+            and not field.name.startswith("links_")
         ]
 
         non_class_specific_relational_fields = [
             field
             for field in cls._meta.get_fields()
             if isinstance(field, relational_fields)
-            and not field.name.endswith("_links")
+            and not field.name.startswith("links_")
         ]
         non_class_specific_relational_fields = _reorder_fields_by_class(
             non_class_specific_relational_fields
