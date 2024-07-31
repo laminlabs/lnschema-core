@@ -1,8 +1,6 @@
 import re
 import textwrap
 
-import lnschema_core.models as ln
-
 # The tests defined in this script use the lamindb instance defined in test_integrity
 
 
@@ -12,7 +10,9 @@ def _strip_ansi(text: str) -> str:
     return ansi_escape.sub("", text)
 
 
-def test_registry__repr__param():
+def test_registry__repr__param(setup_instance):
+    import lnschema_core.models as ln
+
     param = ln.Param
     expected_repr = textwrap.dedent("""\
     Param
@@ -33,7 +33,9 @@ def test_registry__repr__param():
     assert actual_repr.strip() == expected_repr.strip()
 
 
-def test_registry__repr__artifact():
+def test_registry__repr__artifact(setup_instance):
+    import lnschema_core.models as ln
+
     artifact = ln.Artifact
     expected_repr = textwrap.dedent("""\
     Artifact
