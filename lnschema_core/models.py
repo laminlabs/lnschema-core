@@ -2110,7 +2110,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
         Run, PROTECT, related_name="output_artifacts", null=True, default=None
     )
     """:class:`~lamindb.Run` that created the artifact."""
-    input_of: Run = models.ManyToManyField(Run, related_name="input_artifacts")
+    input_of_runs: Run = models.ManyToManyField(Run, related_name="input_artifacts")
     """Runs that use this artifact as an input."""
     # if the artifact is replicated or update in a new run, we link the previous
     # run in previous_runs

@@ -129,4 +129,9 @@ class Migration(migrations.Migration):
             model_name="transform",
             name="latest_report",
         ),
+        migrations.RenameField(
+            model_name="artifact",
+            old_name="input_of",
+            new_name="input_of_runs",
+        ),
     ]
