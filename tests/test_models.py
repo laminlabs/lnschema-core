@@ -63,7 +63,7 @@ def test_registry__repr__artifact(setup_instance):
         .source_code_of: Transform
         .report_of: Run
         .environment_of: Run
-        .meta_of_collection: Collection
+        .collection: Collection
         .collections: Collection
     """).strip()
 
