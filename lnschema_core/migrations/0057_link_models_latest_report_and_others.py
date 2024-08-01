@@ -209,4 +209,16 @@ class Migration(migrations.Migration):
                 to="lnschema_core.artifact",
             ),
         ),
+        migrations.AlterField(
+            model_name="artifact",
+            name="type",
+            field=models.CharField(
+                db_index=True, default=None, max_length=20, null=True
+            ),
+        ),
+        migrations.AlterField(
+            model_name="transform",
+            name="type",
+            field=models.CharField(db_index=True, default="pipeline", max_length=20),
+        ),
     ]
