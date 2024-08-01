@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
                     ("script", "script"),
                 ],
                 db_index=True,
-                default=lnschema_core.types.TransformType["pipeline"],
+                default="pipeline",
                 max_length=20,
             ),
         ),
