@@ -144,16 +144,6 @@ class Migration(migrations.Migration):
             old_name="unordered_artifacts",
             new_name="artifacts",
         ),
-        migrations.AlterField(
-            model_name="collection",
-            name="artifact",
-            field=models.OneToOneField(
-                null=True,
-                on_delete=django.db.models.deletion.PROTECT,
-                related_name="meta_of_collection",
-                to="lnschema_core.artifact",
-            ),
-        ),
         migrations.RenameField(
             model_name="collection",
             old_name="artifact",

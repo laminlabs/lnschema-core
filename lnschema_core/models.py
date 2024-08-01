@@ -2574,9 +2574,12 @@ class Collection(Record, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
     )
     """Artifacts in collection."""
     meta_artifact: Artifact | None = models.OneToOneField(
-        "Artifact", PROTECT, null=True, unique=True, related_name="meta_of_collection"
+        "Artifact", PROTECT, null=True, unique=True, related_name="collection"
     )
-    """An artifact that stores metadata that indexes the collection."""
+    """An artifact that stores metadata that indexes a collection.
+
+    It has a 1:1 correspondence with a collection.
+    """
     visibility: int = models.SmallIntegerField(
         db_index=True, choices=VisibilityChoice.choices, default=1
     )
