@@ -33,7 +33,6 @@ from lnschema_core.types import (
 )
 
 from .ids import base62_8, base62_12, base62_20
-from .types import ArtifactType, TransformType
 from .users import current_user_id
 
 if TYPE_CHECKING:
@@ -57,6 +56,8 @@ if TYPE_CHECKING:
         QuerySet,
         RecordsList,
     )
+
+    from .types import ArtifactType, TransformType
 
 
 _TRACKING_READY: bool | None = None
@@ -1287,11 +1288,10 @@ class Transform(Record, HasParents, IsVersioned):
     """A key for concise reference & versioning (optional)."""
     description: str = CharField(max_length=255, null=True, default=None)
     """A description (optional)."""
-    type: str = CharField(
+    type: TransformType = CharField(
         max_length=20,
-        choices=TransformType.choices(),
         db_index=True,
-        default=TransformType.pipeline,
+        default="pipeline",
     )
     """Transform type (default `"pipeline"`)."""
     _source_code_artifact: Artifact = models.ForeignKey(
@@ -2045,9 +2045,8 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
 
     This is either a file suffix (`".csv"`, `".h5ad"`, etc.) or the empty string "".
     """
-    type: Literal["dataset", "model"] | None = CharField(
+    type: ArtifactType | None = CharField(
         max_length=20,
-        choices=ArtifactType.choices(),
         db_index=True,
         default=None,
         null=True,
@@ -2458,7 +2457,6 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
 
 # auto-generated through choices()
 delattr(Artifact, "get_visibility_display")
-delattr(Artifact, "get_type_display")
 
 
 class Collection(Record, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
