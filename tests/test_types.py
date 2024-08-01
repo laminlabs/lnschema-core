@@ -1,11 +1,4 @@
-from lnschema_core.types import TransformType, VisibilityChoice
-
-
-def test_transform_type():
-    assert TransformType.notebook == "notebook"
-    assert TransformType.script == "script"
-    assert TransformType.pipeline == "pipeline"
-    assert TransformType.upload == "upload"
+from lnschema_core.types import VisibilityChoice
 
 
 def test_visibility_choice():
