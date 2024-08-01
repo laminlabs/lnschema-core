@@ -367,7 +367,7 @@ class CanValidate:
 
         Examples:
             >>> import bionty as bt
-            >>> bt.CellType.from_public(name="T cell").save()
+            >>> bt.CellType.from_source(name="T cell").save()
             >>> lookup = bt.CellType.lookup()
             >>> record = lookup.t_cell
             >>> record.synonyms
@@ -390,7 +390,7 @@ class CanValidate:
 
         Examples:
             >>> import bionty as bt
-            >>> bt.CellType.from_public(name="T cell").save()
+            >>> bt.CellType.from_source(name="T cell").save()
             >>> lookup = bt.CellType.lookup()
             >>> record = lookup.t_cell
             >>> record.synonyms
@@ -412,7 +412,7 @@ class CanValidate:
 
         Examples:
             >>> import bionty as bt
-            >>> bt.ExperimentalFactor.from_public(name="single-cell RNA sequencing").save()
+            >>> bt.ExperimentalFactor.from_source(name="single-cell RNA sequencing").save()
             >>> scrna = bt.ExperimentalFactor.filter(name="single-cell RNA sequencing").one()
             >>> scrna.abbr
             None
@@ -455,7 +455,7 @@ class HasParents:
 
         Examples:
             >>> import bionty as bt
-            >>> bt.Tissue.from_public(name="subsegmental bronchus").save()
+            >>> bt.Tissue.from_source(name="subsegmental bronchus").save()
             >>> record = bt.Tissue.filter(name="respiratory tube").one()
             >>> record.view_parents()
             >>> tissue.view_parents(with_children=True)
@@ -734,7 +734,7 @@ class RecordMeta(ModelBase):
         Examples:
             >>> import bionty as bt
             >>> bt.settings.organism = "human"
-            >>> bt.Gene.from_public(symbol="ADGB-DT").save()
+            >>> bt.Gene.from_source(symbol="ADGB-DT").save()
             >>> lookup = bt.Gene.lookup()
             >>> lookup.adgb_dt
             >>> lookup_dict = lookup.dict()
