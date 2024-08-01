@@ -2719,7 +2719,26 @@ class Collection(Record, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
 
     @property
     def ordered_artifacts(self) -> QuerySet:
-        """Ordered `QuerySet` of `.artifacts`."""
+        """Ordered `QuerySet` of `.artifacts`.
+
+        Accessing the many-to-many field `collection.artifacts` directly gives
+        you non-deterministic order.
+
+        Using the property `.ordered_artifacts` allows to iterate through a set
+        that's ordered in the order of creation.
+        """
+        pass
+
+    @property
+    def data_artifact(self) -> Artifact | None:
+        """Access to a single data artifact.
+
+        If the collection has a single data & metadata artifact, this allows access via::
+
+           collection.data_artifact  # first & only element of collection.artifacts
+           collection.meta_artifact  # metadata
+
+        """
         pass
 
 
