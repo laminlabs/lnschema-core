@@ -193,4 +193,20 @@ class Migration(migrations.Migration):
                 db_index=True, default=None, max_length=150, unique=True
             ),
         ),
+        migrations.RenameField(
+            model_name="transform",
+            old_name="source_code",
+            new_name="_source_code_artifact",
+        ),
+        migrations.AlterField(
+            model_name="transform",
+            name="_source_code_artifact",
+            field=models.ForeignKey(
+                default=None,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="_source_code_of",
+                to="lnschema_core.artifact",
+            ),
+        ),
     ]

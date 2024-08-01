@@ -1294,8 +1294,8 @@ class Transform(Record, HasParents, IsVersioned):
         default=TransformType.pipeline,
     )
     """Transform type (default `"pipeline"`)."""
-    source_code: Artifact = models.ForeignKey(
-        "Artifact", PROTECT, default=None, null=True, related_name="source_code_of"
+    _source_code_artifact: Artifact = models.ForeignKey(
+        "Artifact", PROTECT, default=None, null=True, related_name="_source_code_of"
     )
     """Source of the transform if stored as artifact within LaminDB."""
     reference: str = CharField(max_length=255, db_index=True, null=True, default=None)
