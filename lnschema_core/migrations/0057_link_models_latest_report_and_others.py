@@ -276,4 +276,41 @@ class Migration(migrations.Migration):
             old_name="previous_runs",
             new_name="_previous_runs",
         ),
+        migrations.AlterField(
+            model_name="artifact",
+            name="_hash_type",
+            field=models.CharField(
+                db_column="hash_type",
+                db_index=True,
+                default=None,
+                max_length=30,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="artifact",
+            name="_key_is_virtual",
+            field=models.BooleanField(db_column="key_is_virtual"),
+        ),
+        migrations.AlterField(
+            model_name="artifact",
+            name="hash",
+            field=models.CharField(
+                db_index=True, default=None, max_length=22, null=True
+            ),
+        ),
+        migrations.AlterField(
+            model_name="collection",
+            name="hash",
+            field=models.CharField(
+                db_index=True, default=None, max_length=22, null=True
+            ),
+        ),
+        migrations.AlterField(
+            model_name="featureset",
+            name="hash",
+            field=models.CharField(
+                db_index=True, default=None, max_length=22, null=True, unique=True
+            ),
+        ),
     ]

@@ -22,6 +22,7 @@ from django.db.models.fields.related import (
 )
 from lamin_utils import colors, logger
 from lamindb_setup import _check_instance_setup
+from lamindb_setup.core.hashing import HASH_LENGTH
 
 from lnschema_core.types import (
     CharField,
@@ -1841,7 +1842,7 @@ class FeatureSet(Record, TracksRun):
     Depending on the registry, `.members` stores, e.g. `Feature` or `Gene` records.
     """
     hash: str = CharField(
-        max_length=20, default=None, db_index=True, null=True, unique=True
+        max_length=HASH_LENGTH, default=None, db_index=True, null=True, unique=True
     )
     """The hash of the set."""
 
@@ -2062,13 +2063,15 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
     Examples: 1KB is 1e3 bytes, 1MB is 1e6, 1GB is 1e9, 1TB is 1e12 etc.
     """
     hash: str = CharField(
-        max_length=86, db_index=True, null=True, default=None
-    )  # 86 base64 chars allow to store 64 bytes, 512 bits
+        max_length=HASH_LENGTH, db_index=True, null=True, default=None
+    )
     """Hash or pseudo-hash of artifact content.
 
     Useful to ascertain integrity and avoid duplication.
     """
-    _hash_type: str = CharField(max_length=30, db_index=True, null=True, default=None)
+    _hash_type: str = CharField(
+        max_length=30, db_index=True, null=True, default=None, db_column="hash_type"
+    )
     """Type of hash."""
     n_objects: int = models.BigIntegerField(default=None, null=True, db_index=True)
     """Number of objects.
@@ -2116,7 +2119,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
         db_index=True, choices=VisibilityChoice.choices, default=1
     )
     """Visibility of artifact record in queries & searches (1 default, 1 hidden, -1 trash)."""
-    _key_is_virtual: bool = models.BooleanField()
+    _key_is_virtual: bool = models.BooleanField(db_column="key_is_virtual")
     """Indicates whether `key` is virtual or part of an actual file path."""
 
     @overload
@@ -2521,7 +2524,9 @@ class Collection(Record, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
     """Name or title of collection (required)."""
     description: str = TextField(null=True, default=None)
     """A description."""
-    hash: str = CharField(max_length=86, db_index=True, null=True, default=None)
+    hash: str = CharField(
+        max_length=HASH_LENGTH, db_index=True, null=True, default=None
+    )
     """Hash of collection content. 86 base64 chars allow to store 64 bytes, 512 bits."""
     reference: str = CharField(max_length=255, db_index=True, null=True, default=None)
     """A reference like URL or external ID."""
