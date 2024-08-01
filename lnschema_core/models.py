@@ -25,11 +25,13 @@ from lamindb_setup import _check_instance_setup
 from lamindb_setup.core.hashing import HASH_LENGTH
 
 from lnschema_core.types import (
+    ArtifactType,
     CharField,
     FieldAttr,
     ListLike,
     StrField,
     TextField,
+    TransformType,
     VisibilityChoice,
 )
 
@@ -57,8 +59,6 @@ if TYPE_CHECKING:
         QuerySet,
         RecordsList,
     )
-
-    from .types import ArtifactType, TransformType
 
 
 _TRACKING_READY: bool | None = None
@@ -1237,8 +1237,7 @@ class Transform(Record, HasParents, IsVersioned):
         name: `str` A name or title.
         key: `str | None = None` A short name or path-like semantic key.
         version: `str | None = None` A version.
-        type: `TransformType | None = "pipeline"` Either `'notebook'`, `'pipeline'`
-            or `'script'`.
+        type: `TransformType | None = "pipeline"` See :class:`~lamindb.core.types.TransformType`.
         is_new_version_of: `Transform | None = None` An old version of the transform.
 
     See Also:
@@ -1294,11 +1293,24 @@ class Transform(Record, HasParents, IsVersioned):
         db_index=True,
         default="pipeline",
     )
-    """Transform type (default `"pipeline"`)."""
+    """:class:`~lamindb.core.types.TransformType` (default `"pipeline"`)."""
     _source_code_artifact: Artifact = models.ForeignKey(
         "Artifact", PROTECT, default=None, null=True, related_name="_source_code_of"
     )
-    """Source of the transform if stored as artifact within LaminDB."""
+    """Source code of the transform if stored as artifact within LaminDB.
+
+    .. versionchanged:: 0.75
+       Made private and deprecated for future removal.
+    """
+    source_code: str | None = TextField(null=True, default=None)
+    """Source code of the transform.
+
+    .. versionchanged:: 0.75
+       The `source_code` field is no longer an artifact, but a text field.
+    """
+    hash: str | None = CharField(
+        max_length=HASH_LENGTH, db_index=True, null=True, default=None
+    )
     reference: str = CharField(max_length=255, db_index=True, null=True, default=None)
     """Reference for the transform, e.g..  URL."""
     reference_type: str = CharField(
@@ -1938,7 +1950,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
 
     Args:
         data: `UPathStr` A path to a local or remote folder or file.
-        type: `Literal["dataset", "model", "code"] | None = None` The artifact type.
+        type: `Literal["dataset", "model"] | None = None` The artifact type.
         key: `str | None = None` A relative path within default storage,
             e.g., `"myfolder/myfile.fcs"`.
         description: `str | None = None` A description.
@@ -2052,7 +2064,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
         default=None,
         null=True,
     )
-    """Artifact type (default `None`)."""
+    """:class:`~lamindb.core.types.ArtifactType` (default `None`)."""
     _accessor: str = CharField(
         max_length=64, db_index=True, null=True, default=None, db_column="accessor"
     )
@@ -2126,7 +2138,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
     def __init__(
         self,
         data: UPathStr,
-        type: Literal["dataset", "model"] | None = None,
+        type: ArtifactType | None = None,
         key: str | None = None,
         description: str | None = None,
         is_new_version_of: Artifact | None = None,

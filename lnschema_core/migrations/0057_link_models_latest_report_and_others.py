@@ -313,4 +313,16 @@ class Migration(migrations.Migration):
                 db_index=True, default=None, max_length=22, null=True, unique=True
             ),
         ),
+        migrations.AddField(
+            model_name="transform",
+            name="hash",
+            field=models.CharField(
+                db_index=True, default=None, max_length=22, null=True
+            ),
+        ),
+        migrations.AddField(
+            model_name="transform",
+            name="source_code",
+            field=models.TextField(default=None, null=True),
+        ),
     ]
