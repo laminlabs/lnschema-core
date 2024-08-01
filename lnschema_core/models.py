@@ -189,7 +189,7 @@ class TracksUpdates(models.Model):
     """Time of last update to record."""
     # no default related_name below because it'd clash with the reverse accessor
     # of the .run field
-    previous_runs: Run = models.ManyToManyField("lnschema_core.Run", related_name="+")
+    _previous_runs: Run = models.ManyToManyField("lnschema_core.Run", related_name="+")
     """Sequence of runs that created or updated the record."""
 
     @overload
@@ -1439,7 +1439,7 @@ class Run(Record, HasParams):
     """Finished time of run."""
     created_by: User = models.ForeignKey(User, CASCADE, default=current_user_id)
     """Creator of run. :class:`~lamindb.User`"""
-    param_values: ParamValue = models.ManyToManyField(
+    _param_values: ParamValue = models.ManyToManyField(
         ParamValue, through="RunParamValue", related_name="runs"
     )
     """Parameter values."""
@@ -2068,7 +2068,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
 
     Useful to ascertain integrity and avoid duplication.
     """
-    hash_type: str = CharField(max_length=30, db_index=True, null=True, default=None)
+    _hash_type: str = CharField(max_length=30, db_index=True, null=True, default=None)
     """Type of hash."""
     n_objects: int = models.BigIntegerField(default=None, null=True, db_index=True)
     """Number of objects.
@@ -2096,7 +2096,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
     """Runs that use this artifact as an input."""
     # if the artifact is replicated or update in a new run, we link the previous
     # run in previous_runs
-    previous_runs: Run = models.ManyToManyField(
+    _previous_runs: Run = models.ManyToManyField(
         "Run", related_name="output_artifacts_with_later_updates"
     )
     """Sequence of runs that created or updated the record."""
@@ -2104,11 +2104,11 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
         FeatureSet, related_name="artifacts", through="ArtifactFeatureSet"
     )
     """The feature sets measured in the artifact (:class:`~lamindb.FeatureSet`)."""
-    feature_values: FeatureValue = models.ManyToManyField(
+    _feature_values: FeatureValue = models.ManyToManyField(
         FeatureValue, through="ArtifactFeatureValue"
     )
     """Non-categorical feature values for annotation."""
-    param_values: ParamValue = models.ManyToManyField(
+    _param_values: ParamValue = models.ManyToManyField(
         ParamValue, through="ArtifactParamValue", related_name="artifacts"
     )
     """Parameter values."""
@@ -2116,7 +2116,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
         db_index=True, choices=VisibilityChoice.choices, default=1
     )
     """Visibility of artifact record in queries & searches (1 default, 1 hidden, -1 trash)."""
-    key_is_virtual: bool = models.BooleanField()
+    _key_is_virtual: bool = models.BooleanField()
     """Indicates whether `key` is virtual or part of an actual file path."""
 
     @overload
@@ -2548,7 +2548,7 @@ class Collection(Record, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
     """:class:`~lamindb.Run` that created the `collection`."""
     input_of_runs: Run = models.ManyToManyField(Run, related_name="input_collections")
     """Runs that use this collection as an input."""
-    previous_runs: Run = models.ManyToManyField(
+    _previous_runs: Run = models.ManyToManyField(
         "Run", related_name="output_collections_with_later_updates"
     )
     """Sequence of runs that created or updated the record."""
