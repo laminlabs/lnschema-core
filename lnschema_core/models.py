@@ -234,7 +234,7 @@ class CanValidate:
                 field names.
             mute: Whether to mute logging.
             organism: An Organism name or record.
-            source: A Source record that specifies the version to inspect against.
+            source: A `bionty.Source` record that specifies the version to inspect against.
 
         See Also:
             :meth:`~lamindb.core.CanValidate.validate`
@@ -273,7 +273,7 @@ class CanValidate:
                     or `'name'` to map against the ontologies field names.
             mute: Whether to mute logging.
             organism: An Organism name or record.
-            source: A Source record that specifies the version to validate against.
+            source: A `bionty.Source` record that specifies the version to validate against.
 
         Returns:
             A vector of booleans indicating if an element is validated.
@@ -329,7 +329,7 @@ class CanValidate:
                   When a field is converted into return_field, keep marks which matches to keep when multiple return_field values map to the same field value.
             synonyms_field: A field containing the concatenated synonyms.
             organism: An Organism name or record.
-            source: A Source record that specifies the version to validate against.
+            source: A `bionty.Source` record that specifies the version to validate against.
 
         Returns:
             If `return_mapper` is `False`: a list of standardized names. Otherwise,
@@ -682,7 +682,7 @@ class RecordMeta(ModelBase):
             field: A `Record` field to look up, e.g., `bt.CellMarker.name`.
             create: Whether to create records if they don't exist.
             organism: A `bionty.Organism` name or record.
-            source: A `bionty.Source` record.
+            source: A `bionty.Source` record to validate against to create records for.
             mute: Whether to mute logging.
 
         Returns:
