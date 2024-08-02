@@ -261,6 +261,7 @@ class CanValidate:
         *,
         mute: bool = False,
         organism: str | Record | None = None,
+        source: Record | None = None,
     ) -> np.ndarray:
         """Validate values against existing values of a string field.
 
@@ -305,6 +306,7 @@ class CanValidate:
         keep: Literal["first", "last", False] = "first",
         synonyms_field: str = "synonyms",
         organism: str | Record | None = None,
+        source: Record | None = None,
     ) -> list[str] | dict[str, str]:
         """Maps input synonyms to standardized names.
 
