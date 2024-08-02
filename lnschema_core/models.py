@@ -1354,6 +1354,10 @@ class Transform(Record, IsVersioned):
         """The latest run of this transform."""
         pass
 
+    def view_lineage(self) -> None:
+        """View lineage of transforms."""
+        pass
+
 
 class Param(Record, CanValidate, TracksRun, TracksUpdates):
     """Parameters of runs & models akin to Feature for datasets."""
