@@ -2070,7 +2070,10 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
     )
     """:class:`~lamindb.core.types.ArtifactType` (default `None`)."""
     _accessor: str = CharField(
-        max_length=64, db_index=True, null=True, default=None, db_column="accessor"
+        max_length=64,
+        db_index=True,
+        null=True,
+        default=None,
     )
     """Default backed or memory accessor, e.g., DataFrame, AnnData."""
     size: int = models.BigIntegerField(null=True, db_index=True)
@@ -2086,7 +2089,10 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
     Useful to ascertain integrity and avoid duplication.
     """
     _hash_type: str = CharField(
-        max_length=30, db_index=True, null=True, default=None, db_column="hash_type"
+        max_length=30,
+        db_index=True,
+        null=True,
+        default=None,
     )
     """Type of hash."""
     n_objects: int = models.BigIntegerField(default=None, null=True, db_index=True)
@@ -2135,7 +2141,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
         db_index=True, choices=VisibilityChoice.choices, default=1
     )
     """Visibility of artifact record in queries & searches (1 default, 1 hidden, -1 trash)."""
-    _key_is_virtual: bool = models.BooleanField(db_column="key_is_virtual")
+    _key_is_virtual: bool = models.BooleanField()
     """Indicates whether `key` is virtual or part of an actual file path."""
     _actions: Artifact = models.ManyToManyField(
         "self", symmetrical=False, related_name="+"
