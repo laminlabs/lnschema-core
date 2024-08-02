@@ -17,7 +17,6 @@ def test_registry__repr__param(setup_instance):
     expected_repr = textwrap.dedent("""\
     Param
       Basic fields
-        .id: BigAutoField
         .name: CharField
         .dtype: CharField
         .created_at: DateTimeField
@@ -25,7 +24,6 @@ def test_registry__repr__param(setup_instance):
       Relational fields
         .created_by: User
         .run: Run
-        .previous_runs: Run
         .paramvalue: ParamValue
     """).strip()
 
@@ -40,20 +38,16 @@ def test_registry__repr__artifact(setup_instance):
     expected_repr = textwrap.dedent("""\
     Artifact
       Basic fields
-        .id: AutoField
         .uid: CharField
         .description: CharField
         .key: CharField
         .suffix: CharField
         .type: CharField
-        .accessor: CharField
         .size: BigIntegerField
         .hash: CharField
-        .hash_type: CharField
         .n_objects: BigIntegerField
         .n_observations: BigIntegerField
         .visibility: SmallIntegerField
-        .key_is_virtual: BooleanField
         .version: CharField
         .created_at: DateTimeField
         .updated_at: DateTimeField
@@ -63,13 +57,8 @@ def test_registry__repr__artifact(setup_instance):
         .transform: Transform
         .run: Run
         .ulabels: ULabel
-        .input_of: Run
-        .previous_runs: Run
+        .input_of_runs: Run
         .feature_sets: FeatureSet
-        .feature_values: FeatureValue
-        .param_values: ParamValue
-        .latest_report_of: Transform
-        .source_code_of: Transform
         .report_of: Run
         .environment_of: Run
         .collection: Collection

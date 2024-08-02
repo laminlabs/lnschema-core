@@ -313,7 +313,7 @@ class Migration(migrations.Migration):
                             ("api", "api"),
                         ],
                         db_index=True,
-                        default=lnschema_core.types.TransformType["pipeline"],
+                        default="pipeline",
                         max_length=20,
                     ),
                 ),

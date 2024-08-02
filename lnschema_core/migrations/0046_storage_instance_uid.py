@@ -33,7 +33,7 @@ class Migration(migrations.Migration):
                     ("function", "function"),
                 ],
                 db_index=True,
-                default=lnschema_core.types.TransformType["pipeline"],
+                default="pipeline",
                 max_length=20,
             ),
         ),

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import List, Union
+from typing import List, Literal, Union
 
 import numpy as np
 import pandas as pd
@@ -13,33 +13,8 @@ from django.db.models.query_utils import DeferredAttribute as FieldAttr
 ListLike = Union[List[str], pd.Series, np.array]
 StrField = Union[str, FieldAttr]  # typing.TypeAlias
 
-
-class ChoicesMixin:
-    @classmethod
-    def choices(cls):
-        return [(item.value, item.name) for item in cls]
-
-    # needs to mix with Enum
-    def __repr__(self):
-        return self.value
-
-    # needs to mix with Enum
-    def __str__(self):
-        return self.value
-
-
-class TransformType(ChoicesMixin, str, Enum):
-    pipeline = "pipeline"
-    notebook = "notebook"
-    upload = "upload"
-    script = "script"
-    function = "function"
-
-
-class ArtifactType(ChoicesMixin, str, Enum):
-    dataset = "dataset"
-    model = "model"
-    code = "code"
+TransformType = Literal["pipeline", "notebook", "upload", "script", "function", "glue"]
+ArtifactType = Literal["dataset", "model"]
 
 
 class VisibilityChoice(IntegerChoices):

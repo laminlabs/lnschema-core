@@ -22,18 +22,20 @@ from django.db.models.fields.related import (
 )
 from lamin_utils import colors, logger
 from lamindb_setup import _check_instance_setup
+from lamindb_setup.core.hashing import HASH_LENGTH
 
 from lnschema_core.types import (
+    ArtifactType,
     CharField,
     FieldAttr,
     ListLike,
     StrField,
     TextField,
+    TransformType,
     VisibilityChoice,
 )
 
 from .ids import base62_8, base62_12, base62_20
-from .types import ArtifactType, TransformType
 from .users import current_user_id
 
 if TYPE_CHECKING:
@@ -188,7 +190,7 @@ class TracksUpdates(models.Model):
     """Time of last update to record."""
     # no default related_name below because it'd clash with the reverse accessor
     # of the .run field
-    previous_runs: Run = models.ManyToManyField("lnschema_core.Run", related_name="+")
+    _previous_runs: Run = models.ManyToManyField("lnschema_core.Run", related_name="+")
     """Sequence of runs that created or updated the record."""
 
     @overload
@@ -436,21 +438,14 @@ class HasParents:
         with_children: bool = False,
         distance: int = 5,
     ):
-        """View parents in a graph.
+        """View parents in an ontology.
 
         Args:
             field: Field to display on graph
             with_children: Also show children.
             distance: Maximum distance still shown.
 
-        There are two types of registries with a `parents` field:
-
-        - Ontological hierarchies: :class:`~lamindb.ULabel` (project & sub-project), :class:`~bionty.CellType` (cell type & subtype), ...
-        - Procedural/temporal hierarchies: :class:`~lamindb.Transform` (preceding transform & successing transform), ...
-
-        See Also:
-            - :doc:`docs:data-flow`
-            - :doc:`/tutorial`
+        Ontological hierarchies: :class:`~lamindb.ULabel` (project & sub-project), :class:`~bionty.CellType` (cell type & subtype).
 
         Examples:
             >>> import bionty as bt
@@ -498,7 +493,7 @@ class RecordMeta(ModelBase):
         return result
 
     def __repr__(cls) -> str:
-        """Designed to show schema version when Records are called directly.
+        """Shows fields.
 
         Divided into several parts:
         1. Header
@@ -552,6 +547,8 @@ class RecordMeta(ModelBase):
                 or isinstance(field, ManyToManyRel)
                 or isinstance(field, ManyToManyField)
                 or isinstance(field, ForeignKey)
+                or field.name.startswith("_")
+                or field.name == "id"
             )
         ]
         basic_fields = _reorder_fields_by_class(basic_fields)
@@ -572,14 +569,14 @@ class RecordMeta(ModelBase):
             field
             for field in cls._meta.fields + cls._meta.many_to_many
             if isinstance(field, relational_fields)
-            and not field.name.endswith("_links")
+            and not field.name.startswith(("links_", "_"))
         ]
 
         non_class_specific_relational_fields = [
             field
             for field in cls._meta.get_fields()
             if isinstance(field, relational_fields)
-            and not field.name.endswith("_links")
+            and not field.name.startswith(("links_", "_"))
         ]
         non_class_specific_relational_fields = _reorder_fields_by_class(
             non_class_specific_relational_fields
@@ -934,7 +931,7 @@ class HasFeatures:
     Features denote dataset dimensions, i.e., the variables that measure labels
     & numbers.
 
-    Curate with features & values::
+    Annotate with features & values::
 
        artifact.features.add_values({
             "species": organism,  # here, organism is an Organism record
@@ -1000,7 +997,7 @@ class HasParams:
 
     What `.features` is to dataset-like artifacts, `.params` is to model-like artifacts.
 
-    Curate with params & values::
+    Annotate with params & values::
 
         artifact.params.add_values({
             "hidden_size": 32,
@@ -1206,7 +1203,7 @@ class Storage(Record, TracksRun, TracksUpdates):
         pass
 
 
-class Transform(Record, HasParents, IsVersioned):
+class Transform(Record, IsVersioned):
     """Data transformations.
 
     A transform can refer to a Python function, a script, notebook, or a
@@ -1234,8 +1231,7 @@ class Transform(Record, HasParents, IsVersioned):
         name: `str` A name or title.
         key: `str | None = None` A short name or path-like semantic key.
         version: `str | None = None` A version.
-        type: `TransformType | None = "pipeline"` Either `'notebook'`, `'pipeline'`
-            or `'script'`.
+        type: `TransformType | None = "pipeline"` See :class:`~lamindb.core.types.TransformType`.
         is_new_version_of: `Transform | None = None` An old version of the transform.
 
     See Also:
@@ -1286,21 +1282,29 @@ class Transform(Record, HasParents, IsVersioned):
     """A key for concise reference & versioning (optional)."""
     description: str = CharField(max_length=255, null=True, default=None)
     """A description (optional)."""
-    type: str = CharField(
+    type: TransformType = CharField(
         max_length=20,
-        choices=TransformType.choices(),
         db_index=True,
-        default=TransformType.pipeline,
+        default="pipeline",
     )
-    """Transform type (default `"pipeline"`)."""
-    latest_report: Artifact = models.ForeignKey(
-        "Artifact", PROTECT, default=None, null=True, related_name="latest_report_of"
+    """:class:`~lamindb.core.types.TransformType` (default `"pipeline"`)."""
+    _source_code_artifact: Artifact = models.ForeignKey(
+        "Artifact", PROTECT, default=None, null=True, related_name="_source_code_of"
     )
-    """Latest run report."""
-    source_code: Artifact = models.ForeignKey(
-        "Artifact", PROTECT, default=None, null=True, related_name="source_code_of"
+    """Source code of the transform if stored as artifact within LaminDB.
+
+    .. versionchanged:: 0.75
+       Made private and deprecated for future removal.
+    """
+    source_code: str | None = TextField(null=True, default=None)
+    """Source code of the transform.
+
+    .. versionchanged:: 0.75
+       The `source_code` field is no longer an artifact, but a text field.
+    """
+    hash: str | None = CharField(
+        max_length=HASH_LENGTH, db_index=True, null=True, default=None
     )
-    """Source of the transform if stored as artifact within LaminDB."""
     reference: str = CharField(max_length=255, db_index=True, null=True, default=None)
     """Reference for the transform, e.g..  URL."""
     reference_type: str = CharField(
@@ -1308,10 +1312,10 @@ class Transform(Record, HasParents, IsVersioned):
     )
     """Type of reference, e.g., 'url' or 'doi'."""
     ulabels: ULabel = models.ManyToManyField("ULabel", related_name="transforms")
-    parents: Transform = models.ManyToManyField(
-        "self", symmetrical=False, related_name="children"
+    predecessors: Transform = models.ManyToManyField(
+        "self", symmetrical=False, related_name="successors"
     )
-    """Parent transforms (predecessors) in data flow.
+    """Preceding transforms.
 
     These are auto-populated whenever a transform loads an artifact or collection as run input.
     """
@@ -1344,6 +1348,15 @@ class Transform(Record, HasParents, IsVersioned):
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
+
+    @property
+    def latest_run(self) -> Run:
+        """The latest run of this transform."""
+        pass
+
+    def view_lineage(self) -> None:
+        """View lineage of transforms."""
+        pass
 
 
 class Param(Record, CanValidate, TracksRun, TracksUpdates):
@@ -1437,7 +1450,7 @@ class Run(Record, HasParams):
     """Finished time of run."""
     created_by: User = models.ForeignKey(User, CASCADE, default=current_user_id)
     """Creator of run. :class:`~lamindb.User`"""
-    param_values: ParamValue = models.ManyToManyField(
+    _param_values: ParamValue = models.ManyToManyField(
         ParamValue, through="RunParamValue", related_name="runs"
     )
     """Parameter values."""
@@ -1456,6 +1469,10 @@ class Run(Record, HasParams):
     """
     is_consecutive: bool = models.BooleanField(null=True, default=None)
     """Indicates whether code was consecutively executed. Is relevant for notebooks."""
+    parent: Run = models.ForeignKey(
+        "Run", CASCADE, null=True, default=None, related_name="children"
+    )
+    """Parent run."""
     reference: str = CharField(max_length=255, db_index=True, null=True, default=None)
     """A reference like a URL or external ID (such as from a workflow manager)."""
     reference_type: str = CharField(
@@ -1671,7 +1688,7 @@ class Feature(Record, CanValidate, TracksRun, TracksUpdates):
     """Internal id, valid only in one DB instance."""
     uid: str = CharField(unique=True, db_index=True, max_length=12, default=base62_12)
     """Universal id, valid across DB instances."""
-    name: str = CharField(max_length=150, db_index=True, default=None)
+    name: str = CharField(max_length=150, db_index=True, default=None, unique=True)
     """Name of feature (required)."""
     dtype: str = CharField(max_length=64, db_index=True, default=None)
     """Data type ("number", "cat", "int", "float", "bool", "datetime").
@@ -1839,7 +1856,7 @@ class FeatureSet(Record, TracksRun):
     Depending on the registry, `.members` stores, e.g. `Feature` or `Gene` records.
     """
     hash: str = CharField(
-        max_length=20, default=None, db_index=True, null=True, unique=True
+        max_length=HASH_LENGTH, default=None, db_index=True, null=True, unique=True
     )
     """The hash of the set."""
 
@@ -1926,20 +1943,16 @@ class FeatureSet(Record, TracksRun):
 
 
 class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpdates):
-    """Artifacts: datasets & models stored as files, folders, or arrays.
+    """Datasets & models stored as files, folders, or arrays.
 
-    Artifacts manage data in local or remote storage.
-
-    An artifact stores a dataset or model as either a file or a folder.
+    Artifacts manage data in local or remote storage (:doc:`/tutorial`).
 
     Some artifacts are array-like, e.g., when stored as `.parquet`, `.h5ad`,
     `.zarr`, or `.tiledb`.
 
-    For more info, see tutorial: :doc:`/tutorial`.
-
     Args:
         data: `UPathStr` A path to a local or remote folder or file.
-        type: `Literal["dataset", "model", "code"] | None = None` The artifact type.
+        type: `Literal["dataset", "model"] | None = None` The artifact type.
         key: `str | None = None` A relative path within default storage,
             e.g., `"myfolder/myfile.fcs"`.
         description: `str | None = None` A description.
@@ -1976,20 +1989,15 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
             Create an artifact from a `DataFrame`.
         :meth:`~lamindb.Artifact.from_anndata`
             Create an artifact from an `AnnData`.
-        :meth:`~lamindb.Artifact.from_dir`
-            Bulk create file-like artifacts from a directory.
 
     Examples:
 
-        Create an artifact from a file in the cloud:
+        Create an artifact from a path to a file or folder:
 
-        >>> artifact = ln.Artifact("s3://my-bucket/my-folder/my-file.csv", description="My file")
-        >>> artifact.save()  # only metadata is saved
-
-        Create an artifact from a local filepath:
-
-        >>> artifact = ln.Artifact("./my_file.jpg", description="My image")
-        >>> artifact.save()
+        >>> artifact = ln.Artifact("s3://my_bucket/my_folder/my_file.csv", description="My file")
+        >>> artifact = ln.Artifact("./my_local_file.jpg", description="My image")
+        >>> artifact = ln.Artifact("s3://my_bucket/my_folder", description="My folder")
+        >>> artifact = ln.Artifact("./my_local_folder", description="My local folder")
 
         .. dropdown:: Why does the API look this way?
 
@@ -2042,7 +2050,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
     description: str = CharField(max_length=255, db_index=True, null=True, default=None)
     """A description."""
     storage: Storage = models.ForeignKey(Storage, PROTECT, related_name="artifacts")
-    """Storage location (:class:`~lamindb.Storage`), e.g.. n S3 or GCP bucket or a local directory."""
+    """Storage location, e.g. an S3 or GCP bucket or a local directory."""
     key: str = CharField(max_length=255, db_index=True, null=True, default=None)
     """Storage key, the relative path within the storage location."""
     suffix: str = CharField(max_length=30, db_index=True, default=None)
@@ -2052,15 +2060,16 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
 
     This is either a file suffix (`".csv"`, `".h5ad"`, etc.) or the empty string "".
     """
-    type: str = CharField(
+    type: ArtifactType | None = CharField(
         max_length=20,
-        choices=ArtifactType.choices(),
         db_index=True,
         default=None,
         null=True,
     )
-    """Artifact type (default `None`)."""
-    accessor: str = CharField(max_length=64, db_index=True, null=True, default=None)
+    """:class:`~lamindb.core.types.ArtifactType` (default `None`)."""
+    _accessor: str = CharField(
+        max_length=64, db_index=True, null=True, default=None, db_column="accessor"
+    )
     """Default backed or memory accessor, e.g., DataFrame, AnnData."""
     size: int = models.BigIntegerField(null=True, db_index=True)
     """Size in bytes.
@@ -2068,13 +2077,15 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
     Examples: 1KB is 1e3 bytes, 1MB is 1e6, 1GB is 1e9, 1TB is 1e12 etc.
     """
     hash: str = CharField(
-        max_length=86, db_index=True, null=True, default=None
-    )  # 86 base64 chars allow to store 64 bytes, 512 bits
+        max_length=HASH_LENGTH, db_index=True, null=True, default=None
+    )
     """Hash or pseudo-hash of artifact content.
 
     Useful to ascertain integrity and avoid duplication.
     """
-    hash_type: str = CharField(max_length=30, db_index=True, null=True, default=None)
+    _hash_type: str = CharField(
+        max_length=30, db_index=True, null=True, default=None, db_column="hash_type"
+    )
     """Type of hash."""
     n_objects: int = models.BigIntegerField(default=None, null=True, db_index=True)
     """Number of objects.
@@ -2098,11 +2109,11 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
         Run, PROTECT, related_name="output_artifacts", null=True, default=None
     )
     """:class:`~lamindb.Run` that created the artifact."""
-    input_of: Run = models.ManyToManyField(Run, related_name="input_artifacts")
+    input_of_runs: Run = models.ManyToManyField(Run, related_name="input_artifacts")
     """Runs that use this artifact as an input."""
     # if the artifact is replicated or update in a new run, we link the previous
     # run in previous_runs
-    previous_runs: Run = models.ManyToManyField(
+    _previous_runs: Run = models.ManyToManyField(
         "Run", related_name="output_artifacts_with_later_updates"
     )
     """Sequence of runs that created or updated the record."""
@@ -2110,26 +2121,26 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
         FeatureSet, related_name="artifacts", through="ArtifactFeatureSet"
     )
     """The feature sets measured in the artifact (:class:`~lamindb.FeatureSet`)."""
-    feature_values: FeatureValue = models.ManyToManyField(
+    _feature_values: FeatureValue = models.ManyToManyField(
         FeatureValue, through="ArtifactFeatureValue"
     )
     """Non-categorical feature values for annotation."""
-    param_values: ParamValue = models.ManyToManyField(
+    _param_values: ParamValue = models.ManyToManyField(
         ParamValue, through="ArtifactParamValue", related_name="artifacts"
     )
     """Parameter values."""
     visibility: int = models.SmallIntegerField(
         db_index=True, choices=VisibilityChoice.choices, default=1
     )
-    """Visibility of artifact record in queries & searches (0 default, 1 hidden, 2 trash)."""
-    key_is_virtual: bool = models.BooleanField()
+    """Visibility of artifact record in queries & searches (1 default, 1 hidden, -1 trash)."""
+    _key_is_virtual: bool = models.BooleanField(db_column="key_is_virtual")
     """Indicates whether `key` is virtual or part of an actual file path."""
 
     @overload
     def __init__(
         self,
         data: UPathStr,
-        type: Literal["dataset", "model", "code"] = "dataset",
+        type: ArtifactType | None = None,
         key: str | None = None,
         description: str | None = None,
         is_new_version_of: Artifact | None = None,
@@ -2463,7 +2474,6 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
 
 # auto-generated through choices()
 delattr(Artifact, "get_visibility_display")
-delattr(Artifact, "get_type_display")
 
 
 class Collection(Record, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
@@ -2528,7 +2538,9 @@ class Collection(Record, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
     """Name or title of collection (required)."""
     description: str = TextField(null=True, default=None)
     """A description."""
-    hash: str = CharField(max_length=86, db_index=True, null=True, default=None)
+    hash: str = CharField(
+        max_length=HASH_LENGTH, db_index=True, null=True, default=None
+    )
     """Hash of collection content. 86 base64 chars allow to store 64 bytes, 512 bits."""
     reference: str = CharField(max_length=255, db_index=True, null=True, default=None)
     """A reference like URL or external ID."""
@@ -2553,29 +2565,27 @@ class Collection(Record, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
         Run, PROTECT, related_name="output_collections", null=True, default=None
     )
     """:class:`~lamindb.Run` that created the `collection`."""
-    input_of: Run = models.ManyToManyField(Run, related_name="input_collections")
+    input_of_runs: Run = models.ManyToManyField(Run, related_name="input_collections")
     """Runs that use this collection as an input."""
-    previous_runs: Run = models.ManyToManyField(
+    _previous_runs: Run = models.ManyToManyField(
         "Run", related_name="output_collections_with_later_updates"
     )
     """Sequence of runs that created or updated the record."""
-    artifact: Artifact = models.OneToOneField(
-        "Artifact", PROTECT, null=True, unique=True, related_name="collection"
-    )
-    """Storage of collection as a one artifact."""
-    unordered_artifacts: Artifact = models.ManyToManyField(
+    artifacts: Artifact = models.ManyToManyField(
         "Artifact", related_name="collections", through="CollectionArtifact"
     )
-    """Storage of collection as multiple artifacts."""
+    """Artifacts in collection."""
+    meta_artifact: Artifact | None = models.OneToOneField(
+        "Artifact", PROTECT, null=True, unique=True, related_name="collection"
+    )
+    """An artifact that stores metadata that indexes a collection.
+
+    It has a 1:1 correspondence with a collection.
+    """
     visibility: int = models.SmallIntegerField(
         db_index=True, choices=VisibilityChoice.choices, default=1
     )
-    """Visibility of record,  0-default, 1-hidden, 2-trash."""
-
-    @property
-    def artifacts(self) -> QuerySet:
-        """Ordered QuerySet of artifacts."""
-        pass
+    """Visibility of collection record in queries & searches (1 default, 1 hidden, -1 trash)."""
 
     @overload
     def __init__(
@@ -2727,6 +2737,30 @@ class Collection(Record, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
         """
         pass
 
+    @property
+    def ordered_artifacts(self) -> QuerySet:
+        """Ordered `QuerySet` of `.artifacts`.
+
+        Accessing the many-to-many field `collection.artifacts` directly gives
+        you non-deterministic order.
+
+        Using the property `.ordered_artifacts` allows to iterate through a set
+        that's ordered in the order of creation.
+        """
+        pass
+
+    @property
+    def data_artifact(self) -> Artifact | None:
+        """Access to a single data artifact.
+
+        If the collection has a single data & metadata artifact, this allows access via::
+
+           collection.data_artifact  # first & only element of collection.artifacts
+           collection.meta_artifact  # metadata
+
+        """
+        pass
+
 
 # auto-generated through choices()
 delattr(Collection, "get_visibility_display")
@@ -2750,11 +2784,11 @@ class FeatureSetFeature(Record, LinkORM):
 class ArtifactFeatureSet(Record, LinkORM, TracksRun):
     id: int = models.BigAutoField(primary_key=True)
     artifact: Artifact = models.ForeignKey(
-        Artifact, CASCADE, related_name="feature_set_links"
+        Artifact, CASCADE, related_name="links_feature_set"
     )
     # we follow the lower() case convention rather than snake case for link models
     featureset: FeatureSet = models.ForeignKey(
-        FeatureSet, PROTECT, related_name="artifact_links"
+        FeatureSet, PROTECT, related_name="links_artifact"
     )
     slot: str = CharField(max_length=40, null=True, default=None)
     feature_ref_is_semantic: bool = models.BooleanField(
@@ -2768,11 +2802,11 @@ class ArtifactFeatureSet(Record, LinkORM, TracksRun):
 class CollectionFeatureSet(Record, LinkORM, TracksRun):
     id: int = models.BigAutoField(primary_key=True)
     collection = models.ForeignKey(
-        Collection, CASCADE, related_name="feature_set_links"
+        Collection, CASCADE, related_name="links_feature_set"
     )
     # we follow the lower() case convention rather than snake case for link models
     featureset: FeatureSet = models.ForeignKey(
-        FeatureSet, PROTECT, related_name="collection_links"
+        FeatureSet, PROTECT, related_name="links_collection"
     )
     slot: str = CharField(max_length=50, null=True, default=None)
     feature_ref_is_semantic: bool = models.BooleanField(
@@ -2786,10 +2820,10 @@ class CollectionFeatureSet(Record, LinkORM, TracksRun):
 class CollectionArtifact(Record, LinkORM, TracksRun):
     id: int = models.BigAutoField(primary_key=True)
     collection: Collection = models.ForeignKey(
-        Collection, CASCADE, related_name="artifact_links"
+        Collection, CASCADE, related_name="links_artifact"
     )
     artifact: Artifact = models.ForeignKey(
-        Artifact, PROTECT, related_name="collection_links"
+        Artifact, PROTECT, related_name="links_collection"
     )
 
     class Meta:
@@ -2799,11 +2833,11 @@ class CollectionArtifact(Record, LinkORM, TracksRun):
 class ArtifactULabel(Record, LinkORM, TracksRun):
     id: int = models.BigAutoField(primary_key=True)
     artifact: Artifact = models.ForeignKey(
-        Artifact, CASCADE, related_name="ulabel_links"
+        Artifact, CASCADE, related_name="links_ulabel"
     )
-    ulabel = models.ForeignKey(ULabel, PROTECT, related_name="artifact_links")
+    ulabel = models.ForeignKey(ULabel, PROTECT, related_name="links_artifact")
     feature = models.ForeignKey(
-        Feature, PROTECT, null=True, default=None, related_name="artifactulabel_links"
+        Feature, PROTECT, null=True, default=None, related_name="links_artifactulabel"
     )
     label_ref_is_name: bool = models.BooleanField(null=True, default=None)
     feature_ref_is_name: bool = models.BooleanField(null=True, default=None)
@@ -2815,11 +2849,11 @@ class ArtifactULabel(Record, LinkORM, TracksRun):
 class CollectionULabel(Record, LinkORM, TracksRun):
     id: int = models.BigAutoField(primary_key=True)
     collection: Collection = models.ForeignKey(
-        Collection, CASCADE, related_name="ulabel_links"
+        Collection, CASCADE, related_name="links_ulabel"
     )
-    ulabel: ULabel = models.ForeignKey(ULabel, PROTECT, related_name="collection_links")
+    ulabel: ULabel = models.ForeignKey(ULabel, PROTECT, related_name="links_collection")
     feature: Feature = models.ForeignKey(
-        Feature, PROTECT, null=True, default=None, related_name="collectionulabel_links"
+        Feature, PROTECT, null=True, default=None, related_name="links_collectionulabel"
     )
     label_ref_is_name: bool = models.BooleanField(null=True, default=None)
     feature_ref_is_name: bool = models.BooleanField(null=True, default=None)
