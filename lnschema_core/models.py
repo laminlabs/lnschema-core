@@ -228,14 +228,13 @@ class CanValidate:
         Being mappable means that an exact match exists.
 
         Args:
-            values: Values that will be checked against the
-                field.
+            values: Values that will be checked against the field.
             field: The field of values. Examples are `'ontology_id'` to map
                 against the source ID or `'name'` to map against the ontologies
                 field names.
-            mute: Mute logging.
+            mute: Whether to mute logging.
             organism: An Organism name or record.
-            source: A Source record.
+            source: A `bionty.Source` record that specifies the version to inspect against.
 
         See Also:
             :meth:`~lamindb.core.CanValidate.validate`
@@ -272,7 +271,9 @@ class CanValidate:
             field: The field of values.
                     Examples are `'ontology_id'` to map against the source ID
                     or `'name'` to map against the ontologies field names.
-            mute: Mute logging.
+            mute: Whether to mute logging.
+            organism: An Organism name or record.
+            source: A `bionty.Source` record that specifies the version to validate against.
 
         Returns:
             A vector of booleans indicating if an element is validated.
@@ -316,7 +317,7 @@ class CanValidate:
             return_field: The field to return. Defaults to field.
             return_mapper: If `True`, returns `{input_value: standardized_name}`.
             case_sensitive: Whether the mapping is case sensitive.
-            mute: Mute logging.
+            mute: Whether to mute logging.
             public_aware: Whether to standardize from Bionty reference. Defaults to `True` for Bionty registries.
             keep: When a synonym maps to multiple names, determines which duplicates to mark as `pd.DataFrame.duplicated`:
                     - `"first"`: returns the first mapped standardized name
@@ -328,6 +329,7 @@ class CanValidate:
                   When a field is converted into return_field, keep marks which matches to keep when multiple return_field values map to the same field value.
             synonyms_field: A field containing the concatenated synonyms.
             organism: An Organism name or record.
+            source: A `bionty.Source` record that specifies the version to validate against.
 
         Returns:
             If `return_mapper` is `False`: a list of standardized names. Otherwise,
@@ -360,9 +362,9 @@ class CanValidate:
         """Add synonyms to a record.
 
         Args:
-            synonym
-            force
-            save
+            synonym: The synonyms to add to the record.
+            force: Whether to add synonyms even if they are already synonyms of other records.
+            save: Whether to save the record to the database.
 
         See Also:
             :meth:`~lamindb.core.CanValidate.remove_synonym`
@@ -385,7 +387,7 @@ class CanValidate:
         """Remove synonyms from a record.
 
         Args:
-            synonym: The synonym value.
+            synonym: The synonym values to remove.
 
         See Also:
             :meth:`~lamindb.core.CanValidate.add_synonym`
@@ -444,7 +446,7 @@ class HasParents:
 
         Args:
             field: Field to display on graph
-            with_children: Also show children.
+            with_children: Whether to also show children.
             distance: Maximum distance still shown.
 
         Ontological hierarchies: :class:`~lamindb.ULabel` (project & sub-project), :class:`~bionty.CellType` (cell type & subtype).
@@ -680,11 +682,11 @@ class RecordMeta(ModelBase):
             field: A `Record` field to look up, e.g., `bt.CellMarker.name`.
             create: Whether to create records if they don't exist.
             organism: A `bionty.Organism` name or record.
-            source: A `bionty.Source` record.
-            mute: Do not show logging.
+            source: A `bionty.Source` record to validate against to create records for.
+            mute: Whether to mute logging.
 
         Returns:
-            A list of validated records. For bionty registries. lso returns knowledge-coupled records.
+            A list of validated records. For bionty registries. Also returns knowledge-coupled records.
 
         Notes:
             For more info, see tutorial: :doc:`bio-registries`.
@@ -765,7 +767,7 @@ class RecordMeta(ModelBase):
         """Get a single record.
 
         Args:
-            idlike: Either a uid stub.  uid or an integer id.
+            idlike: Either a uid stub, uid or an integer id.
 
         Returns:
             A record.
@@ -930,8 +932,7 @@ class HasFeatures:
     features: FeatureManager = FeatureManager  # type: ignore
     """Feature manager.
 
-    Features denote dataset dimensions, i.e., the variables that measure labels
-    & numbers.
+    Features denote dataset dimensions, i.e., the variables that measure labels & numbers.
 
     Annotate with features & values::
 
@@ -951,7 +952,6 @@ class HasFeatures:
     `DataFrame`-like artifact and annotates it with features corresponding to
     these columns. `artifact.features.add_values`, by contrast, does not
     validate the content of the artifact.
-
     """
 
     @property
