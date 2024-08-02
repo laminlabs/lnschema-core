@@ -2135,6 +2135,10 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
     """Visibility of artifact record in queries & searches (1 default, 1 hidden, -1 trash)."""
     _key_is_virtual: bool = models.BooleanField(db_column="key_is_virtual")
     """Indicates whether `key` is virtual or part of an actual file path."""
+    _actions: Artifact = models.ManyToManyField(
+        "self", symmetrical=False, related_name="+"
+    )
+    """Actions to attach for the UI."""
 
     @overload
     def __init__(
@@ -2586,6 +2590,8 @@ class Collection(Record, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
         db_index=True, choices=VisibilityChoice.choices, default=1
     )
     """Visibility of collection record in queries & searches (1 default, 1 hidden, -1 trash)."""
+    _actions: Artifact = models.ManyToManyField(Artifact, related_name="+")
+    """Actions to attach for the UI."""
 
     @overload
     def __init__(
