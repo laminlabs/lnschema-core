@@ -307,6 +307,7 @@ class CanValidate:
         keep: Literal["first", "last", False] = "first",
         synonyms_field: str = "synonyms",
         organism: str | Record | None = None,
+        source: Record | None = None,
     ) -> list[str] | dict[str, str]:
         """Maps input synonyms to standardized names.
 
@@ -328,6 +329,7 @@ class CanValidate:
                   When a field is converted into return_field, keep marks which matches to keep when multiple return_field values map to the same field value.
             synonyms_field: A field containing the concatenated synonyms.
             organism: An Organism name or record.
+            source: A Source record that specifies the version to validate against.
 
         Returns:
             If `return_mapper` is `False`: a list of standardized names. Otherwise,
