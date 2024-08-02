@@ -438,21 +438,14 @@ class HasParents:
         with_children: bool = False,
         distance: int = 5,
     ):
-        """View parents in a graph.
+        """View parents in an ontology.
 
         Args:
             field: Field to display on graph
             with_children: Also show children.
             distance: Maximum distance still shown.
 
-        There are two types of registries with a `parents` field:
-
-        - Ontological hierarchies: :class:`~lamindb.ULabel` (project & sub-project), :class:`~bionty.CellType` (cell type & subtype), ...
-        - Procedural/temporal hierarchies: :class:`~lamindb.Transform` (preceding transform & successing transform), ...
-
-        See Also:
-            - :doc:`docs:data-flow`
-            - :doc:`/tutorial`
+        Ontological hierarchies: :class:`~lamindb.ULabel` (project & sub-project), :class:`~bionty.CellType` (cell type & subtype).
 
         Examples:
             >>> import bionty as bt
@@ -1210,7 +1203,7 @@ class Storage(Record, TracksRun, TracksUpdates):
         pass
 
 
-class Transform(Record, HasParents, IsVersioned):
+class Transform(Record, IsVersioned):
     """Data transformations.
 
     A transform can refer to a Python function, a script, notebook, or a
@@ -1319,10 +1312,10 @@ class Transform(Record, HasParents, IsVersioned):
     )
     """Type of reference, e.g., 'url' or 'doi'."""
     ulabels: ULabel = models.ManyToManyField("ULabel", related_name="transforms")
-    parents: Transform = models.ManyToManyField(
-        "self", symmetrical=False, related_name="children"
+    predecessors: Transform = models.ManyToManyField(
+        "self", symmetrical=False, related_name="successors"
     )
-    """Parent transforms (predecessors) in data flow.
+    """Preceding transforms.
 
     These are auto-populated whenever a transform loads an artifact or collection as run input.
     """

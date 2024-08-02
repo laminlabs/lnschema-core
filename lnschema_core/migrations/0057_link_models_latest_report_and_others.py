@@ -326,4 +326,16 @@ class Migration(migrations.Migration):
                 to="lnschema_core.run",
             ),
         ),
+        migrations.RenameField(
+            model_name="transform",
+            old_name="parents",
+            new_name="predecessors",
+        ),
+        migrations.AlterField(
+            model_name="transform",
+            name="predecessors",
+            field=models.ManyToManyField(
+                related_name="successors", to="lnschema_core.transform"
+            ),
+        ),
     ]
