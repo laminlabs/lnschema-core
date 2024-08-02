@@ -16,17 +16,17 @@ class Migration(migrations.Migration):
         migrations.RunSQL(
             sql="""
             UPDATE lnschema_core_artifact
-            SET hash = LEFT(hash, 22)
-            WHERE LENGTH(hash) > 22;
+            SET hash = SUBSTR(hash, 1, 22)
+            WHERE length(hash) > 22;
 
             UPDATE lnschema_core_collection
-            SET hash = LEFT(hash, 22)
-            WHERE LENGTH(hash) > 22;
+            SET hash = SUBSTR(hash, 1, 22)
+            WHERE length(hash) > 22;
 
             UPDATE lnschema_core_featureset
-            SET hash = LEFT(hash, 22)
-            WHERE LENGTH(hash) > 22;
-            """
+            SET hash = SUBSTR(hash, 1, 22)
+            WHERE length(hash) > 22;
+            """,
         ),
         migrations.AlterField(
             model_name="artifactfeatureset",
