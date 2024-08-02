@@ -2363,9 +2363,13 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
         pass
 
     def open(
-        self, is_run_input: bool | None = None
+        self, mode: str = "r", is_run_input: bool | None = None
     ) -> AnnDataAccessor | BackedAccessor | SOMACollection | SOMAExperiment:
         """Return a cloud-backed data object.
+
+        Args:
+            mode: can only be `"w"` (write mode) for `tiledbsoma` stores,
+                otherwise should be always `"r"` (read-only mode).
 
         Notes:
             For more info, see tutorial: :doc:`/arrays`.
