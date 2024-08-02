@@ -315,4 +315,15 @@ class Migration(migrations.Migration):
             name="source_code",
             field=models.TextField(default=None, null=True),
         ),
+        migrations.AddField(
+            model_name="run",
+            name="parent",
+            field=models.ForeignKey(
+                default=None,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="children",
+                to="lnschema_core.run",
+            ),
+        ),
     ]

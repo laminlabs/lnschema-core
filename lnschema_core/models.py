@@ -1472,6 +1472,10 @@ class Run(Record, HasParams):
     """
     is_consecutive: bool = models.BooleanField(null=True, default=None)
     """Indicates whether code was consecutively executed. Is relevant for notebooks."""
+    parent: Run = models.ForeignKey(
+        "Run", CASCADE, null=True, default=None, related_name="children"
+    )
+    """Parent run."""
     reference: str = CharField(max_length=255, db_index=True, null=True, default=None)
     """A reference like a URL or external ID (such as from a workflow manager)."""
     reference_type: str = CharField(
