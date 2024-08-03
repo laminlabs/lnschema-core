@@ -16,7 +16,7 @@ def test_registry__repr__param(setup_instance):
     param = ln.Param
     expected_repr = textwrap.dedent("""\
     Param
-      Basic fields
+      Simple fields
         .name: CharField
         .dtype: CharField
         .created_at: DateTimeField
@@ -37,7 +37,7 @@ def test_registry__repr__artifact(setup_instance):
     artifact = ln.Artifact
     expected_repr = textwrap.dedent("""\
     Artifact
-      Basic fields
+      Simple fields
         .uid: CharField
         .description: CharField
         .key: CharField
