@@ -21,5 +21,3 @@ if _check_instance_setup():
         ULabel,
         User,
     )
-
-    Registry = Record  # backward compat
