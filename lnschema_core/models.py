@@ -1485,7 +1485,7 @@ class Feature(Record, CanValidate, TracksRun, TracksUpdates):
 
     Note:
 
-        For more control, you can use :mod:`bionty` registries to manage basic
+        For more control, you can use :mod:`bionty` registries to manage simple
         biological entities like genes, proteins & cell markers. Or you define
         custom registries to manage high-level derived features like gene sets.
 
@@ -2778,18 +2778,12 @@ def format_field_value(value: datetime | str | Any) -> Any:
         return value
 
 
-def registry_repr(cls):
-    """Shows fields.
+class RegistryInfo:
+    def __init__(self, registry: Registry):
+        self.registry = registry
 
-    Divided into several parts:
-    1. Header
-    2. Basic fields where we first show class specific fields and then base class fields
-    3. Relational fields where we show class specific relational fields and then base class fields
-    4. External schema fields where we show loaded schemas such as Bionty, wetlab and others
-    """
-
-    def _get_type_for_field(field_name: str) -> str:
-        field = cls._meta.get_field(field_name)
+    def _get_type_for_field(self, field_name: str) -> str:
+        field = self.registry._meta.get_field(field_name)
         related_model_name = (
             field.related_model.__name__
             if hasattr(field, "related_model") and field.related_model
@@ -2797,146 +2791,165 @@ def registry_repr(cls):
         )
         return related_model_name if related_model_name else field.get_internal_type()
 
-    def _get_base_class_fields(cls: models.Model) -> list[str]:
+    def _get_base_class_fields(self) -> list[str]:
         return [
             field.name
-            for base in cls.__bases__
+            for base in self.registry.__bases__
             if hasattr(base, "_meta")
             for field in base._meta.get_fields()
         ]
 
-    def _reorder_fields_by_class(fields_to_order: list[Field]) -> list[Field]:
+    def _reorder_fields_by_class(self, fields_to_order: list[Field]) -> list[Field]:
         """Reorders the fields so that base class fields come last."""
         non_base_class_fields = [
             field
             for field in fields_to_order
-            if field.name not in _get_base_class_fields(cls)
+            if field.name not in self._get_base_class_fields()
         ]
         found_base_class_fields = [
             field
             for field in fields_to_order
-            if field.name in _get_base_class_fields(cls)
+            if field.name in self._get_base_class_fields()
         ]
         return non_base_class_fields + found_base_class_fields
 
-    # ---Header---
-    repr_str = f"{colors.green(cls.__name__)}\n"
-
-    # ---Basic fields---
-    basic_fields = [
-        field
-        for field in cls._meta.get_fields()
-        if not (
-            isinstance(field, ManyToOneRel)
-            or isinstance(field, ManyToManyRel)
-            or isinstance(field, ManyToManyField)
-            or isinstance(field, ForeignKey)
-            or field.name.startswith("_")
-            or field.name == "id"
-        )
-    ]
-    basic_fields = _reorder_fields_by_class(basic_fields)
-
-    repr_str += f"  {colors.italic('Basic fields')}\n"
-    if basic_fields:
-        repr_str += "".join(
-            [
-                f"    .{field_name.name}: {_get_type_for_field(field_name.name)}\n"
-                for field_name in basic_fields
-            ]
-        )
-
-    # ---Relational fields---
-    relational_fields = (ManyToOneRel, ManyToManyRel, ManyToManyField, ForeignKey)
-
-    class_specific_relational_fields = [
-        field
-        for field in cls._meta.fields + cls._meta.many_to_many
-        if isinstance(field, relational_fields)
-        and not field.name.startswith(("links_", "_"))
-    ]
-
-    non_class_specific_relational_fields = [
-        field
-        for field in cls._meta.get_fields()
-        if isinstance(field, relational_fields)
-        and not field.name.startswith(("links_", "_"))
-    ]
-    non_class_specific_relational_fields = _reorder_fields_by_class(
-        non_class_specific_relational_fields
-    )
-
-    # Ensure that class specific fields (e.g. Artifact) come before non-class specific fields (e.g. collection)
-    filtered_non_class_specific = [
-        field
-        for field in non_class_specific_relational_fields
-        if field not in class_specific_relational_fields
-    ]
-    ordered_relational_fields = (
-        class_specific_relational_fields + filtered_non_class_specific
-    )
-
-    non_external_schema_fields = []
-    external_schema_fields = []
-    for field in ordered_relational_fields:
-        field_name = repr(field).split(": ")[1][:-1]
-        if field_name.count(".") == 1 and "lnschema_core" not in field_name:
-            external_schema_fields.append(field)
+    def get_simple_fields(self, return_str: bool = False) -> Any:
+        simple_fields = [
+            field
+            for field in self.registry._meta.get_fields()
+            if not (
+                isinstance(field, ManyToOneRel)
+                or isinstance(field, ManyToManyRel)
+                or isinstance(field, ManyToManyField)
+                or isinstance(field, ForeignKey)
+                or field.name.startswith("_")
+                or field.name == "id"
+            )
+        ]
+        simple_fields = self._reorder_fields_by_class(simple_fields)
+        if not return_str:
+            return simple_fields
         else:
-            non_external_schema_fields.append(field)
+            repr_str = f"  {colors.italic('Simple fields')}\n"
+            if simple_fields:
+                repr_str += "".join(
+                    [
+                        f"    .{field_name.name}: {self._get_type_for_field(field_name.name)}\n"
+                        for field_name in simple_fields
+                    ]
+                )
+            return repr_str
 
-    def _get_related_field_type(field) -> str:
-        field_type = (
-            field.related_model.__get_name_with_schema__()
-            .replace(
-                "Artifact", ""
-            )  # some fields have an unnecessary 'Artifact' in their name
-            .replace(
-                "Collection", ""
-            )  # some fields have an unnecessary 'Collection' in their name
+    def get_relational_fields(self, return_str: bool = False):
+        relational_fields = (ManyToOneRel, ManyToManyRel, ManyToManyField, ForeignKey)
+
+        class_specific_relational_fields = [
+            field
+            for field in self.registry._meta.fields + self.registry._meta.many_to_many
+            if isinstance(field, relational_fields)
+            and not field.name.startswith(("links_", "_"))
+        ]
+
+        non_class_specific_relational_fields = [
+            field
+            for field in self.registry._meta.get_fields()
+            if isinstance(field, relational_fields)
+            and not field.name.startswith(("links_", "_"))
+        ]
+        non_class_specific_relational_fields = self._reorder_fields_by_class(
+            non_class_specific_relational_fields
         )
-        return _get_type_for_field(field.name) if not field_type.strip() else field_type
 
-    non_external_schema_fields_formatted = [
-        f"    .{field.name}: {_get_related_field_type(field)}\n"
-        for field in non_external_schema_fields
-    ]
-    external_schema_fields_formatted = [
-        f"    .{field.name}: {_get_related_field_type(field)}\n"
-        for field in external_schema_fields
-    ]
-
-    # Non-external relational fields
-    if non_external_schema_fields:
-        repr_str += f"  {colors.italic('Relational fields')}\n"
-        repr_str += "".join(non_external_schema_fields_formatted)
-
-    # External relational fields
-    external_schemas = set()
-    for field in external_schema_fields_formatted:
-        field_type = field.split(":")[1].split()[0]
-        external_schemas.add(field_type.split(".")[0])
-
-    if external_schemas:
-        # We want Bionty to show up before other schemas
-        external_schemas = (
-            ["bionty"] + sorted(external_schemas - {"bionty"})  # type: ignore
-            if "bionty" in external_schemas
-            else sorted(external_schemas)
+        # Ensure that class specific fields (e.g. Artifact) come before non-class specific fields (e.g. collection)
+        filtered_non_class_specific = [
+            field
+            for field in non_class_specific_relational_fields
+            if field not in class_specific_relational_fields
+        ]
+        ordered_relational_fields = (
+            class_specific_relational_fields + filtered_non_class_specific
         )
-        for ext_schema in external_schemas:
-            ext_schema_fields = [
-                field
-                for field in external_schema_fields_formatted
-                if ext_schema in field
-            ]
 
-            if ext_schema_fields:
-                repr_str += f"  {colors.italic(f'{ext_schema.capitalize()} fields')}\n"
-                repr_str += "".join(ext_schema_fields)
+        core_schema_fields = []
+        external_schema_fields = []
+        for field in ordered_relational_fields:
+            field_name = repr(field).split(": ")[1][:-1]
+            if field_name.count(".") == 1 and "lnschema_core" not in field_name:
+                external_schema_fields.append(field)
+            else:
+                core_schema_fields.append(field)
 
+        def _get_related_field_type(field) -> str:
+            field_type = (
+                field.related_model.__get_name_with_schema__()
+                .replace(
+                    "Artifact", ""
+                )  # some fields have an unnecessary 'Artifact' in their name
+                .replace(
+                    "Collection", ""
+                )  # some fields have an unnecessary 'Collection' in their name
+            )
+            return (
+                self._get_type_for_field(field.name)
+                if not field_type.strip()
+                else field_type
+            )
+
+        core_schema_fields_formatted = [
+            f"    .{field.name}: {_get_related_field_type(field)}\n"
+            for field in core_schema_fields
+        ]
+        external_schema_fields_formatted = [
+            f"    .{field.name}: {_get_related_field_type(field)}\n"
+            for field in external_schema_fields
+        ]
+
+        if not return_str:
+            return core_schema_fields, external_schema_fields
+        else:
+            repr_str = ""
+
+            # Non-external relational fields
+            if core_schema_fields:
+                repr_str += f"  {colors.italic('Relational fields')}\n"
+                repr_str += "".join(core_schema_fields_formatted)
+
+            # External relational fields
+            external_schemas = set()
+            for field in external_schema_fields_formatted:
+                field_type = field.split(":")[1].split()[0]
+                external_schemas.add(field_type.split(".")[0])
+
+            if external_schemas:
+                # We want Bionty to show up before other schemas
+                external_schemas = (
+                    ["bionty"] + sorted(external_schemas - {"bionty"})  # type: ignore
+                    if "bionty" in external_schemas
+                    else sorted(external_schemas)
+                )
+                for ext_schema in external_schemas:
+                    ext_schema_fields = [
+                        field
+                        for field in external_schema_fields_formatted
+                        if ext_schema in field
+                    ]
+
+                    if ext_schema_fields:
+                        repr_str += (
+                            f"  {colors.italic(f'{ext_schema.capitalize()} fields')}\n"
+                        )
+                        repr_str += "".join(ext_schema_fields)
+
+            return repr_str
+
+
+def registry_repr(cls):
+    """Shows fields."""
+    repr_str = f"{colors.green(cls.__name__)}\n"
+    info = RegistryInfo(cls)
+    repr_str += info.get_simple_fields(return_str=True)
+    repr_str += info.get_relational_fields(return_str=True)
     repr_str = repr_str.rstrip("\n")
-
     return repr_str
 
 
