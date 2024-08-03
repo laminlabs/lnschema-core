@@ -1204,7 +1204,7 @@ class Transform(Record, IsVersioned):
 
 
 class Param(Record, CanValidate, TracksRun, TracksUpdates):
-    """Parameters of runs & models akin to Feature for datasets."""
+    """Parameters of runs & models."""
 
     class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
         abstract = False
