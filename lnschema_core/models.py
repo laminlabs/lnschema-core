@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import builtins
+from collections import defaultdict
 from datetime import datetime
 from typing import (
     TYPE_CHECKING,
@@ -2905,7 +2906,14 @@ class RegistryInfo:
         ]
 
         if not return_str:
-            return core_schema_fields, external_schema_fields
+            external_schemas_fields_by_schema = defaultdict(list)
+            for field_str, field in zip(
+                external_schema_fields_formatted, external_schema_fields
+            ):
+                field_type = field_str.split(":")[1].split()[0]
+                schema_name = field_type.split(".")[0]
+                external_schemas_fields_by_schema[schema_name].append(field)
+            return core_schema_fields, external_schemas_fields_by_schema
         else:
             repr_str = ""
 
