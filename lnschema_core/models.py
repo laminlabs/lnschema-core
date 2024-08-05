@@ -464,12 +464,14 @@ class HasParents:
 
 # this is the metaclass for Record
 class Registry(ModelBase):
-    """Metadata registry.
+    """Metaclass for `Record`.
 
     Every registry maps on exactly one SQL Table of the Postgres or SQLite
     database underlying any LaminDB instance.
 
-    :class:`~lamindb.core.Registry` is the `metaclass` of :class:`~lamindb.core.Record`.
+    `Registry` is the `metaclass` of :class:`~lamindb.core.Record`.
+
+    `Registry` extends Django's `ModelBase`.
     """
 
     def __new__(cls, name, bases, attrs, **kwargs):
@@ -711,12 +713,18 @@ class Registry(ModelBase):
 
 
 class Record(models.Model, metaclass=Registry):
-    """Record base class.
+    """Base class for metadata records.
 
-    Extends ``django.db.models.Model``.
+    You define a LaminDB registry by inheriting from `Record`. Every `Record`
+    comes with a registry in form of an auto-managed SQL table in your database.
 
-    Why does LaminDB call it `Record` and not `Model`? The term "Record" can't lead to
-    confusion with statistical, machine learning or biological models.
+    `Record` extends Django's `Model` class. Why does LaminDB call it `Record`
+    and not `Model`? The term `Record` can't lead to confusion with statistical,
+    machine learning or biological models.
+
+    For an example, see `here
+    <https://github.com/laminlabs/wetlab/blob/64e1ec74c1edfa3e26bc0b432add358c34db8006/wetlab/models.py#L64-L99>`__.
+
     """
 
     def save(self, *args, **kwargs) -> Record:
