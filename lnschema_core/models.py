@@ -715,8 +715,11 @@ class Registry(ModelBase):
 class Record(models.Model, metaclass=Registry):
     """Base class for metadata records.
 
-    You define a LaminDB registry by inheriting from `Record`. Every `Record`
-    comes with a registry in form of an auto-managed SQL table in your database.
+    Every `Record` is a data model that comes with a registry in form of a SQL
+    table in your database.
+
+    Sub-classing `Record` defines a new registry while instantiating a `Record`
+    subclass defines a new record.
 
     `Record` extends Django's `Model` class. Why does LaminDB call it `Record`
     and not `Model`? The term `Record` can't lead to confusion with statistical,
