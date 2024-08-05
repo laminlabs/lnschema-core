@@ -1793,7 +1793,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
     Artifacts manage data in local or remote storage (:doc:`/tutorial`).
 
     Some artifacts are array-like, e.g., when stored as `.parquet`, `.h5ad`,
-    `.zarr`, or `.tiledbsoma`.
+    `.zarr`, or `.tiledb`.
 
     Args:
         data: `UPathStr` A path to a local or remote folder or file.
@@ -1810,8 +1810,8 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
         Arrays:
 
         - Table: `.csv`, `.tsv`, `.parquet`, `.ipc` ⟷ `DataFrame`, `pyarrow.Table`
-        - Curated matrix: `.h5ad`, `.h5mu`, `.zrad` ⟷ `AnnData`, `MuData`
-        - Generic array: HDF5 group, zarr group, TileDB-SOMA store ⟷ HDF5, zarr, TileDB-SOMA loaders
+        - Annotated matrix: `.h5ad`, `.h5mu`, `.zrad` ⟷ `AnnData`, `MuData`
+        - Generic array: HDF5 group, zarr group, TileDB store ⟷ HDF5, zarr, TileDB loaders
 
         Non-arrays:
 
