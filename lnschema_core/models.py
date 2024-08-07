@@ -1997,12 +1997,10 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
     """Visibility of artifact record in queries & searches (1 default, 1 hidden, -1 trash)."""
     _key_is_virtual: bool = models.BooleanField()
     """Indicates whether `key` is virtual or part of an actual file path."""
-    # below isn't a symmetrical relationship but we pass symmetrical=True
-    # to avoid the generation of a backward accessor
-    # if we pass symmetrical=False, related_name="+" we run into the following bug
-    # _artifact._actions.all()
-    # raises: FieldError: Cannot resolve keyword '_lnschema_core_artifact' into field.
-    _actions: Artifact = models.ManyToManyField("self", symmetrical=True)
+    # be mindful that below, passing related_name="+" leads to errors
+    _actions: Artifact = models.ManyToManyField(
+        "self", symmetrical=False, related_name="_action_targets"
+    )
     """Actions to attach for the UI."""
 
     @overload
