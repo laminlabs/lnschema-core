@@ -1997,8 +1997,9 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
     """Visibility of artifact record in queries & searches (1 default, 1 hidden, -1 trash)."""
     _key_is_virtual: bool = models.BooleanField()
     """Indicates whether `key` is virtual or part of an actual file path."""
+    # be mindful that below, passing related_name="+" leads to errors
     _actions: Artifact = models.ManyToManyField(
-        "self", symmetrical=False, related_name="+"
+        "self", symmetrical=False, related_name="_action_targets"
     )
     """Actions to attach for the UI."""
 
