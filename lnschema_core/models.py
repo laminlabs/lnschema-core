@@ -1513,7 +1513,9 @@ class Feature(Record, CanValidate, TracksRun, TracksUpdates):
 
     Example:
 
-        >>> ln.Feature("cell_type_by_expert", dtype="cat", description="Expert cell type annotation").save()
+        >>> ln.Feature(name="cell_type_by_expert",
+        ...            dtype="cat",
+        ...            description="Expert cell type annotation").save()
 
     Hint:
 
