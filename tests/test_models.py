@@ -59,9 +59,6 @@ def test_registry__repr__artifact(setup_instance):
         .ulabels: ULabel
         .input_of_runs: Run
         .feature_sets: FeatureSet
-        .report_of: Run
-        .environment_of: Run
-        .collection: Collection
         .collections: Collection
     """).strip()
 

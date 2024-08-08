@@ -1313,11 +1313,11 @@ class Run(Record, HasParams):
     # we don't want to make below a OneToOne because there could be the same trivial report
     # generated for many different runs
     report: Artifact = models.ForeignKey(
-        "Artifact", PROTECT, default=None, null=True, related_name="report_of"
+        "Artifact", PROTECT, default=None, null=True, related_name="_report_of"
     )
     """Report of run, e.g.. n html file."""
     environment: Artifact = models.ForeignKey(
-        "Artifact", PROTECT, default=None, null=True, related_name="environment_of"
+        "Artifact", PROTECT, default=None, null=True, related_name="_environment_of"
     )
     """Computational environment for the run.
 
@@ -1968,11 +1968,11 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
     transform: Transform = models.ForeignKey(
         Transform, PROTECT, related_name="output_artifacts", null=True, default=None
     )
-    """:class:`~lamindb.Transform` whose run created the artifact."""
+    """Transform whose run created the artifact."""
     run: Run = models.ForeignKey(
         Run, PROTECT, related_name="output_artifacts", null=True, default=None
     )
-    """:class:`~lamindb.Run` that created the artifact."""
+    """Run that created the artifact."""
     input_of_runs: Run = models.ManyToManyField(Run, related_name="input_artifacts")
     """Runs that use this artifact as an input."""
     # if the artifact is replicated or update in a new run, we link the previous
@@ -1984,7 +1984,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
     feature_sets: FeatureSet = models.ManyToManyField(
         FeatureSet, related_name="artifacts", through="ArtifactFeatureSet"
     )
-    """The feature sets measured in the artifact (:class:`~lamindb.FeatureSet`)."""
+    """The feature sets measured in the artifact."""
     _feature_values: FeatureValue = models.ManyToManyField(
         FeatureValue, through="ArtifactFeatureValue"
     )
@@ -2004,6 +2004,8 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
         "self", symmetrical=False, related_name="_action_targets"
     )
     """Actions to attach for the UI."""
+    collections: Collection
+    """The collections that this artifact is part of."""
 
     @overload
     def __init__(
@@ -2449,11 +2451,13 @@ class Collection(Record, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
     )
     """Artifacts in collection."""
     meta_artifact: Artifact | None = models.OneToOneField(
-        "Artifact", PROTECT, null=True, unique=True, related_name="collection"
+        "Artifact", PROTECT, null=True, unique=True, related_name="_meta_of_collection"
     )
     """An artifact that stores metadata that indexes a collection.
 
-    It has a 1:1 correspondence with a collection.
+    It has a 1:1 correspondence with an artifact. If needed, you can access the
+    collection from the artifact via a private field:
+    `artifact._meta_of_collection`.
     """
     visibility: int = models.SmallIntegerField(
         db_index=True, choices=VisibilityChoice.choices, default=1
