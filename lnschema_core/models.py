@@ -1529,7 +1529,7 @@ class Feature(Record, CanValidate, TracksRun, TracksUpdates):
         as labels of the dataset.
 
         Re-shaping data can introduce ambiguity among features & labels. If this
-        happened. Ask yourself what the joint measurement was: a feature
+        happened, ask yourself what the joint measurement was: a feature
         qualifies variables in a joint measurement. The canonical data matrix
         lists jointly measured variables in the columns.
 
