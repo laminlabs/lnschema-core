@@ -30,4 +30,19 @@ class Migration(migrations.Migration):
             field=models.BooleanField(db_index=True, default=False),
             preserve_default=False,
         ),
+        migrations.AlterField(
+            model_name="artifact",
+            name="is_latest",
+            field=models.BooleanField(db_index=True, default=True),
+        ),
+        migrations.AlterField(
+            model_name="collection",
+            name="is_latest",
+            field=models.BooleanField(db_index=True, default=True),
+        ),
+        migrations.AlterField(
+            model_name="transform",
+            name="is_latest",
+            field=models.BooleanField(db_index=True, default=True),
+        ),
     ]
