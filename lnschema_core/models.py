@@ -745,6 +745,10 @@ class Record(models.Model, metaclass=Registry):
         super().save(*args, **kwargs)
         return self
 
+    def delete(self) -> None:
+        """Delete."""
+        pass
+
     class Meta:
         abstract = True
 
