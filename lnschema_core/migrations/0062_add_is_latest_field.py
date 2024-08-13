@@ -3,6 +3,7 @@
 from django.db import migrations, models
 
 
+# data migration comes in the next migration due to pending triggers
 class Migration(migrations.Migration):
     dependencies = [
         (
