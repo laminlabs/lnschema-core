@@ -4,11 +4,11 @@ from django.db import migrations, models
 
 SQL_TEMPLATE = """\
 -- First, set all is_latest to False
-UPDATE {table_name} SET is_latest = 0;
+UPDATE {table_name} SET is_latest = false;
 
 -- Then, set is_latest to True for the latest records
 UPDATE {table_name}
-SET is_latest = 1
+SET is_latest = true
 WHERE id IN (
     SELECT t.id
     FROM {table_name} t
