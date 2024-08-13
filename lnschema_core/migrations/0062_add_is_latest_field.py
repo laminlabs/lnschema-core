@@ -2,24 +2,6 @@
 
 from django.db import migrations, models
 
-SQL_TEMPLATE = """\
--- First, set all is_latest to False
-UPDATE {table_name} SET is_latest = false;
-
--- Then, set is_latest to True for the latest records
-UPDATE {table_name}
-SET is_latest = true
-WHERE id IN (
-    SELECT t.id
-    FROM {table_name} t
-    INNER JOIN (
-        SELECT substr(uid, 1, {stem_uid_len}) AS stem_uid, MAX(created_at) AS max_created_at
-        FROM {table_name}
-        GROUP BY substr(uid, 1, {stem_uid_len})
-    ) latest ON substr(t.uid, 1, {stem_uid_len}) = latest.stem_uid AND t.created_at = latest.max_created_at
-);
-"""
-
 
 class Migration(migrations.Migration):
     dependencies = [
@@ -47,16 +29,3 @@ class Migration(migrations.Migration):
             field=models.BooleanField(db_index=True, default=True),
         ),
     ]
-
-
-# add data migration
-for table_name, stem_uid_len in [
-    ("lnschema_core_transform", 12),
-    ("lnschema_core_artifact", 16),
-    ("lnschema_core_collection", 16),
-]:
-    Migration.operations.append(
-        migrations.RunSQL(
-            sql=SQL_TEMPLATE.format(table_name=table_name, stem_uid_len=stem_uid_len)
-        )
-    )
