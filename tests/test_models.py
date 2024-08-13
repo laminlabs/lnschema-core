@@ -49,6 +49,7 @@ def test_registry__repr__artifact(setup_instance):
         .n_observations: BigIntegerField
         .visibility: SmallIntegerField
         .version: CharField
+        .is_latest: BooleanField
         .created_at: DateTimeField
         .updated_at: DateTimeField
       Relational fields

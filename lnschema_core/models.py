@@ -82,6 +82,8 @@ class IsVersioned(models.Model):
     Consider using `semantic versioning <https://semver.org>`__
     with `Python versioning <https://peps.python.org/pep-0440/>`__.
     """
+    is_latest: bool = models.BooleanField(default=True, db_index=True)
+    """Boolean flag that indicates whether a record is the latest in its version family."""
 
     @overload
     def __init__(self): ...
@@ -97,6 +99,9 @@ class IsVersioned(models.Model):
         *args,
         **kwargs,
     ):
+        self._is_new_version_of = (
+            kwargs.pop("is_new_version_of") if "is_new_version_of" in kwargs else None
+        )
         super().__init__(*args, **kwargs)
 
     @property
@@ -739,6 +744,10 @@ class Record(models.Model, metaclass=Registry):
         # django outside of lamindb
         super().save(*args, **kwargs)
         return self
+
+    def delete(self) -> None:
+        """Delete."""
+        pass
 
     class Meta:
         abstract = True
