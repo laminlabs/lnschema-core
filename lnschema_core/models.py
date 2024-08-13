@@ -83,7 +83,7 @@ class IsVersioned(models.Model):
     Consider using `semantic versioning <https://semver.org>`__
     with `Python versioning <https://peps.python.org/pep-0440/>`__.
     """
-    is_latest: bool = models.BooleanField(db_index=True)
+    is_latest: bool = models.BooleanField(default=True, db_index=True)
     """Boolean flag that indicates whether a record is the latest in its version family."""
 
     @overload
