@@ -73,7 +73,6 @@ class IsVersioned(models.Model):
         abstract = True
 
     _len_stem_uid: int
-    _is_new_version_of: IsVersioned
 
     version: str = CharField(max_length=10, default=None, null=True, db_index=True)
     """Version (default `None`).
@@ -100,6 +99,9 @@ class IsVersioned(models.Model):
         *args,
         **kwargs,
     ):
+        self._is_new_version_of = (
+            kwargs.pop("is_new_version_of") if "is_new_version_of" in kwargs else None
+        )
         super().__init__(*args, **kwargs)
 
     @property
