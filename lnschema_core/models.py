@@ -73,6 +73,7 @@ class IsVersioned(models.Model):
         abstract = True
 
     _len_stem_uid: int
+    _is_new_version_of: IsVersioned
 
     version: str = CharField(max_length=10, default=None, null=True, db_index=True)
     """Version (default `None`).
