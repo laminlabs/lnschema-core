@@ -613,14 +613,22 @@ class Registry(ModelBase):
         """
         pass
 
-    def get(cls, idlike: int | str) -> Record:
+    def get(
+        cls,
+        idlike: int | str | None = None,
+        **expressions,
+    ) -> Record:
         """Get a single record.
 
         Args:
             idlike: Either a uid stub, uid or an integer id.
+            expressions: Fields and values passed as Django query expressions.
 
         Returns:
             A record.
+
+        Raises:
+            DoesNotExist: In case no matching record is found.
 
         See Also:
             - Guide: :doc:`records`
@@ -628,11 +636,15 @@ class Registry(ModelBase):
 
         Examples:
             >>> ulabel = ln.ULabel.get("2riu039")
+            >>> ulabel = ln.ULabel.get(name="my-label")
         """
         pass
 
     def df(
-        cls, include: str | list[str] | None = None, join: str = "inner"
+        cls,
+        include: str | list[str] | None = None,
+        join: str = "inner",
+        limit: int = 100,
     ) -> pd.DataFrame:
         """Convert to ``pd.DataFrame``.
 
