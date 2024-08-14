@@ -147,7 +147,7 @@ def current_run() -> Run | None:
     if _TRACKING_READY:
         import lamindb.core
 
-        return lamindb.core.run_context.run
+        return lamindb.context.run
     else:
         return None
 
@@ -1303,12 +1303,12 @@ class Run(Record, HasParams):
         Create a global run context:
 
         >>> ln.track(transform=transform)
-        >>> ln.core.run_context.run  # global available run
+        >>> ln.context.run  # global available run
 
         Track a notebook run:
 
         >>> ln.track()  # Jupyter notebook metadata is automatically parsed
-        >>> ln.core.context.run
+        >>> ln.context.run
     """
 
     _name_field: str = "started_at"
