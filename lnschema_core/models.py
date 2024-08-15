@@ -147,7 +147,7 @@ def current_run() -> Run | None:
     if _TRACKING_READY:
         import lamindb.core
 
-        return lamindb.core.run_context.run
+        return lamindb.context.run
     else:
         return None
 
@@ -1098,7 +1098,7 @@ class Transform(Record, IsVersioned):
 
         If you switch on
         :attr:`~lamindb.core.Settings.sync_git_repo` a script-like transform is
-        synched to its hashed state in a git repository upon calling `ln.track()`.
+        synched to its hashed state in a git repository upon calling `ln.context.track()`.
 
     The definition of transforms and runs is consistent the OpenLineage
     specification where a :class:`~lamindb.Transform` record would be called a
@@ -1112,7 +1112,7 @@ class Transform(Record, IsVersioned):
         is_new_version_of: `Transform | None = None` An old version of the transform.
 
     See Also:
-        :meth:`~lamindb.track`
+        :meth:`~lamindb.core.Context.track`
             Globally track a script, notebook or pipeline run.
         :class:`~lamindb.Run`
             Executions of transforms.
@@ -1133,7 +1133,7 @@ class Transform(Record, IsVersioned):
 
         Create a transform from a notebook:
 
-        >>> ln.track()
+        >>> ln.context.track()
 
         View parents of a transform:
 
@@ -1283,7 +1283,7 @@ class Run(Record, HasParams):
         reference_type: `str | None = None` For instance, `redun_id`, `nextflow_id` or `url`.
 
     See Also:
-        :meth:`~lamindb.track`
+        :meth:`~lamindb.core.Context.track`
             Track global run & transform records for a notebook or pipeline.
 
     Notes:
@@ -1302,13 +1302,13 @@ class Run(Record, HasParams):
 
         Create a global run context:
 
-        >>> ln.track(transform=transform)
-        >>> ln.core.run_context.run  # global available run
+        >>> ln.context.track(transform=transform)
+        >>> ln.context.run  # global available run
 
         Track a notebook run:
 
-        >>> ln.track()  # Jupyter notebook metadata is automatically parsed
-        >>> ln.core.context.run
+        >>> ln.context.track()  # Jupyter notebook metadata is automatically parsed
+        >>> ln.context.run
     """
 
     _name_field: str = "started_at"
@@ -2231,7 +2231,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
         Args:
             data: A file path.
             run: The run that created the artifact gets
-                auto-linked if ``ln.track()`` was called.
+                auto-linked if ``ln.context.track()`` was called.
 
         Examples:
             Say we made a change to the content of an artifact, e.g., edited the image
