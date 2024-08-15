@@ -1112,7 +1112,7 @@ class Transform(Record, IsVersioned):
         is_new_version_of: `Transform | None = None` An old version of the transform.
 
     See Also:
-        :meth:`~lamindb.track`
+        :meth:`~lamindb.core.Context.track`
             Globally track a script, notebook or pipeline run.
         :class:`~lamindb.Run`
             Executions of transforms.
@@ -1283,7 +1283,7 @@ class Run(Record, HasParams):
         reference_type: `str | None = None` For instance, `redun_id`, `nextflow_id` or `url`.
 
     See Also:
-        :meth:`~lamindb.track`
+        :meth:`~lamindb.core.Context.track`
             Track global run & transform records for a notebook or pipeline.
 
     Notes:
