@@ -14,7 +14,7 @@ def current_user_id() -> int:
         else:
             try:
                 user_id = User.objects.get(uid=settings.user.uid).id
-            except User.DoesNotExist:
+            except User._DoesNotExist:
                 register_user(settings.user)
                 user_id = User.objects.get(uid=settings.user.uid).id
             return user_id
