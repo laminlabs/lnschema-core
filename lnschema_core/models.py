@@ -424,7 +424,7 @@ class CanValidate:
         Examples:
             >>> import bionty as bt
             >>> bt.ExperimentalFactor.from_source(name="single-cell RNA sequencing").save()
-            >>> scrna = bt.ExperimentalFactor.filter(name="single-cell RNA sequencing").one()
+            >>> scrna = bt.ExperimentalFactor.get(name="single-cell RNA sequencing")
             >>> scrna.abbr
             None
             >>> scrna.synonyms
@@ -460,7 +460,7 @@ class HasParents:
         Examples:
             >>> import bionty as bt
             >>> bt.Tissue.from_source(name="subsegmental bronchus").save()
-            >>> record = bt.Tissue.filter(name="respiratory tube").one()
+            >>> record = bt.Tissue.get(name="respiratory tube")
             >>> record.view_parents()
             >>> tissue.view_parents(with_children=True)
         """
@@ -609,7 +609,7 @@ class Registry(ModelBase):
 
         Examples:
             >>> ln.ULabel(name="my ulabel").save()
-            >>> ulabel = ln.ULabel.filter(name="my ulabel").one()
+            >>> ulabel = ln.ULabel.get(name="my ulabel")
         """
         pass
 
@@ -857,7 +857,7 @@ class HasFeatures:
 
         Examples:
             >>> ln.Artifact(ln.core.datasets.file_jpg_paradisi05(), description="paradisi05").save()
-            >>> artifact = ln.Artifact.filter(description="paradisi05").one()
+            >>> artifact = ln.Artifact.get(description="paradisi05")
             >>> ln.save(ln.ULabel.from_values(["image", "benchmark", "example"], field="name"))
             >>> ulabels = ln.ULabel.filter(name__in=["image", "benchmark", "example"]).all()
             >>> artifact.ulabels.set(ulabels)
@@ -933,7 +933,7 @@ class User(Record, CanValidate):
 
         Query a user by handle:
 
-        >>> user = ln.User.filter(handle="testuser1").one()
+        >>> user = ln.User.get(handle="testuser1")
         >>> user
     """
 
@@ -1297,7 +1297,7 @@ class Run(Record, HasParams):
     Examples:
 
         >>> ln.Transform(name="Cell Ranger", version="7.2.0", type="pipeline").save()
-        >>> transform = ln.Transform.filter(name="Cell Ranger", version="7.2.0").one()
+        >>> transform = ln.Transform.get(name="Cell Ranger", version="7.2.0")
         >>> run = ln.Run(transform)
 
         Create a global run context:
@@ -1430,7 +1430,7 @@ class ULabel(Record, HasParents, CanValidate, TracksRun, TracksUpdates):
 
         Label a artifact without associating it to a feature:
 
-        >>> ulabel = ln.ULabel.filter(name="My project").one()
+        >>> ulabel = ln.ULabel.get(name="My project")
         >>> artifact = ln.Artifact("./myfile.csv")
         >>> artifact.save()
         >>> artifact.ulabels.add(ulabel)
@@ -2065,7 +2065,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
         File in local storage:
 
         >>> ln.Artifact("./myfile.csv", description="myfile").save()
-        >>> artifact = ln.Artifact.filter(description="myfile").one()
+        >>> artifact = ln.Artifact.get(description="myfile")
         >>> artifact.path
         PosixPath('/home/runner/work/lamindb/lamindb/docs/guide/mydata/myfile.csv')
         """
@@ -2264,7 +2264,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
 
             Read AnnData in backed mode from cloud:
 
-            >>> artifact = ln.Artifact.filter(key="lndb-storage/pbmc68k.h5ad").one()
+            >>> artifact = ln.Artifact.get(key="lndb-storage/pbmc68k.h5ad")
             >>> artifact.open()
             AnnData object with n_obs × n_vars = 70 × 765 backed at 's3://lamindb-ci/lndb-storage/pbmc68k.h5ad'
         """
@@ -2283,7 +2283,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
 
             >>> df = ln.core.datasets.df_iris_in_meter_batch1()
             >>> ln.Artifact.from_df(df, description="iris").save()
-            >>> artifact = ln.Artifact.filter(description="iris").one()
+            >>> artifact = ln.Artifact.get(description="iris")
             >>> artifact.load().head()
             sepal_length sepal_width petal_length petal_width iris_organism_code
             0        0.051       0.035        0.014       0.002                 0
@@ -2570,7 +2570,7 @@ class Collection(Record, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
         Examples:
             >>> import lamindb as ln
             >>> from torch.utils.data import DataLoader
-            >>> ds = ln.Collection.filter(description="my collection").one()
+            >>> ds = ln.Collection.get(description="my collection")
             >>> mapped = collection.mapped(label_keys=["cell_type", "batch"])
             >>> dl = DataLoader(mapped, batch_size=128, shuffle=True)
         """
