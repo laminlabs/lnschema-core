@@ -99,9 +99,7 @@ class IsVersioned(models.Model):
         *args,
         **kwargs,
     ):
-        self._is_new_version_of = (
-            kwargs.pop("is_new_version_of") if "is_new_version_of" in kwargs else None
-        )
+        self._revises = kwargs.pop("revises") if "revises" in kwargs else None
         super().__init__(*args, **kwargs)
 
     @property
@@ -121,19 +119,17 @@ class IsVersioned(models.Model):
     def versions(self) -> QuerySet:
         """Lists all records of the same version family.
 
-        >>> new_artifact = ln.Artifact(df2, is_new_version_of=artifact)
+        >>> new_artifact = ln.Artifact(df2, revises=artifact)
         >>> new_artifact.save()
         >>> new_artifact.versions()
         """
         return self.__class__.filter(uid__startswith=self.stem_uid)  # type: ignore
 
-    def _add_to_version_family(
-        self, is_new_version_of: IsVersioned, version: str | None = None
-    ):
+    def _add_to_version_family(self, revises: IsVersioned, version: str | None = None):
         """Add current record to a version family.
 
         Args:
-            is_new_version_of: a record that belongs to the version family.
+            revises: a record that belongs to the version family.
             version: semantic version of the record.
         """
         pass
@@ -1109,7 +1105,7 @@ class Transform(Record, IsVersioned):
         key: `str | None = None` A short name or path-like semantic key.
         version: `str | None = None` A version.
         type: `TransformType | None = "pipeline"` See :class:`~lamindb.core.types.TransformType`.
-        is_new_version_of: `Transform | None = None` An old version of the transform.
+        revises: `Transform | None = None` An old version of the transform.
 
     See Also:
         :meth:`~lamindb.core.Context.track`
@@ -1210,7 +1206,7 @@ class Transform(Record, IsVersioned):
         key: str | None = None,
         version: str | None = None,
         type: TransformType | None = None,
-        is_new_version_of: Transform | None = None,
+        revises: Transform | None = None,
     ): ...
 
     @overload
@@ -1836,7 +1832,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
             e.g., `"myfolder/myfile.fcs"`.
         description: `str | None = None` A description.
         version: `str | None = None` A version string.
-        is_new_version_of: `Artifact | None = None` A previous version of the artifact.
+        revises: `Artifact | None = None` A previous version of the artifact.
         run: `Run | None = None` The run that creates the artifact.
 
     .. dropdown:: Typical storage formats & their API accessors
@@ -1906,7 +1902,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
         >>> artifact = ln.Artifact(df1, description="My dataframe")
         >>> artifact.save()
         >>> # version an artifact
-        >>> new_artifact = ln.Artifact(df2, is_new_version_of=artifact)
+        >>> new_artifact = ln.Artifact(df2, revises=artifact)
         >>> assert new_artifact.stem_uid == artifact.stem_uid
         >>> assert artifact.version == "1"
         >>> assert new_artifact.version == "2"
@@ -2035,7 +2031,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
         type: ArtifactType | None = None,
         key: str | None = None,
         description: str | None = None,
-        is_new_version_of: Artifact | None = None,
+        revises: Artifact | None = None,
         run: Run | None = None,
     ): ...
 
@@ -2079,7 +2075,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
         description: str | None = None,
         run: Run | None = None,
         version: str | None = None,
-        is_new_version_of: Artifact | None = None,
+        revises: Artifact | None = None,
         **kwargs,
     ) -> Artifact:
         """Create from ``DataFrame``, validate & link features.
@@ -2092,7 +2088,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
                 e.g., `"myfolder/myfile.parquet"`.
             description: A description.
             version: A version string.
-            is_new_version_of: An old version of the artifact.
+            revises: An old version of the artifact.
             run: The run that creates the artifact.
 
         See Also:
@@ -2123,7 +2119,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
         description: str | None = None,
         run: Run | None = None,
         version: str | None = None,
-        is_new_version_of: Artifact | None = None,
+        revises: Artifact | None = None,
         **kwargs,
     ) -> Artifact:
         """Create from ``AnnData``, validate & link features.
@@ -2134,7 +2130,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
                 e.g., `"myfolder/myfile.h5ad"`.
             description: A description.
             version: A version string.
-            is_new_version_of: An old version of the artifact.
+            revises: An old version of the artifact.
             run: The run that creates the artifact.
 
         See Also:
@@ -2161,7 +2157,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
         description: str | None = None,
         run: Run | None = None,
         version: str | None = None,
-        is_new_version_of: Artifact | None = None,
+        revises: Artifact | None = None,
         **kwargs,
     ) -> Artifact:
         """Create from ``MuData``, validate & link features.
@@ -2172,7 +2168,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
                 e.g., `"myfolder/myfile.h5mu"`.
             description: A description.
             version: A version string.
-            is_new_version_of: An old version of the artifact.
+            revises: An old version of the artifact.
             run: The run that creates the artifact.
 
         See Also:
@@ -2382,7 +2378,7 @@ class Collection(Record, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
         name: `str` A name.
         description: `str | None = None` A description.
         version: `str | None = None` A version string.
-        is_new_version_of: `Collection | None = None` An old version of the collection.
+        revises: `Collection | None = None` An old version of the collection.
         run: `Run | None = None` The run that creates the collection.
         meta: `Artifact | None = None` An artifact that defines metadata for the collection.
         reference: `str | None = None` For instance. n external ID or a URL.
@@ -2410,7 +2406,7 @@ class Collection(Record, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
         >>> collection = ln.Collection(df1, description="My dataframe")
         >>> collection.save()
         >>> # create new collection from old collection and version both
-        >>> new_collection = ln.Collection(df2, is_new_version_of=collection)
+        >>> new_collection = ln.Collection(df2, revises=collection)
         >>> assert new_collection.stem_uid == collection.stem_uid
         >>> assert collection.version == "1"
         >>> assert new_collection.version == "2"
@@ -2498,7 +2494,7 @@ class Collection(Record, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
         reference: str | None = None,
         reference_type: str | None = None,
         run: Run | None = None,
-        is_new_version_of: Collection | None = None,
+        revises: Collection | None = None,
     ): ...
 
     @overload
