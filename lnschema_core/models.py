@@ -694,7 +694,7 @@ class Registry(ModelBase):
 
     def using(
         cls,
-        instance: str,
+        instance: str | None,
     ) -> QuerySet:
         """Use a non-default LaminDB instance.
 
