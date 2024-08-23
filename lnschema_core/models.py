@@ -1829,7 +1829,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
         key: `str | None = None` A relative path within your default storage,
             e.g., `"myfolder/myfile.fcs"`. If `not None` will automatically version new artifacts with the same key.
         description: `str | None = None` A description.
-        revises: `Artifact | None = None` A previous version of the artifact.
+        revises: `Artifact | None = None` Previous version of the artifact. Triggers a revision (a new untagged version).
         run: `Run | None = None` The run that creates the artifact.
 
     .. dropdown:: Typical storage formats & their API accessors
