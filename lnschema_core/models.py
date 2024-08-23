@@ -1826,8 +1826,8 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
     Args:
         data: `UPathStr` A path to a local or remote folder or file.
         type: `Literal["dataset", "model"] | None = None` The artifact type.
-        key: `str | None = None` A relative path within default storage,
-            e.g., `"myfolder/myfile.fcs"`.
+        key: `str | None = None` A relative path within your default storage,
+            e.g., `"myfolder/myfile.fcs"`. If `not None` will automatically version new artifacts with the same key.
         description: `str | None = None` A description.
         revises: `Artifact | None = None` A previous version of the artifact.
         run: `Run | None = None` The run that creates the artifact.
@@ -1895,14 +1895,9 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
 
         Make a new version of an artifact:
 
-        >>> # a non-versioned artifact
-        >>> artifact = ln.Artifact(df1, description="My dataframe")
+        >>> artifact = ln.Artifact.from_df(df, description="My dataframe")
         >>> artifact.save()
-        >>> # version an artifact
-        >>> new_artifact = ln.Artifact(df2, revises=artifact)
-        >>> assert new_artifact.stem_uid == artifact.stem_uid
-        >>> assert artifact.version == "1"
-        >>> assert new_artifact.version == "2"
+        >>> artifact_v2 = ln.Artifact(df_updated, revises=artifact)
 
     """
 
