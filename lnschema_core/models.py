@@ -1103,7 +1103,6 @@ class Transform(Record, IsVersioned):
     Args:
         name: `str` A name or title.
         key: `str | None = None` A short name or path-like semantic key.
-        version: `str | None = None` A version.
         type: `TransformType | None = "pipeline"` See :class:`~lamindb.core.types.TransformType`.
         revises: `Transform | None = None` An old version of the transform.
 
@@ -1204,7 +1203,6 @@ class Transform(Record, IsVersioned):
         self,
         name: str,
         key: str | None = None,
-        version: str | None = None,
         type: TransformType | None = None,
         revises: Transform | None = None,
     ): ...
@@ -1831,7 +1829,6 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
         key: `str | None = None` A relative path within default storage,
             e.g., `"myfolder/myfile.fcs"`.
         description: `str | None = None` A description.
-        version: `str | None = None` A version string.
         revises: `Artifact | None = None` A previous version of the artifact.
         run: `Run | None = None` The run that creates the artifact.
 
@@ -2074,7 +2071,6 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
         key: str | None = None,
         description: str | None = None,
         run: Run | None = None,
-        version: str | None = None,
         revises: Artifact | None = None,
         **kwargs,
     ) -> Artifact:
@@ -2087,7 +2083,6 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
             key: A relative path within default storage,
                 e.g., `"myfolder/myfile.parquet"`.
             description: A description.
-            version: A version string.
             revises: An old version of the artifact.
             run: The run that creates the artifact.
 
@@ -2118,7 +2113,6 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
         key: str | None = None,
         description: str | None = None,
         run: Run | None = None,
-        version: str | None = None,
         revises: Artifact | None = None,
         **kwargs,
     ) -> Artifact:
@@ -2129,7 +2123,6 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
             key: A relative path within default storage,
                 e.g., `"myfolder/myfile.h5ad"`.
             description: A description.
-            version: A version string.
             revises: An old version of the artifact.
             run: The run that creates the artifact.
 
@@ -2156,7 +2149,6 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
         key: str | None = None,
         description: str | None = None,
         run: Run | None = None,
-        version: str | None = None,
         revises: Artifact | None = None,
         **kwargs,
     ) -> Artifact:
@@ -2167,7 +2159,6 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
             key: A relative path within default storage,
                 e.g., `"myfolder/myfile.h5mu"`.
             description: A description.
-            version: A version string.
             revises: An old version of the artifact.
             run: The run that creates the artifact.
 
@@ -2377,7 +2368,6 @@ class Collection(Record, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
         data: `List[Artifact]` A list of artifacts.
         name: `str` A name.
         description: `str | None = None` A description.
-        version: `str | None = None` A version string.
         revises: `Collection | None = None` An old version of the collection.
         run: `Run | None = None` The run that creates the collection.
         meta: `Artifact | None = None` An artifact that defines metadata for the collection.
@@ -2488,7 +2478,6 @@ class Collection(Record, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
         self,
         artifacts: list[Artifact],
         name: str,
-        version: str,
         description: str | None = None,
         meta: Any | None = None,
         reference: str | None = None,
