@@ -1939,13 +1939,6 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
         null=True,
     )
     """:class:`~lamindb.core.types.ArtifactType` (default `None`)."""
-    _accessor: str = CharField(
-        max_length=64,
-        db_index=True,
-        null=True,
-        default=None,
-    )
-    """Default backed or memory accessor, e.g., DataFrame, AnnData."""
     size: int = models.BigIntegerField(null=True, db_index=True)
     """Size in bytes.
 
@@ -1958,13 +1951,6 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
 
     Useful to ascertain integrity and avoid duplication.
     """
-    _hash_type: str = CharField(
-        max_length=30,
-        db_index=True,
-        null=True,
-        default=None,
-    )
-    """Type of hash."""
     n_objects: int = models.BigIntegerField(default=None, null=True, db_index=True)
     """Number of objects.
 
@@ -1975,6 +1961,20 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
 
     Typically, this denotes the first array dimension.
     """
+    _hash_type: str = CharField(
+        max_length=30,
+        db_index=True,
+        null=True,
+        default=None,
+    )
+    """Type of hash."""
+    _accessor: str = CharField(
+        max_length=64,
+        db_index=True,
+        null=True,
+        default=None,
+    )
+    """Default backed or memory accessor, e.g., DataFrame, AnnData."""
     ulabels: ULabel = models.ManyToManyField(
         ULabel, through="ArtifactULabel", related_name="artifacts"
     )
