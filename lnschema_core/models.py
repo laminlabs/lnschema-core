@@ -2024,6 +2024,13 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
     @overload
     def __init__(
         self,
+        # we're not choosing the name "path" for this arg because
+        # it'd be confusing with `artifact.path`, which is not the same
+        # so "data" conveys better that this is input data that's ingested
+        # and will be moved to a target path at `artifact.path`
+        # also internally, we sometimes pass "data objects" like a DataFrame
+        # here; and we might refactor this but we might also keep that internal
+        # usage
         data: UPathStr,
         type: ArtifactType | None = None,
         key: str | None = None,
