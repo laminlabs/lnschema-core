@@ -1,8 +1,6 @@
 import re
 import textwrap
 
-# The tests defined in this script use the lamindb instance defined in test_integrity
-
 
 def _strip_ansi(text: str) -> str:
     """Remove ANSI escape sequences from a string."""
