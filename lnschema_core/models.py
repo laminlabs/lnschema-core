@@ -74,7 +74,7 @@ class IsVersioned(models.Model):
 
     _len_stem_uid: int
 
-    version: str = CharField(max_length=10, default=None, null=True, db_index=True)
+    version: str = CharField(max_length=30, default=None, null=True, db_index=True)
     """Version (default `None`).
 
     Defines version of a family of records characterized by the same `stem_uid`.
