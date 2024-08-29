@@ -819,7 +819,7 @@ class HasFeatures:
         ln.Artifact.features.filter(scientist="Barbara McClintock")
 
     Features may or may not be part of the artifact content in storage. For
-    instance, the :class:`~lamindb.Curate` flow validates the columns of a
+    instance, the :class:`~lamindb.Curator` flow validates the columns of a
     `DataFrame`-like artifact and annotates it with features corresponding to
     these columns. `artifact.features.add_values`, by contrast, does not
     validate the content of the artifact.
@@ -1394,7 +1394,7 @@ class ULabel(Record, HasParents, CanValidate, TracksRun, TracksUpdates):
     Often, a ulabel is measured *within* a dataset. For instance, an artifact
     might characterize 2 species of the Iris flower (`"setosa"` &
     `"versicolor"`) measured by a `"species"` feature. Use the
-    :class:`~lamindb.Curate` flow to automatically parse, validate, and
+    :class:`~lamindb.Curator` flow to automatically parse, validate, and
     annotate with labels that are contained in `DataFrame` or `AnnData`
     artifacts.
 
