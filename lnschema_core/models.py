@@ -1412,8 +1412,8 @@ class ULabel(Record, HasParents, CanValidate, TracksRun, TracksUpdates):
     See Also:
         :meth:`~lamindb.Feature`
             Dimensions of measurement for artifacts & collections.
-        :attr:`~lamindb.Artifact.labels`
-            Label manager of an artifact or collection.
+        :attr:`~lamindb.Artifact.features`
+            Feature manager for an artifact.
 
     Examples:
 
