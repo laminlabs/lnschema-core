@@ -2383,7 +2383,7 @@ class Collection(Record, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
 
         Create a collection from a collection of :class:`~lamindb.Artifact` objects:
 
-        >>> collection = ln.Collection([artifact1. rtifact2], name="My collection")
+        >>> collection = ln.Collection([artifact1, artifact2], name="My collection")
         >>> collection.save()
 
         If you have more than 100k artifacts, consider creating a collection directly from the
