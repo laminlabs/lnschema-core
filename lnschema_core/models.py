@@ -627,7 +627,7 @@ class Registry(ModelBase):
             DoesNotExist: In case no matching record is found.
 
         See Also:
-            - Guide: :doc:`records`
+            - Guide: :doc:`docs:records`
             - Django documentation: `Queries <https://docs.djangoproject.com/en/4.2/topics/db/queries/>`__
 
         Examples:
