@@ -535,7 +535,7 @@ class Registry(ModelBase):
             A list of validated records. For bionty registries. Also returns knowledge-coupled records.
 
         Notes:
-            For more info, see tutorial: :doc:`bio-registries`.
+            For more info, see tutorial: :doc:`docs:bio-registries`.
 
         Examples:
 
@@ -591,7 +591,7 @@ class Registry(ModelBase):
         pass
 
     def filter(cls, **expressions) -> QuerySet:
-        """Query records (see :doc:`records`).
+        """Query records.
 
         Args:
             expressions: Fields and values passed as Django query expressions.
@@ -600,7 +600,7 @@ class Registry(ModelBase):
             A :class:`~lamindb.core.QuerySet`.
 
         See Also:
-            - Guide: :doc:`records`
+            - Guide: :doc:`docs:records`
             - Django documentation: `Queries <https://docs.djangoproject.com/en/4.2/topics/db/queries/>`__
 
         Examples:
