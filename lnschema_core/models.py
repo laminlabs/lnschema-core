@@ -1149,7 +1149,7 @@ class Transform(Record, IsVersioned):
     )
     """Universal id."""
     name: str = CharField(max_length=150, db_index=True, null=True, default=None)
-    """A name or title. For instance.  pipeline name, notebook title, etc."""
+    """A name or title. For instance, a pipeline name, notebook title, etc."""
     key: str = CharField(max_length=120, db_index=True, null=True, default=None)
     """A key for concise reference & versioning (optional)."""
     description: str = CharField(max_length=255, null=True, default=None)
@@ -1273,7 +1273,7 @@ class Run(Record, HasParams):
 
     Args:
         transform: `Transform` A :class:`~lamindb.Transform` record.
-        reference: `str | None = None` For instance. n external ID or a download URL.
+        reference: `str | None = None` For instance, an external ID or a download URL.
         reference_type: `str | None = None` For instance, `redun_id`, `nextflow_id` or `url`.
 
     See Also:
@@ -1336,7 +1336,7 @@ class Run(Record, HasParams):
     )
     """Computational environment for the run.
 
-    For instance.  `Dockerfile`.  docker image.  `requirements.txt`. n `environment.yml`, etc.
+    For instance.  `Dockerfile`.  docker image.  `requirements.txt`. `environment.yml`, etc.
     """
     is_consecutive: bool = models.BooleanField(null=True, default=None)
     """Indicates whether code was consecutively executed. Is relevant for notebooks."""
@@ -1381,7 +1381,7 @@ class ULabel(Record, HasParents, CanValidate, TracksRun, TracksUpdates):
     Args:
         name: `str` A name.
         description: `str` A description.
-        reference: `str | None = None` For instance. n external ID or a URL.
+        reference: `str | None = None` For instance, an external ID or a URL.
         reference_type: `str | None = None` For instance, `"url"`.
 
     A `ULabel` record provides the easiest way to annotate a dataset
@@ -2373,7 +2373,7 @@ class Collection(Record, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
         revises: `Collection | None = None` An old version of the collection.
         run: `Run | None = None` The run that creates the collection.
         meta: `Artifact | None = None` An artifact that defines metadata for the collection.
-        reference: `str | None = None` For instance. n external ID or a URL.
+        reference: `str | None = None` For instance, an external ID or a URL.
         reference_type: `str | None = None` For instance, `"url"`.
 
     See Also:
