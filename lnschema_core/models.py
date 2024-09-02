@@ -149,7 +149,7 @@ def current_run() -> Run | None:
 
 
 class TracksRun(models.Model):
-    """Base class tracking latest run, creating user. nd `created_at` timestamp."""
+    """Base class tracking latest run, creating user, and `created_at` timestamp."""
 
     class Meta:
         abstract = True
@@ -415,7 +415,6 @@ class CanValidate:
 
         See Also:
             :meth:`~lamindb.core.CanValidate.add_synonym`
-                Add synonyms.
 
         Examples:
             >>> import bionty as bt
@@ -520,7 +519,7 @@ class Registry(ModelBase):
         source: Record | None = None,
         mute: bool = False,
     ) -> list[Record]:
-        """Bulk create validated records by parsing values for an identifier (a name. n id, etc.).
+        """Bulk create validated records by parsing values for an identifier such as a name or an id).
 
         Args:
             values: A list of values for an identifier, e.g.
@@ -1336,7 +1335,7 @@ class Run(Record, HasParams):
     )
     """Computational environment for the run.
 
-    For instance.  `Dockerfile`.  docker image.  `requirements.txt`. `environment.yml`, etc.
+    For instance, `Dockerfile`, `docker image`, `requirements.txt`, `environment.yml`, etc.
     """
     is_consecutive: bool = models.BooleanField(null=True, default=None)
     """Indicates whether code was consecutively executed. Is relevant for notebooks."""
@@ -1349,7 +1348,7 @@ class Run(Record, HasParams):
     reference_type: str = CharField(
         max_length=25, db_index=True, null=True, default=None
     )
-    """Type of reference, e.g..  workflow manager execution ID."""
+    """Type of reference such as a workflow manager execution ID."""
     created_at: datetime = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of first creation. Mismatches ``started_at`` if the run is re-run."""
 
@@ -1459,7 +1458,7 @@ class ULabel(Record, HasParents, CanValidate, TracksRun, TracksUpdates):
     reference_type: str = CharField(
         max_length=25, db_index=True, null=True, default=None
     )
-    """Type of reference, e.g., donor_id from Vendor X."""
+    """Type of reference such as a donor_id from Vendor X."""
     parents: ULabel = models.ManyToManyField(
         "self", symmetrical=False, related_name="children"
     )
@@ -1491,8 +1490,7 @@ class ULabel(Record, HasParents, CanValidate, TracksRun, TracksUpdates):
 class Feature(Record, CanValidate, TracksRun, TracksUpdates):
     """Dataset dimensions.
 
-    Features denote dataset dimensions, i.e., the variables that measure labels &
-    numbers.
+    Features denote dataset dimensions, i.e., the variables that measure labels & numbers.
 
     The `Feature` registry helps to
 
@@ -1536,8 +1534,8 @@ class Feature(Record, CanValidate, TracksRun, TracksUpdates):
 
         *Features* and *labels* denote two ways of using entities to organize data:
 
-        1. A feature qualifies *what* is measured, i.e..  numerical or categorical random variable
-        2. A label *is* a measured value, i.e..  category
+        1. A feature qualifies *what* is measured such as a numerical or categorical random variable
+        2. A label *is* a measured value like a category
 
         Consider annotating a dataset by that it measured expression of 30k
         genes: genes relate to the dataset as feature identifiers through a
@@ -1622,7 +1620,7 @@ class FeatureValue(Record, TracksRun):
     Categorical feature values are stored in their respective registries:
     :class:`~lamindb.ULabel`, :class:`~bionty.CellType`, etc.
 
-    Unlike for ULabel, in `FeatureValue`, values are grouped by features. nd
+    Unlike for ULabel, in `FeatureValue`, values are grouped by features and
     not by an ontological hierarchy.
     """
 
@@ -1669,7 +1667,8 @@ class FeatureSet(Record, TracksRun):
 
         A feature set is identified by the hash of the feature uids in the set.
 
-        A `slot` provides a string key to access feature sets. It's typically the accessor within the registered data object, here `pd.DataFrame.columns`.
+        A `slot` provides a string key to access feature sets.
+        It's typically the accessor within the registered data object, here `pd.DataFrame.columns`.
 
 
     See Also:
@@ -1772,8 +1771,8 @@ class FeatureSet(Record, TracksRun):
             values: A list of values, like feature names or ids.
             field: The field of a reference registry to map values.
             type: The simple type. Defaults to
-                `None` if reference registry is :class:`~lamindb.Feature`, defaults to
-                `"float"` otherwise.
+                `None` if reference registry is :class:`~lamindb.Feature`,
+                defaults to `"float"` otherwise.
             name: A name.
             organism: An organism to resolve gene mapping.
             source: A public ontology to resolve feature identifier mapping.
@@ -1849,8 +1848,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
 
         You'll find these values in the `suffix` & `accessor` fields.
 
-        LaminDB makes some default choices (e.g., serialize a `DataFrame` as a
-        `.parquet` file).
+        LaminDB makes some default choices (e.g., serialize a `DataFrame` as a `.parquet` file).
 
     See Also:
         :class:`~lamindb.Storage`
@@ -2197,7 +2195,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
         Args:
             path: Source path of folder.
             key: Key for storage destination. If `None` and
-                directory is in a registered location. n inferred `key` will
+                directory is in a registered location, the inferred `key` will
                 reflect the relative position. If `None` and directory is outside
                 of a registered storage location, the inferred key defaults to `path.name`.
             run: A `Run` object.
@@ -2264,7 +2262,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
     ) -> Any:
         """Stage and load to memory.
 
-        Returns in-memory representation if possible, e.g.. n `AnnData` object for an `h5ad` file.
+        Returns in-memory representation if possible such as an `AnnData` object for an `h5ad` file.
 
         Examples:
 
@@ -2298,7 +2296,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
 
         Follows synching logic: only caches an artifact if it's outdated in the local cache.
 
-        Returns a path to a locally cached on-disk object (say.  `.jpg` file).
+        Returns a path to a locally cached on-disk object (say a `.jpg` file).
 
         Examples:
 
@@ -2336,8 +2334,7 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
         """Save to database & storage.
 
         Args:
-            upload: Trigger upload to cloud storage in instances with hybrid
-                storage mode.
+            upload: Trigger upload to cloud storage in instances with hybrid storage mode.
 
         Examples:
             >>> artifact = ln.Artifact("./myfile.csv", description="myfile")
@@ -2583,7 +2580,7 @@ class Collection(Record, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
     ) -> Any:
         """Stage and load to memory.
 
-        Returns in-memory representation if possible, e.g..  concatenated `DataFrame` or `AnnData` object.
+        Returns in-memory representation if possible such as a concatenated `DataFrame` or `AnnData` object.
         """
         pass
 
