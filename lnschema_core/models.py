@@ -624,7 +624,7 @@ class Registry(ModelBase):
             A record.
 
         Raises:
-            DoesNotExist: In case no matching record is found.
+            :exc:`docs:lamindb.core.exceptions.DoesNotExist`: In case no matching record is found.
 
         See Also:
             - Guide: :doc:`docs:records`
