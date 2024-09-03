@@ -1534,8 +1534,8 @@ class Feature(Record, CanValidate, TracksRun, TracksUpdates):
 
         *Features* and *labels* denote two ways of using entities to organize data:
 
-        1. A feature qualifies *what* is measured such as a numerical or categorical random variable
-        2. A label *is* a measured value like a category
+        1. A feature qualifies *what* is measured, i.e., a numerical or categorical random variable
+        2. A label *is* a measured value, i.e., a category
 
         Consider annotating a dataset by that it measured expression of 30k
         genes: genes relate to the dataset as feature identifiers through a
