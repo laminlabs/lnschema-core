@@ -601,7 +601,7 @@ class Registry(ModelBase):
 
         See Also:
             - Guide: :doc:`docs:records`
-            - Django documentation: `Queries <https://docs.djangoproject.com/en/4.2/topics/db/queries/>`__
+            - Django documentation: `Queries <https://docs.djangoproject.com/en/stable/topics/db/queries/>`__
 
         Examples:
             >>> ln.ULabel(name="my ulabel").save()
