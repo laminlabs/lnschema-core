@@ -1825,10 +1825,9 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
     Args:
         data: `UPathStr` A path to a local or remote folder or file.
         type: `Literal["dataset", "model"] | None = None` The artifact type.
-        key: `str | None = None` A relative path within your default storage,
-            e.g., `"myfolder/myfile.fcs"`. If `not None` will automatically version new artifacts with the same key.
+        key: `str | None = None` A path-like key to reference artifact in default storage, e.g., `"myfolder/myfile.fcs"`. Artifacts with the same key form a revision family.
         description: `str | None = None` A description.
-        revises: `Artifact | None = None` Previous version of the artifact. Triggers a revision (a new untagged version).
+        revises: `Artifact | None = None` Previous version of the artifact. Triggers a revision.
         run: `Run | None = None` The run that creates the artifact.
 
     .. dropdown:: Typical storage formats & their API accessors
