@@ -983,22 +983,25 @@ class Storage(Record, TracksRun, TracksUpdates):
 class Transform(Record, IsVersioned):
     """Data transformations.
 
-    A transform can refer to a Python function, a script, notebook, or a
+    A "transform" can refer to a Python function, a script, a notebook, or a
     pipeline. If you execute a transform, you generate a run
-    (:class:`~lamindb.Run`). A run has input and output data.
+    (:class:`~lamindb.Run`). A run has inputs and outputs.
 
     A pipeline is typically created with a workflow tool (Nextflow, Snakemake,
     Prefect, Flyte, MetaFlow, redun, Airflow, ...) and stored in a versioned
     repository.
 
-    Transforms are versioned so that a given transform maps 1:1 to a specific
-    version of code.
+    Transforms are versioned so that a given transform version maps on a given
+    source code version.
 
     .. dropdown:: Can I sync transforms to git?
 
         If you switch on
         :attr:`~lamindb.core.Settings.sync_git_repo` a script-like transform is
         synched to its hashed state in a git repository upon calling `ln.context.track()`.
+
+        >>> ln.settings.sync_git_repo = "https://github.com/laminlabs/lamindb"
+        >>> ln.context.track()
 
     The definition of transforms and runs is consistent the OpenLineage
     specification where a :class:`~lamindb.Transform` record would be called a
@@ -2345,10 +2348,10 @@ delattr(Artifact, "get_visibility_display")
 class Collection(Record, IsVersioned, TracksRun, TracksUpdates):
     """Collections of artifacts.
 
-    For more info: :doc:`/tutorial`.
+    Collections provide a simple way of linking & versioning collections of artifacts (:doc:`/tutorial`).
 
     Args:
-        data: `List[Artifact]` A list of artifacts.
+        data: `list[Artifact]` A list of artifacts.
         name: `str` A name.
         description: `str | None = None` A description.
         revises: `Collection | None = None` An old version of the collection.
@@ -2362,27 +2365,14 @@ class Collection(Record, IsVersioned, TracksRun, TracksUpdates):
 
     Examples:
 
-        Create a collection from a collection of :class:`~lamindb.Artifact` objects:
+        Create a collection from a list of :class:`~lamindb.Artifact` objects:
 
         >>> collection = ln.Collection([artifact1, artifact2], name="My collection")
-        >>> collection.save()
 
-        If you have more than 100k artifacts, consider creating a collection directly from the
-        directory without creating File records (e.g., here :doc:`docs:rxrx`):
+        Create a collection that groups a data & a metadata artifact (e.g., here :doc:`docs:rxrx`):
 
-        >>> collection = ln.Artifact("s3://my-bucket/my-images/", name="My collection", meta=df)
-        >>> collection.save()
+        >>> collection = ln.Collection(data_artifact, name="My collection", meta=metadata_artifact)
 
-        Make a new version of a collection:
-
-        >>> # a non-versioned collection
-        >>> collection = ln.Collection(df1, description="My dataframe")
-        >>> collection.save()
-        >>> # create new collection from old collection and version both
-        >>> new_collection = ln.Collection(df2, revises=collection)
-        >>> assert new_collection.stem_uid == collection.stem_uid
-        >>> assert collection.version == "1"
-        >>> assert new_collection.version == "2"
     """
 
     class Meta(Record.Meta, IsVersioned.Meta, TracksRun.Meta, TracksUpdates.Meta):
