@@ -796,24 +796,6 @@ class ParamManagerRun(ParamManager):
     pass
 
 
-class HasParams:
-    """Base class linking params."""
-
-    params: ParamManager = ParamManager  # type: ignore
-    """Param manager.
-
-    What `.features` is to dataset-like artifacts, `.params` is to model-like artifacts.
-
-    Annotate with params & values::
-
-        artifact.params.add_values({
-            "hidden_size": 32,
-            "bottleneck_size": 16,
-            "batch_size": 32
-        })
-    """
-
-
 # -------------------------------------------------------------------------------------
 # A note on required fields at the Record level
 #
@@ -1202,7 +1184,7 @@ class ParamValue(Record):
     """Creator of record. :class:`~lamindb.User`"""
 
 
-class Run(Record, HasParams):
+class Run(Record):
     """Runs of transforms.
 
     Args:
@@ -1242,6 +1224,18 @@ class Run(Record, HasParams):
     _name_field: str = "started_at"
 
     params: ParamManager = ParamManagerRun  # type: ignore
+    """Param manager.
+
+    What `.features` is to dataset-like artifacts, `.params` is to model-like artifacts.
+
+    Annotate with params & values::
+
+        artifact.params.add_values({
+            "hidden_size": 32,
+            "bottleneck_size": 16,
+            "batch_size": 32
+        })
+    """
 
     id: int = models.BigAutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
@@ -1749,7 +1743,7 @@ class FeatureSet(Record, TracksRun):
         pass
 
 
-class Artifact(Record, HasParams, IsVersioned, TracksRun, TracksUpdates):
+class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
     """Datasets & models stored as files, folders, or arrays.
 
     Artifacts manage data in local or remote storage (:doc:`/tutorial`).
@@ -1838,8 +1832,21 @@ class Artifact(Record, HasParams, IsVersioned, TracksRun, TracksUpdates):
 
     _len_full_uid: int = 20
     _len_stem_uid: int = 16
-    params: ParamManager = ParamManagerArtifact  # type: ignore
     _name_field: str = "description"
+
+    params: ParamManager = ParamManagerArtifact  # type: ignore
+    """Param manager.
+
+    What `.features` is to dataset-like artifacts, `.params` is to model-like artifacts.
+
+    Annotate with params & values::
+
+        artifact.params.add_values({
+            "hidden_size": 32,
+            "bottleneck_size": 16,
+            "batch_size": 32
+        })
+    """
 
     features: FeatureManager = FeatureManagerArtifact  # type: ignore
     """Feature manager.
