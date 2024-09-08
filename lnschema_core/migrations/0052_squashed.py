@@ -122,7 +122,6 @@ class Migration(migrations.Migration):
             options={
                 "abstract": False,
             },
-            bases=(lnschema_core.models.HasFeatures, models.Model),
         ),
         migrations.CreateModel(
             name="Feature",
@@ -297,7 +296,6 @@ class Migration(migrations.Migration):
             options={
                 "abstract": False,
             },
-            bases=(lnschema_core.models.HasFeatures, models.Model),
         ),
         migrations.CreateModel(
             name="CollectionArtifact",
