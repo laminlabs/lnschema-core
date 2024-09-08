@@ -796,71 +796,6 @@ class ParamManagerRun(ParamManager):
     pass
 
 
-class HasFeatures:
-    """Base class linking features, in particular, for :class:`~lamindb.Artifact` & :class:`~lamindb.Collection`."""
-
-    features: FeatureManager = FeatureManager  # type: ignore
-    """Feature manager.
-
-    Features denote dataset dimensions, i.e., the variables that measure labels & numbers.
-
-    Annotate with features & values::
-
-       artifact.features.add_values({
-            "species": organism,  # here, organism is an Organism record
-            "scientist": ['Barbara McClintock', 'Edgar Anderson'],
-            "temperature": 27.6,
-            "study": "Study 0: initial plant gathering"
-       })
-
-    Query for features & values::
-
-        ln.Artifact.features.filter(scientist="Barbara McClintock")
-
-    Features may or may not be part of the artifact content in storage. For
-    instance, the :class:`~lamindb.Curator` flow validates the columns of a
-    `DataFrame`-like artifact and annotates it with features corresponding to
-    these columns. `artifact.features.add_values`, by contrast, does not
-    validate the content of the artifact.
-    """
-
-    @property
-    def labels(self) -> LabelManager:
-        """Label manager.
-
-        To annotate with labels, you typically use the registry-specific accessors,
-        for instance :attr:`~lamindb.Artifact.ulabels`::
-
-            candidate_marker_study = ln.ULabel(name="Candidate marker study").save()
-            artifact.ulabels.add(candidate_marker_study)
-
-        Similarly, you query based on these accessors::
-
-            ln.Artifact.filter(ulabels__name="Candidate marker study").all()
-
-        The `.labels` accessor allows you to associate labels of any registry with features::
-
-            study = ln.Feature(name="study", dtype="cat").save()
-            artifact.labels.add(candidate_marker_study, study)
-        """
-        from lamindb.core._label_manager import LabelManager
-
-        return LabelManager(self)
-
-    def describe(self) -> None:
-        """Describe relations of data record.
-
-        Examples:
-            >>> ln.Artifact(ln.core.datasets.file_jpg_paradisi05(), description="paradisi05").save()
-            >>> artifact = ln.Artifact.get(description="paradisi05")
-            >>> ln.save(ln.ULabel.from_values(["image", "benchmark", "example"], field="name"))
-            >>> ulabels = ln.ULabel.filter(name__in=["image", "benchmark", "example"]).all()
-            >>> artifact.ulabels.set(ulabels)
-            >>> artifact.describe()
-        """
-        pass
-
-
 class HasParams:
     """Base class linking params."""
 
@@ -1814,7 +1749,7 @@ class FeatureSet(Record, TracksRun):
         pass
 
 
-class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpdates):
+class Artifact(Record, HasParams, IsVersioned, TracksRun, TracksUpdates):
     """Datasets & models stored as files, folders, or arrays.
 
     Artifacts manage data in local or remote storage (:doc:`/tutorial`).
@@ -1903,9 +1838,56 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
 
     _len_full_uid: int = 20
     _len_stem_uid: int = 16
-    features: FeatureManager = FeatureManagerArtifact  # type: ignore
     params: ParamManager = ParamManagerArtifact  # type: ignore
     _name_field: str = "description"
+
+    features: FeatureManager = FeatureManagerArtifact  # type: ignore
+    """Feature manager.
+
+    Features denote dataset dimensions, i.e., the variables that measure labels & numbers.
+
+    Annotate with features & values::
+
+       artifact.features.add_values({
+            "species": organism,  # here, organism is an Organism record
+            "scientist": ['Barbara McClintock', 'Edgar Anderson'],
+            "temperature": 27.6,
+            "study": "Study 0: initial plant gathering"
+       })
+
+    Query for features & values::
+
+        ln.Artifact.features.filter(scientist="Barbara McClintock")
+
+    Features may or may not be part of the artifact content in storage. For
+    instance, the :class:`~lamindb.Curator` flow validates the columns of a
+    `DataFrame`-like artifact and annotates it with features corresponding to
+    these columns. `artifact.features.add_values`, by contrast, does not
+    validate the content of the artifact.
+    """
+
+    @property
+    def labels(self) -> LabelManager:
+        """Label manager.
+
+        To annotate with labels, you typically use the registry-specific accessors,
+        for instance :attr:`~lamindb.Artifact.ulabels`::
+
+            candidate_marker_study = ln.ULabel(name="Candidate marker study").save()
+            artifact.ulabels.add(candidate_marker_study)
+
+        Similarly, you query based on these accessors::
+
+            ln.Artifact.filter(ulabels__name="Candidate marker study").all()
+
+        The `.labels` accessor allows you to associate labels of any registry with features::
+
+            study = ln.Feature(name="study", dtype="cat").save()
+            artifact.labels.add(candidate_marker_study, study)
+        """
+        from lamindb.core._label_manager import LabelManager
+
+        return LabelManager(self)
 
     id: int = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
@@ -2352,12 +2334,20 @@ class Artifact(Record, HasFeatures, HasParams, IsVersioned, TracksRun, TracksUpd
         """
         pass
 
+    def describe(self) -> None:
+        """Describe relations of record.
+
+        Examples:
+            >>> artifact.describe()
+        """
+        pass
+
 
 # auto-generated through choices()
 delattr(Artifact, "get_visibility_display")
 
 
-class Collection(Record, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
+class Collection(Record, IsVersioned, TracksRun, TracksUpdates):
     """Collections of artifacts.
 
     For more info: :doc:`/tutorial`.
@@ -2641,6 +2631,14 @@ class Collection(Record, HasFeatures, IsVersioned, TracksRun, TracksUpdates):
            collection.data_artifact  # first & only element of collection.artifacts
            collection.meta_artifact  # metadata
 
+        """
+        pass
+
+    def describe(self) -> None:
+        """Describe relations of record.
+
+        Examples:
+            >>> artifact.describe()
         """
         pass
 
