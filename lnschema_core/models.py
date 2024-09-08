@@ -772,18 +772,6 @@ class ParamManager:
     pass
 
 
-class FeatureManagerArtifact(FeatureManager):
-    """Feature manager."""
-
-    pass
-
-
-class FeatureManagerCollection(FeatureManager):
-    """Feature manager."""
-
-    pass
-
-
 class ParamManagerArtifact(ParamManager):
     """Param manager."""
 
@@ -1848,7 +1836,7 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
         })
     """
 
-    features: FeatureManager = FeatureManagerArtifact  # type: ignore
+    features: FeatureManager = FeatureManager  # type: ignore
     """Feature manager.
 
     Features denote dataset dimensions, i.e., the variables that measure labels & numbers.
@@ -2402,7 +2390,6 @@ class Collection(Record, IsVersioned, TracksRun, TracksUpdates):
 
     _len_full_uid: int = 20
     _len_stem_uid: int = 16
-    features = FeatureManagerCollection  # type: ignore
     _name_field: str = "name"
 
     id: int = models.AutoField(primary_key=True)
