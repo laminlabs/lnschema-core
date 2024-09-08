@@ -2426,10 +2426,6 @@ class Collection(Record, IsVersioned, TracksRun, TracksUpdates):
         max_length=25, db_index=True, null=True, default=None
     )
     """Type of reference, e.g., cellxgene Census collection_id."""
-    feature_sets: FeatureSet = models.ManyToManyField(
-        "FeatureSet", related_name="collections", through="CollectionFeatureSet"
-    )
-    """The feature sets measured in this collection (see :class:`~lamindb.FeatureSet`)."""
     ulabels: ULabel = models.ManyToManyField(
         "ULabel", through="CollectionULabel", related_name="collections"
     )
@@ -2685,24 +2681,6 @@ class ArtifactFeatureSet(Record, LinkORM, TracksRun):
 
     class Meta:
         unique_together = ("artifact", "featureset")
-
-
-class CollectionFeatureSet(Record, LinkORM, TracksRun):
-    id: int = models.BigAutoField(primary_key=True)
-    collection = models.ForeignKey(
-        Collection, CASCADE, related_name="links_feature_set"
-    )
-    # we follow the lower() case convention rather than snake case for link models
-    featureset: FeatureSet = models.ForeignKey(
-        FeatureSet, PROTECT, related_name="links_collection"
-    )
-    slot: str = CharField(max_length=50, null=True, default=None)
-    feature_ref_is_semantic: bool = models.BooleanField(
-        null=True, default=None
-    )  # like Feature name or Gene symbol or CellMarker name
-
-    class Meta:
-        unique_together = ("collection", "featureset")
 
 
 class CollectionArtifact(Record, LinkORM, TracksRun):
