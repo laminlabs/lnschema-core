@@ -22,7 +22,6 @@ def test_registry__repr__param(setup_instance):
       Relational fields
         .created_by: User
         .run: Run
-        .paramvalue: ParamValue
     """).strip()
 
     actual_repr = _strip_ansi(repr(param))
