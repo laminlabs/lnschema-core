@@ -600,7 +600,7 @@ class Registry(ModelBase):
             A :class:`~lamindb.core.QuerySet`.
 
         See Also:
-            - Guide: :doc:`docs:records`
+            - Guide: :doc:`docs:registries`
             - Django documentation: `Queries <https://docs.djangoproject.com/en/stable/topics/db/queries/>`__
 
         Examples:
@@ -627,7 +627,7 @@ class Registry(ModelBase):
             :exc:`docs:lamindb.core.exceptions.DoesNotExist`: In case no matching record is found.
 
         See Also:
-            - Guide: :doc:`docs:records`
+            - Guide: :doc:`docs:registries`
             - Django documentation: `Queries <https://docs.djangoproject.com/en/stable/topics/db/queries/>`__
 
         Examples:
