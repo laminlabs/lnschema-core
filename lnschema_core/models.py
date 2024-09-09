@@ -1193,20 +1193,22 @@ class Run(Record):
         A run can have inputs and outputs:
 
         - References to outputs are stored in the `run` field of registries.
-        - References to inputs are stored in the `input_of` field of :class:`~lamindb.Artifact` and :class:`~lamindb.Collection`.
+        - References to inputs are stored in the `input_of_runs` field of :class:`~lamindb.Artifact` and :class:`~lamindb.Collection`.
 
     Examples:
+
+        Create a run record:
 
         >>> ln.Transform(name="Cell Ranger", version="7.2.0", type="pipeline").save()
         >>> transform = ln.Transform.get(name="Cell Ranger", version="7.2.0")
         >>> run = ln.Run(transform)
 
-        Create a global run context:
+        Create a global run context for a custom transform:
 
         >>> ln.context.track(transform=transform)
-        >>> ln.context.run  # global available run
+        >>> ln.context.run  # globally available run
 
-        Track a notebook run:
+        Track a global run context for a notebook or script:
 
         >>> ln.context.track()  # Jupyter notebook metadata is automatically parsed
         >>> ln.context.run
@@ -1990,6 +1992,8 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
         "self", symmetrical=False, related_name="_action_targets"
     )
     """Actions to attach for the UI."""
+
+    # backward fields
     collections: Collection
     """The collections that this artifact is part of."""
 
@@ -2824,7 +2828,10 @@ class RegistryInfo:
             return repr_str
 
     def get_relational_fields(self, return_str: bool = False):
-        relational_fields = (ManyToOneRel, ManyToManyRel, ManyToManyField, ForeignKey)
+        # we ignore ManyToOneRel because it leads to so much clutter in the API
+        # also note that our general guideline is to have backward_relation="+"
+        # for ForeignKey fields
+        relational_fields = (ManyToManyRel, ManyToManyField, ForeignKey)
 
         class_specific_relational_fields = [
             field
