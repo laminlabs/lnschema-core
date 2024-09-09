@@ -945,6 +945,8 @@ class Storage(Record, TracksRun, TracksUpdates):
     """Cloud storage region, if applicable."""
     instance_uid: str = CharField(max_length=12, db_index=True, null=True, default=None)
     """Instance that manages this storage location."""
+    artifacts: Artifact
+    """Artifacts contained in this storage location."""
 
     @overload
     def __init__(
@@ -1036,16 +1038,15 @@ class Transform(Record, IsVersioned):
 
         Create a transform for a pipeline:
 
-        >>> transform = ln.Transform(name="Cell Ranger", version="7.2.0", type="pipeline")
-        >>> transform.save()
+        >>> transform = ln.Transform(name="Cell Ranger", version="7.2.0", type="pipeline").save()
 
         Create a transform from a notebook:
 
         >>> ln.context.track()
 
-        View parents of a transform:
+        View predecessors of a transform:
 
-        >>> transform.view_parents()
+        >>> transform.view_lineage()
     """
 
     class Meta(Record.Meta, IsVersioned.Meta):
@@ -1396,26 +1397,20 @@ class ULabel(Record, HasParents, CanValidate, TracksRun, TracksUpdates):
 
         Create a new label:
 
-        >>> my_project = ln.ULabel(name="My project")
-        >>> my_project.save()
-
-        Label a artifact without associating it to a feature:
-
-        >>> ulabel = ln.ULabel.get(name="My project")
-        >>> artifact = ln.Artifact("./myfile.csv")
-        >>> artifact.save()
-        >>> artifact.ulabels.add(ulabel)
+        >>> my_project = ln.ULabel(name="My project").save()
 
         Organize labels in a hierarchy:
 
-        >>> ulabels = ln.ULabel.lookup()  # create a lookup
-        >>> is_project = ln.ULabel(name="is_project")  # create a super-category `is_project`
-        >>> is_project.save()
-        >>> ulabels.my_project.parents.add(is_project)
+        >>> is_project = ln.ULabel(name="is_project").save()
+        >>> my_project.parents.add(is_project)
+
+        Label an artifact:
+
+        >>> artifact.ulabels.add(ulabel)
 
         Query by `ULabel`:
 
-        >>> ln.Artifact.filter(ulabels=project).first()
+        >>> ln.Artifact.filter(ulabels=project)
     """
 
     class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
@@ -1440,7 +1435,15 @@ class ULabel(Record, HasParents, CanValidate, TracksRun, TracksUpdates):
     parents: ULabel = models.ManyToManyField(
         "self", symmetrical=False, related_name="children"
     )
-    """Parent labels, useful to hierarchically group labels (optional)."""
+    """Parent entities of this ulabel."""
+    children: ULabel
+    """Child entities of this ulabel."""
+    transforms: Transform
+    """Transforms annotated with this ulabel."""
+    artifacts: Artifact
+    """Artifacts annotated with this ulabel."""
+    collections: Collection
+    """Collections annotated with this ulabel."""
 
     @overload
     def __init__(
@@ -1624,8 +1627,8 @@ class FeatureSet(Record, TracksRun):
     """Feature sets.
 
     Stores references to sets of :class:`~lamindb.Feature` and other registries
-    that may be used to identify features (e.g., class:`~bionty.Gene` or
-    class:`~bionty.Protein`).
+    that may be used to identify features (e.g., :class:`~bionty.Gene` or
+    :class:`~bionty.Protein`).
 
     .. dropdown:: Why does LaminDB model feature sets, not just features?
 
@@ -1651,7 +1654,8 @@ class FeatureSet(Record, TracksRun):
 
     Note:
 
-        A feature set is identified by the hash of the feature uids in the set.
+        A feature set can be identified by the `hash` its feature uids. It's
+        stored in the `.hash` field.
 
         A `slot` provides a string key to access feature sets.
         It's typically the accessor within the registered data object, here `pd.DataFrame.columns`.
@@ -1717,6 +1721,10 @@ class FeatureSet(Record, TracksRun):
         max_length=HASH_LENGTH, default=None, db_index=True, null=True, unique=True
     )
     """The hash of the set."""
+    features: Feature
+    """The features related to a `FeatureSet` record."""
+    artifacts: Artifact
+    """The artifacts related to a `FeatureSet` record."""
 
     @overload
     def __init__(
@@ -1916,7 +1924,7 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
             "species": organism,  # here, organism is an Organism record
             "scientist": ['Barbara McClintock', 'Edgar Anderson'],
             "temperature": 27.6,
-            "study": "Study 0: initial plant gathering"
+            "study": "Candidate marker study"
        })
 
     Query for features & values::
@@ -1944,10 +1952,15 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
 
             ln.Artifact.filter(ulabels__name="Candidate marker study").all()
 
-        The `.labels` accessor allows you to associate labels of any registry with features::
+        Unlike the registry-specific accessors, the `.labels` accessor provides
+        a way of associating labels with features::
 
             study = ln.Feature(name="study", dtype="cat").save()
-            artifact.labels.add(candidate_marker_study, study)
+            artifact.labels.add(candidate_marker_study, feature=study)
+
+        Note that the above is equivalent to::
+
+            artifact.features.add_values({"study": candidate_marker_study})
         """
         from lamindb.core._label_manager import LabelManager
 
