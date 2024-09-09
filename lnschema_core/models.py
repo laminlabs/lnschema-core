@@ -157,11 +157,11 @@ class TracksRun(models.Model):
     created_at: datetime = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     created_by: User = models.ForeignKey(
-        "lnschema_core.User", PROTECT, default=current_user_id
+        "lnschema_core.User", PROTECT, default=current_user_id, related_name="+"
     )
     """Creator of record."""
     run: Run = models.ForeignKey(
-        "lnschema_core.Run", PROTECT, null=True, default=current_run
+        "lnschema_core.Run", PROTECT, null=True, default=current_run, related_name="+"
     )
     """Last run that created or updated the record."""
 
@@ -2829,7 +2829,7 @@ class RegistryInfo:
 
     def get_relational_fields(self, return_str: bool = False):
         # we ignore ManyToOneRel because it leads to so much clutter in the API
-        # also note that our general guideline is to have backward_relation="+"
+        # also note that our general guideline is to have related_name="+"
         # for ForeignKey fields
         relational_fields = (ManyToManyRel, ManyToManyField, ForeignKey)
 
