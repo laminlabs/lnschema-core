@@ -1974,7 +1974,7 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
     )
     """The feature sets measured in the artifact."""
     _feature_values: FeatureValue = models.ManyToManyField(
-        FeatureValue, through="ArtifactFeatureValue"
+        FeatureValue, through="ArtifactFeatureValue", related_name="artifacts"
     )
     """Non-categorical feature values for annotation."""
     _param_values: ParamValue = models.ManyToManyField(
