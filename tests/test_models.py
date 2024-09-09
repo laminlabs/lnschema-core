@@ -22,9 +22,11 @@ def test_registry__repr__param(setup_instance):
       Relational fields
         .created_by: User
         .run: Run
+        .values: ParamValue
     """).strip()
 
     actual_repr = _strip_ansi(repr(param))
+    print(actual_repr)
     assert actual_repr.strip() == expected_repr.strip()
 
 
@@ -50,10 +52,10 @@ def test_registry__repr__artifact(setup_instance):
         .created_at: DateTimeField
         .updated_at: DateTimeField
       Relational fields
-        .created_by: User
         .storage: Storage
         .transform: Transform
         .run: Run
+        .created_by: User
         .ulabels: ULabel
         .input_of_runs: Run
         .feature_sets: FeatureSet
@@ -61,4 +63,5 @@ def test_registry__repr__artifact(setup_instance):
     """).strip()
 
     actual_repr = _strip_ansi(repr(artifact))
+    print(actual_repr)
     assert actual_repr.strip() == expected_repr.strip()
