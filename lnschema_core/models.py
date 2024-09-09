@@ -589,10 +589,11 @@ class Registry(ModelBase):
         """
         pass
 
-    def filter(cls, **expressions) -> QuerySet:
+    def filter(cls, *queries, **expressions) -> QuerySet:
         """Query records.
 
         Args:
+            queries: One or multiple `Q` objects.
             expressions: Fields and values passed as Django query expressions.
 
         Returns:
