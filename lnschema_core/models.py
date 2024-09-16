@@ -123,7 +123,11 @@ class IsVersioned(models.Model):
         >>> new_artifact.save()
         >>> new_artifact.versions()
         """
-        return self.__class__.filter(uid__startswith=self.stem_uid)  # type: ignore
+        db = self._state.db
+        if db is not None and db != "default":
+            return self.__class__.using(db).filter(uid__startswith=self.stem_uid)  # type: ignore
+        else:
+            return self.__class__.filter(uid__startswith=self.stem_uid)  # type: ignore
 
     def _add_to_version_family(self, revises: IsVersioned, version: str | None = None):
         """Add current record to a version family.
