@@ -2330,17 +2330,14 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
     def load(
         self, is_run_input: bool | None = None, stream: bool = False, **kwargs
     ) -> Any:
-        """Stage and load to memory.
+        """Cache and load into memory.
 
-        Returns in-memory representation if possible such as an `AnnData` object for an `h5ad` file.
+        See all artifact loaders :mod:`~lamindb.core.loaders`.
 
         Examples:
 
-            Load as a `DataFrame`:
+            Load a `DataFrame`-like artifact:
 
-            >>> df = ln.core.datasets.df_iris_in_meter_batch1()
-            >>> ln.Artifact.from_df(df, description="iris").save()
-            >>> artifact = ln.Artifact.get(description="iris")
             >>> artifact.load().head()
             sepal_length sepal_width petal_length petal_width iris_organism_code
             0        0.051       0.035        0.014       0.002                 0
@@ -2349,7 +2346,7 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
             3        0.046       0.031        0.015       0.002                 0
             4        0.050       0.036        0.014       0.002                 0
 
-            Load as an `AnnData`:
+            Load an `AnnData`-like artifact:
 
             >>> artifact.load()
             AnnData object with n_obs × n_vars = 70 × 765
