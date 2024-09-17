@@ -1487,7 +1487,7 @@ class Feature(Record, CanValidate, TracksRun, TracksUpdates):
 
     Args:
         name: `str` Name of the feature, typically.  column name.
-        type: `str | list[Type[Record]]` Data type ("number", "cat", "int", "float", "bool", "datetime").
+        dtype: `str | list[Type[Record]]` Data type ("number", "cat", "int", "float", "bool", "datetime").
             For categorical types, can define from which registry values are
             sampled, e.g., `cat[ULabel]` or `cat[bionty.CellType]`.
         unit: `str | None = None` Unit of measure, ideally SI (`"m"`, `"s"`, `"kg"`, etc.) or `"normalized"` etc.
