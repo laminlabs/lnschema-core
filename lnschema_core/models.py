@@ -2332,7 +2332,7 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
     ) -> Any:
         """Cache and load into memory.
 
-        See all artifact loaders :mod:`~lamindb.core.loaders`.
+        See all :mod:`~lamindb.core.loaders`.
 
         Examples:
 
