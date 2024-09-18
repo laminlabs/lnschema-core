@@ -2327,9 +2327,7 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
         """
         pass
 
-    def load(
-        self, is_run_input: bool | None = None, stream: bool = False, **kwargs
-    ) -> Any:
+    def load(self, is_run_input: bool | None = None, **kwargs) -> Any:
         """Cache and load into memory.
 
         See all :mod:`~lamindb.core.loaders`.
