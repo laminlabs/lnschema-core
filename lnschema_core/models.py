@@ -2558,6 +2558,7 @@ class Collection(Record, IsVersioned, TracksRun, TracksUpdates):
         layers_keys: str | list[str] | None = None,
         obs_keys: str | list[str] | None = None,
         obsm_keys: str | list[str] | None = None,
+        obs_filter: tuple[str, str | tuple[str, ...]] | None = None,
         join: Literal["inner", "outer"] | None = "inner",
         encode_labels: bool | list[str] = True,
         unknown_label: str | dict[str, str] | None = None,
@@ -2591,8 +2592,11 @@ class Collection(Record, IsVersioned, TracksRun, TracksUpdates):
         Args:
             layers_keys: Keys from the ``.layers`` slot. ``layers_keys=None`` or ``"X"`` in the list
                 retrieves ``.X``.
-            obsm_keys: Keys from the ``.obsm`` slots.
             obs_keys: Keys from the ``.obs`` slots.
+            obsm_keys: Keys from the ``.obsm`` slots.
+            obs_filter: Select only observations with these values for the given obs column.
+                Should be a tuple with an obs column name as the first element
+                and filtering values (a string or a tuple of strings) as the second element.
             join: `"inner"` or `"outer"` virtual joins. If ``None`` is passed,
                 does not join.
             encode_labels: Encode labels into integers.
