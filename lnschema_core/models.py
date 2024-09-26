@@ -3036,7 +3036,7 @@ def record_repr(
     self: Record, include_foreign_keys: bool = True, exclude_field_names=None
 ) -> str:
     if exclude_field_names is None:
-        exclude_field_names = ["id", "created_at"]
+        exclude_field_names = ["id", "updated_at", "source_code"]
     field_names = [
         field.name
         for field in self._meta.fields
@@ -3051,9 +3051,9 @@ def record_repr(
             for field in self._meta.fields
             if isinstance(field, models.ForeignKey)
         ]
-    if "updated_at" in field_names:
-        field_names.remove("updated_at")
-        field_names.append("updated_at")
+    if "created_at" in field_names:
+        field_names.remove("created_at")
+        field_names.append("created_at")
     if field_names[0] != "uid" and "uid" in field_names:
         field_names.remove("uid")
         field_names.insert(0, "uid")
