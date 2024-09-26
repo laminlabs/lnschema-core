@@ -1011,10 +1011,10 @@ class Transform(Record, IsVersioned):
 
         If you switch on
         :attr:`~lamindb.core.Settings.sync_git_repo` a script-like transform is
-        synched to its hashed state in a git repository upon calling `ln.context.track()`.
+        synched to its hashed state in a git repository upon calling `ln.track()`.
 
         >>> ln.settings.sync_git_repo = "https://github.com/laminlabs/lamindb"
-        >>> ln.context.track()
+        >>> ln.track()
 
     The definition of transforms and runs is consistent the OpenLineage
     specification where a :class:`~lamindb.Transform` record would be called a
@@ -1047,7 +1047,7 @@ class Transform(Record, IsVersioned):
 
         Create a transform from a notebook:
 
-        >>> ln.context.track()
+        >>> ln.track()
 
         View predecessors of a transform:
 
@@ -1253,7 +1253,7 @@ class Run(Record):
 
         Track a global run context for a notebook or script:
 
-        >>> ln.context.track()  # Jupyter notebook metadata is automatically parsed
+        >>> ln.track()  # Jupyter notebook metadata is automatically parsed
         >>> ln.context.run
     """
 
@@ -2288,7 +2288,7 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
         Args:
             data: A file path.
             run: The run that created the artifact gets
-                auto-linked if ``ln.context.track()`` was called.
+                auto-linked if ``ln.track()`` was called.
 
         Examples:
             Say we made a change to the content of an artifact, e.g., edited the image
