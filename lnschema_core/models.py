@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import builtins
 from collections import defaultdict
-from datetime import datetime
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -40,6 +39,7 @@ from .ids import base62_8, base62_12, base62_20
 from .users import current_user_id
 
 if TYPE_CHECKING:
+    from datetime import datetime
     from pathlib import Path
 
     import numpy as np
@@ -2843,9 +2843,17 @@ class ArtifactParamValue(Record, LinkORM):
 
 
 def format_field_value(value: datetime | str | Any) -> Any:
+    from datetime import datetime
+
     if isinstance(value, datetime):
-        value = value.strftime("%Y-%m-%d %H:%M:%S %Z")
+        return value.strftime("%Y-%m-%d %H:%M:%S %Z")
+
     if isinstance(value, str):
+        try:
+            value = datetime.fromisoformat(value)
+            value = value.strftime("%Y-%m-%d %H:%M:%S %Z")
+        except ValueError:
+            pass
         return f"'{value}'"
     else:
         return value
