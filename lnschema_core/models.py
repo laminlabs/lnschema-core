@@ -299,6 +299,53 @@ class CanValidate:
         """
         pass
 
+    def from_values(
+        cls,
+        values: ListLike,
+        field: StrField | None = None,
+        create: bool = False,
+        organism: Record | str | None = None,
+        source: Record | None = None,
+        mute: bool = False,
+    ) -> list[Record]:
+        """Bulk create validated records by parsing values for an identifier such as a name or an id).
+
+        Args:
+            values: A list of values for an identifier, e.g.
+                `["name1", "name2"]`.
+            field: A `Record` field to look up, e.g., `bt.CellMarker.name`.
+            create: Whether to create records if they don't exist.
+            organism: A `bionty.Organism` name or record.
+            source: A `bionty.Source` record to validate against to create records for.
+            mute: Whether to mute logging.
+
+        Returns:
+            A list of validated records. For bionty registries. Also returns knowledge-coupled records.
+
+        Notes:
+            For more info, see tutorial: :doc:`docs:bio-registries`.
+
+        Examples:
+
+            Bulk create from non-validated values will log warnings & returns empty list:
+
+            >>> ulabels = ln.ULabel.from_values(["benchmark", "prediction", "test"], field="name")
+            >>> assert len(ulabels) == 0
+
+            Bulk create records from validated values returns the corresponding existing records:
+
+            >>> ln.save([ln.ULabel(name=name) for name in ["benchmark", "prediction", "test"]])
+            >>> ulabels = ln.ULabel.from_values(["benchmark", "prediction", "test"], field="name")
+            >>> assert len(ulabels) == 3
+
+            Bulk create records from public reference:
+
+            >>> import bionty as bt
+            >>> records = bt.CellType.from_values(["T cell", "B cell"], field="name")
+            >>> records
+        """
+        pass
+
     @classmethod
     def standardize(
         cls,
@@ -513,53 +560,6 @@ class Registry(ModelBase):
 
     def __repr__(cls) -> str:
         return registry_repr(cls)
-
-    def from_values(
-        cls,
-        values: ListLike,
-        field: StrField | None = None,
-        create: bool = False,
-        organism: Record | str | None = None,
-        source: Record | None = None,
-        mute: bool = False,
-    ) -> list[Record]:
-        """Bulk create validated records by parsing values for an identifier such as a name or an id).
-
-        Args:
-            values: A list of values for an identifier, e.g.
-                `["name1", "name2"]`.
-            field: A `Record` field to look up, e.g., `bt.CellMarker.name`.
-            create: Whether to create records if they don't exist.
-            organism: A `bionty.Organism` name or record.
-            source: A `bionty.Source` record to validate against to create records for.
-            mute: Whether to mute logging.
-
-        Returns:
-            A list of validated records. For bionty registries. Also returns knowledge-coupled records.
-
-        Notes:
-            For more info, see tutorial: :doc:`docs:bio-registries`.
-
-        Examples:
-
-            Bulk create from non-validated values will log warnings & returns empty list:
-
-            >>> ulabels = ln.ULabel.from_values(["benchmark", "prediction", "test"], field="name")
-            >>> assert len(ulabels) == 0
-
-            Bulk create records from validated values returns the corresponding existing records:
-
-            >>> ln.save([ln.ULabel(name=name) for name in ["benchmark", "prediction", "test"]])
-            >>> ulabels = ln.ULabel.from_values(["benchmark", "prediction", "test"], field="name")
-            >>> assert len(ulabels) == 3
-
-            Bulk create records from public reference:
-
-            >>> import bionty as bt
-            >>> records = bt.CellType.from_values(["T cell", "B cell"], field="name")
-            >>> records
-        """
-        pass
 
     def lookup(
         cls,
