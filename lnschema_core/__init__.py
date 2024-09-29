@@ -5,6 +5,13 @@ __version__ = "0.74.5"
 
 from lamindb_setup import _check_instance_setup
 
+
+def __getattr__(name):
+    if name != "models":
+        _check_instance_setup(from_module="lnschema_core")
+    return globals()[name]
+
+
 if _check_instance_setup():
     from . import ids, types
     from .models import (  # type: ignore
