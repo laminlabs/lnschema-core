@@ -2068,7 +2068,7 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
     visibility: int = models.SmallIntegerField(
         db_index=True, choices=VisibilityChoice.choices, default=1
     )
-    """Visibility of artifact record in queries & searches (1 default, 1 hidden, -1 trash)."""
+    """Visibility of artifact record in queries & searches (1 default, 0 hidden, -1 trash)."""
     _key_is_virtual: bool = models.BooleanField()
     """Indicates whether `key` is virtual or part of an actual file path."""
     # be mindful that below, passing related_name="+" leads to errors
@@ -2375,10 +2375,9 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
     def delete(
         self, permanent: bool | None = None, storage: bool | None = None
     ) -> None:
-        """Delete.
+        """Trash or permanently delete.
 
         A first call to `.delete()` puts an artifact into the trash (sets `visibility` to `-1`).
-
         A second call permanently deletes the artifact.
 
         FAQ: :doc:`docs:faq/storage`
@@ -2523,7 +2522,7 @@ class Collection(Record, IsVersioned, TracksRun, TracksUpdates):
     visibility: int = models.SmallIntegerField(
         db_index=True, choices=VisibilityChoice.choices, default=1
     )
-    """Visibility of collection record in queries & searches (1 default, 1 hidden, -1 trash)."""
+    """Visibility of collection record in queries & searches (1 default, 0 hidden, -1 trash)."""
     _actions: Artifact = models.ManyToManyField(Artifact, related_name="+")
     """Actions to attach for the UI."""
 
