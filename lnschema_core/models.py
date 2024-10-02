@@ -2253,7 +2253,7 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
         path: UPathStr,
         key: str | None = None,
         *,
-        run: Run | None = None,
+        run: Run | bool | None = None,
     ) -> list[Artifact]:
         """Create a list of artifact objects from a directory.
 
@@ -2268,7 +2268,9 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
                 directory is in a registered location, the inferred `key` will
                 reflect the relative position. If `None` and directory is outside
                 of a registered storage location, the inferred key defaults to `path.name`.
-            run: A `Run` object.
+            run: A `Run` object. Set to `False` to not associate the :class:`~lamindb.Artifact`
+                as :attr:`ln.Run.output_artifacts`. This is useful if you want to register
+                them as :attr:`ln.Run.input_artifacts` instead.
 
         Examples:
             >>> dir_path = ln.core.datasets.generate_cell_ranger_files("sample_001", ln.settings.storage)
