@@ -108,8 +108,8 @@ class IsVersioned(models.Model):
 
         The full uid of a record is obtained via concatenating the stem uid and version information::
 
-            stem_uid = random_base62(n_char)  # a random base62 sequence of length n_char
-            version_uid = encode_base62(md5_hash(version))[:4]  # version is, e.g., "1" or "2.1.0" or "2022-03-01"
+            stem_uid = random_base62(n_char)  # a random base62 sequence of length 12 (transform) or 16 (artifact, collection)
+            version_uid = "0000"  # an auto-incrementing 4-digit base62 number
             uid = f"{stem_uid}{version_uid}"  # concatenate the stem_uid & version_uid
 
         """
@@ -293,8 +293,6 @@ class CanValidate:
             >>> ln.save(bt.Gene.from_values(["A1CF", "A1BG", "BRCA2"], field="symbol"))
             >>> gene_symbols = ["A1CF", "A1BG", "FANCD1", "FANCD20"]
             >>> bt.Gene.validate(gene_symbols, field=bt.Gene.symbol)
-            ✅ 2 terms (50.00%) are validated
-            🔶 2 terms (50.00%) are not validated
             array([ True,  True, False, False])
         """
         pass
@@ -1138,7 +1136,7 @@ class Transform(Record, IsVersioned):
     created_by: User = models.ForeignKey(
         User, PROTECT, default=current_user_id, related_name="created_transforms"
     )
-    """Creator of record. :class:`~lamindb.User`"""
+    """Creator of record."""
 
     @overload
     def __init__(
@@ -1215,7 +1213,7 @@ class ParamValue(Record):
     created_by: User = models.ForeignKey(
         User, PROTECT, default=current_user_id, related_name="+"
     )
-    """Creator of record. :class:`~lamindb.User`"""
+    """Creator of record."""
 
 
 class Run(Record):
@@ -1262,14 +1260,16 @@ class Run(Record):
     params: ParamManager = ParamManagerRun  # type: ignore
     """Param manager.
 
-    What `.features` is to dataset-like artifacts, `.params` is to model-like artifacts.
+    Example::
 
-    Annotate with params & values::
-
-        artifact.params.add_values({
-            "hidden_size": 32,
-            "bottleneck_size": 16,
-            "batch_size": 32
+        run.params.add_values({
+            "learning_rate": 0.01,
+            "input_dir": "s3://my-bucket/mydataset",
+            "downsample": True,
+            "preprocess_params": {
+                "normalization_type": "cool",
+                "subset_highlyvariable": True,
+            },
         })
     """
 
@@ -1321,7 +1321,7 @@ class Run(Record):
     created_by: User = models.ForeignKey(
         User, CASCADE, default=current_user_id, related_name="created_runs"
     )
-    """Creator of run. :class:`~lamindb.User`"""
+    """Creator of run."""
     parent: Run = models.ForeignKey(
         "Run", CASCADE, null=True, default=None, related_name="children"
     )
@@ -1512,9 +1512,11 @@ class Feature(Record, CanValidate, TracksRun, TracksUpdates):
 
     Example:
 
-        >>> ln.Feature(name="cell_type_by_expert",
-        ...            dtype="cat",
-        ...            description="Expert cell type annotation").save()
+        >>> ln.Feature(
+        ...     name="cell_type_by_expert",
+        ...     dtype="cat[bionty.CellType]",
+        ...     description="Expert cell type annotation"
+        ... ).save()
 
     Hint:
 
@@ -1907,14 +1909,16 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
     params: ParamManager = ParamManagerArtifact  # type: ignore
     """Param manager.
 
-    What `.features` is to dataset-like artifacts, `.params` is to model-like artifacts.
-
-    Annotate with params & values::
+    Example::
 
         artifact.params.add_values({
             "hidden_size": 32,
             "bottleneck_size": 16,
-            "batch_size": 32
+            "batch_size": 32,
+            "preprocess_params": {
+                "normalization_type": "cool",
+                "subset_highlyvariable": True,
+            },
         })
     """
 
