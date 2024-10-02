@@ -11,7 +11,6 @@ from typing import (
     overload,
 )
 
-from _docs import doc_args, from_x_run_docs
 from django.db import models
 from django.db.models import CASCADE, PROTECT, Field
 from django.db.models.base import ModelBase
@@ -25,6 +24,7 @@ from lamin_utils import colors, logger
 from lamindb_setup import _check_instance_setup
 from lamindb_setup.core.hashing import HASH_LENGTH
 
+from lnschema_core._docs import doc_args, from_x_run_docs
 from lnschema_core.types import (
     ArtifactType,
     CharField,
