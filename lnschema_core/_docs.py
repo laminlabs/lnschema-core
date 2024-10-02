@@ -1,0 +1,20 @@
+from __future__ import annotations
+
+from textwrap import dedent
+
+
+def doc_args(*args):
+    """Pass arguments to docstrings."""
+
+    def dec(obj):
+        obj.__orig_doc__ = obj.__doc__
+        obj.__doc__ = dedent(obj.__doc__).format(*args)
+        return obj
+
+    return dec
+
+
+from_x_run_docs = """
+`Run` object or `False`. If :meth:`ln.track` was called, `False` prevents
+associating :class:`ln.Artifact` as :attr:`Run.output_artifacts`, allowing :attr:`Run.input_artifacts` instead.
+"""
