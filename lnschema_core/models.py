@@ -1192,16 +1192,21 @@ class Param(Record, CanValidate, TracksRun, TracksUpdates):
 
 
 class ParamValue(Record):
-    """Run parameter values akin to FeatureValue for artifacts."""
+    """Parameters with values akin to FeatureValue."""
 
-    class Meta:
-        unique_together = ("param", "value")
-
+    # we do not have a unique constraint on param & value because it leads to hashing errors
+    # for large dictionaries: https://lamin.ai/laminlabs/lamindata/transform/jgTrkoeuxAfs0000
+    # we do not hash values because we have `get_or_create` logic all over the place
+    # and also for checking whether the (param, value) combination exists
+    # there does not seem an issue with querying for a dict-like value
+    # https://lamin.ai/laminlabs/lamindata/transform/jgTrkoeuxAfs0001
     _name_field: str = "value"
 
     param: Param = models.ForeignKey(Param, CASCADE, related_name="values")
     """The dimension metadata."""
-    value: Any = models.JSONField()  # stores float, integer, boolean or datetime
+    value: Any = (
+        models.JSONField()
+    )  # stores float, integer, boolean, datetime or dictionaries
     """The JSON-like value."""
     # it'd be confusing and hard to populate a run here because these
     # values are typically created upon creating a run
@@ -1616,9 +1621,15 @@ class FeatureValue(Record, TracksRun):
     not by an ontological hierarchy.
     """
 
+    # we do not have a unique constraint on feature & value because it leads to hashing errors
+    # for large dictionaries: https://lamin.ai/laminlabs/lamindata/transform/jgTrkoeuxAfs0000
+    # we do not hash values because we have `get_or_create` logic all over the place
+    # and also for checking whether the (feature, value) combination exists
+    # there does not seem an issue with querying for a dict-like value
+    # https://lamin.ai/laminlabs/lamindata/transform/jgTrkoeuxAfs0001
+
     class Meta(Record.Meta, TracksRun.Meta):
         abstract = False
-        unique_together = ("feature", "value")
 
     _name_field: str = "value"
 
