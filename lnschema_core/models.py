@@ -24,6 +24,7 @@ from lamin_utils import colors, logger
 from lamindb_setup import _check_instance_setup
 from lamindb_setup.core.hashing import HASH_LENGTH
 
+from lnschema_core._docs import doc_args, from_x_run_docs
 from lnschema_core.types import (
     ArtifactType,
     CharField,
@@ -2150,12 +2151,13 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
         pass
 
     @classmethod
+    @doc_args(from_x_run_docs)
     def from_df(
         cls,
         df: pd.DataFrame,
         key: str | None = None,
         description: str | None = None,
-        run: Run | None = None,
+        run: Run | bool | None = None,
         revises: Artifact | None = None,
         **kwargs,
     ) -> Artifact:
@@ -2169,7 +2171,7 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
                 e.g., `"myfolder/myfile.parquet"`.
             description: A description.
             revises: An old version of the artifact.
-            run: The run that creates the artifact.
+            run: {0}
 
         See Also:
             :meth:`~lamindb.Collection`
@@ -2197,7 +2199,7 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
         adata: AnnData | UPathStr,
         key: str | None = None,
         description: str | None = None,
-        run: Run | None = None,
+        run: Run | bool | None = None,
         revises: Artifact | None = None,
         **kwargs,
     ) -> Artifact:
@@ -2209,7 +2211,7 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
                 e.g., `"myfolder/myfile.h5ad"`.
             description: A description.
             revises: An old version of the artifact.
-            run: The run that creates the artifact.
+            run: {0}
 
         See Also:
 
@@ -2228,12 +2230,13 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
         pass
 
     @classmethod
+    @doc_args(from_x_run_docs)
     def from_mudata(
         cls,
         mdata: MuData,
         key: str | None = None,
         description: str | None = None,
-        run: Run | None = None,
+        run: Run | bool | None = None,
         revises: Artifact | None = None,
         **kwargs,
     ) -> Artifact:
@@ -2245,7 +2248,7 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
                 e.g., `"myfolder/myfile.h5mu"`.
             description: A description.
             revises: An old version of the artifact.
-            run: The run that creates the artifact.
+            run: {0}
 
         See Also:
             :meth:`~lamindb.Collection`
@@ -2263,12 +2266,13 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
         pass
 
     @classmethod
+    @doc_args(from_x_run_docs)
     def from_dir(
         cls,
         path: UPathStr,
         key: str | None = None,
         *,
-        run: Run | None = None,
+        run: Run | bool | None = None,
     ) -> list[Artifact]:
         """Create a list of artifact objects from a directory.
 
@@ -2279,11 +2283,11 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
 
         Args:
             path: Source path of folder.
-            key: Key for storage destination. If `None` and
+            key: Optional Key for storage destination. If `None` and
                 directory is in a registered location, the inferred `key` will
                 reflect the relative position. If `None` and directory is outside
                 of a registered storage location, the inferred key defaults to `path.name`.
-            run: A `Run` object.
+            run: {0}
 
         Examples:
             >>> dir_path = ln.core.datasets.generate_cell_ranger_files("sample_001", ln.settings.storage)
