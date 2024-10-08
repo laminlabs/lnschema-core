@@ -2451,7 +2451,7 @@ class Collection(Record, IsVersioned, TracksRun, TracksUpdates):
     Collections provide a simple way of linking & versioning collections of artifacts (:doc:`/tutorial`).
 
     Args:
-        data: `list[Artifact]` A list of artifacts.
+        artifacts: `list[Artifact]` A list of artifacts.
         name: `str` A name.
         description: `str | None = None` A description.
         revises: `Collection | None = None` An old version of the collection.
