@@ -644,15 +644,15 @@ class Registry(ModelBase):
         join: str = "inner",
         limit: int = 100,
     ) -> pd.DataFrame:
-        """Convert to ``pd.DataFrame``.
+        """Convert to `pd.DataFrame`.
 
-        By default, shows all direct fields, except ``created_at``.
+        By default, shows all direct fields, except `updated_at`.
 
-        If you'd like to include related fields, use parameter ``include``.
+        If you'd like to include other fields, use parameter `include`.
 
         Args:
             include: Related fields to include as columns. Takes strings of
-                form ``"labels__name"``, ``"cell_types__name"``, etc. or a list
+                form `"labels__name"`, `"cell_types__name"`, etc. or a list
                 of such strings.
             join: The `join` parameter of `pandas`.
 
