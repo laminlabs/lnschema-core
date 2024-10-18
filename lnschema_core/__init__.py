@@ -1,6 +1,6 @@
 """LaminDB's core registries."""
 
-__version__ = "0.75.0"
+__version__ = "0.76.0"
 
 
 from lamindb_setup import _check_instance_setup
