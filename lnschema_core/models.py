@@ -2745,6 +2745,9 @@ class FeatureSetFeature(Record, LinkORM):
     featureset: FeatureSet = models.ForeignKey(FeatureSet, CASCADE, related_name="+")
     feature: Feature = models.ForeignKey(Feature, PROTECT, related_name="+")
 
+    class Meta:
+        unique_together = ("featureset", "feature")
+
 
 class ArtifactFeatureSet(Record, LinkORM, TracksRun):
     id: int = models.BigAutoField(primary_key=True)
@@ -2790,7 +2793,9 @@ class ArtifactULabel(Record, LinkORM, TracksRun):
     feature_ref_is_name: bool = models.BooleanField(null=True, default=None)
 
     class Meta:
-        unique_together = ("artifact", "ulabel")
+        # can have the same label linked to the same artifact if the feature is
+        # different
+        unique_together = ("artifact", "ulabel", "feature")
 
 
 class CollectionULabel(Record, LinkORM, TracksRun):
