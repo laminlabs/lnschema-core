@@ -2575,6 +2575,8 @@ class Collection(Record, IsVersioned, TracksRun, TracksUpdates):
         Args:
             artifact: An artifact to add to the collection.
             run: The run that creates the new version of the collection.
+
+        .. versionadded:: 0.76.14
         """
         pass
 
