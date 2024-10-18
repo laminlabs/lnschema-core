@@ -2567,6 +2567,17 @@ class Collection(Record, IsVersioned, TracksRun, TracksUpdates):
     ):
         pass
 
+    def append(self, artifact: Artifact, run: Run | None = None) -> Collection:
+        """Add an artifact to the collection.
+
+        Creates a new version of the collection.
+
+        Args:
+            artifact: An artifact to add to the collection.
+            run: The run that creates the new version of the collection.
+        """
+        pass
+
     def mapped(
         self,
         layers_keys: str | list[str] | None = None,
