@@ -2612,7 +2612,7 @@ class Collection(Record, IsVersioned, TracksRun, TracksUpdates):
 
         .. note::
 
-            For a guide, see :doc:`docs:scrna5`.
+            For a guide, see :doc:`docs:scrna-mappedcollection`.
 
             This method currently only works for collections of `AnnData` artifacts.
 
