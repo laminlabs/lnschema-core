@@ -510,6 +510,14 @@ class HasParents:
         """
         pass
 
+    def query_parents(self) -> QuerySet:
+        """Query parents in an ontology."""
+        pass
+
+    def query_children(self) -> QuerySet:
+        """Query children in an ontology."""
+        pass
+
 
 # this is the metaclass for Record
 class Registry(ModelBase):
