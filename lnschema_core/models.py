@@ -49,6 +49,7 @@ if TYPE_CHECKING:
     from lamindb.core import LabelManager
     from lamindb_setup.core.types import UPathStr
     from mudata import MuData
+    from pyarrow.dataset import Dataset as PyArrowDataset
     from tiledbsoma import Collection as SOMACollection
     from tiledbsoma import Experiment as SOMAExperiment
     from upath import UPath
@@ -2330,7 +2331,13 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
 
     def open(
         self, mode: str = "r", is_run_input: bool | None = None
-    ) -> AnnDataAccessor | BackedAccessor | SOMACollection | SOMAExperiment:
+    ) -> (
+        AnnDataAccessor
+        | BackedAccessor
+        | SOMACollection
+        | SOMAExperiment
+        | PyArrowDataset
+    ):
         """Return a cloud-backed data object.
 
         Args:
