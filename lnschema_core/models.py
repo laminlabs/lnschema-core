@@ -2340,6 +2340,9 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
     ):
         """Return a cloud-backed data object.
 
+        Works for `AnnData` (`.h5ad` and `.zarr`), generic `hdf5` and `zarr`,
+        `tiledbsoma` objects (`.tiledbsoma`), `pyarrow` compatible formats.
+
         Args:
             mode: can only be `"w"` (write mode) for `tiledbsoma` stores,
                 otherwise should be always `"r"` (read-only mode).
@@ -2353,7 +2356,9 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
 
             >>> artifact = ln.Artifact.get(key="lndb-storage/pbmc68k.h5ad")
             >>> artifact.open()
-            AnnData object with n_obs × n_vars = 70 × 765 backed at 's3://lamindb-ci/lndb-storage/pbmc68k.h5ad'
+            AnnDataAccessor object with n_obs × n_vars = 70 × 765
+                constructed for the AnnData object pbmc68k.h5ad
+                ...
         """
         pass
 
