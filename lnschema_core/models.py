@@ -2661,7 +2661,7 @@ class Collection(Record, IsVersioned, TracksRun, TracksUpdates):
             >>> import lamindb as ln
             >>> from torch.utils.data import DataLoader
             >>> ds = ln.Collection.get(description="my collection")
-            >>> mapped = collection.mapped(label_keys=["cell_type", "batch"])
+            >>> mapped = collection.mapped(obs_keys=["cell_type", "batch"])
             >>> dl = DataLoader(mapped, batch_size=128, shuffle=True)
         """
         pass
