@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import builtins
+import sys
 from collections import defaultdict
+from itertools import chain
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -64,7 +66,6 @@ if TYPE_CHECKING:
 
 
 _TRACKING_READY: bool | None = None
-IS_RUN_FROM_IPYTHON = getattr(builtins, "__IPYTHON__", False)
 
 
 class IsVersioned(models.Model):
@@ -543,8 +544,7 @@ class Registry(ModelBase):
         # this is needed to bring auto-complete on the class-level back
         # https://laminlabs.slack.com/archives/C04FPE8V01W/p1717535625268849
         # Filter class attributes, excluding instance methods
-
-        exclude_instance_methods = IS_RUN_FROM_IPYTHON
+        exclude_instance_methods = "sphinx" not in sys.modules
         # https://laminlabs.slack.com/archives/C04FPE8V01W/p1721134595920959
 
         def include_attribute(attr_name, attr_value):
@@ -554,11 +554,17 @@ class Registry(ModelBase):
                 return isinstance(attr_value, (classmethod, staticmethod, type))
             return True
 
-        result = [
-            attr_name
-            for attr_name, attr_value in cls.__dict__.items()
-            if include_attribute(attr_name, attr_value)
-        ]
+        # check also inherited attributes
+        if hasattr(cls, "mro"):
+            attrs = chain(*(c.__dict__.items() for c in cls.mro()))
+        else:
+            attrs = cls.__dict__.items()
+
+        result = []
+        for attr_name, attr_value in attrs:
+            if attr_name not in result and include_attribute(attr_name, attr_value):
+                result.append(attr_name)
+
         # Add non-dunder attributes from Registry
         for attr in dir(Registry):
             if not attr.startswith("__") and attr not in result:
