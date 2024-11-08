@@ -3121,9 +3121,15 @@ def record_repr(
     if field_names[0] != "uid" and "uid" in field_names:
         field_names.remove("uid")
         field_names.insert(0, "uid")
-    fields_str = {
-        k: format_field_value(getattr(self, k)) for k in field_names if hasattr(self, k)
-    }
+    fields_str = {}
+    for k in field_names:
+        if hasattr(self, k):
+            value = getattr(self, k)
+            # Force strip the time component of the version
+            if k == "version" and value:
+                fields_str[k] = f"'{str(value).split()[0]}'"
+            else:
+                fields_str[k] = format_field_value(value)
     fields_joined_str = ", ".join(
         [f"{k}={fields_str[k]}" for k in fields_str if fields_str[k] is not None]
     )
