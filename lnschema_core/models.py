@@ -659,11 +659,11 @@ class Registry(ModelBase):
         join: str = "inner",
         limit: int = 100,
     ) -> pd.DataFrame:
-        """Convert to :class:`pd.DataFrame`.
+        """Convert to `pd.DataFrame`.
 
         By default, shows all direct fields, except `updated_at`.
 
-        Use parameter `include` to include other fields
+        Use parameter `include` to include other fields.
 
         Args:
             include: Related fields to include as columns. Takes strings of
