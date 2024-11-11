@@ -652,17 +652,19 @@ class Registry(ModelBase):
         join: str = "inner",
         limit: int = 100,
     ) -> pd.DataFrame:
-        """Convert to `pd.DataFrame`.
+        """Convert to :class:`pd.DataFrame`.
 
         By default, shows all direct fields, except `updated_at`.
 
-        If you'd like to include other fields, use parameter `include`.
+        Use parameter `include` to include other fields
 
         Args:
             include: Related fields to include as columns. Takes strings of
                 form `"labels__name"`, `"cell_types__name"`, etc. or a list
                 of such strings.
             join: The `join` parameter of `pandas`.
+            limit: Maximum number of rows to display from a Pandas DataFrame.
+                Defaults to 100 to reduce database load.
 
         Examples:
             >>> labels = [ln.ULabel(name="Label {i}") for i in range(3)]
