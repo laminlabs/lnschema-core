@@ -27,7 +27,13 @@ from lamin_utils import colors
 from lamindb_setup import _check_instance_setup
 from lamindb_setup.core.hashing import HASH_LENGTH
 
-from lnschema_core.fields import BooleanField, CharField, ForeignKey, TextField
+from lnschema_core.fields import (
+    BooleanField,
+    CharField,
+    DateTimeField,
+    ForeignKey,
+    TextField,
+)
 from lnschema_core.types import (
     ArtifactType,
     FieldAttr,
@@ -159,7 +165,7 @@ class TracksRun(models.Model):
     class Meta:
         abstract = True
 
-    created_at: datetime = models.DateTimeField(auto_now_add=True, db_index=True)
+    created_at: datetime = DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     created_by: User = ForeignKey(
         "lnschema_core.User", PROTECT, default=current_user_id, related_name="+"
@@ -193,7 +199,7 @@ class TracksUpdates(models.Model):
     class Meta:
         abstract = True
 
-    updated_at: datetime = models.DateTimeField(auto_now=True, db_index=True)
+    updated_at: datetime = DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
     # no default related_name below because it'd clash with the reverse accessor
     # of the .run field
@@ -872,9 +878,9 @@ class User(Record, CanValidate):
     """Transforms created by user."""
     created_runs: Run
     """Runs created by user."""
-    created_at: datetime = models.DateTimeField(auto_now_add=True, db_index=True)
+    created_at: datetime = DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
-    updated_at: datetime = models.DateTimeField(auto_now=True, db_index=True)
+    updated_at: datetime = DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
 
     @overload
@@ -1145,9 +1151,9 @@ class Transform(Record, IsVersioned):
 
     If you're looking for the outputs of a single run, see :attr:`lamindb.Run.output_collections`.
     """
-    created_at: datetime = models.DateTimeField(auto_now_add=True, db_index=True)
+    created_at: datetime = DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
-    updated_at: datetime = models.DateTimeField(auto_now=True, db_index=True)
+    updated_at: datetime = DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
     created_by: User = ForeignKey(
         User, PROTECT, default=current_user_id, related_name="created_transforms"
@@ -1229,7 +1235,7 @@ class ParamValue(Record):
     # hence, ParamValue does _not_ inherit from TracksRun but manually
     # adds created_at & created_by
     # because ParamValue cannot be updated, we don't need updated_at
-    created_at: datetime = models.DateTimeField(auto_now_add=True, db_index=True)
+    created_at: datetime = DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
     created_by: User = ForeignKey(
         User, PROTECT, default=current_user_id, related_name="+"
@@ -1294,9 +1300,9 @@ class Run(Record):
     """Universal id, valid across DB instances."""
     transform = ForeignKey(Transform, CASCADE, related_name="runs")
     """The transform :class:`~lamindb.Transform` that is being run."""
-    started_at: datetime = models.DateTimeField(auto_now_add=True, db_index=True)
+    started_at: datetime = DateTimeField(auto_now_add=True, db_index=True)
     """Start time of run."""
-    finished_at: datetime = models.DateTimeField(db_index=True, null=True, default=None)
+    finished_at: datetime = DateTimeField(db_index=True, null=True, default=None)
     """Finished time of run."""
     # we don't want to make below a OneToOne because there could be the same trivial report
     # generated for many different runs
@@ -1337,7 +1343,7 @@ class Run(Record):
         max_length=25, db_index=True, null=True, default=None
     )
     """Type of reference such as a workflow manager execution ID."""
-    created_at: datetime = models.DateTimeField(auto_now_add=True, db_index=True)
+    created_at: datetime = DateTimeField(auto_now_add=True, db_index=True)
     """Time of first creation. Mismatches ``started_at`` if the run is re-run."""
     created_by: User = ForeignKey(
         User, CASCADE, default=current_user_id, related_name="created_runs"
@@ -2881,7 +2887,7 @@ class ArtifactParamValue(Record, LinkORM):
 # class Migration(Record):
 #     app = CharField(max_length=255)
 #     name = CharField(max_length=255)
-#     applied: datetime = models.DateTimeField()
+#     applied: datetime = DateTimeField()
 
 #     class Meta:
 #         db_table = "django_migrations"

@@ -47,3 +47,14 @@ class BooleanField(models.BooleanField):
         kwargs.setdefault("blank", True)
         kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
+
+
+class DateTimeField(models.DateTimeField):
+    """Custom `DateTimeField` with default values for `blank`.
+
+    Django default values for `DateTimeField` are `blank=False`.
+    """
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("blank", True)
+        super().__init__(*args, **kwargs)
