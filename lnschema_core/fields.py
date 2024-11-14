@@ -80,3 +80,14 @@ class IntegerField(models.IntegerField):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
         super().__init__(*args, **kwargs)
+
+
+class OneToOneField(models.OneToOneField):
+    """Custom `OneToOneField` with default values for `blank`.
+
+    Django default values for `OneToOneField` are `blank=False`.
+    """
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("blank", True)
+        super().__init__(*args, **kwargs)

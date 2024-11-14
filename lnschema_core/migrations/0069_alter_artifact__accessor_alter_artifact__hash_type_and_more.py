@@ -474,6 +474,17 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AlterField(
+            model_name="collection",
+            name="meta_artifact",
+            field=lnschema_core.fields.OneToOneField(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="_meta_of_collection",
+                to="lnschema_core.artifact",
+            ),
+        ),
+        migrations.AlterField(
             model_name="collectionartifact",
             name="artifact",
             field=lnschema_core.fields.ForeignKey(

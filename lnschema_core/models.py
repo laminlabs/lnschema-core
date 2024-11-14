@@ -34,6 +34,7 @@ from lnschema_core.fields import (
     DateTimeField,
     ForeignKey,
     IntegerField,
+    OneToOneField,
     TextField,
 )
 from lnschema_core.types import (
@@ -2560,8 +2561,13 @@ class Collection(Record, IsVersioned, TracksRun, TracksUpdates):
         "Artifact", related_name="collections", through="CollectionArtifact"
     )
     """Artifacts in collection."""
-    meta_artifact: Artifact | None = models.OneToOneField(
-        "Artifact", PROTECT, null=True, unique=True, related_name="_meta_of_collection"
+    meta_artifact: Artifact | None = OneToOneField(
+        "Artifact",
+        PROTECT,
+        null=True,
+        unique=True,
+        related_name="_meta_of_collection",
+        blank=True,
     )
     """An artifact that stores metadata that indexes a collection.
 
