@@ -28,10 +28,12 @@ from lamindb_setup import _check_instance_setup
 from lamindb_setup.core.hashing import HASH_LENGTH
 
 from lnschema_core.fields import (
+    BigIntegerField,
     BooleanField,
     CharField,
     DateTimeField,
     ForeignKey,
+    IntegerField,
     TextField,
 )
 from lnschema_core.types import (
@@ -1745,7 +1747,7 @@ class FeatureSet(Record, TracksRun):
     """A universal id (hash of the set of feature values)."""
     name: str = CharField(max_length=150, null=True, default=None)
     """A name (optional)."""
-    n = models.IntegerField()
+    n = IntegerField()
     """Number of features in the set."""
     dtype: str = CharField(max_length=64, null=True, default=None)
     """Data type, e.g., "number", "float", "int". Is `None` for :class:`~lamindb.Feature`.
@@ -2032,7 +2034,7 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
         null=True,
     )
     """:class:`~lamindb.core.types.ArtifactType` (default `None`)."""
-    size: int = models.BigIntegerField(null=True, db_index=True)
+    size: int = BigIntegerField(null=True, db_index=True)
     """Size in bytes.
 
     Examples: 1KB is 1e3 bytes, 1MB is 1e6, 1GB is 1e9, 1TB is 1e12 etc.
@@ -2044,12 +2046,12 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
 
     Useful to ascertain integrity and avoid duplication.
     """
-    n_objects: int = models.BigIntegerField(default=None, null=True, db_index=True)
+    n_objects: int = BigIntegerField(default=None, null=True, db_index=True)
     """Number of objects.
 
     Typically, this denotes the number of files in an artifact.
     """
-    n_observations: int = models.BigIntegerField(default=None, null=True, db_index=True)
+    n_observations: int = BigIntegerField(default=None, null=True, db_index=True)
     """Number of observations.
 
     Typically, this denotes the first array dimension.

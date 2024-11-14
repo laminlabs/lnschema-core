@@ -58,3 +58,25 @@ class DateTimeField(models.DateTimeField):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
         super().__init__(*args, **kwargs)
+
+
+class BigIntegerField(models.BigIntegerField):
+    """Custom `BigIntegerField` with default values for `blank`.
+
+    Django default values for `BigIntegerField` are `blank=False`.
+    """
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("blank", True)
+        super().__init__(*args, **kwargs)
+
+
+class IntegerField(models.IntegerField):
+    """Custom `IntegerField` with default values for `blank`.
+
+    Django default values for `IntegerField` are `blank=False`.
+    """
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("blank", True)
+        super().__init__(*args, **kwargs)
