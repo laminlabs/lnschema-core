@@ -14,7 +14,11 @@ def validate_literal_fields(record: Record, kwargs) -> None:
     Raises:
         ValidationError: If any field value is not in its Literal's allowed values
     """
-    type_hints = get_type_hints(record.__class__)
+    try:
+        type_hints = get_type_hints(record.__class__)
+    except TypeError:
+        # for 3.9, get_type_hints errors with | in type hints
+        return
     errors = {}
 
     for field_name, field_type in type_hints.items():
