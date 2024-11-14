@@ -5,7 +5,7 @@ from typing import List, Literal, Union
 
 import numpy as np
 import pandas as pd
-from django.db.models import CharField, IntegerChoices, TextField  # needed elsewhere
+from django.db.models import IntegerChoices  # needed elsewhere
 from django.db.models.query_utils import DeferredAttribute as FieldAttr
 
 # need to use Union because __future__.annotations doesn't do the job here <3.10

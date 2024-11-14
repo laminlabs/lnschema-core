@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from .models import Record
 
 
-def validate_literal_fields(record: Record) -> None:
+def validate_literal_fields(record: Record, kwargs) -> None:
     """Validate all Literal type fields in a record.
 
     Args:
@@ -33,7 +33,7 @@ def validate_literal_fields(record: Record) -> None:
         if literal_type is None:
             continue
 
-        value = getattr(record, field_name)
+        value = kwargs.get(field_name)
         if value is not None:
             valid_values = set(get_args(literal_type))
             if value not in valid_values:

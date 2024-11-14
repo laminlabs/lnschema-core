@@ -17,7 +17,6 @@ from django.db import models
 from django.db.models import CASCADE, PROTECT, Field
 from django.db.models.base import ModelBase
 from django.db.models.fields.related import (
-    ForeignKey,
     ManyToManyField,
     ManyToManyRel,
     ManyToOneRel,
@@ -26,13 +25,12 @@ from lamin_utils import colors, logger
 from lamindb_setup import _check_instance_setup
 from lamindb_setup.core.hashing import HASH_LENGTH
 
+from lnschema_core.fields import CharField, ForeignKey, TextField
 from lnschema_core.types import (
     ArtifactType,
-    CharField,
     FieldAttr,
     ListLike,
     StrField,
-    TextField,
     TransformType,
     VisibilityChoice,
 )
@@ -162,11 +160,11 @@ class TracksRun(models.Model):
 
     created_at: datetime = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
-    created_by: User = models.ForeignKey(
+    created_by: User = ForeignKey(
         "lnschema_core.User", PROTECT, default=current_user_id, related_name="+"
     )
     """Creator of record."""
-    run: Run = models.ForeignKey(
+    run: Run = ForeignKey(
         "lnschema_core.Run", PROTECT, null=True, default=current_run, related_name="+"
     )
     """Last run that created or updated the record."""
@@ -1094,7 +1092,7 @@ class Transform(Record, IsVersioned):
         default="pipeline",
     )
     """:class:`~lamindb.core.types.TransformType` (default `"pipeline"`)."""
-    _source_code_artifact: Artifact = models.ForeignKey(
+    _source_code_artifact: Artifact = ForeignKey(
         "Artifact", PROTECT, default=None, null=True, related_name="_source_code_of"
     )
     """Source code of the transform if stored as artifact within LaminDB.
@@ -1150,7 +1148,7 @@ class Transform(Record, IsVersioned):
     """Time of creation of record."""
     updated_at: datetime = models.DateTimeField(auto_now=True, db_index=True)
     """Time of last update to record."""
-    created_by: User = models.ForeignKey(
+    created_by: User = ForeignKey(
         User, PROTECT, default=current_user_id, related_name="created_transforms"
     )
     """Creator of record."""
@@ -1219,7 +1217,7 @@ class ParamValue(Record):
     # https://lamin.ai/laminlabs/lamindata/transform/jgTrkoeuxAfs0001
     _name_field: str = "value"
 
-    param: Param = models.ForeignKey(Param, CASCADE, related_name="values")
+    param: Param = ForeignKey(Param, CASCADE, related_name="values")
     """The dimension metadata."""
     value: Any = (
         models.JSONField()
@@ -1232,7 +1230,7 @@ class ParamValue(Record):
     # because ParamValue cannot be updated, we don't need updated_at
     created_at: datetime = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of creation of record."""
-    created_by: User = models.ForeignKey(
+    created_by: User = ForeignKey(
         User, PROTECT, default=current_user_id, related_name="+"
     )
     """Creator of record."""
@@ -1293,7 +1291,7 @@ class Run(Record):
     """Internal id, valid only in one DB instance."""
     uid: str = CharField(unique=True, db_index=True, max_length=20, default=base62_20)
     """Universal id, valid across DB instances."""
-    transform = models.ForeignKey(Transform, CASCADE, related_name="runs")
+    transform = ForeignKey(Transform, CASCADE, related_name="runs")
     """The transform :class:`~lamindb.Transform` that is being run."""
     started_at: datetime = models.DateTimeField(auto_now_add=True, db_index=True)
     """Start time of run."""
@@ -1301,11 +1299,11 @@ class Run(Record):
     """Finished time of run."""
     # we don't want to make below a OneToOne because there could be the same trivial report
     # generated for many different runs
-    report: Artifact = models.ForeignKey(
+    report: Artifact = ForeignKey(
         "Artifact", PROTECT, default=None, null=True, related_name="_report_of"
     )
     """Report of run, e.g.. n html file."""
-    environment: Artifact = models.ForeignKey(
+    environment: Artifact = ForeignKey(
         "Artifact", PROTECT, default=None, null=True, related_name="_environment_of"
     )
     """Computational environment for the run.
@@ -1340,11 +1338,11 @@ class Run(Record):
     """Type of reference such as a workflow manager execution ID."""
     created_at: datetime = models.DateTimeField(auto_now_add=True, db_index=True)
     """Time of first creation. Mismatches ``started_at`` if the run is re-run."""
-    created_by: User = models.ForeignKey(
+    created_by: User = ForeignKey(
         User, CASCADE, default=current_user_id, related_name="created_runs"
     )
     """Creator of run."""
-    parent: Run = models.ForeignKey(
+    parent: Run = ForeignKey(
         "Run", CASCADE, null=True, default=None, related_name="children"
     )
     """The run that triggered the current run.
@@ -1650,7 +1648,7 @@ class FeatureValue(Record, TracksRun):
 
     _name_field: str = "value"
 
-    feature: Feature = models.ForeignKey(
+    feature: Feature = ForeignKey(
         Feature, CASCADE, null=True, default=None, related_name="values"
     )
     """The dimension metadata."""
@@ -2009,7 +2007,7 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
     """A universal random id (20-char base62 ~ UUID), valid across DB instances."""
     description: str = CharField(max_length=255, db_index=True, null=True, default=None)
     """A description."""
-    storage: Storage = models.ForeignKey(Storage, PROTECT, related_name="artifacts")
+    storage: Storage = ForeignKey(Storage, PROTECT, related_name="artifacts")
     """Storage location, e.g. an S3 or GCP bucket or a local directory."""
     key: str = CharField(max_length=255, db_index=True, null=True, default=None)
     """Storage key, the relative path within the storage location."""
@@ -2067,11 +2065,11 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
         ULabel, through="ArtifactULabel", related_name="artifacts"
     )
     """The ulabels measured in the artifact (:class:`~lamindb.ULabel`)."""
-    transform: Transform = models.ForeignKey(
+    transform: Transform = ForeignKey(
         Transform, PROTECT, related_name="output_artifacts", null=True, default=None
     )
     """Transform whose run created the artifact."""
-    run: Run = models.ForeignKey(
+    run: Run = ForeignKey(
         Run, PROTECT, related_name="output_artifacts", null=True, default=None
     )
     """Run that created the artifact."""
@@ -2108,7 +2106,7 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
         "self", symmetrical=False, related_name="_action_targets"
     )
     """Actions to attach for the UI."""
-    created_by: User = models.ForeignKey(
+    created_by: User = ForeignKey(
         "lnschema_core.User",
         PROTECT,
         default=current_user_id,
@@ -2535,11 +2533,11 @@ class Collection(Record, IsVersioned, TracksRun, TracksUpdates):
         "ULabel", through="CollectionULabel", related_name="collections"
     )
     """ULabels sampled in the collection (see :class:`~lamindb.Feature`)."""
-    transform: Transform = models.ForeignKey(
+    transform: Transform = ForeignKey(
         Transform, PROTECT, related_name="output_collections", null=True, default=None
     )
     """:class:`~lamindb.Transform` whose run created the collection."""
-    run: Run = models.ForeignKey(
+    run: Run = ForeignKey(
         Run, PROTECT, related_name="output_collections", null=True, default=None
     )
     """:class:`~lamindb.Run` that created the `collection`."""
@@ -2783,8 +2781,8 @@ class LinkORM:
 class FeatureSetFeature(Record, LinkORM):
     id: int = models.BigAutoField(primary_key=True)
     # we follow the lower() case convention rather than snake case for link models
-    featureset: FeatureSet = models.ForeignKey(FeatureSet, CASCADE, related_name="+")
-    feature: Feature = models.ForeignKey(Feature, PROTECT, related_name="+")
+    featureset: FeatureSet = ForeignKey(FeatureSet, CASCADE, related_name="+")
+    feature: Feature = ForeignKey(Feature, PROTECT, related_name="+")
 
     class Meta:
         unique_together = ("featureset", "feature")
@@ -2792,11 +2790,9 @@ class FeatureSetFeature(Record, LinkORM):
 
 class ArtifactFeatureSet(Record, LinkORM, TracksRun):
     id: int = models.BigAutoField(primary_key=True)
-    artifact: Artifact = models.ForeignKey(
-        Artifact, CASCADE, related_name="links_feature_set"
-    )
+    artifact: Artifact = ForeignKey(Artifact, CASCADE, related_name="links_feature_set")
     # we follow the lower() case convention rather than snake case for link models
-    featureset: FeatureSet = models.ForeignKey(
+    featureset: FeatureSet = ForeignKey(
         FeatureSet, PROTECT, related_name="links_artifact"
     )
     slot: str = CharField(max_length=40, null=True, default=None)
@@ -2810,12 +2806,10 @@ class ArtifactFeatureSet(Record, LinkORM, TracksRun):
 
 class CollectionArtifact(Record, LinkORM, TracksRun):
     id: int = models.BigAutoField(primary_key=True)
-    collection: Collection = models.ForeignKey(
+    collection: Collection = ForeignKey(
         Collection, CASCADE, related_name="links_artifact"
     )
-    artifact: Artifact = models.ForeignKey(
-        Artifact, PROTECT, related_name="links_collection"
-    )
+    artifact: Artifact = ForeignKey(Artifact, PROTECT, related_name="links_collection")
 
     class Meta:
         unique_together = ("collection", "artifact")
@@ -2823,11 +2817,9 @@ class CollectionArtifact(Record, LinkORM, TracksRun):
 
 class ArtifactULabel(Record, LinkORM, TracksRun):
     id: int = models.BigAutoField(primary_key=True)
-    artifact: Artifact = models.ForeignKey(
-        Artifact, CASCADE, related_name="links_ulabel"
-    )
-    ulabel = models.ForeignKey(ULabel, PROTECT, related_name="links_artifact")
-    feature = models.ForeignKey(
+    artifact: Artifact = ForeignKey(Artifact, CASCADE, related_name="links_ulabel")
+    ulabel = ForeignKey(ULabel, PROTECT, related_name="links_artifact")
+    feature = ForeignKey(
         Feature, PROTECT, null=True, default=None, related_name="links_artifactulabel"
     )
     label_ref_is_name: bool = models.BooleanField(null=True, default=None)
@@ -2841,11 +2833,11 @@ class ArtifactULabel(Record, LinkORM, TracksRun):
 
 class CollectionULabel(Record, LinkORM, TracksRun):
     id: int = models.BigAutoField(primary_key=True)
-    collection: Collection = models.ForeignKey(
+    collection: Collection = ForeignKey(
         Collection, CASCADE, related_name="links_ulabel"
     )
-    ulabel: ULabel = models.ForeignKey(ULabel, PROTECT, related_name="links_collection")
-    feature: Feature = models.ForeignKey(
+    ulabel: ULabel = ForeignKey(ULabel, PROTECT, related_name="links_collection")
+    feature: Feature = ForeignKey(
         Feature, PROTECT, null=True, default=None, related_name="links_collectionulabel"
     )
     label_ref_is_name: bool = models.BooleanField(null=True, default=None)
@@ -2857,9 +2849,9 @@ class CollectionULabel(Record, LinkORM, TracksRun):
 
 class ArtifactFeatureValue(Record, LinkORM, TracksRun):
     id: int = models.BigAutoField(primary_key=True)
-    artifact: Artifact = models.ForeignKey(Artifact, CASCADE, related_name="+")
+    artifact: Artifact = ForeignKey(Artifact, CASCADE, related_name="+")
     # we follow the lower() case convention rather than snake case for link models
-    featurevalue = models.ForeignKey(FeatureValue, PROTECT, related_name="+")
+    featurevalue = ForeignKey(FeatureValue, PROTECT, related_name="+")
 
     class Meta:
         unique_together = ("artifact", "featurevalue")
@@ -2867,9 +2859,9 @@ class ArtifactFeatureValue(Record, LinkORM, TracksRun):
 
 class RunParamValue(Record, LinkORM):
     id: int = models.BigAutoField(primary_key=True)
-    run: Run = models.ForeignKey(Run, CASCADE, related_name="+")
+    run: Run = ForeignKey(Run, CASCADE, related_name="+")
     # we follow the lower() case convention rather than snake case for link models
-    paramvalue: ParamValue = models.ForeignKey(ParamValue, PROTECT, related_name="+")
+    paramvalue: ParamValue = ForeignKey(ParamValue, PROTECT, related_name="+")
 
     class Meta:
         unique_together = ("run", "paramvalue")
@@ -2877,9 +2869,9 @@ class RunParamValue(Record, LinkORM):
 
 class ArtifactParamValue(Record, LinkORM):
     id: int = models.BigAutoField(primary_key=True)
-    artifact: Artifact = models.ForeignKey(Artifact, CASCADE, related_name="+")
+    artifact: Artifact = ForeignKey(Artifact, CASCADE, related_name="+")
     # we follow the lower() case convention rather than snake case for link models
-    paramvalue: ParamValue = models.ForeignKey(ParamValue, PROTECT, related_name="+")
+    paramvalue: ParamValue = ForeignKey(ParamValue, PROTECT, related_name="+")
 
     class Meta:
         unique_together = ("artifact", "paramvalue")
@@ -3112,16 +3104,13 @@ def record_repr(
     field_names = [
         field.name
         for field in self._meta.fields
-        if (
-            not isinstance(field, models.ForeignKey)
-            and field.name not in exclude_field_names
-        )
+        if (not isinstance(field, ForeignKey) and field.name not in exclude_field_names)
     ]
     if include_foreign_keys:
         field_names += [
             f"{field.name}_id"
             for field in self._meta.fields
-            if isinstance(field, models.ForeignKey)
+            if isinstance(field, ForeignKey)
         ]
     if "created_at" in field_names:
         field_names.remove("created_at")
