@@ -35,3 +35,15 @@ class ForeignKey(models.ForeignKey):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
         super().__init__(*args, **kwargs)
+
+
+class BooleanField(models.BooleanField):
+    """Custom `BooleanField` with default values for `blank` and `default`.
+
+    Django default values for `BooleanField` are `blank=False`, `default=False`.
+    """
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("blank", True)
+        kwargs.setdefault("default", None)
+        super().__init__(*args, **kwargs)
