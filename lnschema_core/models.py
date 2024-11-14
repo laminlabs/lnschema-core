@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import builtins
 import sys
 from collections import defaultdict
 
@@ -24,7 +23,7 @@ from django.db.models.fields.related import (
     ManyToManyRel,
     ManyToOneRel,
 )
-from lamin_utils import colors, logger
+from lamin_utils import colors
 from lamindb_setup import _check_instance_setup
 from lamindb_setup.core.hashing import HASH_LENGTH
 
