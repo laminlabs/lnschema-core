@@ -2793,6 +2793,10 @@ class LinkORM:
     pass
 
 
+class ValidateFields:
+    pass
+
+
 class FeatureSetFeature(Record, LinkORM):
     id: int = models.BigAutoField(primary_key=True)
     # we follow the lower() case convention rather than snake case for link models
