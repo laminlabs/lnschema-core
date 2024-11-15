@@ -48,8 +48,8 @@ def validate_literal_fields(record: Record, kwargs) -> None:
             valid_values = set(get_args(literal_type))
             if value not in valid_values:
                 errors[field_name] = (
-                    f"{colors.yellow(value)} is not a valid value"
-                    f"\n    → valid values are: {colors.green(', '.join(sorted(valid_values)))}"
+                    f"{field_name}: {colors.yellow(value)} is not a valid"
+                    f"\n    → Valid values are: {colors.green(', '.join(sorted(valid_values)))}"
                 )
 
     if errors:
