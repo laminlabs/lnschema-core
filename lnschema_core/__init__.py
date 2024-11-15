@@ -9,7 +9,7 @@ if _check_instance_setup():
     from . import ids, types
     from .models import (  # type: ignore
         Artifact,
-        CanValidate,
+        CanCurate,
         Collection,
         Feature,
         FeatureSet,
