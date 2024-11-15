@@ -49,6 +49,17 @@ class BooleanField(models.BooleanField):
         super().__init__(*args, **kwargs)
 
 
+class DateField(models.DateField):
+    """Custom `DateField` with default values for `blank`.
+
+    Django default values for `DateField` are `blank=False`.
+    """
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("blank", True)
+        super().__init__(*args, **kwargs)
+
+
 class DateTimeField(models.DateTimeField):
     """Custom `DateTimeField` with default values for `blank`.
 
@@ -86,6 +97,50 @@ class OneToOneField(models.OneToOneField):
     """Custom `OneToOneField` with default values for `blank`.
 
     Django default values for `OneToOneField` are `blank=False`.
+    """
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("blank", True)
+        super().__init__(*args, **kwargs)
+
+
+class FloatField(models.FloatField):
+    """Custom `FloatField` with default values for `blank`.
+
+    Django default values for `FloatField` are `blank=False`.
+    """
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("blank", True)
+        super().__init__(*args, **kwargs)
+
+
+class DecimalField(models.DecimalField):
+    """Custom `DecimalField` with default values for `blank`.
+
+    Django default values for `DecimalField` are `blank=False`.
+    """
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("blank", True)
+        super().__init__(*args, **kwargs)
+
+
+class JSONField(models.JSONField):
+    """Custom `JSONField` with default values for `blank`.
+
+    Django default values for `JSONField` are `blank=False`.
+    """
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("blank", True)
+        super().__init__(*args, **kwargs)
+
+
+class DurationField(models.DurationField):
+    """Custom `DurationField` with default values for `blank`.
+
+    Django default values for `DurationField` are `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
