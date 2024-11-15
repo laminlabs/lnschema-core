@@ -1,10 +1,12 @@
 from typing import Literal, Union, get_args, get_origin, get_type_hints
 
+from lamin_utils import colors, logger
+
 from .models import Record
 
 
-class RecordValidationError(SystemExit):
-    """Record validation error."""
+class FieldValidationError(SystemExit):
+    """Field validation error."""
 
     pass
 
@@ -46,9 +48,12 @@ def validate_literal_fields(record: Record, kwargs) -> None:
             valid_values = set(get_args(literal_type))
             if value not in valid_values:
                 errors[field_name] = (
-                    f"'{value}' is not a valid value. "
-                    f"Valid values are: {', '.join(sorted(valid_values))}"
+                    f"{colors.yellow(value)} is not a valid value"
+                    f"\n    → valid values are: {colors.green(', '.join(sorted(valid_values)))}"
                 )
 
     if errors:
-        raise RecordValidationError(errors)
+        message = "\n  "
+        for _, error in errors.items():
+            message += error + "\n  "
+        raise FieldValidationError(message)
