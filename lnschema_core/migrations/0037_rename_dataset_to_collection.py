@@ -99,7 +99,7 @@ class Migration(migrations.Migration):
             options={
                 "abstract": False,
             },
-            bases=(models.Model, lnschema_core.models.CanValidate),
+            bases=(models.Model, lnschema_core.models.CanCurate),
         ),
         migrations.CreateModel(
             name="FeatureSet",
@@ -212,7 +212,7 @@ class Migration(migrations.Migration):
             options={
                 "abstract": False,
             },
-            bases=(models.Model, lnschema_core.models.CanValidate),
+            bases=(models.Model, lnschema_core.models.CanCurate),
         ),
         migrations.CreateModel(
             name="ULabel",
@@ -270,7 +270,7 @@ class Migration(migrations.Migration):
             bases=(
                 models.Model,
                 lnschema_core.models.HasParents,
-                lnschema_core.models.CanValidate,
+                lnschema_core.models.CanCurate,
             ),
         ),
         migrations.CreateModel(
@@ -546,7 +546,7 @@ class Migration(migrations.Migration):
             bases=(
                 models.Model,
                 lnschema_core.models.HasParents,
-                lnschema_core.models.CanValidate,
+                lnschema_core.models.CanCurate,
             ),
         ),
         migrations.CreateModel(

@@ -226,7 +226,7 @@ class TracksUpdates(models.Model):
         super().__init__(*args, **kwargs)
 
 
-class CanValidate:
+class CanCurate:
     """Base class providing :class:`~lamindb.core.Record`-based validation."""
 
     @classmethod
@@ -253,7 +253,7 @@ class CanValidate:
             source: A `bionty.Source` record that specifies the version to inspect against.
 
         See Also:
-            :meth:`~lamindb.core.CanValidate.validate`
+            :meth:`~lamindb.core.CanCurate.validate`
 
         Examples:
             >>> import bionty as bt
@@ -295,7 +295,7 @@ class CanValidate:
             A vector of booleans indicating if an element is validated.
 
         See Also:
-            :meth:`~lamindb.core.CanValidate.inspect`
+            :meth:`~lamindb.core.CanCurate.inspect`
 
         Examples:
             >>> import bionty as bt
@@ -398,9 +398,9 @@ class CanValidate:
             standardized names as values.
 
         See Also:
-            :meth:`~lamindb.core.CanValidate.add_synonym`
+            :meth:`~lamindb.core.CanCurate.add_synonym`
                 Add synonyms.
-            :meth:`~lamindb.core.CanValidate.remove_synonym`
+            :meth:`~lamindb.core.CanCurate.remove_synonym`
                 Remove synonyms.
 
         Examples:
@@ -428,7 +428,7 @@ class CanValidate:
             save: Whether to save the record to the database.
 
         See Also:
-            :meth:`~lamindb.core.CanValidate.remove_synonym`
+            :meth:`~lamindb.core.CanCurate.remove_synonym`
                 Remove synonyms.
 
         Examples:
@@ -451,7 +451,7 @@ class CanValidate:
             synonym: The synonym values to remove.
 
         See Also:
-            :meth:`~lamindb.core.CanValidate.add_synonym`
+            :meth:`~lamindb.core.CanCurate.add_synonym`
                 Add synonyms
 
         Examples:
@@ -473,7 +473,7 @@ class CanValidate:
             value: A value for an abbreviation.
 
         See Also:
-            :meth:`~lamindb.core.CanValidate.add_synonym`
+            :meth:`~lamindb.core.CanCurate.add_synonym`
 
         Examples:
             >>> import bionty as bt
@@ -851,7 +851,7 @@ class ParamManagerRun(ParamManager):
 # This is a good maximal length for a description field.
 
 
-class User(Record, CanValidate):
+class User(Record, CanCurate):
     """Users.
 
     All data in this registry is synched from `lamin.ai` to ensure a universal
@@ -1195,7 +1195,7 @@ class Transform(Record, IsVersioned):
         pass
 
 
-class Param(Record, CanValidate, TracksRun, TracksUpdates):
+class Param(Record, CanCurate, TracksRun, TracksUpdates):
     """Parameters of runs & models."""
 
     class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
@@ -1388,7 +1388,7 @@ class Run(Record):
         super().__init__(*args, **kwargs)
 
 
-class ULabel(Record, HasParents, CanValidate, TracksRun, TracksUpdates):
+class ULabel(Record, HasParents, CanCurate, TracksRun, TracksUpdates):
     """Universal labels.
 
     Args:
@@ -1503,7 +1503,7 @@ class ULabel(Record, HasParents, CanValidate, TracksRun, TracksUpdates):
         pass
 
 
-class Feature(Record, CanValidate, TracksRun, TracksUpdates):
+class Feature(Record, CanCurate, TracksRun, TracksUpdates):
     """Dataset dimensions.
 
     Features denote dataset dimensions, i.e., the variables that measure labels & numbers.
@@ -3176,3 +3176,5 @@ def deferred_attribute__repr__(self):
 
 
 FieldAttr.__repr__ = deferred_attribute__repr__  # type: ignore
+# backward compatibility
+CanVaidate = CanCurate
