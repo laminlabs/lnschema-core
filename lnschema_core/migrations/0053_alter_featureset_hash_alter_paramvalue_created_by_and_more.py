@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
     dependencies = [
         (
             "lnschema_core",
-            "0052_rename_feature_value_artifactfeaturevalue_featurevalue_and_more",
+            "0052_squashed",
         ),
     ]
 
