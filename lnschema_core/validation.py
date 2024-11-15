@@ -1,8 +1,12 @@
 from typing import Literal, Union, get_args, get_origin, get_type_hints
 
-from django.core.exceptions import ValidationError
-
 from .models import Record
+
+
+class RecordValidationError(SystemExit):
+    """Record validation error."""
+
+    pass
 
 
 def validate_literal_fields(record: Record, kwargs) -> None:
@@ -47,4 +51,4 @@ def validate_literal_fields(record: Record, kwargs) -> None:
                 )
 
     if errors:
-        raise ValidationError(errors)
+        raise RecordValidationError(errors)
