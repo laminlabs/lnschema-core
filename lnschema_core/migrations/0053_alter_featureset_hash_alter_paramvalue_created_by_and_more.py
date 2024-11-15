@@ -8,10 +8,7 @@ import lnschema_core.users
 
 class Migration(migrations.Migration):
     dependencies = [
-        (
-            "lnschema_core",
-            "0052_squashed",
-        ),
+        ("lnschema_core", "0052_squashed"),
     ]
 
     operations = [
