@@ -21,3 +21,6 @@ if _check_instance_setup():
         ULabel,
         User,
     )
+
+    # backward compatibility
+    CanValidate = CanCurate
