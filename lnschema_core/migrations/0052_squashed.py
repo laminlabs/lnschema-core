@@ -10,46 +10,7 @@ import lnschema_core.users
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        (
-            "lnschema_core",
-            "0037_rename_dataset_to_collection",
-        ),
-        (
-            "lnschema_core",
-            "0038_alter_collection_artifact_alter_collection_artifacts_and_more",
-        ),
-        (
-            "lnschema_core",
-            "0039_remove_collection_artifacts_collectionartifact_and_more",
-        ),
-        ("lnschema_core", "0040_alter_transform_type"),
-        (
-            "lnschema_core",
-            "0041_remove_transform_short_name_transform_description_and_more",
-        ),
-        ("lnschema_core", "0042_rename_run_at_run_started_at_run_finished_at"),
-        ("lnschema_core", "0043_run_json"),
-        ("lnschema_core", "0044_run_replicated_outputs_transform_ulabels_and_more"),
-        (
-            "lnschema_core",
-            "0045_rename_replicated_outputs_run_replicated_output_artifacts_and_more",
-        ),
-        ("lnschema_core", "0046_storage_instance_uid"),
-        ("lnschema_core", "0047_featurevalue_artifactfeaturevalue_and_more"),
-        ("lnschema_core", "0048_alter_artifactulabel_feature_and_more"),
-        ("lnschema_core", "0049_rename_type_feature_dtype_and_more"),
-        ("lnschema_core", "0050_artifactfeatureset_feature_ref_is_semantic_and_more"),
-        (
-            "lnschema_core",
-            "0051_remove_feature_feature_sets_featuresetfeature_and_more",
-        ),
-        (
-            "lnschema_core",
-            "0052_rename_feature_value_artifactfeaturevalue_featurevalue_and_more",
-        ),
-    ]
-
+    initial = True
     dependencies = []  # type: ignore
 
     operations = [
