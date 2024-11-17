@@ -1,8 +1,9 @@
-from typing import Literal, Union, get_args, get_origin, get_type_hints
+from typing import TYPE_CHECKING, Literal, Union, get_args, get_origin, get_type_hints
 
-from lamin_utils import colors, logger
+from lamin_utils import colors
 
-from .models import Record
+if TYPE_CHECKING:
+    from .models import Record
 
 
 class FieldValidationError(SystemExit):
@@ -11,7 +12,7 @@ class FieldValidationError(SystemExit):
     pass
 
 
-def validate_literal_fields(record: Record, kwargs) -> None:
+def validate_literal_fields(record: "Record", kwargs) -> None:
     """Validate all Literal type fields in a record.
 
     Args:

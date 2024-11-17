@@ -6,7 +6,7 @@ __version__ = "0.76.2"
 from lamindb_setup import _check_instance_setup
 
 if _check_instance_setup():
-    from . import ids, types
+    from . import ids, types, validation
     from .models import (  # type: ignore
         Artifact,
         CanCurate,
