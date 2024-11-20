@@ -48,7 +48,6 @@ class Migration(migrations.Migration):
             "lnschema_core",
             "0052_rename_feature_value_artifactfeaturevalue_featurevalue_and_more",
         ),
-        ("lnschema_core", "0052_squashed"),
         (
             "lnschema_core",
             "0053_alter_featureset_hash_alter_paramvalue_created_by_and_more",
