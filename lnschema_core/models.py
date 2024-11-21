@@ -2538,7 +2538,6 @@ class Collection(Record, IsVersioned, TracksRun, TracksUpdates):
         null=True,
         unique=True,
         related_name="_meta_of_collection",
-        blank=True,
     )
     """An artifact that stores metadata that indexes a collection.
 

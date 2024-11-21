@@ -27,7 +27,7 @@ class TextField(models.TextField):
 
 
 class ForeignKey(models.ForeignKey):
-    """Custom `ForeignKey` with default values for `blank`.
+    """Custom `ForeignKey` with default values for `blank` and `default`.
 
     Django default value for `ForeignKey` `blank=False`.
     """
@@ -46,7 +46,9 @@ class BooleanField(models.BooleanField):
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
-        kwargs.setdefault("default", None)
+        if "blank" in kwargs and kwargs["blank"] is True:
+            # default=None is requires to pair with `blank=True` for BooleanField
+            kwargs["default"] = None
         super().__init__(*args, **kwargs)
 
 
@@ -57,8 +59,10 @@ class DateField(models.DateField):
     """
 
     def __init__(self, *args, **kwargs):
+        # Only set default=None if auto_now and auto_now_add aren't used, otherwise it will error
+        if not kwargs.get("auto_now") and not kwargs.get("auto_now_add"):
+            kwargs.setdefault("default", None)
         kwargs.setdefault("blank", True)
-        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
@@ -69,8 +73,10 @@ class DateTimeField(models.DateTimeField):
     """
 
     def __init__(self, *args, **kwargs):
+        # Only set default=None if auto_now and auto_now_add aren't used, otherwise it will error
+        if not kwargs.get("auto_now") and not kwargs.get("auto_now_add"):
+            kwargs.setdefault("default", None)
         kwargs.setdefault("blank", True)
-        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
@@ -189,8 +195,10 @@ class TimeField(models.TimeField):
     """
 
     def __init__(self, *args, **kwargs):
+        # Only set default=None if auto_now and auto_now_add aren't used, otherwise it will error
+        if not kwargs.get("auto_now") and not kwargs.get("auto_now_add"):
+            kwargs.setdefault("default", None)
         kwargs.setdefault("blank", True)
-        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
