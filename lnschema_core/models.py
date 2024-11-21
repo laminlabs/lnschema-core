@@ -1299,7 +1299,7 @@ class Run(Record):
     """The transform :class:`~lamindb.Transform` that is being run."""
     started_at: datetime = DateTimeField(auto_now_add=True, db_index=True)
     """Start time of run."""
-    finished_at: datetime | None = DateTimeField(db_index=True, null=True)
+    finished_at: datetime | None = DateTimeField(db_index=True, null=True, default=None)
     """Finished time of run."""
     # we don't want to make below a OneToOne because there could be the same trivial report
     # generated for many different runs
@@ -2022,7 +2022,7 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
         null=True,
     )
     """:class:`~lamindb.core.types.ArtifactType` (default `None`)."""
-    size: int | None = BigIntegerField(null=True, db_index=True)
+    size: int | None = BigIntegerField(null=True, db_index=True, default=None)
     """Size in bytes.
 
     Examples: 1KB is 1e3 bytes, 1MB is 1e6, 1GB is 1e9, 1TB is 1e12 etc.
@@ -2032,12 +2032,12 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
 
     Useful to ascertain integrity and avoid duplication.
     """
-    n_objects: int | None = BigIntegerField(null=True, db_index=True)
+    n_objects: int | None = BigIntegerField(null=True, db_index=True, default=None)
     """Number of objects.
 
     Typically, this denotes the number of files in an artifact.
     """
-    n_observations: int | None = BigIntegerField(null=True, db_index=True)
+    n_observations: int | None = BigIntegerField(null=True, db_index=True, default=None)
     """Number of observations.
 
     Typically, this denotes the first array dimension.

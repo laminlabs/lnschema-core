@@ -27,13 +27,14 @@ class TextField(models.TextField):
 
 
 class ForeignKey(models.ForeignKey):
-    """Custom `ForeignKey` with default values for `blank` and `default`.
+    """Custom `ForeignKey` with default values for `blank`.
 
     Django default value for `ForeignKey` `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
+        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
@@ -45,11 +46,12 @@ class BooleanField(models.BooleanField):
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
+        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
 class DateField(models.DateField):
-    """Custom `DateField` with default values for `blank` and `default`.
+    """Custom `DateField` with default values for `blank`.
 
     Django default values for `DateField` are `blank=False`.
     """
@@ -60,7 +62,7 @@ class DateField(models.DateField):
 
 
 class DateTimeField(models.DateTimeField):
-    """Custom `DateTimeField` with default values for `blank` and `default`.
+    """Custom `DateTimeField` with default values for `blank`.
 
     Django default values for `DateTimeField` are `blank=False`.
     """
@@ -71,18 +73,19 @@ class DateTimeField(models.DateTimeField):
 
 
 class BigIntegerField(models.BigIntegerField):
-    """Custom `BigIntegerField` with default values for `blank` and `default`.
+    """Custom `BigIntegerField` with default values for `blank`.
 
     Django default values for `BigIntegerField` are `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
+        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
 class IntegerField(models.IntegerField):
-    """Custom `IntegerField` with default values for `blank` and `default`.
+    """Custom `IntegerField` with default values for `blank`.
 
     Django default values for `IntegerField` are `blank=False`.
     """
@@ -93,7 +96,7 @@ class IntegerField(models.IntegerField):
 
 
 class OneToOneField(models.OneToOneField):
-    """Custom `OneToOneField` with default values for `blank` and `default`.
+    """Custom `OneToOneField` with default values for `blank`.
 
     Django default values for `OneToOneField` are `blank=False`.
     """
@@ -104,7 +107,7 @@ class OneToOneField(models.OneToOneField):
 
 
 class FloatField(models.FloatField):
-    """Custom `FloatField` with default values for `blank` and `default`.
+    """Custom `FloatField` with default values for `blank`.
 
     Django default values for `FloatField` are `blank=False`.
     """
@@ -115,7 +118,7 @@ class FloatField(models.FloatField):
 
 
 class DecimalField(models.DecimalField):
-    """Custom `DecimalField` with default values for `blank` and `default`.
+    """Custom `DecimalField` with default values for `blank`.
 
     Django default values for `DecimalField` are `blank=False`.
     """
@@ -126,7 +129,7 @@ class DecimalField(models.DecimalField):
 
 
 class JSONField(models.JSONField):
-    """Custom `JSONField` with default values for `blank` and `default`.
+    """Custom `JSONField` with default values for `blank`.
 
     Django default values for `JSONField` are `blank=False`.
     """
@@ -137,7 +140,7 @@ class JSONField(models.JSONField):
 
 
 class DurationField(models.DurationField):
-    """Custom `DurationField` with default values for `blank` and `default`.
+    """Custom `DurationField` with default values for `blank`.
 
     Django default values for `DurationField` are `blank=False`.
     """
@@ -148,7 +151,7 @@ class DurationField(models.DurationField):
 
 
 class URLField(models.URLField):
-    """Custom `URLField` with default values for `blank` and `default`.
+    """Custom `URLField` with default values for `blank`.
 
     Django default values for `URLField` are `blank=False`.
     """
@@ -159,7 +162,7 @@ class URLField(models.URLField):
 
 
 class EmailField(models.EmailField):
-    """Custom `EmailField` with default values for `blank` and `default`.
+    """Custom `EmailField` with default values for `blank`.
 
     Django default values for `EmailField` are `blank=False`.
     """
