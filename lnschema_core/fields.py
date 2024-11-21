@@ -34,6 +34,7 @@ class ForeignKey(models.ForeignKey):
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
+        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
