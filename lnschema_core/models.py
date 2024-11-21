@@ -1101,7 +1101,7 @@ class Transform(Record, IsVersioned):
     )
     """:class:`~lamindb.core.types.TransformType` (default `"pipeline"`)."""
     _source_code_artifact: Artifact | None = ForeignKey(
-        "Artifact", PROTECT, null=True, related_name="_source_code_of"
+        "Artifact", PROTECT, null=True, related_name="_source_code_of", default=None
     )
     """Source code of the transform if stored as artifact within LaminDB.
 
@@ -1299,16 +1299,16 @@ class Run(Record):
     """The transform :class:`~lamindb.Transform` that is being run."""
     started_at: datetime = DateTimeField(auto_now_add=True, db_index=True)
     """Start time of run."""
-    finished_at: datetime | None = DateTimeField(db_index=True, null=True)
+    finished_at: datetime | None = DateTimeField(db_index=True, null=True, default=None)
     """Finished time of run."""
     # we don't want to make below a OneToOne because there could be the same trivial report
     # generated for many different runs
     report: Artifact | None = ForeignKey(
-        "Artifact", PROTECT, null=True, related_name="_report_of"
+        "Artifact", PROTECT, null=True, related_name="_report_of", default=None
     )
     """Report of run, e.g.. n html file."""
     environment: Artifact | None = ForeignKey(
-        "Artifact", PROTECT, null=True, related_name="_environment_of"
+        "Artifact", PROTECT, null=True, related_name="_environment_of", default=None
     )
     """Computational environment for the run.
 
@@ -1344,7 +1344,9 @@ class Run(Record):
         User, CASCADE, default=current_user_id, related_name="created_runs"
     )
     """Creator of run."""
-    parent: Run | None = ForeignKey("Run", CASCADE, null=True, related_name="children")
+    parent: Run | None = ForeignKey(
+        "Run", CASCADE, null=True, related_name="children", default=None
+    )
     """The run that triggered the current run.
 
     This is not a preceding run. The preceding runs ("predecessors") is the set
@@ -1647,7 +1649,7 @@ class FeatureValue(Record, TracksRun):
     _name_field: str = "value"
 
     feature: Feature | None = ForeignKey(
-        Feature, CASCADE, null=True, related_name="values"
+        Feature, CASCADE, null=True, related_name="values", default=None
     )
     """The dimension metadata."""
     value: Any = models.JSONField()
@@ -2022,7 +2024,7 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
         null=True,
     )
     """:class:`~lamindb.core.types.ArtifactType` (default `None`)."""
-    size: int | None = BigIntegerField(null=True, db_index=True)
+    size: int | None = BigIntegerField(null=True, db_index=True, default=None)
     """Size in bytes.
 
     Examples: 1KB is 1e3 bytes, 1MB is 1e6, 1GB is 1e9, 1TB is 1e12 etc.
@@ -2032,12 +2034,12 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
 
     Useful to ascertain integrity and avoid duplication.
     """
-    n_objects: int | None = BigIntegerField(null=True, db_index=True)
+    n_objects: int | None = BigIntegerField(null=True, db_index=True, default=None)
     """Number of objects.
 
     Typically, this denotes the number of files in an artifact.
     """
-    n_observations: int | None = BigIntegerField(null=True, db_index=True)
+    n_observations: int | None = BigIntegerField(null=True, db_index=True, default=None)
     """Number of observations.
 
     Typically, this denotes the first array dimension.
@@ -2051,11 +2053,11 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
     )
     """The ulabels measured in the artifact (:class:`~lamindb.ULabel`)."""
     transform: Transform | None = ForeignKey(
-        Transform, PROTECT, related_name="output_artifacts", null=True
+        Transform, PROTECT, related_name="output_artifacts", null=True, default=None
     )
     """Transform whose run created the artifact."""
     run: Run | None = ForeignKey(
-        Run, PROTECT, related_name="output_artifacts", null=True
+        Run, PROTECT, related_name="output_artifacts", null=True, default=None
     )
     """Run that created the artifact."""
     input_of_runs: Run = models.ManyToManyField(Run, related_name="input_artifacts")
@@ -2515,11 +2517,11 @@ class Collection(Record, IsVersioned, TracksRun, TracksUpdates):
     )
     """ULabels sampled in the collection (see :class:`~lamindb.Feature`)."""
     transform: Transform | None = ForeignKey(
-        Transform, PROTECT, related_name="output_collections", null=True
+        Transform, PROTECT, related_name="output_collections", null=True, default=None
     )
     """:class:`~lamindb.Transform` whose run created the collection."""
     run: Run | None = ForeignKey(
-        Run, PROTECT, related_name="output_collections", null=True
+        Run, PROTECT, related_name="output_collections", null=True, default=None
     )
     """:class:`~lamindb.Run` that created the `collection`."""
     input_of_runs: Run = models.ManyToManyField(Run, related_name="input_collections")
@@ -2809,7 +2811,7 @@ class ArtifactULabel(Record, LinkORM, TracksRun):
     artifact: Artifact = ForeignKey(Artifact, CASCADE, related_name="links_ulabel")
     ulabel: ULabel = ForeignKey(ULabel, PROTECT, related_name="links_artifact")
     feature: Feature | None = ForeignKey(
-        Feature, PROTECT, null=True, related_name="links_artifactulabel"
+        Feature, PROTECT, null=True, related_name="links_artifactulabel", default=None
     )
     label_ref_is_name: bool | None = BooleanField(null=True)
     feature_ref_is_name: bool | None = BooleanField(null=True)
@@ -2827,7 +2829,7 @@ class CollectionULabel(Record, LinkORM, TracksRun):
     )
     ulabel: ULabel = ForeignKey(ULabel, PROTECT, related_name="links_collection")
     feature: Feature | None = ForeignKey(
-        Feature, PROTECT, null=True, related_name="links_collectionulabel"
+        Feature, PROTECT, null=True, related_name="links_collectionulabel", default=None
     )
     label_ref_is_name: bool | None = BooleanField(null=True)
     feature_ref_is_name: bool | None = BooleanField(null=True)
