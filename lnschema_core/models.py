@@ -84,7 +84,7 @@ class IsVersioned(models.Model):
 
     _len_stem_uid: int
 
-    version: str = CharField(max_length=30, default=None, null=True, db_index=True)
+    version: str | None = CharField(max_length=30, null=True, db_index=True)
     """Version (default `None`).
 
     Defines version of a family of records characterized by the same `stem_uid`.
@@ -174,7 +174,7 @@ class TracksRun(models.Model):
         "lnschema_core.User", PROTECT, default=current_user_id, related_name="+"
     )
     """Creator of record."""
-    run: Run = ForeignKey(
+    run: Run | None = ForeignKey(
         "lnschema_core.Run", PROTECT, null=True, default=current_run, related_name="+"
     )
     """Last run that created or updated the record."""
@@ -869,11 +869,11 @@ class User(Record, CanCurate):
 
     id: int = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
-    uid: str = CharField(unique=True, db_index=True, max_length=8, default=None)
+    uid: str = CharField(unique=True, db_index=True, max_length=8)
     """Universal id, valid across DB instances."""
-    handle: str = CharField(max_length=30, unique=True, db_index=True, default=None)
+    handle: str = CharField(max_length=30, unique=True, db_index=True)
     """Universal handle, valid across DB instances (required)."""
-    name: str = CharField(max_length=150, db_index=True, null=True, default=None)
+    name: str | None = CharField(max_length=150, db_index=True, null=True)
     """Name (optional)."""  # has to match hub specification, where it's also optional
     created_artifacts: Artifact
     """Artifacts created by user."""
@@ -963,15 +963,15 @@ class Storage(Record, TracksRun, TracksUpdates):
     uid: str = CharField(unique=True, max_length=12, default=base62_12, db_index=True)
     """Universal id, valid across DB instances."""
     # we are very conservative here with 255 characters
-    root: str = CharField(max_length=255, db_index=True, unique=True, default=None)
+    root: str = CharField(max_length=255, db_index=True, unique=True)
     """Root path of storage. n s3 path.  local path, etc. (required)."""
-    description: str = CharField(max_length=255, db_index=True, null=True, default=None)
+    description: str | None = CharField(max_length=255, db_index=True, null=True)
     """A description of what the storage location is used for (optional)."""
     type: str = CharField(max_length=30, db_index=True)
     """Can be "local" vs. "s3" vs. "gs"."""
-    region: str = CharField(max_length=64, db_index=True, null=True, default=None)
+    region: str | None = CharField(max_length=64, db_index=True, null=True)
     """Cloud storage region, if applicable."""
-    instance_uid: str = CharField(max_length=12, db_index=True, null=True, default=None)
+    instance_uid: str | None = CharField(max_length=12, db_index=True, null=True)
     """Instance that manages this storage location."""
     artifacts: Artifact
     """Artifacts contained in this storage location."""
@@ -1086,15 +1086,13 @@ class Transform(Record, IsVersioned):
 
     id: int = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
-    uid: str = CharField(
-        unique=True, db_index=True, max_length=_len_full_uid, default=None
-    )
+    uid: str = CharField(unique=True, db_index=True, max_length=_len_full_uid)
     """Universal id."""
-    name: str = CharField(max_length=150, db_index=True, null=True, default=None)
+    name: str | None = CharField(max_length=150, db_index=True, null=True)
     """A name or title. For instance, a pipeline name, notebook title, etc."""
-    key: str = CharField(max_length=120, db_index=True, null=True, default=None)
+    key: str | None = CharField(max_length=120, db_index=True, null=True)
     """A key for concise reference & versioning (optional)."""
-    description: str = CharField(max_length=255, null=True, default=None)
+    description: str | None = CharField(max_length=255, null=True)
     """A description (optional)."""
     type: TransformType = CharField(
         max_length=20,
@@ -1102,28 +1100,24 @@ class Transform(Record, IsVersioned):
         default="pipeline",
     )
     """:class:`~lamindb.core.types.TransformType` (default `"pipeline"`)."""
-    _source_code_artifact: Artifact = ForeignKey(
-        "Artifact", PROTECT, default=None, null=True, related_name="_source_code_of"
+    _source_code_artifact: Artifact | None = ForeignKey(
+        "Artifact", PROTECT, null=True, related_name="_source_code_of"
     )
     """Source code of the transform if stored as artifact within LaminDB.
 
     .. versionchanged:: 0.75
        Made private and deprecated for future removal.
     """
-    source_code: str | None = TextField(null=True, default=None)
+    source_code: str | None = TextField(null=True)
     """Source code of the transform.
 
     .. versionchanged:: 0.75
        The `source_code` field is no longer an artifact, but a text field.
     """
-    hash: str | None = CharField(
-        max_length=HASH_LENGTH, db_index=True, null=True, default=None
-    )
-    reference: str = CharField(max_length=255, db_index=True, null=True, default=None)
+    hash: str | None = CharField(max_length=HASH_LENGTH, db_index=True, null=True)
+    reference: str | None = CharField(max_length=255, db_index=True, null=True)
     """Reference for the transform, e.g..  URL."""
-    reference_type: str = CharField(
-        max_length=25, db_index=True, null=True, default=None
-    )
+    reference_type: str | None = CharField(max_length=25, db_index=True, null=True)
     runs: Run
     """Runs of this transform."""
     ulabels: ULabel = models.ManyToManyField("ULabel", related_name="transforms")
@@ -1204,7 +1198,7 @@ class Param(Record, CanCurate, TracksRun, TracksUpdates):
     _name_field: str = "name"
 
     name: str = CharField(max_length=100, db_index=True)
-    dtype: str = CharField(max_length=64, db_index=True, default=None)
+    dtype: str = CharField(max_length=64, db_index=True)
     """Data type ("number", "cat", "int", "float", "bool", "datetime").
 
     For categorical types, can define from which registry values are
@@ -1305,16 +1299,16 @@ class Run(Record):
     """The transform :class:`~lamindb.Transform` that is being run."""
     started_at: datetime = DateTimeField(auto_now_add=True, db_index=True)
     """Start time of run."""
-    finished_at: datetime = DateTimeField(db_index=True, null=True, default=None)
+    finished_at: datetime | None = DateTimeField(db_index=True, null=True)
     """Finished time of run."""
     # we don't want to make below a OneToOne because there could be the same trivial report
     # generated for many different runs
-    report: Artifact = ForeignKey(
-        "Artifact", PROTECT, default=None, null=True, related_name="_report_of"
+    report: Artifact | None = ForeignKey(
+        "Artifact", PROTECT, null=True, related_name="_report_of"
     )
     """Report of run, e.g.. n html file."""
-    environment: Artifact = ForeignKey(
-        "Artifact", PROTECT, default=None, null=True, related_name="_environment_of"
+    environment: Artifact | None = ForeignKey(
+        "Artifact", PROTECT, null=True, related_name="_environment_of"
     )
     """Computational environment for the run.
 
@@ -1334,17 +1328,15 @@ class Run(Record):
     """The collections serving as input for this run."""
     output_collections: Collection
     """The collections generated by this run."""
-    is_consecutive: bool = BooleanField(null=True, default=None)
+    is_consecutive: bool | None = BooleanField(null=True)
     """Indicates whether code was consecutively executed. Is relevant for notebooks."""
     _param_values: ParamValue = models.ManyToManyField(
         ParamValue, through="RunParamValue", related_name="runs"
     )
     """Parameter values."""
-    reference: str = CharField(max_length=255, db_index=True, null=True, default=None)
+    reference: str | None = CharField(max_length=255, db_index=True, null=True)
     """A reference like a URL or external ID (such as from a workflow manager)."""
-    reference_type: str = CharField(
-        max_length=25, db_index=True, null=True, default=None
-    )
+    reference_type: str | None = CharField(max_length=25, db_index=True, null=True)
     """Type of reference such as a workflow manager execution ID."""
     created_at: datetime = DateTimeField(auto_now_add=True, db_index=True)
     """Time of first creation. Mismatches ``started_at`` if the run is re-run."""
@@ -1352,9 +1344,7 @@ class Run(Record):
         User, CASCADE, default=current_user_id, related_name="created_runs"
     )
     """Creator of run."""
-    parent: Run = ForeignKey(
-        "Run", CASCADE, null=True, default=None, related_name="children"
-    )
+    parent: Run | None = ForeignKey("Run", CASCADE, null=True, related_name="children")
     """The run that triggered the current run.
 
     This is not a preceding run. The preceding runs ("predecessors") is the set
@@ -1457,15 +1447,13 @@ class ULabel(Record, HasParents, CanCurate, TracksRun, TracksUpdates):
     """Internal id, valid only in one DB instance."""
     uid: str = CharField(unique=True, db_index=True, max_length=8, default=base62_8)
     """A universal random id, valid across DB instances."""
-    name: str = CharField(max_length=150, db_index=True, unique=True, default=None)
+    name: str = CharField(max_length=150, db_index=True, unique=True)
     """Name or title of ulabel (required)."""
-    description: str = TextField(null=True, default=None)
+    description: str | None = TextField(null=True)
     """A description (optional)."""
-    reference: str = CharField(max_length=255, db_index=True, null=True, default=None)
+    reference: str | None = CharField(max_length=255, db_index=True, null=True)
     """A reference like URL or external ID."""
-    reference_type: str = CharField(
-        max_length=25, db_index=True, null=True, default=None
-    )
+    reference_type: str | None = CharField(max_length=25, db_index=True, null=True)
     """Type of reference such as a donor_id from Vendor X."""
     parents: ULabel = models.ManyToManyField(
         "self", symmetrical=False, related_name="children"
@@ -1577,19 +1565,19 @@ class Feature(Record, CanCurate, TracksRun, TracksUpdates):
     """Internal id, valid only in one DB instance."""
     uid: str = CharField(unique=True, db_index=True, max_length=12, default=base62_12)
     """Universal id, valid across DB instances."""
-    name: str = CharField(max_length=150, db_index=True, default=None, unique=True)
+    name: str = CharField(max_length=150, db_index=True, unique=True)
     """Name of feature (required)."""
-    dtype: str = CharField(max_length=64, db_index=True, default=None)
+    dtype: str = CharField(max_length=64, db_index=True)
     """Data type ("number", "cat", "int", "float", "bool", "datetime").
 
     For categorical types, can define from which registry values are
     sampled, e.g., `cat[ULabel]` or `cat[bionty.CellType]`.
     """
-    unit: str = CharField(max_length=30, db_index=True, null=True, default=None)
+    unit: str | None = CharField(max_length=30, db_index=True, null=True)
     """Unit of measure, ideally SI (`m`, `s`, `kg`, etc.) or 'normalized' etc. (optional)."""
-    description: str = TextField(db_index=True, null=True, default=None)
+    description: str | None = TextField(db_index=True, null=True)
     """A description."""
-    synonyms: str = TextField(null=True, default=None)
+    synonyms: str | None = TextField(null=True)
     """Bar-separated (|) synonyms (optional)."""
     # we define the below ManyToMany on the feature model because it parallels
     # how other registries (like Gene, Protein, etc.) relate to FeatureSet
@@ -1658,8 +1646,8 @@ class FeatureValue(Record, TracksRun):
 
     _name_field: str = "value"
 
-    feature: Feature = ForeignKey(
-        Feature, CASCADE, null=True, default=None, related_name="values"
+    feature: Feature | None = ForeignKey(
+        Feature, CASCADE, null=True, related_name="values"
     )
     """The dimension metadata."""
     value: Any = models.JSONField()
@@ -1744,13 +1732,13 @@ class FeatureSet(Record, TracksRun):
 
     id: int = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
-    uid: str = CharField(unique=True, db_index=True, max_length=20, default=None)
+    uid: str = CharField(unique=True, db_index=True, max_length=20)
     """A universal id (hash of the set of feature values)."""
-    name: str = CharField(max_length=150, null=True, default=None)
+    name: str | None = CharField(max_length=150, null=True)
     """A name (optional)."""
     n = IntegerField()
     """Number of features in the set."""
-    dtype: str = CharField(max_length=64, null=True, default=None)
+    dtype: str | None = CharField(max_length=64, null=True)
     """Data type, e.g., "number", "float", "int". Is `None` for :class:`~lamindb.Feature`.
 
     For :class:`~lamindb.Feature`, types are expected to be heterogeneous and defined on a per-feature level.
@@ -1760,8 +1748,8 @@ class FeatureSet(Record, TracksRun):
 
     Depending on the registry, `.members` stores, e.g. `Feature` or `Gene` records.
     """
-    hash: str = CharField(
-        max_length=HASH_LENGTH, default=None, db_index=True, null=True, unique=True
+    hash: str | None = CharField(
+        max_length=HASH_LENGTH, db_index=True, null=True, unique=True
     )
     """The hash of the set."""
     features: Feature
@@ -2015,13 +2003,13 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
     """Internal id, valid only in one DB instance."""
     uid: str = CharField(unique=True, db_index=True, max_length=_len_full_uid)
     """A universal random id (20-char base62 ~ UUID), valid across DB instances."""
-    description: str = CharField(max_length=255, db_index=True, null=True, default=None)
+    description: str | None = CharField(max_length=255, db_index=True, null=True)
     """A description."""
     storage: Storage = ForeignKey(Storage, PROTECT, related_name="artifacts")
     """Storage location, e.g. an S3 or GCP bucket or a local directory."""
-    key: str = CharField(max_length=255, db_index=True, null=True, default=None)
+    key: str | None = CharField(max_length=255, db_index=True, null=True)
     """Storage key, the relative path within the storage location."""
-    suffix: str = CharField(max_length=30, db_index=True, default=None)
+    suffix: str = CharField(max_length=30, db_index=True)
     # Initially, we thought about having this be nullable to indicate folders
     # But, for instance, .zarr is stored in a folder that ends with a .zarr suffix
     """Path suffix or empty string if no canonical suffix exists.
@@ -2031,56 +2019,43 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
     type: ArtifactType | None = CharField(
         max_length=20,
         db_index=True,
-        default=None,
         null=True,
     )
     """:class:`~lamindb.core.types.ArtifactType` (default `None`)."""
-    size: int = BigIntegerField(null=True, db_index=True)
+    size: int | None = BigIntegerField(null=True, db_index=True)
     """Size in bytes.
 
     Examples: 1KB is 1e3 bytes, 1MB is 1e6, 1GB is 1e9, 1TB is 1e12 etc.
     """
-    hash: str = CharField(
-        max_length=HASH_LENGTH, db_index=True, null=True, default=None
-    )
+    hash: str | None = CharField(max_length=HASH_LENGTH, db_index=True, null=True)
     """Hash or pseudo-hash of artifact content.
 
     Useful to ascertain integrity and avoid duplication.
     """
-    n_objects: int = BigIntegerField(default=None, null=True, db_index=True)
+    n_objects: int | None = BigIntegerField(null=True, db_index=True)
     """Number of objects.
 
     Typically, this denotes the number of files in an artifact.
     """
-    n_observations: int = BigIntegerField(default=None, null=True, db_index=True)
+    n_observations: int | None = BigIntegerField(null=True, db_index=True)
     """Number of observations.
 
     Typically, this denotes the first array dimension.
     """
-    _hash_type: str = CharField(
-        max_length=30,
-        db_index=True,
-        null=True,
-        default=None,
-    )
+    _hash_type: str | None = CharField(max_length=30, db_index=True, null=True)
     """Type of hash."""
-    _accessor: str = CharField(
-        max_length=64,
-        db_index=True,
-        null=True,
-        default=None,
-    )
+    _accessor: str | None = CharField(max_length=64, db_index=True, null=True)
     """Default backed or memory accessor, e.g., DataFrame, AnnData."""
     ulabels: ULabel = models.ManyToManyField(
         ULabel, through="ArtifactULabel", related_name="artifacts"
     )
     """The ulabels measured in the artifact (:class:`~lamindb.ULabel`)."""
-    transform: Transform = ForeignKey(
-        Transform, PROTECT, related_name="output_artifacts", null=True, default=None
+    transform: Transform | None = ForeignKey(
+        Transform, PROTECT, related_name="output_artifacts", null=True
     )
     """Transform whose run created the artifact."""
-    run: Run = ForeignKey(
-        Run, PROTECT, related_name="output_artifacts", null=True, default=None
+    run: Run | None = ForeignKey(
+        Run, PROTECT, related_name="output_artifacts", null=True
     )
     """Run that created the artifact."""
     input_of_runs: Run = models.ManyToManyField(Run, related_name="input_artifacts")
@@ -2524,31 +2499,27 @@ class Collection(Record, IsVersioned, TracksRun, TracksUpdates):
         unique=True, db_index=True, max_length=_len_full_uid, default=base62_20
     )
     """Universal id, valid across DB instances."""
-    name: str = CharField(max_length=150, db_index=True, default=None)
+    name: str = CharField(max_length=150, db_index=True)
     """Name or title of collection (required)."""
-    description: str = TextField(null=True, default=None)
+    description: str | None = TextField(null=True)
     """A description."""
-    hash: str = CharField(
-        max_length=HASH_LENGTH, db_index=True, null=True, default=None
-    )
+    hash: str | None = CharField(max_length=HASH_LENGTH, db_index=True, null=True)
     """Hash of collection content. 86 base64 chars allow to store 64 bytes, 512 bits."""
-    reference: str = CharField(max_length=255, db_index=True, null=True, default=None)
+    reference: str | None = CharField(max_length=255, db_index=True, null=True)
     """A reference like URL or external ID."""
     # also for reference_type here, we allow an extra long max_length
-    reference_type: str = CharField(
-        max_length=25, db_index=True, null=True, default=None
-    )
+    reference_type: str | None = CharField(max_length=25, db_index=True, null=True)
     """Type of reference, e.g., cellxgene Census collection_id."""
     ulabels: ULabel = models.ManyToManyField(
         "ULabel", through="CollectionULabel", related_name="collections"
     )
     """ULabels sampled in the collection (see :class:`~lamindb.Feature`)."""
-    transform: Transform = ForeignKey(
-        Transform, PROTECT, related_name="output_collections", null=True, default=None
+    transform: Transform | None = ForeignKey(
+        Transform, PROTECT, related_name="output_collections", null=True
     )
     """:class:`~lamindb.Transform` whose run created the collection."""
-    run: Run = ForeignKey(
-        Run, PROTECT, related_name="output_collections", null=True, default=None
+    run: Run | None = ForeignKey(
+        Run, PROTECT, related_name="output_collections", null=True
     )
     """:class:`~lamindb.Run` that created the `collection`."""
     input_of_runs: Run = models.ManyToManyField(Run, related_name="input_collections")
@@ -2567,7 +2538,6 @@ class Collection(Record, IsVersioned, TracksRun, TracksUpdates):
         null=True,
         unique=True,
         related_name="_meta_of_collection",
-        blank=True,
     )
     """An artifact that stores metadata that indexes a collection.
 
@@ -2814,9 +2784,9 @@ class ArtifactFeatureSet(Record, LinkORM, TracksRun):
     featureset: FeatureSet = ForeignKey(
         FeatureSet, PROTECT, related_name="links_artifact"
     )
-    slot: str = CharField(max_length=40, null=True, default=None)
-    feature_ref_is_semantic: bool = BooleanField(
-        null=True, default=None
+    slot: str | None = CharField(max_length=40, null=True)
+    feature_ref_is_semantic: bool | None = BooleanField(
+        null=True
     )  # like Feature name or Gene symbol or CellMarker name
 
     class Meta:
@@ -2837,12 +2807,12 @@ class CollectionArtifact(Record, LinkORM, TracksRun):
 class ArtifactULabel(Record, LinkORM, TracksRun):
     id: int = models.BigAutoField(primary_key=True)
     artifact: Artifact = ForeignKey(Artifact, CASCADE, related_name="links_ulabel")
-    ulabel = ForeignKey(ULabel, PROTECT, related_name="links_artifact")
-    feature = ForeignKey(
-        Feature, PROTECT, null=True, default=None, related_name="links_artifactulabel"
+    ulabel: ULabel = ForeignKey(ULabel, PROTECT, related_name="links_artifact")
+    feature: Feature | None = ForeignKey(
+        Feature, PROTECT, null=True, related_name="links_artifactulabel"
     )
-    label_ref_is_name: bool = BooleanField(null=True, default=None)
-    feature_ref_is_name: bool = BooleanField(null=True, default=None)
+    label_ref_is_name: bool | None = BooleanField(null=True)
+    feature_ref_is_name: bool | None = BooleanField(null=True)
 
     class Meta:
         # can have the same label linked to the same artifact if the feature is
@@ -2856,11 +2826,11 @@ class CollectionULabel(Record, LinkORM, TracksRun):
         Collection, CASCADE, related_name="links_ulabel"
     )
     ulabel: ULabel = ForeignKey(ULabel, PROTECT, related_name="links_collection")
-    feature: Feature = ForeignKey(
-        Feature, PROTECT, null=True, default=None, related_name="links_collectionulabel"
+    feature: Feature | None = ForeignKey(
+        Feature, PROTECT, null=True, related_name="links_collectionulabel"
     )
-    label_ref_is_name: bool = BooleanField(null=True, default=None)
-    feature_ref_is_name: bool = BooleanField(null=True, default=None)
+    label_ref_is_name: bool | None = BooleanField(null=True)
+    feature_ref_is_name: bool | None = BooleanField(null=True)
 
     class Meta:
         unique_together = ("collection", "ulabel")
