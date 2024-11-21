@@ -51,231 +51,252 @@ class BooleanField(models.BooleanField):
 
 
 class DateField(models.DateField):
-    """Custom `DateField` with default values for `blank`.
+    """Custom `DateField` with default values for `blank` and `default`.
 
     Django default values for `DateField` are `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
+        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
 class DateTimeField(models.DateTimeField):
-    """Custom `DateTimeField` with default values for `blank`.
+    """Custom `DateTimeField` with default values for `blank` and `default`.
 
     Django default values for `DateTimeField` are `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
+        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
 class BigIntegerField(models.BigIntegerField):
-    """Custom `BigIntegerField` with default values for `blank`.
+    """Custom `BigIntegerField` with default values for `blank` and `default`.
 
     Django default values for `BigIntegerField` are `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
+        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
 class IntegerField(models.IntegerField):
-    """Custom `IntegerField` with default values for `blank`.
+    """Custom `IntegerField` with default values for `blank` and `default`.
 
     Django default values for `IntegerField` are `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
+        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
 class OneToOneField(models.OneToOneField):
-    """Custom `OneToOneField` with default values for `blank`.
+    """Custom `OneToOneField` with default values for `blank` and `default`.
 
     Django default values for `OneToOneField` are `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
+        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
 class FloatField(models.FloatField):
-    """Custom `FloatField` with default values for `blank`.
+    """Custom `FloatField` with default values for `blank` and `default`.
 
     Django default values for `FloatField` are `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
+        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
 class DecimalField(models.DecimalField):
-    """Custom `DecimalField` with default values for `blank`.
+    """Custom `DecimalField` with default values for `blank` and `default`.
 
     Django default values for `DecimalField` are `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
+        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
 class JSONField(models.JSONField):
-    """Custom `JSONField` with default values for `blank`.
+    """Custom `JSONField` with default values for `blank` and `default`.
 
     Django default values for `JSONField` are `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
+        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
 class DurationField(models.DurationField):
-    """Custom `DurationField` with default values for `blank`.
+    """Custom `DurationField` with default values for `blank` and `default`.
 
     Django default values for `DurationField` are `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
+        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
 class URLField(models.URLField):
-    """Custom `URLField` with default values for `blank`.
+    """Custom `URLField` with default values for `blank` and `default`.
 
     Django default values for `URLField` are `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
+        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
 class EmailField(models.EmailField):
-    """Custom `EmailField` with default values for `blank`.
+    """Custom `EmailField` with default values for `blank` and `default`.
 
     Django default values for `EmailField` are `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
+        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
 class TimeField(models.TimeField):
-    """Custom `TimeField` with default values for `blank`.
+    """Custom `TimeField` with default values for `blank` and `default`.
 
     Django default values for `TimeField` are `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
+        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
 class SlugField(models.SlugField):
-    """Custom `SlugField` with default values for `blank`.
+    """Custom `SlugField` with default values for `blank` and `default`.
 
     Django default values for `SlugField` are `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
+        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
 class UUIDField(models.UUIDField):
-    """Custom `UUIDField` with default values for `blank`.
+    """Custom `UUIDField` with default values for `blank` and `default`.
 
     Django default values for `UUIDField` are `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
+        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
 class PositiveIntegerField(models.PositiveIntegerField):
-    """Custom `PositiveIntegerField` with default values for `blank`.
+    """Custom `PositiveIntegerField` with default values for `blank` and `default`.
 
     Django default values for `PositiveIntegerField` are `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
+        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
 class PositiveSmallIntegerField(models.PositiveSmallIntegerField):
-    """Custom `PositiveSmallIntegerField` with default values for `blank`.
+    """Custom `PositiveSmallIntegerField` with default values for `blank` and `default`.
 
     Django default values for `PositiveSmallIntegerField` are `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
+        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
 class SmallIntegerField(models.SmallIntegerField):
-    """Custom `SmallIntegerField` with default values for `blank`.
+    """Custom `SmallIntegerField` with default values for `blank` and `default`.
 
     Django default values for `SmallIntegerField` are `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
+        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
 class BinaryField(models.BinaryField):
-    """Custom `BinaryField` with default values for `blank`.
+    """Custom `BinaryField` with default values for `blank` and `default`.
 
     Django default values for `BinaryField` are `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
+        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
 class GenericIPAddressField(models.GenericIPAddressField):
-    """Custom `GenericIPAddressField` with default values for `blank`.
+    """Custom `GenericIPAddressField` with default values for `blank` and `default`.
 
     Django default values for `GenericIPAddressField` are `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
+        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
 class FileField(models.FileField):
-    """Custom `FileField` with default values for `blank`.
+    """Custom `FileField` with default values for `blank` and `default`.
 
     Django default values for `FileField` are `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
+        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
 class ImageField(models.ImageField):
-    """Custom `ImageField` with default values for `blank`.
+    """Custom `ImageField` with default values for `blank` and `default`.
 
     Django default values for `ImageField` are `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
+        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
