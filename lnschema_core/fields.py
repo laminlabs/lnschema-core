@@ -34,7 +34,6 @@ class ForeignKey(models.ForeignKey):
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
-        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
@@ -46,9 +45,6 @@ class BooleanField(models.BooleanField):
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
-        if "blank" in kwargs and kwargs["blank"] is True:
-            # default=None is requires to pair with `blank=True` for BooleanField
-            kwargs["default"] = None
         super().__init__(*args, **kwargs)
 
 
@@ -59,9 +55,6 @@ class DateField(models.DateField):
     """
 
     def __init__(self, *args, **kwargs):
-        # Only set default=None if auto_now and auto_now_add aren't used, otherwise it will error
-        if not kwargs.get("auto_now") and not kwargs.get("auto_now_add"):
-            kwargs.setdefault("default", None)
         kwargs.setdefault("blank", True)
         super().__init__(*args, **kwargs)
 
@@ -73,9 +66,6 @@ class DateTimeField(models.DateTimeField):
     """
 
     def __init__(self, *args, **kwargs):
-        # Only set default=None if auto_now and auto_now_add aren't used, otherwise it will error
-        if not kwargs.get("auto_now") and not kwargs.get("auto_now_add"):
-            kwargs.setdefault("default", None)
         kwargs.setdefault("blank", True)
         super().__init__(*args, **kwargs)
 
@@ -88,7 +78,6 @@ class BigIntegerField(models.BigIntegerField):
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
-        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
@@ -100,7 +89,6 @@ class IntegerField(models.IntegerField):
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
-        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
@@ -112,7 +100,6 @@ class OneToOneField(models.OneToOneField):
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
-        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
@@ -124,7 +111,6 @@ class FloatField(models.FloatField):
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
-        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
@@ -136,7 +122,6 @@ class DecimalField(models.DecimalField):
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
-        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
@@ -148,7 +133,6 @@ class JSONField(models.JSONField):
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
-        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
@@ -160,7 +144,6 @@ class DurationField(models.DurationField):
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
-        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
@@ -172,7 +155,6 @@ class URLField(models.URLField):
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
-        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
@@ -184,127 +166,114 @@ class EmailField(models.EmailField):
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
-        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
 class TimeField(models.TimeField):
-    """Custom `TimeField` with default values for `blank` and `default`.
+    """Custom `TimeField` with default values for `blank`.
 
     Django default values for `TimeField` are `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
-        # Only set default=None if auto_now and auto_now_add aren't used, otherwise it will error
-        if not kwargs.get("auto_now") and not kwargs.get("auto_now_add"):
-            kwargs.setdefault("default", None)
         kwargs.setdefault("blank", True)
         super().__init__(*args, **kwargs)
 
 
 class SlugField(models.SlugField):
-    """Custom `SlugField` with default values for `blank` and `default`.
+    """Custom `SlugField` with default values for `blank`.
 
     Django default values for `SlugField` are `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
-        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
 class UUIDField(models.UUIDField):
-    """Custom `UUIDField` with default values for `blank` and `default`.
+    """Custom `UUIDField` with default values for `blank`.
 
     Django default values for `UUIDField` are `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
-        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
 class PositiveIntegerField(models.PositiveIntegerField):
-    """Custom `PositiveIntegerField` with default values for `blank` and `default`.
+    """Custom `PositiveIntegerField` with default values for `blank`.
 
     Django default values for `PositiveIntegerField` are `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
-        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
 class PositiveSmallIntegerField(models.PositiveSmallIntegerField):
-    """Custom `PositiveSmallIntegerField` with default values for `blank` and `default`.
+    """Custom `PositiveSmallIntegerField` with default values for `blank`.
 
     Django default values for `PositiveSmallIntegerField` are `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
-        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
 class SmallIntegerField(models.SmallIntegerField):
-    """Custom `SmallIntegerField` with default values for `blank` and `default`.
+    """Custom `SmallIntegerField` with default values for `blank`.
 
     Django default values for `SmallIntegerField` are `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
-        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
 class BinaryField(models.BinaryField):
-    """Custom `BinaryField` with default values for `blank` and `default`.
+    """Custom `BinaryField` with default values for `blank`.
 
     Django default values for `BinaryField` are `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
-        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
 class GenericIPAddressField(models.GenericIPAddressField):
-    """Custom `GenericIPAddressField` with default values for `blank` and `default`.
+    """Custom `GenericIPAddressField` with default values for `blank`.
 
     Django default values for `GenericIPAddressField` are `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
-        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
 class FileField(models.FileField):
-    """Custom `FileField` with default values for `blank` and `default`.
+    """Custom `FileField` with default values for `blank`.
 
     Django default values for `FileField` are `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
-        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
 
 
 class ImageField(models.ImageField):
-    """Custom `ImageField` with default values for `blank` and `default`.
+    """Custom `ImageField` with default values for `blank`.
 
     Django default values for `ImageField` are `blank=False`.
     """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("blank", True)
-        kwargs.setdefault("default", None)
         super().__init__(*args, **kwargs)
