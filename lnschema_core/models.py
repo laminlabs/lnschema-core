@@ -25,6 +25,7 @@ from django.db.models.fields.related import (
 )
 from lamin_utils import colors
 from lamindb_setup import _check_instance_setup
+from lamindb_setup.core._docs import doc_args
 from lamindb_setup.core.hashing import HASH_LENGTH
 
 from lnschema_core.fields import (
@@ -529,7 +530,27 @@ class HasParents:
         pass
 
 
+RECORD_REGISTRY_EXAMPLE = """Example::
+
+        from lnschema_core import Record, fields
+
+        # sub-classing `Record` creates a new registry
+        class Experiment(Record):
+            name: str = fields.CharField()
+
+        # instantiating `Experiment` creates a record `experiment`
+        experiment = Experiment(name="my experiment")
+
+        # you can save the record to the database
+        experiment.save()
+
+        # `Experiment` refers to the registry, which you can query
+        df = Experiment.filter(name__startswith="my ").df()
+"""
+
+
 # this is the metaclass for Record
+@doc_args(RECORD_REGISTRY_EXAMPLE)
 class Registry(ModelBase):
     """Metaclass for :class:`~lamindb.core.Record`.
 
@@ -541,22 +562,7 @@ class Registry(ModelBase):
 
     If you want to create a new registry, you sub-class `Record`.
 
-    Example::
-
-        from lnschema_core import Record, fields
-
-        # sub-classing `Record` creates a new registry
-        class Experiment(Record):
-            name: str = fields.CharField()
-
-        # instantiating `Experiment` creates a record `experiment`
-        experiment = Experiment(name="my experiment")
-
-        # you can save the record in the database
-        experiment.save()
-
-        # `Experiment` refers to the registry, which you can query
-        df = Experiment.filter(name__startswith="my ").df()
+    {}
 
     Note: `Registry` inherits from Django's `ModelBase`.
     """
@@ -772,22 +778,23 @@ class Registry(ModelBase):
         return f"{schema_prefix}{cls.__name__}"
 
 
+@doc_args(RECORD_REGISTRY_EXAMPLE)
 class Record(models.Model, metaclass=Registry):
     """Base class for metadata records.
 
     Every `Record` is a data model that comes with a registry in form of a SQL
     table in your database.
 
-    Sub-classing `Record` defines a new registry while instantiating a `Record`
-    subclass defines a new record.
+    Sub-classing `Record` creates a new registry while instantiating a `Record`
+    creates a new record.
 
-    `Record` extends Django's `Model` class. Why does LaminDB call it `Record`
+    {}
+
+    `Record`'s metaclass is :class:`~lamindb.core.Registry`.
+
+    `Record` inherits from Django's `Model` class. Why does LaminDB call it `Record`
     and not `Model`? The term `Record` can't lead to confusion with statistical,
     machine learning or biological models.
-
-    For an example, see `here
-    <https://github.com/laminlabs/wetlab/blob/64e1ec74c1edfa3e26bc0b432add358c34db8006/wetlab/models.py#L64-L99>`__.
-
     """
 
     def save(self, *args, **kwargs) -> Record:
