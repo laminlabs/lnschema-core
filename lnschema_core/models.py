@@ -1403,8 +1403,6 @@ class ULabel(Record, HasParents, CanCurate, TracksRun, TracksUpdates):
     annotate with labels that are contained in `DataFrame` or `AnnData`
     artifacts.
 
-    See :doc:`tutorial2` to learn more.
-
     .. note::
 
         If you work with complex entities like cell lines, cell types, tissues,
@@ -1502,8 +1500,6 @@ class Feature(Record, CanCurate, TracksRun, TracksUpdates):
 
     1. manage metadata of features
     2. annotate datasets by whether they measured a feature
-
-    Learn more: :doc:`tutorial2`.
 
     Args:
         name: `str` Name of the feature, typically.  column name.
@@ -1844,7 +1840,7 @@ class FeatureSet(Record, TracksRun):
 class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
     """Datasets & models stored as files, folders, or arrays.
 
-    Artifacts manage data in local or remote storage (:doc:`/tutorial`).
+    Artifacts manage data in local or remote storage.
 
     Some artifacts are array-like, e.g., when stored as `.parquet`, `.h5ad`,
     `.zarr`, or `.tiledb`.
@@ -2161,9 +2157,7 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
         revises: Artifact | None = None,
         **kwargs,
     ) -> Artifact:
-        """Create from ``DataFrame``, validate & link features.
-
-        For more info, see tutorial: :doc:`/tutorial`.
+        """Create from `DataFrame`, validate & link features.
 
         Args:
             df: A `DataFrame` object.
@@ -2461,7 +2455,7 @@ delattr(Artifact, "get_visibility_display")
 class Collection(Record, IsVersioned, TracksRun, TracksUpdates):
     """Collections of artifacts.
 
-    Collections provide a simple way of linking & versioning collections of artifacts (:doc:`/tutorial`).
+    Collections provide a simple way of versioning collections of artifacts.
 
     Args:
         artifacts: `list[Artifact]` A list of artifacts.
