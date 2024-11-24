@@ -531,14 +531,34 @@ class HasParents:
 
 # this is the metaclass for Record
 class Registry(ModelBase):
-    """Metaclass for `Record`.
+    """Metaclass for :class:`~lamindb.core.Record`.
 
-    Every registry maps on exactly one SQL Table of the Postgres or SQLite
-    database underlying any LaminDB instance.
+    Each `Registry` *object* is a `Record` *class* and corresponds to a table in the metadata SQL database.
 
-    `Registry` is the `metaclass` of :class:`~lamindb.core.Record`.
+    You work with `Registry` objects whenever you use *class methods* of `Record`.
 
-    `Registry` extends Django's `ModelBase`.
+    You call any subclass of `Record` a "registry" and their objects "records". A `Record` object corresponds to a row in the SQL table.
+
+    If you want to create a new registry, you sub-class `Record`.
+
+    Example::
+
+        from lnschema_core import Record, fields
+
+        # sub-classing `Record` creates a new registry
+        class Experiment(Record):
+            name: str = fields.CharField()
+
+        # instantiating `Experiment` creates a record `experiment`
+        experiment = Experiment(name="my experiment")
+
+        # you can save the record in the database
+        experiment.save()
+
+        # `Experiment` refers to the registry, which you can query
+        df = Experiment.filter(name__startswith="my ").df()
+
+    Note: `Registry` inherits from Django's `ModelBase`.
     """
 
     def __new__(cls, name, bases, attrs, **kwargs):
@@ -629,8 +649,8 @@ class Registry(ModelBase):
             - Django documentation: `Queries <https://docs.djangoproject.com/en/stable/topics/db/queries/>`__
 
         Examples:
-            >>> ln.ULabel(name="my ulabel").save()
-            >>> ulabel = ln.ULabel.get(name="my ulabel")
+            >>> ln.ULabel(name="my label").save()
+            >>> ln.ULabel.filter(name__startswith="my").df()
         """
         pass
 
@@ -656,7 +676,7 @@ class Registry(ModelBase):
             - Django documentation: `Queries <https://docs.djangoproject.com/en/stable/topics/db/queries/>`__
 
         Examples:
-            >>> ulabel = ln.ULabel.get("2riu039")
+            >>> ulabel = ln.ULabel.get("FvtpPJLJ")
             >>> ulabel = ln.ULabel.get(name="my-label")
         """
         pass
