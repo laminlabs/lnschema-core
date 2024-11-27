@@ -6,9 +6,9 @@
 
 ## Developers' Note
 
-This package implements models but leaves concrete implementations of non-ORM methods (such as `Artifact.cache`) empty. The methods are implemented in `lamindb` and then the model classes are monkey-patched there as well.
+This package implements ORMs but leaves concrete implementations of non-ORM methods (such as `Artifact.cache`) empty. The methods are implemented in lamindb and the implementations are added to the ORM classes dynamically ("monkey-patching").
 
-### Why monkey pathing?
+### Why monkey patching?
 
 We want to avoid implementing anything non-ORM related in this package and just have models here, so that concrete implementations are all in `lamindb`. This provides better code structure and clarity compared to having imports from `lamindb` needed if the implementations are done here.
 
