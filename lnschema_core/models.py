@@ -1226,7 +1226,7 @@ class Param(Record, CanCurate, TracksRun, TracksUpdates):
 
     name: str = CharField(max_length=100, db_index=True)
     dtype: str = CharField(max_length=64, db_index=True)
-    """Data type ("number", "cat", "int", "float", "bool", "datetime").
+    """Data type ("num", "cat", "int", "float", "bool", "datetime").
 
     For categorical types, can define from which registry values are
     sampled, e.g., `cat[ULabel]` or `cat[bionty.CellType]`.
@@ -1530,7 +1530,7 @@ class Feature(Record, CanCurate, TracksRun, TracksUpdates):
 
     Args:
         name: `str` Name of the feature, typically.  column name.
-        dtype: `str | list[Type[Record]]` Data type ("number", "cat", "int", "float", "bool", "datetime").
+        dtype: `str | list[Type[Record]]` Data type ("num", "cat", "int", "float", "bool", "datetime").
             For categorical types, can define from which registry values are
             sampled, e.g., `cat[ULabel]` or `cat[bionty.CellType]`.
         unit: `str | None = None` Unit of measure, ideally SI (`"m"`, `"s"`, `"kg"`, etc.) or `"normalized"` etc.
@@ -1593,7 +1593,7 @@ class Feature(Record, CanCurate, TracksRun, TracksUpdates):
     name: str = CharField(max_length=150, db_index=True, unique=True)
     """Name of feature (required)."""
     dtype: str = CharField(max_length=64, db_index=True)
-    """Data type ("number", "cat", "int", "float", "bool", "datetime").
+    """Data type ("num", "cat", "int", "float", "bool", "datetime").
 
     For categorical types, can define from which registry values are
     sampled, e.g., `cat[ULabel]` or `cat[bionty.CellType]`.
@@ -1705,7 +1705,7 @@ class FeatureSet(Record, TracksRun):
             :meth:`~lamindb.FeatureSet.from_df`.
         dtype: `str | None = None` The simple type. Defaults to
             `None` for sets of :class:`~lamindb.Feature` records. nd otherwise
-            defaults to `"number"` (e.g., for sets of :class:`~bionty.Gene`).
+            defaults to `"num"` (e.g., for sets of :class:`~bionty.Gene`).
         name: `str | None = None` A name.
 
     Note:
@@ -1764,7 +1764,7 @@ class FeatureSet(Record, TracksRun):
     n = IntegerField()
     """Number of features in the set."""
     dtype: str | None = CharField(max_length=64, null=True)
-    """Data type, e.g., "number", "float", "int". Is `None` for :class:`~lamindb.Feature`.
+    """Data type, e.g., "num", "float", "int". Is `None` for :class:`~lamindb.Feature`.
 
     For :class:`~lamindb.Feature`, types are expected to be heterogeneous and defined on a per-feature level.
     """
