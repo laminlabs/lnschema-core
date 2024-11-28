@@ -15,6 +15,17 @@ StrField = Union[str, FieldAttr]  # typing.TypeAlias
 
 TransformType = Literal["pipeline", "notebook", "upload", "script", "function", "glue"]
 ArtifactType = Literal["dataset", "model"]
+FeatureDtype = Literal[
+    "cat",  # categorical variables
+    "num",  # numerical variables
+    "str",  # string variables
+    "int",  # integer variables
+    "float",  # float variables
+    "bool",  # boolean variables
+    "date",  # date variables
+    "datetime",  # datetime variables
+    "object",  # this is a pandas type, we're only using it for complicated types, not for strings
+]
 
 
 class VisibilityChoice(IntegerChoices):
