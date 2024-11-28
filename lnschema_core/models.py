@@ -40,6 +40,7 @@ from lnschema_core.fields import (
 )
 from lnschema_core.types import (
     ArtifactType,
+    FeatureDtype,
     FieldAttr,
     ListLike,
     StrField,
@@ -1521,18 +1522,22 @@ class ULabel(Record, HasParents, CanCurate, TracksRun, TracksUpdates):
 class Feature(Record, CanCurate, TracksRun, TracksUpdates):
     """Dataset dimensions.
 
-    Features denote dataset dimensions, i.e., the variables that measure labels & numbers.
+    Features denote dataset dimensions, e.g., the column of a dataframe. The `Feature` registry organizes the metadata of features.
 
-    The `Feature` registry helps to
+    With the `Feature` registry, you can query datasets by whether they measure
+    a feature or structure label annotations by feature. For example, the `"T
+    cell"` label could be measured by features `"cell_type_by_expert"` or
+    `"cell_type_by_model"`.
 
-    1. manage metadata of features
-    2. annotate datasets by whether they measured a feature
+    The two most important metadata of a feature are its `name` and the `dtype`.
+    In addition to typical data types found across packages, LaminDB also has a
+    `"num"` `dtype` to concisely denote the union of all numerical types.
 
     Args:
         name: `str` Name of the feature, typically.  column name.
-        dtype: `str | list[Type[Record]]` Data type ("num", "cat", "int", "float", "bool", "datetime").
+        dtype: `FeatureDtype | list[Registry]` See :class:`~lamindb.core.types.FeatureDtype`.
             For categorical types, can define from which registry values are
-            sampled, e.g., `cat[ULabel]` or `cat[bionty.CellType]`.
+            sampled, e.g., `ULabel` or `[ULabel, bionty.CellType]`.
         unit: `str | None = None` Unit of measure, ideally SI (`"m"`, `"s"`, `"kg"`, etc.) or `"normalized"` etc.
         description: `str | None = None` A description.
         synonyms: `str | None = None` Bar-separated synonyms.
@@ -1592,11 +1597,12 @@ class Feature(Record, CanCurate, TracksRun, TracksUpdates):
     """Universal id, valid across DB instances."""
     name: str = CharField(max_length=150, db_index=True, unique=True)
     """Name of feature (required)."""
-    dtype: str = CharField(max_length=64, db_index=True)
-    """Data type ("num", "cat", "int", "float", "bool", "datetime").
+    dtype: FeatureDtype = CharField(max_length=64, db_index=True)
+    """Data type (:class:`~lamindb.core.types.FeatureDtype`).
 
     For categorical types, can define from which registry values are
-    sampled, e.g., `cat[ULabel]` or `cat[bionty.CellType]`.
+    sampled, e.g., `'cat[ULabel]'` or `'cat[bionty.CellType]'`. Unions are also
+    allowed if the feature samples from two registries, e.g., `'cat[ULabel|bionty.CellType]'`
     """
     unit: str | None = CharField(max_length=30, db_index=True, null=True)
     """Unit of measure, ideally SI (`m`, `s`, `kg`, etc.) or 'normalized' etc. (optional)."""
@@ -1620,7 +1626,7 @@ class Feature(Record, CanCurate, TracksRun, TracksUpdates):
     def __init__(
         self,
         name: str,
-        type: str | list[type[Record]],
+        dtype: FeatureDtype | list[Registry],
         unit: str | None,
         description: str | None,
         synonyms: str | None,
