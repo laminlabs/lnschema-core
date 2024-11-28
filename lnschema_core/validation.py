@@ -21,6 +21,10 @@ def validate_literal_fields(record: "Record", kwargs) -> None:
     Raises:
         ValidationError: If any field value is not in its Literal's allowed values
     """
+    if record.__class__.__name__ == "Feature":
+        # the FeatureDtype is more complicated than a simple literal
+        # because it allows constructs like cat[ULabel] etc.
+        return None
     try:
         type_hints = get_type_hints(record.__class__)
     except TypeError:

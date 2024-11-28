@@ -1522,20 +1522,23 @@ class ULabel(Record, HasParents, CanCurate, TracksRun, TracksUpdates):
 class Feature(Record, CanCurate, TracksRun, TracksUpdates):
     """Dataset dimensions.
 
-    Features denote dataset dimensions, e.g., the column of a dataframe. The `Feature` registry organizes the metadata of features.
+    A feature represents a dimension of a dataset, such as a column in a
+    `DataFrame`. The `Feature` registry organizes metadata of features.
 
-    With the `Feature` registry, you can query datasets by whether they measure
-    a feature or structure label annotations by feature. For example, the `"T
-    cell"` label could be measured by features `"cell_type_by_expert"` or
-    `"cell_type_by_model"`.
+    The `Feature` registry helps you organize and query datasets based on their
+    features and corresponding label annotations. For instance, when working
+    with a "T cell" label, it could be measured through different features
+    such as `"cell_type_by_expert"` where an expert manually classified the
+    cell, or `"cell_type_by_model"` where a computational model made the
+    classification.
 
     The two most important metadata of a feature are its `name` and the `dtype`.
-    In addition to typical data types found across packages, LaminDB also has a
-    `"num"` `dtype` to concisely denote the union of all numerical types.
+    In addition to typical data types, LaminDB has a `"num"` `dtype` to
+    concisely denote the union of all numerical types.
 
     Args:
         name: `str` Name of the feature, typically.  column name.
-        dtype: `FeatureDtype | list[Registry]` See :class:`~lamindb.core.types.FeatureDtype`.
+        dtype: `FeatureDtype | Registry | list[Registry]` See :class:`~lamindb.core.types.FeatureDtype`.
             For categorical types, can define from which registry values are
             sampled, e.g., `ULabel` or `[ULabel, bionty.CellType]`.
         unit: `str | None = None` Unit of measure, ideally SI (`"m"`, `"s"`, `"kg"`, etc.) or `"normalized"` etc.
@@ -1560,10 +1563,25 @@ class Feature(Record, CanCurate, TracksRun, TracksUpdates):
 
     Example:
 
+        A simple `"str"` feature.
+
         >>> ln.Feature(
-        ...     name="cell_type_by_expert",
-        ...     dtype="cat[bionty.CellType]",
-        ...     description="Expert cell type annotation"
+        ...     name="sample_note",
+        ...     dtype="str",
+        ... ).save()
+
+        A dtype `"cat[ULabel]"` can be more easily passed as below.
+
+        >>> ln.Feature(
+        ...     name="project",
+        ...     dtype=ln.ULabel,
+        ... ).save()
+
+        A dtype `"cat[ULabel|bionty.CellType]"` can be more easily passed as below.
+
+        >>> ln.Feature(
+        ...     name="cell_type",
+        ...     dtype=[ln.ULabel, bt.CellType],
         ... ).save()
 
     Hint:
@@ -1626,7 +1644,7 @@ class Feature(Record, CanCurate, TracksRun, TracksUpdates):
     def __init__(
         self,
         name: str,
-        dtype: FeatureDtype | list[Registry],
+        dtype: FeatureDtype | Registry | list[Registry],
         unit: str | None,
         description: str | None,
         synonyms: str | None,
