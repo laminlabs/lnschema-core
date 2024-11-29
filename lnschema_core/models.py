@@ -690,25 +690,39 @@ class Registry(ModelBase):
     def df(
         cls,
         include: str | list[str] | None = None,
+        features: bool | list[str] = False,
         limit: int = 100,
     ) -> pd.DataFrame:
         """Convert to `pd.DataFrame`.
 
         By default, shows all direct fields, except `updated_at`.
 
-        Use parameter `include` to include other fields.
+        Use arguments `include` or `feature` to include other data.
 
         Args:
             include: Related fields to include as columns. Takes strings of
-                form `"labels__name"`, `"cell_types__name"`, etc. or a list
+                form `"ulabels__name"`, `"cell_types__name"`, etc. or a list
                 of such strings.
+            features: If `True`, map all features of the
+                :class:`~lamindb.Feature` registry onto the resulting
+                `DataFrame`. Only available for `Artifact`.
             limit: Maximum number of rows to display from a Pandas DataFrame.
                 Defaults to 100 to reduce database load.
 
         Examples:
-            >>> labels = [ln.ULabel(name="Label {i}") for i in range(3)]
-            >>> ln.save(labels)
-            >>> ln.ULabel.filter().df(include=["created_by__name"])
+
+            Include the name of the creator in the `DataFrame`:
+
+            >>> ln.ULabel.df(include="created_by__name"])
+
+            Include display of features for `Artifact`:
+
+            >>> df = ln.Artifact.df(features=True)
+            >>> ln.view(df)  # visualize with type annotations
+
+            Only include select features:
+
+            >>> df = ln.Artifact.df(features=["cell_type_by_expert", "cell_type_by_model"])
         """
         pass
 
