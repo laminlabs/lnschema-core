@@ -14,5 +14,5 @@ class QuerySet:
     pass
 
 
-class RecordsList:
+class RecordList:
     pass
