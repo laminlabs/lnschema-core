@@ -690,7 +690,6 @@ class Registry(ModelBase):
     def df(
         cls,
         include: str | list[str] | None = None,
-        join: str = "inner",
         limit: int = 100,
     ) -> pd.DataFrame:
         """Convert to `pd.DataFrame`.
@@ -703,7 +702,6 @@ class Registry(ModelBase):
             include: Related fields to include as columns. Takes strings of
                 form `"labels__name"`, `"cell_types__name"`, etc. or a list
                 of such strings.
-            join: The `join` parameter of `pandas`.
             limit: Maximum number of rows to display from a Pandas DataFrame.
                 Defaults to 100 to reduce database load.
 
