@@ -71,7 +71,7 @@ if TYPE_CHECKING:
         BackedAccessor,
         MappedCollection,
         QuerySet,
-        RecordsList,
+        RecordList,
     )
 
 
@@ -317,7 +317,7 @@ class CanCurate:
         organism: Record | str | None = None,
         source: Record | None = None,
         mute: bool = False,
-    ) -> list[Record]:
+    ) -> RecordList:
         """Bulk create validated records by parsing values for an identifier such as a name or an id).
 
         Args:
@@ -1664,7 +1664,7 @@ class Feature(Record, CanCurate, TracksRun, TracksUpdates):
         pass
 
     @classmethod
-    def from_df(cls, df: pd.DataFrame, field: FieldAttr | None = None) -> RecordsList:
+    def from_df(cls, df: pd.DataFrame, field: FieldAttr | None = None) -> RecordList:
         """Create Feature records for columns."""
         pass
 
