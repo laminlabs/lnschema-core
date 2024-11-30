@@ -131,8 +131,7 @@ class IsVersioned(models.Model):
     def versions(self) -> QuerySet:
         """Lists all records of the same version family.
 
-        >>> new_artifact = ln.Artifact(df2, revises=artifact)
-        >>> new_artifact.save()
+        >>> new_artifact = ln.Artifact(df2, revises=artifact).save()
         >>> new_artifact.versions()
         """
         db = self._state.db
@@ -691,27 +690,39 @@ class Registry(ModelBase):
     def df(
         cls,
         include: str | list[str] | None = None,
-        join: str = "inner",
+        features: bool | list[str] = False,
         limit: int = 100,
     ) -> pd.DataFrame:
         """Convert to `pd.DataFrame`.
 
         By default, shows all direct fields, except `updated_at`.
 
-        Use parameter `include` to include other fields.
+        Use arguments `include` or `feature` to include other data.
 
         Args:
             include: Related fields to include as columns. Takes strings of
-                form `"labels__name"`, `"cell_types__name"`, etc. or a list
+                form `"ulabels__name"`, `"cell_types__name"`, etc. or a list
                 of such strings.
-            join: The `join` parameter of `pandas`.
+            features: If `True`, map all features of the
+                :class:`~lamindb.Feature` registry onto the resulting
+                `DataFrame`. Only available for `Artifact`.
             limit: Maximum number of rows to display from a Pandas DataFrame.
                 Defaults to 100 to reduce database load.
 
         Examples:
-            >>> labels = [ln.ULabel(name="Label {i}") for i in range(3)]
-            >>> ln.save(labels)
-            >>> ln.ULabel.filter().df(include=["created_by__name"])
+
+            Include the name of the creator in the `DataFrame`:
+
+            >>> ln.ULabel.df(include="created_by__name"])
+
+            Include display of features for `Artifact`:
+
+            >>> df = ln.Artifact.df(features=True)
+            >>> ln.view(df)  # visualize with type annotations
+
+            Only include select features:
+
+            >>> df = ln.Artifact.df(features=["cell_type_by_expert", "cell_type_by_model"])
         """
         pass
 
@@ -1935,12 +1946,20 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
 
     Examples:
 
-        Create an artifact from a path to a file or folder:
+        Create an artifact from a file path and pass `description`:
 
         >>> artifact = ln.Artifact("s3://my_bucket/my_folder/my_file.csv", description="My file")
         >>> artifact = ln.Artifact("./my_local_file.jpg", description="My image")
+
+        You can also pass `key` to create a virtual filepath hierarchy:
+
+        >>> artifact = ln.Artifact("./my_local_file.jpg", key="example_datasets/dataset1.jpg")
+
+        What works for files also works for folders:
+
         >>> artifact = ln.Artifact("s3://my_bucket/my_folder", description="My folder")
         >>> artifact = ln.Artifact("./my_local_folder", description="My local folder")
+        >>> artifact = ln.Artifact("./my_local_folder", key="project1/my_target_folder")
 
         .. dropdown:: Why does the API look this way?
 
@@ -1966,9 +1985,13 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
 
         Make a new version of an artifact:
 
-        >>> artifact = ln.Artifact.from_df(df, description="My dataframe")
-        >>> artifact.save()
-        >>> artifact_v2 = ln.Artifact(df_updated, revises=artifact)
+        >>> artifact = ln.Artifact.from_df(df, key="example_datasets/dataset1.parquet").save()
+        >>> artifact_v2 = ln.Artifact(df_updated, key="example_datasets/dataset1.parquet").save()
+
+        Alternatively, if you don't want to provide a value for `key`, you can use `revises`:
+
+        >>> artifact = ln.Artifact.from_df(df, description="My dataframe").save()
+        >>> artifact_v2 = ln.Artifact(df_updated, revises=artifact).save()
 
     """
 
@@ -2051,13 +2074,24 @@ class Artifact(Record, IsVersioned, TracksRun, TracksUpdates):
     id: int = models.AutoField(primary_key=True)
     """Internal id, valid only in one DB instance."""
     uid: str = CharField(unique=True, db_index=True, max_length=_len_full_uid)
-    """A universal random id (20-char base62 ~ UUID), valid across DB instances."""
-    description: str | None = CharField(max_length=255, db_index=True, null=True)
-    """A description."""
+    """A universal random id."""
+    key: str | None = CharField(db_index=True, null=True)
+    """A (virtual) relative file path within the artifact's storage location.
+
+    Setting a `key` is useful to automatically group artifacts into a version family.
+
+    LaminDB defaults to a virtual file path to make renaming of data in object storage easy.
+
+    If you register existing files in a storage location, the `key` equals the
+    actual filepath on the underyling filesytem or object store.
+    """
+    description: str | None = CharField(db_index=True, null=True)
+    """A description.
+
+    LaminDB doesn't require you to pass a key, you can
+    """
     storage: Storage = ForeignKey(Storage, PROTECT, related_name="artifacts")
     """Storage location, e.g. an S3 or GCP bucket or a local directory."""
-    key: str | None = CharField(max_length=255, db_index=True, null=True)
-    """Storage key, the relative path within the storage location."""
     suffix: str = CharField(max_length=30, db_index=True)
     # Initially, we thought about having this be nullable to indicate folders
     # But, for instance, .zarr is stored in a folder that ends with a .zarr suffix

@@ -38,8 +38,8 @@ def test_registry__repr__artifact(setup_instance):
     Artifact
       Simple fields
         .uid: CharField
-        .description: CharField
         .key: CharField
+        .description: CharField
         .suffix: CharField
         .type: CharField
         .size: BigIntegerField
