@@ -1767,7 +1767,7 @@ class FeatureSet(Record, TracksRun):
 
         Create a featureset from features:
 
-        >>> features = [ln.Feature(name=feat, dtype="float") for feat in ["feat1", "feat2"]]
+        >>> features = [ln.Feature(name=feat, dtype="float").save() for feat in ["feat1", "feat2"]]
         >>> feature_set = ln.FeatureSet(features)
 
         Create a featureset from feature values:
@@ -1868,7 +1868,7 @@ class FeatureSet(Record, TracksRun):
 
         Examples:
 
-            >>> features = ["feat1", "feat2"]
+            >>> features = [ln.Feature(name=feat, dtype="str").save() for feat in ["feat11", "feat21"]]
             >>> feature_set = ln.FeatureSet.from_values(features)
 
             >>> genes = ["ENSG00000139618", "ENSG00000198786"]
