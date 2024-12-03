@@ -1739,14 +1739,14 @@ class FeatureSet(Record, TracksRun):
             :meth:`~lamindb.FeatureSet.from_values` or
             :meth:`~lamindb.FeatureSet.from_df`.
         dtype: `str | None = None` The simple type. Defaults to
-            `None` for sets of :class:`~lamindb.Feature` records. nd otherwise
-            defaults to `"num"` (e.g., for sets of :class:`~bionty.Gene`).
+            `None` for sets of :class:`~lamindb.Feature` records.
+            Otherwise defaults to `"num"` (e.g., for sets of :class:`~bionty.Gene`).
         name: `str | None = None` A name.
 
     Note:
 
-        A feature set can be identified by the `hash` its feature uids. It's
-        stored in the `.hash` field.
+        A feature set can be identified by the `hash` its feature uids.
+        It's stored in the `.hash` field.
 
         A `slot` provides a string key to access feature sets.
         It's typically the accessor within the registered data object, here `pd.DataFrame.columns`.
@@ -1767,13 +1767,13 @@ class FeatureSet(Record, TracksRun):
 
         Create a featureset from features:
 
-        >>> features = ln.Feature.from_values(["feat1", "feat2"], type=float)
+        >>> features = [ln.Feature(name=feat, dtype="float") for feat in ["feat1", "feat2"]]
         >>> feature_set = ln.FeatureSet(features)
 
         Create a featureset from feature values:
 
         >>> import bionty as bt
-        >>> feature_set = ln.FeatureSet.from_values(adata.var["ensemble_id"], Gene.ensembl_gene_id, orgaism="mouse")
+        >>> feature_set = ln.FeatureSet.from_values(adata.var["ensemble_id"], Gene.ensembl_gene_id, organism="mouse")
         >>> feature_set.save()
 
         Link a feature set to an artifact:
@@ -1855,8 +1855,8 @@ class FeatureSet(Record, TracksRun):
         Args:
             values: A list of values, like feature names or ids.
             field: The field of a reference registry to map values.
-            type: The simple type. Defaults to
-                `None` if reference registry is :class:`~lamindb.Feature`,
+            type: The simple type.
+                Defaults to `None` if reference registry is :class:`~lamindb.Feature`,
                 defaults to `"float"` otherwise.
             name: A name.
             organism: An organism to resolve gene mapping.
@@ -1871,8 +1871,8 @@ class FeatureSet(Record, TracksRun):
             >>> features = ["feat1", "feat2"]
             >>> feature_set = ln.FeatureSet.from_values(features)
 
-            >>> genes = ["ENS980983409", "ENS980983410"]
-            >>> feature_set = ln.FeatureSet.from_values(features, bt.Gene.ensembl_gene_id, float)
+            >>> genes = ["ENSG00000139618", "ENSG00000198786"]
+            >>> feature_set = ln.FeatureSet.from_values(features, bt.Gene.ensembl_gene_id, "float")
         """
         pass
 
