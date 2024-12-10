@@ -1487,7 +1487,7 @@ class ULabel(Record, HasParents, CanCurate, TracksRun, TracksUpdates):
     uid: str = CharField(unique=True, db_index=True, max_length=8, default=base62_8)
     """A universal random id, valid across DB instances."""
     name: str = CharField(max_length=150, db_index=True, unique=True)
-    """Name or title of ulabel (required)."""
+    """Name or title of ulabel (`unique=True`)."""
     description: str | None = TextField(null=True)
     """A description (optional)."""
     reference: str | None = CharField(max_length=255, db_index=True, null=True)
@@ -1625,7 +1625,7 @@ class Feature(Record, CanCurate, TracksRun, TracksUpdates):
     uid: str = CharField(unique=True, db_index=True, max_length=12, default=base62_12)
     """Universal id, valid across DB instances."""
     name: str = CharField(max_length=150, db_index=True, unique=True)
-    """Name of feature (required)."""
+    """Name of feature (`unique=True`)."""
     dtype: FeatureDtype = CharField(max_length=64, db_index=True)
     """Data type (:class:`~lamindb.core.types.FeatureDtype`).
 
